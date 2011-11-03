@@ -57,8 +57,7 @@
       after a command was finished?
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="help"/>
 <node CREATED="1319706905706" ID="ID_619575623" MODIFIED="1319706957850" TEXT="This will enable player analysis again">
 <arrowlink DESTINATION="ID_264083774" ENDARROW="Default" ENDINCLINATION="283;-180;" ID="Arrow_ID_479356601" STARTARROW="None" STARTINCLINATION="22;363;"/>
@@ -97,8 +96,7 @@
       Instead the command will time-out if nothing is done.
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 </node>
 </node>
 <node CREATED="1317411582490" ID="ID_1948409082" MODIFIED="1319706648743" TEXT="Initiative" VGAP="38">
@@ -177,8 +175,7 @@
       at the same time as we defend the player?
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="help"/>
 </node>
 <node CREATED="1319705993878" ID="ID_1865097336" MODIFIED="1319706324210">
@@ -194,8 +191,7 @@
       should we always obey the command?
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="help"/>
 <node CREATED="1319706082812" ID="ID_134436642" MODIFIED="1319706169218">
 <richcontent TYPE="NODE"><html>
@@ -216,8 +212,7 @@
       the map). How much initiative?
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="idea"/>
 </node>
 <node CREATED="1319706172230" ID="ID_1513371403" MODIFIED="1319706268953" TEXT="Yes if the AI has less initiative">
@@ -227,7 +222,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#000000" CREATED="1317404597672" FOLDED="true" ID="ID_765469986" MODIFIED="1319716724756" POSITION="left" VGAP="25">
+<node COLOR="#000000" CREATED="1317404597672" ID="ID_765469986" MODIFIED="1320086538685" POSITION="left" VGAP="25">
 <richcontent TYPE="NODE"><html>
   <head>
     
@@ -366,27 +361,30 @@
       Tags: article, fps, player behavior
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="pencil"/>
 </node>
 </node>
 <node CREATED="1319721208656" ID="ID_150573860" MODIFIED="1319721209846" TEXT="RTS">
-<node CREATED="1319721210797" ID="ID_1885194669" MODIFIED="1319721235550" TEXT="Player Adaptive Cooperative Artificial Intelligence for RTS Games">
+<node CREATED="1319721210797" ID="ID_1885194669" MODIFIED="1320139944681" TEXT="Player Adaptive Cooperative Artificial Intelligence for RTS Games">
 <icon BUILTIN="group"/>
+<icon BUILTIN="yes"/>
 </node>
 </node>
-<node CREATED="1319721860683" ID="ID_1567055676" MODIFIED="1319723120580" TEXT="Real-time team-mate AI in Games">
+<node CREATED="1319721860683" ID="ID_1567055676" MODIFIED="1320139944680" TEXT="Real-time team-mate AI in Games">
 <icon BUILTIN="edit"/>
+<icon BUILTIN="yes"/>
 </node>
-<node CREATED="1319723006777" ID="ID_365699139" MODIFIED="1319723020822" TEXT="Personality-based Adaption for Teamwork in Game Agents">
+<node CREATED="1319723006777" ID="ID_365699139" MODIFIED="1320139944680" TEXT="Personality-based Adaption for Teamwork in Game Agents">
 <icon BUILTIN="edit"/>
+<icon BUILTIN="yes"/>
 </node>
 </node>
 <node CREATED="1319720921245" ID="ID_234333388" MODIFIED="1319720923447" TEXT="Communication">
 <node CREATED="1319720944641" ID="ID_1106915023" MODIFIED="1319720946227" TEXT="FPS">
-<node CREATED="1319720675698" ID="ID_1335171590" MODIFIED="1319720712813" TEXT="Human, all too non-Human: Coop AI and the Conversation of Action">
+<node CREATED="1319720675698" ID="ID_1335171590" MODIFIED="1320139944680" TEXT="Human, all too non-Human: Coop AI and the Conversation of Action">
 <icon BUILTIN="edit"/>
+<icon BUILTIN="yes"/>
 </node>
 </node>
 <node CREATED="1319721268342" FOLDED="true" ID="ID_1221689759" MODIFIED="1319721805494" TEXT="The Design of Future Things">
@@ -404,8 +402,7 @@
       (Don't keep the user in the dark)
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 </node>
 <node CREATED="1319721642104" ID="ID_491163781" MODIFIED="1319721650766" TEXT="Design Rules p.193"/>
 </node>
@@ -421,12 +418,12 @@
       AI Game Programming Wisdom 2: 10.1
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <icon BUILTIN="pencil"/>
 </node>
-<node CREATED="1319721068919" ID="ID_1557383836" MODIFIED="1319721079693" TEXT="AI for Dynamic Team-mate Adaption in Games">
+<node CREATED="1319721068919" ID="ID_1557383836" MODIFIED="1320139944679" TEXT="AI for Dynamic Team-mate Adaption in Games">
 <icon BUILTIN="edit"/>
+<icon BUILTIN="yes"/>
 </node>
 </node>
 <node CREATED="1319721920925" ID="ID_277078248" MODIFIED="1319721927279" TEXT="Design"/>
