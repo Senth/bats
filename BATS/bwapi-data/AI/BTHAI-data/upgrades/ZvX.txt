@@ -1,0 +1,13 @@
+Lurker_Aspect:1
+Antennae:2
+Pneumatized_Carapace:2
+Zerg_Carapace:3
+Zerg_Carapace:3
+Zerg_Carapace:3
+Zerg_Missile_Attacks:2
+Zerg_Missile_Attacks:2
+Zerg_Missile_Attacks:2
+Zerg_Flyer_Attacks:2
+Zerg_Flyer_Attacks:2
+Zerg_Flyer_Attacks:2
+Consume:3
