@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2E63AE74-758A-4607-9DE4-D28E814A6E13}</ProjectGuid>
+    <RootNamespace>BTHAIModule</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>mpfr-vc90-mt.lib;gmp-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;BWAPI.lib;BWTA.lib;tinyxmld.lib;CGAL-vc90-mt-gd.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-gd-1_40.lib;gmp-vc90-mt-gd.lib;mpfr-vc90-mt-gd.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>../../../BWAPI/lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>BWAPI.lib;BWTA.lib;tinyxml.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;gmp-vc90-mt.lib;mpfr-vc90-mt.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>../../../BWAPI/lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\AIloop.cpp" />
+    <ClCompile Include="Source\BTHAIModule.cpp" />
+    <ClCompile Include="Source\Dll.cpp" />
+    <ClCompile Include="Source\PFFunctions.cpp" />
+    <ClCompile Include="Source\PFManager.cpp" />
+    <ClCompile Include="Source\RefineryAgent.cpp" />
+    <ClCompile Include="Source\StructureAgent.cpp" />
+    <ClCompile Include="Source\CommandCenterAgent.cpp" />
+    <ClCompile Include="Source\ComsatAgent.cpp" />
+    <ClCompile Include="Source\NexusAgent.cpp" />
+    <ClCompile Include="Source\HatcheryAgent.cpp" />
+    <ClCompile Include="Source\TransportAgent.cpp" />
+    <ClCompile Include="Source\UnitAgent.cpp" />
+    <ClCompile Include="Source\BattlecruiserAgent.cpp" />
+    <ClCompile Include="Source\FirebatAgent.cpp" />
+    <ClCompile Include="Source\GhostAgent.cpp" />
+    <ClCompile Include="Source\GoliathAgent.cpp" />
+    <ClCompile Include="Source\MarineAgent.cpp" />
+    <ClCompile Include="Source\MedicAgent.cpp" />
+    <ClCompile Include="Source\ScienceVesselAgent.cpp" />
+    <ClCompile Include="Source\SiegeTankAgent.cpp" />
+    <ClCompile Include="Source\ValkyrieAgent.cpp" />
+    <ClCompile Include="Source\VultureAgent.cpp" />
+    <ClCompile Include="Source\WraithAgent.cpp" />
+    <ClCompile Include="Source\ArbiterAgent.cpp" />
+    <ClCompile Include="Source\CarrierAgent.cpp" />
+    <ClCompile Include="Source\CorsairAgent.cpp" />
+    <ClCompile Include="Source\DarkTemplarAgent.cpp" />
+    <ClCompile Include="Source\DragoonAgent.cpp" />
+    <ClCompile Include="Source\HighTemplarAgent.cpp" />
+    <ClCompile Include="Source\ObserverAgent.cpp" />
+    <ClCompile Include="Source\ReaverAgent.cpp" />
+    <ClCompile Include="Source\ScoutAgent.cpp" />
+    <ClCompile Include="Source\ZealotAgent.cpp" />
+    <ClCompile Include="Source\DefilerAgent.cpp" />
+    <ClCompile Include="Source\DevourerAgent.cpp" />
+    <ClCompile Include="Source\GuardianAgent.cpp" />
+    <ClCompile Include="Source\HydraliskAgent.cpp" />
+    <ClCompile Include="Source\InfestedTerranAgent.cpp" />
+    <ClCompile Include="Source\LurkerAgent.cpp" />
+    <ClCompile Include="Source\MutaliskAgent.cpp" />
+    <ClCompile Include="Source\OverlordAgent.cpp" />
+    <ClCompile Include="Source\QueenAgent.cpp" />
+    <ClCompile Include="Source\ScourgeAgent.cpp" />
+    <ClCompile Include="Source\UltraliskAgent.cpp" />
+    <ClCompile Include="Source\ZerglingAgent.cpp" />
+    <ClCompile Include="Source\AgentFactory.cpp" />
+    <ClCompile Include="Source\BaseAgent.cpp" />
+    <ClCompile Include="Source\TargetingAgent.cpp" />
+    <ClCompile Include="Source\WorkerAgent.cpp" />
+    <ClCompile Include="Source\AgentManager.cpp" />
+    <ClCompile Include="Source\BuildOrderFileReader.cpp" />
+    <ClCompile Include="Source\BuildPlanner.cpp" />
+    <ClCompile Include="Source\CoverMap.cpp" />
+    <ClCompile Include="Source\ExplorationManager.cpp" />
+    <ClCompile Include="Source\MapDataReader.cpp" />
+    <ClCompile Include="Source\ResourceManager.cpp" />
+    <ClCompile Include="Source\SpottedObject.cpp" />
+    <ClCompile Include="Source\UpgradesFileReader.cpp" />
+    <ClCompile Include="Source\UpgradesPlanner.cpp" />
+    <ClCompile Include="Source\ChokeHarassSquad.cpp" />
+    <ClCompile Include="Source\Commander.cpp" />
+    <ClCompile Include="Source\ExplorationSquad.cpp" />
+    <ClCompile Include="Source\KiteSquad.cpp" />
+    <ClCompile Include="Source\RushSquad.cpp" />
+    <ClCompile Include="Source\Squad.cpp" />
+    <ClCompile Include="Source\SquadFileReader.cpp" />
+    <ClCompile Include="Source\UnitSetup.cpp" />
+    <ClCompile Include="Source\Statistics.cpp" />
+    <ClCompile Include="Source\Config.cpp" />
+    <ClCompile Include="Source\cthread.cpp" />
+    <ClCompile Include="Source\FileReaderUtils.cpp" />
+    <ClCompile Include="Source\Pathfinder.cpp" />
+    <ClCompile Include="Source\PathObj.cpp" />
+    <ClCompile Include="Source\Profiler.cpp" />
+    <ClCompile Include="Source\ProfilerObj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\AIloop.h" />
+    <ClInclude Include="Source\BTHAIModule.h" />
+    <ClInclude Include="Source\BWTAExtern.h" />
+    <ClInclude Include="Source\RefineryAgent.h" />
+    <ClInclude Include="Source\StructureAgent.h" />
+    <ClInclude Include="Source\CommandCenterAgent.h" />
+    <ClInclude Include="Source\ComsatAgent.h" />
+    <ClInclude Include="Source\NexusAgent.h" />
+    <ClInclude Include="Source\HatcheryAgent.h" />
+    <ClInclude Include="Source\TransportAgent.h" />
+    <ClInclude Include="Source\UnitAgent.h" />
+    <ClInclude Include="Source\BattlecruiserAgent.h" />
+    <ClInclude Include="Source\DropshipAgent.h" />
+    <ClInclude Include="Source\FirebatAgent.h" />
+    <ClInclude Include="Source\GhostAgent.h" />
+    <ClInclude Include="Source\GoliathAgent.h" />
+    <ClInclude Include="Source\MarineAgent.h" />
+    <ClInclude Include="Source\MedicAgent.h" />
+    <ClInclude Include="Source\ScienceVesselAgent.h" />
+    <ClInclude Include="Source\SiegeTankAgent.h" />
+    <ClInclude Include="Source\ValkyrieAgent.h" />
+    <ClInclude Include="Source\VultureAgent.h" />
+    <ClInclude Include="Source\WraithAgent.h" />
+    <ClInclude Include="Source\ArbiterAgent.h" />
+    <ClInclude Include="Source\CarrierAgent.h" />
+    <ClInclude Include="Source\CorsairAgent.h" />
+    <ClInclude Include="Source\DarkTemplarAgent.h" />
+    <ClInclude Include="Source\DragoonAgent.h" />
+    <ClInclude Include="Source\HighTemplarAgent.h" />
+    <ClInclude Include="Source\ObserverAgent.h" />
+    <ClInclude Include="Source\ReaverAgent.h" />
+    <ClInclude Include="Source\ScoutAgent.h" />
+    <ClInclude Include="Source\ShuttleAgent.h" />
+    <ClInclude Include="Source\ZealotAgent.h" />
+    <ClInclude Include="Source\DefilerAgent.h" />
+    <ClInclude Include="Source\DevourerAgent.h" />
+    <ClInclude Include="Source\GuardianAgent.h" />
+    <ClInclude Include="Source\HydraliskAgent.h" />
+    <ClInclude Include="Source\InfestedTerranAgent.h" />
+    <ClInclude Include="Source\LurkerAgent.h" />
+    <ClInclude Include="Source\MutaliskAgent.h" />
+    <ClInclude Include="Source\OverlordAgent.h" />
+    <ClInclude Include="Source\QueenAgent.h" />
+    <ClInclude Include="Source\ScourgeAgent.h" />
+    <ClInclude Include="Source\UltraliskAgent.h" />
+    <ClInclude Include="Source\ZerglingAgent.h" />
+    <ClInclude Include="Source\PFFunctions.h" />
+    <ClInclude Include="Source\PFManager.h" />
+    <ClInclude Include="Source\AgentFactory.h" />
+    <ClInclude Include="Source\BaseAgent.h" />
+    <ClInclude Include="Source\TargetingAgent.h" />
+    <ClInclude Include="Source\WorkerAgent.h" />
+    <ClInclude Include="Source\AgentManager.h" />
+    <ClInclude Include="Source\BuildOrderFileReader.h" />
+    <ClInclude Include="Source\BuildPlanner.h" />
+    <ClInclude Include="Source\CoverMap.h" />
+    <ClInclude Include="Source\ExplorationManager.h" />
+    <ClInclude Include="Source\MapDataReader.h" />
+    <ClInclude Include="Source\ResourceManager.h" />
+    <ClInclude Include="Source\SpottedObject.h" />
+    <ClInclude Include="Source\UpgradesFileReader.h" />
+    <ClInclude Include="Source\UpgradesPlanner.h" />
+    <ClInclude Include="Source\ChokeHarassSquad.h" />
+    <ClInclude Include="Source\Commander.h" />
+    <ClInclude Include="Source\ExplorationSquad.h" />
+    <ClInclude Include="Source\KiteSquad.h" />
+    <ClInclude Include="Source\RushSquad.h" />
+    <ClInclude Include="Source\Squad.h" />
+    <ClInclude Include="Source\SquadFileReader.h" />
+    <ClInclude Include="Source\UnitSetup.h" />
+    <ClInclude Include="source\Statistics.h" />
+    <ClInclude Include="Source\Config.h" />
+    <ClInclude Include="Source\cthread.h" />
+    <ClInclude Include="Source\FileReaderUtils.h" />
+    <ClInclude Include="Source\Pathfinder.h" />
+    <ClInclude Include="Source\PathObj.h" />
+    <ClInclude Include="Source\Profiler.h" />
+    <ClInclude Include="Source\ProfilerObj.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
