@@ -1,0 +1,97 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{appendix}
+\usepackage[utf8x]{inputenc}
+\usepackage[Lenny]{fncychap}
+\usepackage[numbers]{natbib}
+\usepackage{a4wide}
+\usepackage{paralist}
+\usepackage{BTH_title}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[all]{xy}
+\usepackage[bookmarks=true,%
+bookmarksopen=true,%
+bookmarksopenlevel=0,%
+bookmarksnumbered=true,%
+colorlinks,%
+linkcolor={black},%
+citecolor={black},%
+urlcolor={black},%
+pdfstartview={FitV},%
+unicode,%
+breaklinks=true,%
+plainpages=false,%
+%TODO set title
+pdftitle={...},%
+%TODO add more authors
+pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
+
+%\def\tm{\leavevmode\hbox{$\rm {}^{TM}$}} % UNCOMMENT for ™ support
+
+% TODO add more authors
+\author{
+	\textbf{Matteus Magnusson}\\
+	19880314-2473\\
+	Blekinge Institute of Technology\\
+	Karlskrona, Sweden\\
+	\href{mailto:senth.wallace@gmail.com}{senth.wallace@gmail.com}\\[0.2cm]
+	\textbf{Suresh Balsasubramaniyan}\\
+	19880512-7571\\
+	Blekinge Institute of Technology\\
+	Karlskrona, Sweden\\
+	\href{mailto:suresh.draco@gmail.com}{suresh.draco@gmail.com}
+}
+\supervisor{
+	\textbf{Johan Hagelbäck}\\
+	Blekinge Institute of Technology\\
+	Karlskrona, Sweden\\
+	\href{mailto:johan.hagelback@bth.se}{johan.hagelback@bth.se}
+}
+% TODO set title
+\title{Thesis Proposal: }
+\date{\today}
+\course{DV2512 — Master's Thesis in Computer Science}
+\logoPath{BTH_RGB_logo}
+
+\DeclareGraphicsExtensions{.png,.pdf}
+\graphicspath{{figures/}}
+
+\begin{document}
+\pagenumbering{roman}
+
+\makeBthTitle
+\newpage
+
+
+\pagenumbering{arabic}
+
+% -----------------------
+% TODO Chapters
+% -----------------------
+\input{chapters/abstract}
+\input{chapters/introduction}
+\input{chapters/background}
+\input{chapters/challenge}
+\input{chapters/approach}
+\input{chapters/goals}
+\input{chapters/risks}
+\input{chapters/timeplan}
+
+% -----------------------
+% TODO Appendices
+% -----------------------
+%\begin{appendices}
+	%\input{...}
+%\end{appendices}
+
+% -----------------------
+% TODO Bibliography
+% -----------------------
+%\clearpage
+%\phantomsection
+%\addcontentsline{toc}{section}{References}
+\bibliographystyle{plainnat}
+\bibliography{bibliography}
+
+\end{document}

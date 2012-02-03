@@ -1,0 +1,46 @@
+\ProvidesPackage{BTH_title}
+
+\newcommand*{\course}[1]{\def\courseName{#1}}
+\newcommand*{\logoPath}[1]{\def\logoName{#1}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\newcommand{\supervisor}[1]{\def\supervisorName{#1}}
+
+\newcommand{\makeBthTitle} {\begin{titlepage}
+	\begin{center}
+		% Upper part of the page
+		\includegraphics[width=0.35\textwidth]{\logoName}\\[1cm]
+		\textsc{\LARGE Blekinge Tekniska H\"ogskola}\\[1.5cm]
+		\textsc{\Large \courseName}\\[0.5cm]
+
+		% Title
+		\HRule \\[0.4cm]
+		{\huge \bfseries \@title}\\[0.4cm]
+		\HRule \\[1.5cm]
+
+	%\end{center}
+
+		% Authors		
+		\begin{minipage}[t]{0.45\textwidth}
+			\textit{Authors}\\[0.2cm]
+			\@author
+		\end{minipage}
+		\begin{minipage}[t]{0.45\textwidth}
+		% Supervisor
+		\begin{flushright}
+			\textit{Supervisor}\\[0.2cm]
+			\supervisorName
+			\vfill
+		\end{flushright}
+		\end{minipage}
+
+		
+
+		\vfill
+
+	%\begin{center}
+		% Bottom of the page
+		{\large \@date}
+	\end{center}
+  \end{titlepage}
+}

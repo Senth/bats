@@ -1,13 +1,13 @@
 <map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
-<node COLOR="#111111" CREATED="1317404294590" ID="ID_1025087291" MODIFIED="1319716495692" STYLE="bubble" TEXT="StarCraft AI" VGAP="65">
+<node COLOR="#111111" CREATED="1317404294590" ID="ID_1025087291" MODIFIED="1328172266575" STYLE="bubble" TEXT="StarCraft AI" VGAP="65">
 <edge COLOR="#111111" WIDTH="thin"/>
 <font BOLD="true" NAME="SansSerif" SIZE="18"/>
 <node CREATED="1317404580265" ID="ID_546022262" MODIFIED="1319716712628" POSITION="right" TEXT="What should it do?" VGAP="54">
 <font BOLD="true" NAME="SansSerif" SIZE="16"/>
 <node CREATED="1317411757954" ID="ID_1162545605" MODIFIED="1319622515649" TEXT="Communication" VGAP="15">
 <font NAME="SansSerif" SIZE="14"/>
-<node CREATED="1317411766810" ID="ID_1689435221" MODIFIED="1319707789355" TEXT="Communicate it&apos;s intentions to the player">
+<node CREATED="1317411766810" ID="ID_1689435221" MODIFIED="1328172092093" TEXT="Communicate it&apos;s intentions to the player">
 <font NAME="SansSerif" SIZE="12"/>
 <node CREATED="1317411808954" ID="ID_1100775062" MODIFIED="1319622475793" TEXT="What it is building and why"/>
 <node CREATED="1317411823938" ID="ID_1236110767" MODIFIED="1319622475793" TEXT="Why it is counter-attacking instead of helping the player, etc."/>
@@ -27,7 +27,9 @@
 </node>
 <node CREATED="1317412166466" ID="ID_14132702" MODIFIED="1319707785086" TEXT="Strategy">
 <font NAME="SansSerif" SIZE="12"/>
-<node CREATED="1317412395810" ID="ID_707297363" MODIFIED="1319622475804" TEXT="Main focus on units" VGAP="19">
+<node CREATED="1317412395810" FOLDED="true" ID="ID_707297363" MODIFIED="1328172269563" TEXT="Main focus on units" VGAP="19">
+<edge COLOR="#cccccc"/>
+<icon BUILTIN="closed"/>
 <node CREATED="1317412415418" ID="ID_1074589831" MODIFIED="1319622475804" TEXT="Abstract">
 <node CREATED="1317412418282" ID="ID_428451467" MODIFIED="1319622475804" TEXT="Air"/>
 <node CREATED="1317412468986" ID="ID_985883202" MODIFIED="1319622475804" TEXT="Ground"/>
@@ -39,6 +41,13 @@
 <node CREATED="1317412489322" ID="ID_209086169" MODIFIED="1319622475803" TEXT="Marines"/>
 <node CREATED="1317412491546" ID="ID_1681240823" MODIFIED="1319622475803" TEXT="etc."/>
 </node>
+</node>
+</node>
+<node CREATED="1328171404586" ID="ID_1660074898" MODIFIED="1328171408183" TEXT="Tacticts">
+<node CREATED="1328171413620" ID="ID_1280842328" MODIFIED="1328171416960" TEXT="Behavior">
+<node CREATED="1328171420277" ID="ID_926292358" MODIFIED="1328171423015" TEXT="Aggressive"/>
+<node CREATED="1328171426087" ID="ID_596481578" MODIFIED="1328171430596" TEXT="In between"/>
+<node CREATED="1328171423606" ID="ID_1169202581" MODIFIED="1328171425407" TEXT="Defensive"/>
 </node>
 </node>
 <node CREATED="1319706707644" ID="ID_1498765382" MODIFIED="1319706726122" TEXT="Should the action time-out?">
@@ -59,8 +68,34 @@
   </body>
 </html></richcontent>
 <icon BUILTIN="help"/>
-<node CREATED="1319706905706" ID="ID_619575623" MODIFIED="1319706957850" TEXT="This will enable player analysis again">
-<arrowlink DESTINATION="ID_264083774" ENDARROW="Default" ENDINCLINATION="283;-180;" ID="Arrow_ID_479356601" STARTARROW="None" STARTINCLINATION="22;363;"/>
+<node CREATED="1319706905706" ID="ID_619575623" MODIFIED="1328171879978" TEXT="This will enable player analysis again">
+<arrowlink DESTINATION="ID_264083774" ENDARROW="Default" ENDINCLINATION="292;-150;" ID="Arrow_ID_479356601" STARTARROW="None" STARTINCLINATION="10;443;"/>
+</node>
+</node>
+<node CREATED="1328171696178" FOLDED="true" ID="ID_1534128445" MODIFIED="1328171864826">
+<richcontent TYPE="NODE"><html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      Abort the player action if it won't succeed.
+    </p>
+  </body>
+</html>
+</richcontent>
+<node CREATED="1328171798529" ID="ID_976360406" MODIFIED="1328171862982">
+<richcontent TYPE="NODE"><html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      E.g. Player orders attack on enemy base.<br />The enemy base is very well defended,<br />instead of loosing the whole army and<br />the enemy nothing, a retreat action will<br />be taken.
+    </p>
+  </body>
+</html>
+</richcontent>
 </node>
 </node>
 </node>
@@ -75,9 +110,12 @@
 <node CREATED="1319621167580" ID="ID_1710106960" MODIFIED="1319630188282" TEXT="Can be done that so that it creates units and&#xa;develops technology in roughly the same pase&#xa;as the player">
 <icon BUILTIN="idea"/>
 </node>
+<node CREATED="1328171492372" ID="ID_1588687565" MODIFIED="1328171600610" TEXT="Maybe the amount of workers should be the&#xa;same as the player, then the income would&#xa;be roughly the same.">
+<icon BUILTIN="idea"/>
 </node>
 </node>
-<node CREATED="1319630055358" ID="ID_264083774" MODIFIED="1319706957850" TEXT="Player and enemy analysis">
+</node>
+<node CREATED="1319630055358" ID="ID_264083774" MODIFIED="1328171879978" TEXT="Player and enemy analysis">
 <arrowlink DESTINATION="ID_1948409082" ENDARROW="Default" ENDINCLINATION="14;-27;" ID="Arrow_ID_1814469343" STARTARROW="None" STARTINCLINATION="-11;22;"/>
 <font NAME="SansSerif" SIZE="14"/>
 <node CREATED="1319630067257" ID="ID_233677184" MODIFIED="1319630082378" TEXT="How to read the player&apos;s behaviors?">
@@ -115,7 +153,7 @@
 </node>
 <node CREATED="1317411690402" ID="ID_1093672673" MODIFIED="1319706213379" TEXT="Medium">
 <node CREATED="1317411954474" ID="ID_235954418" MODIFIED="1319622475796" TEXT="Comes with less suggestions."/>
-<node CREATED="1317412704242" ID="ID_114992750" MODIFIED="1319622475796" TEXT="Can attack some time"/>
+<node CREATED="1317412704242" ID="ID_114992750" MODIFIED="1328171955015" TEXT="In general does less things"/>
 <node CREATED="1317412713298" ID="ID_30029357" MODIFIED="1319622475796" TEXT="Goes around scouting"/>
 <node CREATED="1317414921451" ID="ID_1714267300" MODIFIED="1319622475796" TEXT="When the player moves out to attack it also moves out and groups with the player"/>
 </node>
