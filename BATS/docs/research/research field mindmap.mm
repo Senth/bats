@@ -136,8 +136,7 @@
       Build groups instead of an order
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <node CREATED="1328781326435" ID="ID_1090106624" MODIFIED="1328781332389" TEXT="Early game"/>
 <node CREATED="1328781333140" ID="ID_873080167" MODIFIED="1328781334984" TEXT="Mid-game"/>
 <node CREATED="1328781335384" ID="ID_1225263967" MODIFIED="1328781337574" TEXT="Late-game"/>
@@ -197,8 +196,7 @@
       Both for player and bot commands.
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <node CREATED="1328171798529" ID="ID_976360406" MODIFIED="1328171862982">
 <richcontent TYPE="NODE"><html>
   <head>
@@ -308,9 +306,6 @@
 <node CREATED="1328781845850" ID="ID_1846324246" MODIFIED="1328781847764" TEXT="Scope">
 <node CREATED="1328781849048" ID="ID_1145076343" MODIFIED="1328781861977" TEXT="One bot race"/>
 <node CREATED="1328781862467" ID="ID_482041294" MODIFIED="1328781870570" TEXT="One enemy race (but two bots)"/>
-<node CREATED="1328781876184" ID="ID_725993310" MODIFIED="1328781877867" TEXT="One map">
-<node CREATED="1328781878589" ID="ID_514189006" MODIFIED="1328781894251" TEXT="Use one of the official Brood War tournament maps"/>
-</node>
 <node CREATED="1328781925014" ID="ID_429308402" MODIFIED="1328781935151" TEXT="Works with any player race"/>
 </node>
 </node>
