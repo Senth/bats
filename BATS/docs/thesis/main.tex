@@ -1,0 +1,151 @@
+%
+% According to
+% http://www.bth.se/tek/asb.nsf/sidor/31b58e62056523f7c12571a20027d9d3!OpenDocument
+%
+\documentclass[a4paper,oneside]{bthcsdiss}
+%If you use Latex2.09 instead of Latex2e, comment the \documentclass line
+%and uncomment one of the following lines (depending on whether you
+%also want to use MakeIndex)
+
+%\documentstyle[12pt,epsf]{illc_diss}
+%\documentstyle[12pt,makeidx,epsf]{illc_diss}
+
+%If you want to use MakeIndex, uncomment these lines
+%\usepackage{makeidx}     % only with Latex2e
+%\makeindex
+
+\usepackage[utf8x]{inputenc}
+\usepackage{tabularx}
+\usepackage{natbib} % for funky \cite options
+\usepackage{amsmath}
+\usepackage{mathenv}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{textcomp}
+%\usepackage{a4wide}
+\usepackage{longtable} %table spanning pages
+\usepackage{multirow}
+\usepackage{pifont}
+\usepackage{changepage}
+\usepackage[font=small,labelfont=it,bf]{caption} %for customizable figure and table captions
+
+\usepackage{fancyhdr}  % you can choose between 7 different types of heading, besides the default. for instance, try 
+%\usepackage[Lenny]{fncychap} 
+%\usepackage[Conny]{fncychap}
+%\usepackage[Sonny]{fncychap} 
+
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{xspace}
+\usepackage{xtab}
+% \usepackage{palatino} %for different font type
+% \usepackage[T1]{fontenc}
+%\usepackage[scaled]{uarial}% for the modern-look fonttype:
+%\renewcommand*\familydefault{\sfdefault}
+
+%\usepackage{soul, color} % this with the next one gives convenient colouring options for drafts, e.g. with a \hl{xxx}, the marking becomes ugly green.
+
+%\sethlcolor{green} 
+%\setul{2pt}{0.5pt} % use this if you want to change spacing of the underling
+
+\usepackage[neveradjust]{paralist} %this one is handy if you are short on space or want to have a listing with bulletes, starts etc. e.g. use \begin{compactenum} \item ... \end{comactenum}
+
+%\usepackage[top=3cm, bottom=2.8cm, left=2.7cm, right=2.7cm]{geometry} % to make nice page margins to squezze more or less text on a page
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\usepackage{graphicx}
+% declare the path(s) where your graphic files are
+\graphicspath{{figures/}}
+% and their extensions so you won't have to specify these with
+% every instance of \includegraphics
+\DeclareGraphicsExtensions{.pdf,.png}
+
+\usepackage[bookmarks=true,%
+bookmarksopen=true,%
+bookmarksopenlevel=0,%
+bookmarksnumbered=true,%
+colorlinks,%
+linkcolor={black},%
+citecolor={black},%
+urlcolor={black},%
+pdfstartview={FitV},%
+unicode,%
+breaklinks=true,%
+plainpages=false,%
+%TODO set title
+pdftitle={TITLE},%
+pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%and then my shortcuts
+
+% put your \newcommand etc here. For instance, the following formats are quite nice, but you also can take the default by commenting them:
+
+% \newtheorem{lem}{\textsc{Lemma}}[chapter]
+% \newtheorem{thm}{\textsc{Theorem}}[chapter]
+% \newtheorem{prop}{\textsc{Proposition}}[chapter]
+% \newtheorem{post}{Postulate}[chapter]
+% \newtheorem{corr}{\textsc{Corollary}}[chapter]
+% \newtheorem{defs}{\textsc{Definition}}[chapter]
+% \newtheorem{cons}{\textsc{Constraint}}[chapter]
+% \newtheorem{ex}{\textbf{Example}}[chapter]
+% \newtheorem{qu}{\textbf{Question}}[chapter]
+
+%\makeindex
+
+%\typeout{bth CS Dissertation Example File `guide.tex' <June 23, 2007>.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\pagenumbering{alph}
+
+\pagestyle{plain}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%  \include the `front matter'
+
+\input{chapters/fronts}
+\pagenumbering{roman}
+\input{chapters/abstract}
+%\include{acknowledgments} %OPTIONAL
+%\listoffigures %in case you have them
+%\listoftables %in case you have them
+%\listofalgorithms %in case you have them
+\tableofcontents 
+
+%%  now we can start with the real thing
+
+\cleardoublepage
+\pagestyle{headings}
+\pagenumbering{arabic}
+\input{chapters/introduction}
+%\input{conclusion}
+%\appendix
+
+%%  \include the `end matter'
+
+%
+% New style of Bibliography
+% http://amath.colorado.edu/documentation/LaTeX/reference/faq/bibstyles.html
+%
+%\bibliographystyle{plain}	% (uses file "IEEE.bst")
+%\bibliography{bibliography}	% expects file "thesis.bib"
+%
+%\input{glossary}
+%\input{index}
+%\input{guide_symbols}
+%\input{guide_curriculum}
+
+%%  finally, \include the list of previous bth-CS dissertations
+
+%\cleardoublepage % if you are so inclined
+%\include{bthcsdissertations} %PERSONALIZE that is: make sure you have the
+%latest list.
+%\include{guide_back1} % for a thesis with a back-flap summary
+%\include{guide_back} %or take this one for a fairly plain back cover
+ 
+\end{document}
