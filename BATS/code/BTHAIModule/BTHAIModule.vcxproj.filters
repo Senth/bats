@@ -365,9 +365,6 @@
     <ClInclude Include="Source\BattlecruiserAgent.h">
       <Filter>Header Files\UnitAgents\Terran</Filter>
     </ClInclude>
-    <ClInclude Include="Source\DropshipAgent.h">
-      <Filter>Header Files\UnitAgents\Terran</Filter>
-    </ClInclude>
     <ClInclude Include="Source\FirebatAgent.h">
       <Filter>Header Files\UnitAgents\Terran</Filter>
     </ClInclude>

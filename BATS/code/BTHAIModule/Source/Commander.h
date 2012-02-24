@@ -68,103 +68,103 @@ protected:
 
 public:
 	/** Destructor. */
-	~Commander();
+	virtual ~Commander();
 
 	/** Returns the instance of the class. */
 	static Commander* getInstance();
 
 	/** Called each update to issue orders. */
-	void computeActions();
+	virtual void computeActions();
 
 	/** Returns true if an attack against the enemy has been launched. */
-	bool isLaunchingAttack();
+	virtual bool isLaunchingAttack();
 
 	/** Used in debug modes to show goal of squads. */
 	virtual void debug_showGoal();
 
 	/** Checks if it is time to engage the enemy. This happens when all Required squads
 	 * are active. */
-	bool shallEngage();
+	virtual bool shallEngage();
 
-	void updateGoals();
+	virtual void updateGoals();
 
 	/** Called each time a unit is created. The unit is then
 	 * placed in a Squad. */
-	void unitCreated(BaseAgent* agent);
+	virtual void unitCreated(BaseAgent* agent);
 
 	/** Called each time a unit is destroyed. The unit is then
 	 * removed from its Squad. */
-	void unitDestroyed(BaseAgent* agent);
+	virtual void unitDestroyed(BaseAgent* agent);
 
 	/* Checks if the specified unittype needs to be built. */
-	bool needUnit(UnitType type);
+	virtual bool needUnit(UnitType type);
 
 	/** Returns the Squad with the specified id, or NULL if not found. */
-	Squad* getSquad(int id);
+	virtual Squad* getSquad(int id);
 
 	/** Returns all Squads. */
-	vector<Squad*> getSquads();
+	virtual vector<Squad*> getSquads();
 
 	/** Returns the position of the closest enemy building from the start position,
 	 * or TilePosition(-1,-1) if not found. */
-	TilePosition getClosestEnemyBuilding(TilePosition start);
+	virtual TilePosition getClosestEnemyBuilding(TilePosition start);
 	
 	/** Returns the number of active offensive squads within maxRange of 
 	 * the center position. */
-	int noOffensiveSquadsWithin(TilePosition center, int maxRange);
+	virtual int noOffensiveSquadsWithin(TilePosition center, int maxRange);
 
 	/** Checks if workers needs to attack. Happens if base is under attack and no offensive units
 	 * are available. */
-	bool checkWorkersAttack(BaseAgent* base);
+	virtual bool checkWorkersAttack(BaseAgent* base);
 
 	/** Tries to find a free squad to assist a building. */
-	void assistBuilding(BaseAgent* building);
+	virtual void assistBuilding(BaseAgent* building);
 
 	/** Tries to find a free squad to assist a worker that is under attack. */
-	void assistWorker(BaseAgent* worker);
+	virtual void assistWorker(BaseAgent* worker);
 
 	/** Counts the number of enemy units withing range from the start position. */
-	int enemyUnitsWithinRange(TilePosition start, int range);
+	virtual int enemyUnitsWithinRange(TilePosition start, int range);
 
 	/** Checks if there are any removable obstacles nearby, i.e. minerals with less than 20 resources
 	 * left. */
-	void checkRemovableObstacles();
+	virtual void checkRemovableObstacles();
 
 	/** Forces an attack, even if some squads are not full. */
-	void forceAttack();
+	virtual void forceAttack();
 
 	/** Shows some info on the screen. */
-	void printInfo();
+	virtual void printInfo();
 
 	/** Searches for a chokepoint that is unfortified, i.e. does not contain for example a Bunker or defensive
 	 * turret. Returns TilePosition(-1, -1) if no position was found. */
-	TilePosition findUnfortifiedChokePoint();
+	virtual TilePosition findUnfortifiedChokePoint();
 	
 	/** Searches for and returns a good chokepoint position to defend the territory. */
-	TilePosition findChokePoint();
+	virtual TilePosition findChokePoint();
 
 	/** Checks if a position is covered by psi (Protoss only). */
-	bool isPowered(TilePosition pos);
+	virtual bool isPowered(TilePosition pos);
 
-	/** Checks is a position is buildable. */
-	bool isBuildable(TilePosition pos);
+	/** Checks if a position is buildable. */
+	virtual bool isBuildable(TilePosition pos);
 
 	/** Checks if there are any unfinished buildings that does not have an SCV working on them. Terran only. */
-	bool checkUnfinishedBuildings();
+	virtual bool checkUnfinishedBuildings();
 
 	/** Check if there are any important buildings or units to repair. Terran only. */
-	bool checkRepairUnits();
+	virtual bool checkRepairUnits();
 
 	/** Returns true if the unit is important to assist, false if not. All buildings and large expensive units
 	 * such as siege tanks and battlecruisers are considered important, while small units such as marines and
 	 * vultures are not considered important. Terran only.*/
-	bool isImportantUnit(Unit* unit);
+	virtual bool isImportantUnit(Unit* unit);
 
 	/** Assigns a worker to repair the specified agent. Terran only.*/
-	void repair(BaseAgent* agent);
+	virtual void repair(BaseAgent* agent);
 
 	/** Assigns a worker to finish constructing an interrupted building. Terran only. */
-	void finishBuild(BaseAgent* agent);
+	virtual void finishBuild(BaseAgent* agent);
 
 	/** The total killScore points of all own, destroyed units (not buildings). */
 	int ownDeadScore;
@@ -173,7 +173,7 @@ public:
 	int enemyDeadScore;
 
 	/** Adds a bunker squad when a Terran Bunker has been created. */
-	void addBunkerSquad();
+	virtual void addBunkerSquad();
 };
 
 #endif

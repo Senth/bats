@@ -190,7 +190,6 @@
     <ClInclude Include="Source\TransportAgent.h" />
     <ClInclude Include="Source\UnitAgent.h" />
     <ClInclude Include="Source\BattlecruiserAgent.h" />
-    <ClInclude Include="Source\DropshipAgent.h" />
     <ClInclude Include="Source\FirebatAgent.h" />
     <ClInclude Include="Source\GhostAgent.h" />
     <ClInclude Include="Source\GoliathAgent.h" />
