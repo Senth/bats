@@ -6,6 +6,9 @@
 #include "ExplorationManager.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 CommandCenterAgent::CommandCenterAgent(Unit* mUnit)
 {
 	unit = mUnit;

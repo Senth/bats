@@ -4,6 +4,9 @@
 #include "ExplorationManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 DarkTemplarAgent::DarkTemplarAgent(Unit* mUnit)
 {
 	unit = mUnit;

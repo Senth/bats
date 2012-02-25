@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The DragoonAgent handles Protoss Dragoon units.
  *
@@ -18,7 +16,7 @@ class DragoonAgent : public UnitAgent {
 private:
 
 public:
-	DragoonAgent(Unit* mUnit);
+	DragoonAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

@@ -4,6 +4,9 @@
 #include <fstream>
 #include <sstream>
 
+using namespace BWAPI;
+using namespace std;
+
 Config* Config::instance = NULL;
 
 Config::Config()

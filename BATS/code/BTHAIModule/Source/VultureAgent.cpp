@@ -4,7 +4,10 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 
-VultureAgent::VultureAgent(Unit* mUnit)
+using namespace BWAPI;
+using namespace std;
+
+VultureAgent::VultureAgent(BWAPI::Unit* mUnit)
 {
 	unit = mUnit;
 	type = unit->getType();
@@ -13,7 +16,7 @@ VultureAgent::VultureAgent(Unit* mUnit)
 	//Broodwar->printf("VultureAgent created (%s)", unit->getType().getName().c_str());
 	mineDropFrame = 0;
 
-	goal = TilePosition(-1, -1);
+	goal = BWAPI::TilePosition(-1, -1);
 }
 
 void VultureAgent::computeActions()
@@ -41,7 +44,7 @@ void VultureAgent::computeActions()
 		}
 	}
 
-	Unit* target = TargetingAgent::findTarget(this);
+	BWAPI::Unit* target = TargetingAgent::findTarget(this);
 	if (target != NULL)
 	{
 		unit->attack(target);

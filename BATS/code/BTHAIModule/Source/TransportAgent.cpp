@@ -4,6 +4,9 @@
 #include "Commander.h"
 #include "Squad.h"
 
+using namespace BWAPI;
+using namespace std;
+
 TransportAgent::TransportAgent(Unit* mUnit)
 {
 	unit = mUnit;

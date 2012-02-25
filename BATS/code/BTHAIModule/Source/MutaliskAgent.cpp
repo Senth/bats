@@ -5,6 +5,9 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 MutaliskAgent::MutaliskAgent(Unit* mUnit)
 {
 	unit = mUnit;

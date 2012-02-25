@@ -4,6 +4,9 @@
 #include "ExplorationManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 LurkerAgent::LurkerAgent(Unit* mUnit)
 {
 	unit = mUnit;

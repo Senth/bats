@@ -3,6 +3,9 @@
 #include "Commander.h"
 #include "AgentManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 OverlordAgent::OverlordAgent(Unit* mUnit)
 {
 	unit = mUnit;

@@ -5,6 +5,9 @@
 #include "BuildPlanner.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 NexusAgent::NexusAgent(Unit* mUnit)
 {
 	unit = mUnit;

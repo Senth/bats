@@ -4,6 +4,9 @@
 #include "ExplorationManager.h"
 #include "SpottedObject.h"
 
+using namespace BWAPI;
+using namespace std;
+
 UnitAgent::UnitAgent()
 {
 	

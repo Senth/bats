@@ -3,16 +3,12 @@
 
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 struct MapData {
-	TilePosition basePos;
-	TilePosition pos;
+	BWAPI::TilePosition basePos;
+	BWAPI::TilePosition pos;
 	int dist;
 
-	bool matches(TilePosition t1, TilePosition t2)
+	bool matches(BWAPI::TilePosition t1, BWAPI::TilePosition t2)
 	{
 		if (t1.x() == basePos.x() && t1.y() == basePos.y() && t2.x() == pos.x() && t2.y() == pos.y())
 		{
@@ -30,14 +26,14 @@ struct MapData {
 class MapDataReader {
 
 private:
-	vector<MapData> data;
-	string mapName;
+	std::vector<MapData> data;
+	std::string mapName;
 
 	void saveFile();
 	bool loadFile();
-	string getFilename();
-	void addEntry(string line);
-	int toInt(string &str);
+	std::string getFilename();
+	void addEntry(std::string line);
+	int toInt(std::string &str);
 
 public:
 	/** Constructor */
@@ -51,7 +47,7 @@ public:
 
 	/** Returns the ground distance between two positions. If not found in
 	 * the data, bird distance is used. */
-	int getDistance(TilePosition t1, TilePosition t2);
+	int getDistance(BWAPI::TilePosition t1, BWAPI::TilePosition t2);
 };
 
 #endif

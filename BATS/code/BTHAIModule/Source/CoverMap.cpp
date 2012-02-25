@@ -6,6 +6,10 @@
 #include "Commander.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 bool CoverMap::instanceFlag = false;
 CoverMap* CoverMap::instance = NULL;
 

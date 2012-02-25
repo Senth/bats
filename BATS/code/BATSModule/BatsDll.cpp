@@ -4,7 +4,7 @@
 #include <tchar.h>
 
 /** @todo change to "BATSModule.h"  */
-#include "BTHAIModule.h"
+#include "BTHAIModule/Source/BTHAIModule.h"
 namespace BWAPI { Game* Broodwar; }
 BOOL APIENTRY DllMain( HANDLE hModule, 
 	DWORD  reasonForCall, 

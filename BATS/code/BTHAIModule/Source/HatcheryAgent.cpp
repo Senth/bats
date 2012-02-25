@@ -7,6 +7,9 @@
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 HatcheryAgent::HatcheryAgent(Unit* mUnit)
 {
 	unit = mUnit;

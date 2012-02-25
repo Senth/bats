@@ -3,12 +3,9 @@
 
 #include <BWAPI.h>
 
-using namespace BWAPI;
-using namespace std;
-
 struct CTokens {
-	string key;
-	string value;
+	std::string key;
+	std::string value;
 };
 
 /** This class reads and parses the bthai-config.txt file, and contain methods for getting
@@ -19,19 +16,19 @@ struct CTokens {
 class Config {
 
 private:
-	string scriptPath;
-	string botName;
-	string version;
+	std::string scriptPath;
+	std::string botName;
+	std::string version;
 
-	string info1;
-	string info2;
+	std::string info1;
+	std::string info2;
 
 	bool init;
 
 	void readConfigFile();
 
-	CTokens split(string line, string delimiter);
-	int toInt(string &str);
+	CTokens split(std::string line, std::string delimiter);
+	int toInt(std::string &str);
 
 	static Config* instance;
 	
@@ -44,13 +41,13 @@ public:
 	static Config* getInstance();
 
 	/** Returns the path to the folder where the scripfiles are placed. */
-	string getScriptPath();
+	std::string getScriptPath();
 
 	/** Returns the name of the bot as specified in the config file. */
-	string getBotName();
+	std::string getBotName();
 
 	/** Returns the current bot version. */
-	string getVersion();
+	std::string getVersion();
 
 	/** Displays bot name in the game window. */
 	void displayBotName();

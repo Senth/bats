@@ -5,10 +5,6 @@
 #include "SpottedObject.h"
 #include "Squad.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 struct ForceData {
 	int airAttackStr;
 	int airDefendStr;
@@ -41,7 +37,7 @@ struct ForceData {
 		noDetectorUnits = 0;
 	}
 
-	void checkType(UnitType type)
+	void checkType(BWAPI::UnitType type)
 	{
 		if (type.isRefinery())
 		{
@@ -63,19 +59,19 @@ struct ForceData {
 		{
 			noDefenseStructures++;
 		}
-		if (type.getID() == UnitTypes::Terran_Bunker.getID())
+		if (type.getID() == BWAPI::UnitTypes::Terran_Bunker.getID())
 		{
 			noDefenseStructures++;
 		}
-		if (type.getID() == UnitTypes::Terran_Starport.getID() || type.getID() == UnitTypes::Protoss_Stargate.getID())
+		if (type.getID() == BWAPI::UnitTypes::Terran_Starport.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Stargate.getID())
 		{
 			noAirports++;	
 		}
-		if (type.getID() == UnitTypes::Terran_Barracks.getID() || type.getID() == UnitTypes::Protoss_Gateway.getID())
+		if (type.getID() == BWAPI::UnitTypes::Terran_Barracks.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Gateway.getID())
 		{
 			noBarracks++;
 		}
-		if (type.getID() == UnitTypes::Terran_Factory.getID() || type.getID() == UnitTypes::Protoss_Gateway.getID() || type.getID() == UnitTypes::Protoss_Robotics_Facility.getID())
+		if (type.getID() == BWAPI::UnitTypes::Terran_Factory.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Gateway.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Robotics_Facility.getID())
 		{
 			noFactories++;
 		}
@@ -83,12 +79,12 @@ struct ForceData {
 };
 
 struct ExploreData {
-	TilePosition center;
+	BWAPI::TilePosition center;
 	int lastVisitFrame;
 	
-	ExploreData(Position tCenter)
+	ExploreData(BWAPI::Position tCenter)
 	{
-		center = TilePosition(tCenter);
+		center = BWAPI::TilePosition(tCenter);
 		lastVisitFrame = 0;
 	}
 
@@ -108,11 +104,11 @@ struct ExploreData {
 		{
 			return false;
 		}
-		TilePosition tCenter = TilePosition(region->getCenter());
+		BWAPI::TilePosition tCenter = BWAPI::TilePosition(region->getCenter());
 		return matches(tCenter);
 	}
 
-	bool matches(TilePosition tCenter)
+	bool matches(BWAPI::TilePosition tCenter)
 	{
 		double dist = tCenter.getDistance(center);
 		if (dist <= 2)
@@ -134,10 +130,10 @@ struct ExploreData {
 class ExplorationManager {
 
 private:
-	vector<SpottedObject*> spottedBuildings;
-	vector<SpottedObject*> spottedUnits;
+	std::vector<SpottedObject*> spottedBuildings;
+	std::vector<SpottedObject*> spottedUnits;
 	
-	vector<ExploreData> exploreData;
+	std::vector<ExploreData> exploreData;
 	int getLastVisitFrame(BWTA::Region* region);
 	
 	ForceData ownForce;
@@ -157,7 +153,7 @@ private:
 	int lastCallFrame;
 
 	int siteSetFrame;
-	TilePosition expansionSite;
+	BWAPI::TilePosition expansionSite;
 
 public:
 	/** Destructor */
@@ -176,36 +172,36 @@ public:
 	void computeActions();
 
 	/** Returns the next position to explore for this squad. */
-	TilePosition getNextToExplore(Squad* squad);
+	BWAPI::TilePosition getNextToExplore(Squad* squad);
 
 	/** Searches for the next position to expand the base to. */
-	TilePosition searchExpansionSite();
+	BWAPI::TilePosition searchExpansionSite();
 
 	/** Returns the next position to expand the base to. */
-	TilePosition getExpansionSite();
+	BWAPI::TilePosition getExpansionSite();
 
 	/** Sets the next position to expand the base to. */
-	void setExpansionSite(TilePosition pos);
+	void setExpansionSite(BWAPI::TilePosition pos);
 
 	/** Shows all spotted objects as squares on the SC map. Use for debug purpose. */
 	void printInfo();
 
 	/** Notifies about an enemy unit that has been spotted. */
-	void addSpottedUnit(Unit* unit);
+	void addSpottedUnit(BWAPI::Unit* unit);
 
 	/** Notifies that an enemy unit has been destroyed. If the destroyed unit was among
 	 * the spotted units, it is removed from the list. */
-	void unitDestroyed(Unit* unit);
+	void unitDestroyed(BWAPI::Unit* unit);
 
 	/** Returns the list of spotted enemy buildings. */
-	vector<SpottedObject*> getSpottedBuildings();
+	std::vector<SpottedObject*> getSpottedBuildings();
 
-	/** Returns the closest enemy spotted building from a start position, or TilePosition(-1,-1) if 
+	/** Returns the closest enemy spotted building from a start position, or BWAPI::TilePosition(-1,-1) if 
 	 * none was found. */
-	TilePosition getClosestSpottedBuilding(TilePosition start);
+	BWAPI::TilePosition getClosestSpottedBuilding(BWAPI::TilePosition start);
 
 	/** Calculates the number of spotted enemy buildings within the specified range (in tiles). */
-	int spottedBuildingsWithinRange(TilePosition pos, int range);
+	int spottedBuildingsWithinRange(BWAPI::TilePosition pos, int range);
 
 	/** Returns true if any enemy buildings have been spotted. */
 	bool buildingsSpotted();
@@ -215,23 +211,23 @@ public:
 
 	/** Returns true if a ground unit can reach position b from position a.
 	 * Uses BWTA. */
-	static bool canReach(TilePosition a, TilePosition b);
+	static bool canReach(BWAPI::TilePosition a, BWAPI::TilePosition b);
 
 	/** Returns true if an agent can reach position b. */
-	static bool canReach(BaseAgent* agent, TilePosition b);
+	static bool canReach(BaseAgent* agent, BWAPI::TilePosition b);
 
-	/** Sets that a region is explored. The position must be the TilePosition for the center of the
+	/** Sets that a region is explored. The position must be the BWAPI::TilePosition for the center of the
 	 * region. */
-	void setExplored(TilePosition goal);
+	void setExplored(BWAPI::TilePosition goal);
 
 	/** Scans for vulnerable enemy bases, i.e. bases without protection from detectors. */
-	TilePosition scanForVulnerableBase();
+	BWAPI::TilePosition scanForVulnerableBase();
 
 	/** Checks if an enemy detector is covering the specified position. */
-	bool isDetectorCovering(TilePosition pos);
+	bool isDetectorCovering(BWAPI::TilePosition pos);
 
 	/** Checks if an enemy detector is covering the specified position. */
-	bool isDetectorCovering(Position pos);
+	bool isDetectorCovering(BWAPI::Position pos);
 
 	/** Returns true if an enemy is Protoss. */
 	static bool enemyIsProtoss();

@@ -3,6 +3,10 @@
 #include <fstream>
 #include <sstream>
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 MapDataReader::MapDataReader()
 {
 	

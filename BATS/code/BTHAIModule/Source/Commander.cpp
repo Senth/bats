@@ -8,6 +8,10 @@
 #include "Profiler.h"
 #include <algorithm>
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 Commander* Commander::instance = NULL;
 
 Commander::Commander()

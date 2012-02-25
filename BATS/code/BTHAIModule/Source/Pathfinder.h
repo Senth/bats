@@ -5,10 +5,6 @@
 #include "PathObj.h"
 #include "cthread.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 /** This class is used to find a path betweed two tiles in the game world. Currently it uses the 
  * A-star implementation in BWTA, but it can easily be changed to another algorithm if needed.
  *
@@ -27,9 +23,9 @@ private:
 	bool lock;
 	bool end;
 
-	vector<PathObj*> pathObj;
+	std::vector<PathObj*> pathObj;
 
-	PathObj* getPathObj(TilePosition start, TilePosition end);
+	PathObj* getPathObj(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
 	bool isRunning();
 
@@ -41,14 +37,14 @@ public:
 	static Pathfinder* getInstance();
 
 	/** Returns the ground distance between two positions. */
-	int getDistance(TilePosition start, TilePosition end);
+	int getDistance(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
-	void requestPath(TilePosition start, TilePosition end);
+	void requestPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
-	bool isReady(TilePosition start, TilePosition end);
+	bool isReady(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
 	/** Returns the path between two positions. */
-	vector<TilePosition> getPath(TilePosition start, TilePosition end);
+	std::vector<BWAPI::TilePosition> getPath(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
 	/** Stops the pathfinder thread. */
 	void stop();

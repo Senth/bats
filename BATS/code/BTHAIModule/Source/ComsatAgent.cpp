@@ -2,6 +2,9 @@
 #include "WorkerAgent.h"
 #include "AgentManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ComsatAgent::ComsatAgent(Unit* mUnit)
 {
 	unit = mUnit;

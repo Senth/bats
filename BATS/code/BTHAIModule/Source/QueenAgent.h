@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The QueenAgent handles Zerg Queen units.
  *
@@ -20,7 +18,7 @@ private:
 	bool checkSpawnBroodlings();
 
 public:
-	QueenAgent(Unit* mUnit);
+	QueenAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

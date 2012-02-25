@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "BaseAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 #define DISABLE_UNIT_AI 0
 
@@ -20,7 +18,7 @@ class UnitAgent : public BaseAgent {
 protected:
 	
 public:
-	UnitAgent(Unit* mUnit);
+	UnitAgent(BWAPI::Unit* mUnit);
 	UnitAgent();
 
 	int dropped;
@@ -36,7 +34,7 @@ public:
 
 	/** Sets the goal for this unit. Goals are set from either the SquadCommander for attacking
 	 * or defending units, or from ExplorationManager for explore units. */
-	virtual void setGoal(TilePosition goal);
+	virtual void setGoal(BWAPI::TilePosition goal);
 
 	/** Clears the goal for this unit. */
 	virtual void clearGoal();
@@ -48,16 +46,16 @@ public:
 	int friendlyUnitsWithinRange(int maxRange);
 
 	/** Returns the number of own units that are within maxRange of the specified tile. */
-	int friendlyUnitsWithinRange(TilePosition tilePos, int maxRange);
+	int friendlyUnitsWithinRange(BWAPI::TilePosition tilePos, int maxRange);
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the agent. */
 	int enemyAttackingUnitsWithinRange();
 
 	/** Returns the number of enemy units and buildings that can attack and are within range of the center tile. */
-	int enemyAttackingUnitsWithinRange(int maxRange, TilePosition center);
+	int enemyAttackingUnitsWithinRange(int maxRange, BWAPI::TilePosition center);
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the specified unit type. */
-	int enemyAttackingUnitsWithinRange(UnitType type);
+	int enemyAttackingUnitsWithinRange(BWAPI::UnitType type);
 
 	/** Returns the number of enemy units and buildings that are within maxRange of the agent. */
 	int enemyUnitsWithinRange(int maxRange);
@@ -66,10 +64,10 @@ public:
 	int enemyGroundUnitsWithinRange(int maxRange);
 
 	/** Calculates the number of enemy sieged Siege Tanks within Siege Tank range. */
-	int enemySiegedTanksWithinRange(TilePosition center);
+	int enemySiegedTanksWithinRange(BWAPI::TilePosition center);
 
 	/** Returns the number of enemy ground units and buildings that are within maxRange of the center tile, and can attack the agent. */
-	int enemyGroundAttackingUnitsWithinRange(TilePosition center, int maxRange);
+	int enemyGroundAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange);
 
 	/** Returns the number of flying units that are within maxRange of the agent. */
 	int enemyAirUnitsWithinRange(int maxRange);
@@ -82,35 +80,35 @@ public:
 	int enemyAirToGroundUnitsWithinRange(int maxRange);
 
 	/** Returns the number of flying unit that are within maxRange of the center tile, and can attack the agent. */
-	int enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRange);
+	int enemyAirAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange);
 
 	/** Returns the max firerange of the ground weapon this agent has, or -1 if it cannot attack ground. */
 	int getGroundRange();
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack ground. */
-	static int getGroundRange(UnitType type);
+	static int getGroundRange(BWAPI::UnitType type);
 
 	/** Returns true if the attacker UnitType can attack target UnitType. Note: Does not take spells into account, only weapons. */
-	static bool canAttack(UnitType attacker, UnitType target);
+	static bool canAttack(BWAPI::UnitType attacker, BWAPI::UnitType target);
 
 	/** Returns the max firerange of the air weapon this agent has, or -1 if it cannot attack air. */
 	int getAirRange();
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack air. */
-	static int getAirRange(UnitType type);
+	static int getAirRange(BWAPI::UnitType type);
 	
 	/** Returns the closest organic enemy unit within maxRange, or NULL if not found. */
-	Unit* getClosestOrganicEnemy(int maxRange);
+	BWAPI::Unit* getClosestOrganicEnemy(int maxRange);
 
 	/** Returns the closest enemy unit that is shielded and within maxRange, or NULL if not found. */
-	Unit* getClosestShieldedEnemy(int maxRange);
+	BWAPI::Unit* getClosestShieldedEnemy(int maxRange);
 
 	/** Returns the closest enemy turret or other attacking building within maxRange, or NULL if not found. */
-	Unit* getClosestEnemyTurret(int maxRange);
+	BWAPI::Unit* getClosestEnemyTurret(int maxRange);
 
 	/** Returns the closest enemy turret, other attacking building or mechanical unit within maxRange that
 	 * can attack air units, or NULL if not found. */
-	Unit* getClosestEnemyAirDefense(int maxRange);
+	BWAPI::Unit* getClosestEnemyAirDefense(int maxRange);
 
 	/** Orders a Protoss unit to recharge shields. */
 	bool chargeShields();

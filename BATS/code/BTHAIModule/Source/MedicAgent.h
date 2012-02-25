@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The MedicAgent handles Terran Medics.
  *
@@ -21,14 +19,14 @@ private:
 	bool checkUnitsToFollow();
 
 public:
-	MedicAgent(Unit* mUnit);
+	MedicAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();
 
 	/** Returns true if the specified own unit is a good target for the medic to follow and heal. Good targets
 	 * must be biological, must be in the attack force, and must not be loaded into a building or transport. */
-	static bool isMedicTarget(Unit* mUnit);
+	static bool isMedicTarget(BWAPI::Unit* mUnit);
 };
 
 #endif

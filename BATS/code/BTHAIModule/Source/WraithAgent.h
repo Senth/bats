@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The WraithAgent handles Terran Wraith flying units.
  *
@@ -20,7 +18,7 @@ class WraithAgent : public UnitAgent {
 private:
 	bool checkUseCloak();
 public:
-	WraithAgent(Unit* mUnit);
+	WraithAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

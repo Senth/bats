@@ -4,6 +4,9 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 GuardianAgent::GuardianAgent(Unit* mUnit)
 {
 	unit = mUnit;

@@ -1,6 +1,9 @@
 #include "ProfilerObj.h"
 #include <sstream>
 
+using namespace BWAPI;
+using namespace std;
+
 ProfilerObj::ProfilerObj(string mId)
 {
 	startTime = 0;

@@ -4,9 +4,6 @@
 #include <BWAPI.h>
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This agent is used to find the best target to attack for a unit. 
  * It is possible to add several rules, for example always target workers first.
  *
@@ -18,13 +15,13 @@ using namespace std;
 class TargetingAgent {
 
 private:
-	static double getTargetModifier(UnitType attacker, UnitType target);
-	static bool isCloakingUnit(UnitType type);
+	static double getTargetModifier(BWAPI::UnitType attacker, BWAPI::UnitType target);
+	static bool isCloakingUnit(BWAPI::UnitType type);
 
 public:
 	/** Returns the best target within seekrange for a unit agent, or NULL if no target
 	 * was found. */
-	static Unit* findTarget(BaseAgent* agent);
+	static BWAPI::Unit* findTarget(BaseAgent* agent);
 };
 
 #endif

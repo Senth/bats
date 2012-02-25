@@ -5,6 +5,9 @@
 #include "Squad.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 MarineAgent::MarineAgent(Unit* mUnit)
 {
 	unit = mUnit;

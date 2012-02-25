@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "StructureAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The CommandCenterAgent handles Terran Command Center buildings.
  *
@@ -21,7 +19,7 @@ private:
 	bool hasSentWorkers;
 
 public:
-	CommandCenterAgent(Unit* mUnit);
+	CommandCenterAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

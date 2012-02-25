@@ -7,6 +7,9 @@
 #include "TargetingAgent.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ZealotAgent::ZealotAgent(Unit* mUnit)
 {
 	unit = mUnit;

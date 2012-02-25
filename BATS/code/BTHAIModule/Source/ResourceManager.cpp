@@ -4,6 +4,9 @@
 #include "Commander.h"
 #include "Squad.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ResourceManager* ResourceManager::instance = NULL;
 
 ResourceManager::ResourceManager()

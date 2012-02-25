@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The GuardianAgent handles Zerg Guardian units.
  *
@@ -18,7 +16,7 @@ class GuardianAgent : public UnitAgent {
 private:
 
 public:
-	GuardianAgent(Unit* mUnit);
+	GuardianAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

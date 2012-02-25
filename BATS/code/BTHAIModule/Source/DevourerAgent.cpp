@@ -3,6 +3,9 @@
 #include "AgentManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 DevourerAgent::DevourerAgent(Unit* mUnit)
 {
 	unit = mUnit;

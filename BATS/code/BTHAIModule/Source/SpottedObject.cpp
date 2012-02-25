@@ -1,5 +1,8 @@
 #include "SpottedObject.h"
 
+using namespace BWAPI;
+using namespace std;
+
 SpottedObject::SpottedObject()
 {
 	position = Position(-1, -1);

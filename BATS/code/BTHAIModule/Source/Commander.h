@@ -4,9 +4,6 @@
 #include "Squad.h"
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
 
 struct SortSquadList {
 	bool operator()(Squad*& sq1, Squad*& sq2)
@@ -37,14 +34,14 @@ struct SortSquadList {
 class Commander {
 
 private:
-	bool chokePointFortified(TilePosition center);
-	bool chokePointGuarded(TilePosition center);
+	bool chokePointFortified(BWAPI::TilePosition center);
+	bool chokePointGuarded(BWAPI::TilePosition center);
 	void sortSquadList();
 	bool isOccupied(BWTA::Region* region);
-	bool isEdgeChokepoint(Chokepoint* choke);
-	double getDistToBase(Chokepoint* choke);
-	TilePosition findDefensePos(Chokepoint* choke);
-	double getChokepointPrio(TilePosition center);
+	bool isEdgeChokepoint(BWTA::Chokepoint* choke);
+	double getDistToBase(BWTA::Chokepoint* choke);
+	BWAPI::TilePosition findDefensePos(BWTA::Chokepoint* choke);
+	double getChokepointPrio(BWAPI::TilePosition center);
 
 	void checkNoSquadUnits();
 	void assignUnit(BaseAgent* agent);
@@ -52,7 +49,7 @@ private:
 	int lastCallFrame;
 
 protected:
-	vector<Squad*> squads;
+	std::vector<Squad*> squads;
 	int currentID;
 	static Commander* instance;
 
@@ -64,7 +61,7 @@ protected:
 
 	/** Used to find where offensive attackin ground squads are, so
 	 * air squads doesnt get ahead of other squads when attacking. */
-	TilePosition findOffensiveSquadPosition(TilePosition closeEnemy);
+	BWAPI::TilePosition findOffensiveSquadPosition(BWAPI::TilePosition closeEnemy);
 
 public:
 	/** Destructor. */
@@ -97,21 +94,21 @@ public:
 	virtual void unitDestroyed(BaseAgent* agent);
 
 	/* Checks if the specified unittype needs to be built. */
-	virtual bool needUnit(UnitType type);
+	virtual bool needUnit(BWAPI::UnitType type);
 
 	/** Returns the Squad with the specified id, or NULL if not found. */
 	virtual Squad* getSquad(int id);
 
 	/** Returns all Squads. */
-	virtual vector<Squad*> getSquads();
+	virtual std::vector<Squad*> getSquads();
 
 	/** Returns the position of the closest enemy building from the start position,
-	 * or TilePosition(-1,-1) if not found. */
-	virtual TilePosition getClosestEnemyBuilding(TilePosition start);
+	 * or BWAPI::TilePosition(-1,-1) if not found. */
+	virtual BWAPI::TilePosition getClosestEnemyBuilding(BWAPI::TilePosition start);
 	
 	/** Returns the number of active offensive squads within maxRange of 
 	 * the center position. */
-	virtual int noOffensiveSquadsWithin(TilePosition center, int maxRange);
+	virtual int noOffensiveSquadsWithin(BWAPI::TilePosition center, int maxRange);
 
 	/** Checks if workers needs to attack. Happens if base is under attack and no offensive units
 	 * are available. */
@@ -124,7 +121,7 @@ public:
 	virtual void assistWorker(BaseAgent* worker);
 
 	/** Counts the number of enemy units withing range from the start position. */
-	virtual int enemyUnitsWithinRange(TilePosition start, int range);
+	virtual int enemyUnitsWithinRange(BWAPI::TilePosition start, int range);
 
 	/** Checks if there are any removable obstacles nearby, i.e. minerals with less than 20 resources
 	 * left. */
@@ -137,17 +134,17 @@ public:
 	virtual void printInfo();
 
 	/** Searches for a chokepoint that is unfortified, i.e. does not contain for example a Bunker or defensive
-	 * turret. Returns TilePosition(-1, -1) if no position was found. */
-	virtual TilePosition findUnfortifiedChokePoint();
+	 * turret. Returns BWAPI::TilePosition(-1, -1) if no position was found. */
+	virtual BWAPI::TilePosition findUnfortifiedChokePoint();
 	
 	/** Searches for and returns a good chokepoint position to defend the territory. */
-	virtual TilePosition findChokePoint();
+	virtual BWAPI::TilePosition findChokePoint();
 
 	/** Checks if a position is covered by psi (Protoss only). */
-	virtual bool isPowered(TilePosition pos);
+	virtual bool isPowered(BWAPI::TilePosition pos);
 
 	/** Checks if a position is buildable. */
-	virtual bool isBuildable(TilePosition pos);
+	virtual bool isBuildable(BWAPI::TilePosition pos);
 
 	/** Checks if there are any unfinished buildings that does not have an SCV working on them. Terran only. */
 	virtual bool checkUnfinishedBuildings();
@@ -158,7 +155,7 @@ public:
 	/** Returns true if the unit is important to assist, false if not. All buildings and large expensive units
 	 * such as siege tanks and battlecruisers are considered important, while small units such as marines and
 	 * vultures are not considered important. Terran only.*/
-	virtual bool isImportantUnit(Unit* unit);
+	virtual bool isImportantUnit(BWAPI::Unit* unit);
 
 	/** Assigns a worker to repair the specified agent. Terran only.*/
 	virtual void repair(BaseAgent* agent);

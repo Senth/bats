@@ -4,10 +4,6 @@
 #include "UnitAgent.h"
 #include "MapDataReader.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 struct Corners {
 	int x1;
 	int y1;
@@ -40,25 +36,25 @@ private:
 	int h;
 	int** cover_map;
 
-	Corners getCorners(Unit* unit);
-	Corners getCorners(UnitType type, TilePosition center);
+	Corners getCorners(BWAPI::Unit* unit);
+	Corners getCorners(BWAPI::UnitType type, BWAPI::TilePosition center);
 
-	TilePosition findSpotAtSide(UnitType toBuild, TilePosition start, TilePosition end);
-	bool canBuildAt(UnitType toBuild, TilePosition pos);
+	BWAPI::TilePosition findSpotAtSide(BWAPI::UnitType toBuild, BWAPI::TilePosition start, BWAPI::TilePosition end);
+	bool canBuildAt(BWAPI::UnitType toBuild, BWAPI::TilePosition pos);
 
 	void fill(Corners c);
 	void clear(Corners c);
 
-	Unit* findWorker();
+	BWAPI::Unit* findWorker();
 
-	bool suitableForDetector(TilePosition pos);
+	bool suitableForDetector(BWAPI::TilePosition pos);
 
 	MapDataReader mapData;
 
 	bool baseUnderConstruction(BaseAgent* base);
-	TilePosition findBuildSpot(UnitType toBuild, TilePosition start);
+	BWAPI::TilePosition findBuildSpot(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
-	Unit* hasMineralNear(TilePosition pos);
+	BWAPI::Unit* hasMineralNear(BWAPI::TilePosition pos);
 
 public:
 	/** Destructor */
@@ -68,48 +64,48 @@ public:
 	static CoverMap* getInstance();
 
 	/** Adds a newly constructed building to the cover map. */
-	void addConstructedBuilding(Unit* unit);
+	void addConstructedBuilding(BWAPI::Unit* unit);
 
 	/** Used by WorkerAgent when constructing builds. */
-	void fillTemp(UnitType toBuild, TilePosition buildSpot);
+	void fillTemp(BWAPI::UnitType toBuild, BWAPI::TilePosition buildSpot);
 
 	/** Used by WorkerAgent when constructing builds. */
-	void clearTemp(UnitType toBuild, TilePosition buildSpot);
+	void clearTemp(BWAPI::UnitType toBuild, BWAPI::TilePosition buildSpot);
 
 	/** Called when a building is destroyed, to free up the space. */
-	void buildingDestroyed(Unit* unit);
+	void buildingDestroyed(BWAPI::Unit* unit);
 
 	/** Checks if the specified building type can be built at the buildSpot. True if it can,
 	 * false otherwise. */
-	bool canBuild(UnitType toBuild, TilePosition buildSpot);
+	bool canBuild(BWAPI::UnitType toBuild, BWAPI::TilePosition buildSpot);
 
 	/** Checks if a position is free. */
-	bool positionFree(TilePosition pos);
+	bool positionFree(BWAPI::TilePosition pos);
 
 	/** Blocks a position from being used as a valid buildSpot. Used when a worker is timedout when
 	 * moving towards the buildSpot. */
-	void blockPosition(TilePosition buildSpot);
+	void blockPosition(BWAPI::TilePosition buildSpot);
 
 	/** Finds and returns a buildSpot for the specified building type.
-	 * If no buildspot is found, a TilePosition(-1,-1) is returned. */
-	TilePosition findBuildSpot(UnitType toBuild);
+	 * If no buildspot is found, a BWAPI::TilePosition(-1,-1) is returned. */
+	BWAPI::TilePosition findBuildSpot(BWAPI::UnitType toBuild);
 
 	/** Searches for the closest vespene gas that is not in use. If no gas is sighted,
 	 * the ExplorationManager is queried. */
-	TilePosition findRefineryBuildSpot(UnitType toBuild, TilePosition start);
+	BWAPI::TilePosition findRefineryBuildSpot(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
 	/** Finds and returns the position of the closest free vespene gas around the specified start position.
-	 * If no gas vein is found, a TilePosition(-1, -1) is returned. */
-	TilePosition findClosestGasWithoutRefinery(UnitType toBuild, TilePosition start);
+	 * If no gas vein is found, a BWAPI::TilePosition(-1, -1) is returned. */
+	BWAPI::TilePosition findClosestGasWithoutRefinery(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
-	/** Searches for a spot to build a refinery at. Returns TilePosition(-1, -1) if no spot was found.*/
-	TilePosition searchRefinerySpot();
+	/** Searches for a spot to build a refinery at. Returns BWAPI::TilePosition(-1, -1) if no spot was found.*/
+	BWAPI::TilePosition searchRefinerySpot();
 
 	/** Returns a position of a suitable site for expansion, i.e. new bases. */
-	TilePosition findExpansionSite();
+	BWAPI::TilePosition findExpansionSite();
 
 	/** Finds a mineral to gather from. */
-	Unit* findClosestMineral(TilePosition workerPos);
+	BWAPI::Unit* findClosestMineral(BWAPI::TilePosition workerPos);
 
 	/** Shows debug info on screen. */
 	void debug();

@@ -11,6 +11,7 @@
 #include <Shlwapi.h>
 
 using namespace BWAPI;
+using namespace std;
 
 bool analyzed;
 bool analysis_just_finished;

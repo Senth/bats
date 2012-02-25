@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The TransportAgent handles transport units (Terran Dropship and Protoss Shuttle).
  *
@@ -21,7 +19,7 @@ private:
 	BaseAgent* findUnitToLoad(int spaceLimit);
 
 public:
-	TransportAgent(Unit* mUnit);
+	TransportAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

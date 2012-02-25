@@ -9,6 +9,9 @@
 #include <fstream>
 #include <sstream>
 
+using namespace BWAPI;
+using namespace std;
+
 SquadFileReader::SquadFileReader()
 {
 	id = 1;

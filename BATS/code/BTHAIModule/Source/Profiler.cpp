@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 
+using namespace BWAPI;
+using namespace std;
+
 bool Profiler::instanceFlag = false;
 Profiler* Profiler::instance = NULL;
 

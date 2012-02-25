@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The DefilerAgent handles Zerg Defiler units.
  *
@@ -21,7 +19,7 @@ private:
 	bool checkConsume();
 
 public:
-	DefilerAgent(Unit* mUnit);
+	DefilerAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

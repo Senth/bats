@@ -7,10 +7,6 @@
 #include "Commander.h"
 #include "BuildPlanner.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 /** This class handles the main AI loop that is executed each frame. It is 
  * separated from the BTHAIModule::onFrame() to make it possible to use
  * multi-threading.
@@ -41,13 +37,13 @@ public:
 	void show_debug();
 
 	/** Called when a new unit is added to the game. */
-	void addUnit(Unit* unit);
+	void addUnit(BWAPI::Unit* unit);
 
 	/** Called when a unit is destroyed in the game. */
-	void unitDestroyed(Unit* unit);
+	void unitDestroyed(BWAPI::Unit* unit);
 
 	/** Called when a unit is morphed in in the game. */
-	void morphUnit(Unit* unit);
+	void morphUnit(BWAPI::Unit* unit);
 };
 
 #endif

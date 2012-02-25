@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ScourgeAgent handles Zerg Scourge units.
  *
@@ -18,7 +16,7 @@ class ScourgeAgent : public UnitAgent {
 private:
 
 public:
-	ScourgeAgent(Unit* mUnit);
+	ScourgeAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

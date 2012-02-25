@@ -4,6 +4,9 @@
 #include "ResourceManager.h"
 #include "ExplorationManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 BaseAgent::BaseAgent()
 {
 	alive = true;

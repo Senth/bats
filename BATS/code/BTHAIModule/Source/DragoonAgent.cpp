@@ -5,6 +5,9 @@
 #include "TargetingAgent.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace std;
+
 DragoonAgent::DragoonAgent(Unit* mUnit)
 {
 	unit = mUnit;

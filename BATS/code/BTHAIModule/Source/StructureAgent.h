@@ -2,8 +2,6 @@
 #define __STRUCTUREAGENT_H__
 
 #include "BaseAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The StructureAgent is the base agent class for all agents handling buildings. If a building is created and no
  * specific agent for that type is found, the building is assigned to a StructureAgent. StructureAgents are typically
@@ -19,15 +17,15 @@ private:
 protected:
 	bool repairing;
 	
-	bool canBuildUnit(UnitType type);
-	bool canEvolveUnit(UnitType type);
+	bool canBuildUnit(BWAPI::UnitType type);
+	bool canEvolveUnit(BWAPI::UnitType type);
 
-	TilePosition getNextScanLocation();
-	vector<TilePosition> hasScanned;
+	BWAPI::TilePosition getNextScanLocation();
+	std::vector<BWAPI::TilePosition> hasScanned;
 
 public:
 	StructureAgent();
-	StructureAgent(Unit* mUnit);
+	StructureAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	virtual void computeActions();
@@ -36,7 +34,7 @@ public:
 	virtual void debug_showGoal();
 
 	/** Checks if the agent can morph into the specified type. Zerg only. */
-	bool canMorphInto(UnitType type);
+	bool canMorphInto(BWAPI::UnitType type);
 
 	/** Sends a number of workers to a newly constructed base. */
 	void sendWorkers();

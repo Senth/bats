@@ -3,9 +3,6 @@
 
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** Helper class for Profiler. This class represents a profiling of one specific
  * codeblock. Profiling can be done on any number of codeblocks.
  *
@@ -16,7 +13,7 @@ class ProfilerObj {
 private:
 	int startTime;
 	int endTime;
-	string id;
+	std::string id;
 	int maxTime;
 	int total;
 	int startCalls;
@@ -29,13 +26,13 @@ private:
 
 public:
 	/** Constructor */
-	ProfilerObj(string mId);
+	ProfilerObj(std::string mId);
 
 	/** Destructor */
 	~ProfilerObj();
 
-	/** Checks if this object matches the specified id string. */
-	bool matches(string mId);
+	/** Checks if this object matches the specified id std::string. */
+	bool matches(std::string mId);
 
 	/** Starts measuring a codeblock. */
 	void start();
@@ -49,8 +46,8 @@ public:
 	/** Print data to the ingame chat window. */
 	void show();
 
-	/** Returns the html string for this profiling object. */
-	string getDumpStr();
+	/** Returns the html std::string for this profiling object. */
+	std::string getDumpStr();
 };
 
 #endif

@@ -2,6 +2,9 @@
 #include "WorkerAgent.h"
 #include "AgentManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 RefineryAgent::RefineryAgent(Unit* mUnit)
 {
 	unit = mUnit;

@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The GhostAgent handles Terran Ghost units.
  *
@@ -17,10 +15,10 @@ using namespace std;
 class GhostAgent : public UnitAgent {
 
 private:
-	Unit* findLockdownTarget();
+	BWAPI::Unit* findLockdownTarget();
 
 public:
-	GhostAgent(Unit* mUnit);
+	GhostAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

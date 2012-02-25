@@ -4,6 +4,10 @@
 #include "ExplorationManager.h"
 #include "Commander.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 KiteSquad::KiteSquad(int mId, string mName, int mPriority)
 {
 	this->id = mId;

@@ -7,6 +7,10 @@
 #include "Pathfinder.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 Squad::Squad()
 {
 

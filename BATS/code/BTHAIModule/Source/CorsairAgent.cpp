@@ -3,6 +3,9 @@
 #include "AgentManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 CorsairAgent::CorsairAgent(Unit* mUnit)
 {
 	unit = mUnit;

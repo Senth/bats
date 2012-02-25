@@ -1,6 +1,9 @@
 #include "TargetingAgent.h"
 #include "AgentManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 Unit* TargetingAgent::findTarget(BaseAgent* agent)
 {
 	//Check if the agent targets ground and/or air

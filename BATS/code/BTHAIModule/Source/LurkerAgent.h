@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The LurkerAgent handles Zerg Lurker units.
  *
@@ -18,7 +16,7 @@ class LurkerAgent : public UnitAgent {
 private:
 
 public:
-	LurkerAgent(Unit* mUnit);
+	LurkerAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

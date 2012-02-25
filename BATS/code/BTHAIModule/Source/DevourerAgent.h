@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The DevourerAgent handles Zerg DevourerAgent units.
  *
@@ -18,7 +16,7 @@ class DevourerAgent : public UnitAgent {
 private:
 
 public:
-	DevourerAgent(Unit* mUnit);
+	DevourerAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

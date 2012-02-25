@@ -3,6 +3,9 @@
 #include "PFManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 SiegeTankAgent::SiegeTankAgent(Unit* mUnit)
 {
 	unit = mUnit;

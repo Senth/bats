@@ -3,12 +3,9 @@
 
 #include <BWAPI.h>
 
-using namespace BWAPI;
-using namespace std;
-
 struct Tokens {
-	string key;
-	string value;
+	std::string key;
+	std::string value;
 };
 
 /** This class contains some common methods used by classes handling the
@@ -25,32 +22,32 @@ public:
 
 	/** Returns the filename to use in sub folder squads, buildorder or upgrades.
 	 * The methods checks if for example PvZ is defined, and if not PvX is used. */
-	string getFilename(string subpath);
+	std::string getFilename(std::string subpath);
 
 	/** Returns the path to the folder where the scripfiles are placed. */
-	string getScriptPath();
+	std::string getScriptPath();
 
 	/** Checks if a file in the specified subpath exists, for example PvZ.txt in
 	 * subfolder buildorder. */
-	bool fileExists(string subpath, string filename);
+	bool fileExists(std::string subpath, std::string filename);
 
 	/** Returns a unit type from a textline, or Unknown if no type was found. */
-	UnitType getUnitType(string line);
+	BWAPI::UnitType getUnitType(std::string line);
 
 	/** Returns an upgrade type from a textline, or Unknown if no type was found. */
-	UpgradeType getUpgradeType(string line);
+	BWAPI::UpgradeType getUpgradeType(std::string line);
 
 	/** Returns a tech type from a textline, or Unknown if no type was found. */
-	TechType getTechType(string line);
+	BWAPI::TechType getTechType(std::string line);
 
-	/** Replaces all underscores (_) with whitespaces in a string. */
-	void replace(string &line);
+	/** Replaces all underscores (_) with whitespaces in a std::string. */
+	void replace(std::string &line);
 
 	/** Splits a line into tokens. Delimiter is the characted to split at, for example = or :. */
-	Tokens split(string line, string delimiter);
+	Tokens split(std::string line, std::string delimiter);
 
-	/** Converts a string to an int. */
-	int toInt(string &str);
+	/** Converts a std::string to an int. */
+	int toInt(std::string &str);
 
 };
 

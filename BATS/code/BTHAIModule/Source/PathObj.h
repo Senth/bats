@@ -3,10 +3,6 @@
 
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace BWTA;
-using namespace std;
-
 /** Helper class for the threaded Pathfinder agent. Each PathObj contains the path between two
  * two positions, start and end. 
  *
@@ -15,20 +11,20 @@ using namespace std;
 class PathObj {
 
 private:
-	TilePosition start;
-	TilePosition end;
-	vector<TilePosition> path;
+	BWAPI::TilePosition start;
+	BWAPI::TilePosition end;
+	std::vector<BWAPI::TilePosition> path;
 	bool finished;
 
 public:
 	/** Constructor */
-	PathObj(TilePosition cStart, TilePosition cEnd);
+	PathObj(BWAPI::TilePosition cStart, BWAPI::TilePosition cEnd);
 
 	/** Destructor */
 	~PathObj();
 
 	/** Checks if this path object matches the start and end positions. */
-	bool matches(TilePosition cStart, TilePosition cEnd);
+	bool matches(BWAPI::TilePosition cStart, BWAPI::TilePosition cEnd);
 
 	/** Checks if this path has been calculated. */
 	bool isFinished();
@@ -37,7 +33,7 @@ public:
 	void calculatePath();
 
 	/** Returns the path. */
-	vector<TilePosition> getPath();
+	std::vector<BWAPI::TilePosition> getPath();
 };
 
 #endif

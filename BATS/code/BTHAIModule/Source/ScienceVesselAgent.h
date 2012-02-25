@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ScienceVesselAgent handles Terran Science Vessels units.
  *
@@ -25,7 +23,7 @@ private:
 	int lastIrradiateFrame;
 	
 public:
-	ScienceVesselAgent(Unit* mUnit);
+	ScienceVesselAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

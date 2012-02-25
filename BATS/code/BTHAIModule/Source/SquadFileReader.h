@@ -5,9 +5,6 @@
 #include "Squad.h"
 #include "FileReaderUtils.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This class reads the squad setup script files.
  *
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
@@ -15,29 +12,29 @@ using namespace std;
 class SquadFileReader : public FileReaderUtils {
 
 private:
-	void addSquad(string line, vector<UnitType> &squads);
-	void addUnit(string line);
+	void addSquad(std::string line, std::vector<BWAPI::UnitType> &squads);
+	void addUnit(std::string line);
 	void createSquad();
 
-	string type;
-	string name;
-	string offType;
-	string requirement;
+	std::string type;
+	std::string name;
+	std::string offType;
+	std::string requirement;
 	int priority;
 	int activePriority;
-	UnitType morphsTo;
+	BWAPI::UnitType morphsTo;
 
 	Squad* cSquad;
 	int id;
 
-	vector<Squad*> squads;
+	std::vector<Squad*> squads;
 
 public:
 	/** Constructor. */
 	SquadFileReader();
 
 	/** Reads the squad setup script file. */
-	vector<Squad*> readSquadList();
+	std::vector<Squad*> readSquadList();
 };
 
 #endif

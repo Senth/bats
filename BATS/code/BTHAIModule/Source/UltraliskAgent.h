@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ZerglingAgent handles Zerg Ultralisk units.
  *
@@ -18,7 +16,7 @@ class UltraliskAgent : public UnitAgent {
 private:
 
 public:
-	UltraliskAgent(Unit* mUnit);
+	UltraliskAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

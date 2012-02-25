@@ -11,6 +11,9 @@
 #include "Profiler.h"
 #include <sstream>
 
+using namespace BWAPI;
+using namespace std;
+
 WorkerAgent::WorkerAgent(Unit* mUnit)
 {
 	unit = mUnit;

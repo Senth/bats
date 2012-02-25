@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ObserverAgent handles Protoss Observer cloaked flying units.
  *
@@ -19,7 +17,7 @@ class ObserverAgent : public UnitAgent {
 private:
 	
 public:
-	ObserverAgent(Unit* mUnit);
+	ObserverAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

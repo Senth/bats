@@ -5,9 +5,6 @@
 #include "Squad.h"
 #include "UnitSetup.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** The Squad class represents a squad of units with a shared goal, for example
  * attacking the enemy or defending the base. The Squad can be built up from
  * different combinations and numbers of UnitTypes. 
@@ -17,17 +14,17 @@ using namespace std;
 class Squad {
 
 protected:
-	vector<BaseAgent*> agents;
-	vector<UnitSetup> setup;
-	UnitType morphs;
+	std::vector<BaseAgent*> agents;
+	std::vector<UnitSetup> setup;
+	BWAPI::UnitType morphs;
 
-	TilePosition goal;
-	vector<TilePosition> path;
+	BWAPI::TilePosition goal;
+	std::vector<BWAPI::TilePosition> path;
 	int pathIndex;
 	int arrivedFrame;
 	
-	void setMemberGoals(TilePosition cGoal);
-	Unit* findTarget();
+	void setMemberGoals(BWAPI::TilePosition cGoal);
+	BWAPI::Unit* findTarget();
 	
 	int id;
 	bool active;
@@ -36,16 +33,16 @@ protected:
 	int activePriority;
 	int moveType;
 	bool required;
-	string name;
+	std::string name;
 	int goalSetFrame;
 	int currentState;
 
 	void checkAttack();
-	bool isVisible(TilePosition pos);
-	vector<TilePosition> hasVisited;
+	bool isVisible(BWAPI::TilePosition pos);
+	std::vector<BWAPI::TilePosition> hasVisited;
 
 	/** Sets the goal for this Squad. */
-	void setGoal(TilePosition mGoal);
+	void setGoal(BWAPI::TilePosition mGoal);
 
 public:
 	/** Default constructor. */
@@ -57,27 +54,27 @@ public:
 	 * higher priority. A squad with priority of 1000 or more will not be built. This can be used
 	 * to create one-time squads that are only filled once.
 	 */
-	Squad(int mId, int mType, string mName, int mPriority);
+	Squad(int mId, int mType, std::string mName, int mPriority);
 
 	/** Returns the id for this Squad. */
 	int getID();
 
 	/** Adds a requirement that needs to be fulfilled before this Squad is filled with units.
 	 * For example (Protoss_Zealot, 10), then the Squad will be filled once 10 Zealots has been built. */
-	void addRequirement(UnitType type, int no);
+	void addRequirement(BWAPI::UnitType type, int no);
 
 	/** Returns the next starting area to visit, if opponent has not been spotted. */
-	TilePosition getNextStartLocation();
+	BWAPI::TilePosition getNextStartLocation();
 
 	/** Returns the name of this Squad. */
-	string getName();
+	std::string getName();
 
 	/** Returns the unit squad members shall morph to (for example Archons or Lurkers)
-	 * UnitType::Unknown if no morph is set. */
-	UnitType morphsTo();
+	 * BWAPI::UnitType::Unknown if no morph is set. */
+	BWAPI::UnitType morphsTo();
 
 	/** Sets the unit squad members shall morph to (for example Archons or Lurkers) */
-	void setMorphsTo(UnitType type);
+	void setMorphsTo(BWAPI::UnitType type);
 
 	/** Checks if this Squad is required to be active before an attack is launched. */	
 	bool isRequired();
@@ -96,11 +93,11 @@ public:
 
 	/** Adds a setup for this Squad. Setup is a type and amount of units
 	 * that shall be in this Squad. */
-	virtual void addSetup(UnitType type, int no);
+	virtual void addSetup(BWAPI::UnitType type, int no);
 
-	/** Returns all setups for this Squad. Each UnitType in the Squad
+	/** Returns all setups for this Squad. Each BWAPI::UnitType in the Squad
 	 * is one setup. */
-	vector<UnitSetup> getSetup();
+	std::vector<UnitSetup> getSetup();
 
 	/** Returns true if this Squad is active, or false if not.
 	 * A Squad is active when it first has been filled with agents.
@@ -139,53 +136,53 @@ public:
 	bool isUnderAttack();
 
 	/** Check if this Squad need units of the specified type. */
-	bool needUnit(UnitType type);
+	bool needUnit(BWAPI::UnitType type);
 
 	/** Adds an agent to this Squad. */
 	bool addMember(BaseAgent* agent);
 
 	/** Returns the members of this Squad. */
-	vector<BaseAgent*> getMembers();
+	std::vector<BaseAgent*> getMembers();
 
 	/** Removes an agent from this Squad. */
 	void removeMember(BaseAgent* agent);
 
 	/** Removes an agent of the specified type from this Squad,
 	 * and returns the reference to the removed agent. */
-	BaseAgent* removeMember(UnitType type);
+	BaseAgent* removeMember(BWAPI::UnitType type);
 
 	/** Orders this squad to defend a position. */
-	virtual void defend(TilePosition mGoal);
+	virtual void defend(BWAPI::TilePosition mGoal);
 
 	/** Orders this squad to launch an attack at a position. */
-	virtual void attack(TilePosition mGoal);
+	virtual void attack(BWAPI::TilePosition mGoal);
 
 	/** Orders this squad to assist units at a position. */
-	virtual void assist(TilePosition mGoal);
+	virtual void assist(BWAPI::TilePosition mGoal);
 
 	/** Clears the goal for this Squad, i.e. sets the goal
-	 * to TilePosition(-1,-1). */
+	 * to BWAPI::TilePosition(-1,-1). */
 	virtual void clearGoal();
 
 	/** Returns the current goal of this Squad. */
-	virtual TilePosition getGoal();
+	virtual BWAPI::TilePosition getGoal();
 
-	/** Returns the next TilePosition to move to. */
-	TilePosition nextMovePosition();
+	/** Returns the next BWAPI::TilePosition to move to. */
+	BWAPI::TilePosition nextMovePosition();
 
 	/** Returns true if this squad has an assigned goal. */
 	virtual bool hasGoal();
 
 	/** Returns true if the goal of this squad is the same as the
 	 * specified goal, false if not. */
-	bool isThisGoal(TilePosition mGoal);
+	bool isThisGoal(BWAPI::TilePosition mGoal);
 
 	/** Returns true if the goal of this squad is close to the specified goal. */
-	bool isCloseTo(TilePosition mGoal);
+	bool isCloseTo(BWAPI::TilePosition mGoal);
 
 	/** Returns the center position of this Squad, i.e. the
 	 * average x and y position of its members. */
-	TilePosition getCenter();
+	BWAPI::TilePosition getCenter();
 
 	/** Returns the unit closest to the center position of the Squad. */
 	BaseAgent* getCenterAgent();
@@ -234,7 +231,7 @@ public:
 
 	/** Disbands this Squad and send its remaining members to
 	 * a retreat point. */
-	void disband(TilePosition retreatPoint);
+	void disband(BWAPI::TilePosition retreatPoint);
 
 	/** Used to print some info to the screen. */
 	virtual void printInfo();
@@ -250,13 +247,13 @@ public:
 
 	/** Returns true if this Squad has the number of the specified
 	 * unit types in it. */
-	bool hasUnits(UnitType type, int no);
+	bool hasUnits(BWAPI::UnitType type, int no);
 
 	/** Checks if the squad has at least one unit of the specified type. */
-	bool contains(UnitType type);
+	bool contains(BWAPI::UnitType type);
 
 	/** Returns the closest start location to the specified position. */
-	TilePosition getClosestStartLocation(TilePosition pos);
+	BWAPI::TilePosition getClosestStartLocation(BWAPI::TilePosition pos);
 
 	/** Offensive Squad */
 	static const int OFFENSIVE = 0;

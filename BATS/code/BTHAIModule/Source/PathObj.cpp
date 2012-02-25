@@ -1,5 +1,8 @@
 #include "PathObj.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
 
 PathObj::PathObj(TilePosition cStart, TilePosition cEnd)
 {

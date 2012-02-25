@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The MarineAgent handles Terran Marine units.
  *
@@ -21,7 +19,7 @@ class MarineAgent : public UnitAgent {
 private:
 	
 public:
-	MarineAgent(Unit* mUnit);
+	MarineAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

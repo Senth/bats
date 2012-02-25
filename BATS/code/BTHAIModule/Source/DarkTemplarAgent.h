@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The DarkTemplarAgent handles Protoss Dark Templar units.
  *
@@ -22,7 +20,7 @@ class DarkTemplarAgent : public UnitAgent {
 private:
 
 public:
-	DarkTemplarAgent(Unit* mUnit);
+	DarkTemplarAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

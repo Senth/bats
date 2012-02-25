@@ -4,9 +4,6 @@
 #include <BWAPI.h>
 #include "FileReaderUtils.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This file reads the buildorder script files.
  *
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
@@ -14,13 +11,13 @@ using namespace std;
 class BuildOrderFileReader : public FileReaderUtils {
 
 private:
-	void addUnitType(string line, vector<UnitType> &buildOrder);
+	void addUnitType(std::string line, std::vector<BWAPI::UnitType> &buildOrder);
 
 public:
 	BuildOrderFileReader();
 
 	/** Reads the buildorder from script file. */
-	vector<UnitType> readBuildOrder();
+	std::vector<BWAPI::UnitType> readBuildOrder();
 };
 
 #endif

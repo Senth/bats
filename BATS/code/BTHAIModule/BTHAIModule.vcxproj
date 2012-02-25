@@ -209,7 +209,6 @@
     <ClInclude Include="Source\ObserverAgent.h" />
     <ClInclude Include="Source\ReaverAgent.h" />
     <ClInclude Include="Source\ScoutAgent.h" />
-    <ClInclude Include="Source\ShuttleAgent.h" />
     <ClInclude Include="Source\ZealotAgent.h" />
     <ClInclude Include="Source\DefilerAgent.h" />
     <ClInclude Include="Source\DevourerAgent.h" />

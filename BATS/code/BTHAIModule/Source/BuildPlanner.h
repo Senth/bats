@@ -3,11 +3,8 @@
 
 #include <BWAPI.h>
 
-using namespace BWAPI;
-using namespace std;
-
 struct BuildQueueItem {
-	UnitType toBuild;
+	BWAPI::UnitType toBuild;
 	int assignedFrame;
 	int assignedWorkerId;
 };
@@ -28,15 +25,15 @@ private:
 
 protected:
 	BuildPlanner();
-	vector<UnitType> buildOrder;
-	vector<BuildQueueItem> buildQueue;
+	std::vector<BWAPI::UnitType> buildOrder;
+	std::vector<BuildQueueItem> buildQueue;
 	void lock(int buildOrderIndex, int unitId);
-	bool executeOrder(UnitType type);
+	bool executeOrder(BWAPI::UnitType type);
 	bool shallBuildSupplyDepot();
-	string format(UnitType type);
+	std::string format(BWAPI::UnitType type);
 
 	bool hasResourcesLeft();
-	int mineralsNearby(TilePosition center);
+	int mineralsNearby(BWAPI::TilePosition center);
 
 	int lastCommandCenter;
 
@@ -50,26 +47,26 @@ public:
 	static BuildPlanner* getInstance();
 
 	/** Returns the number of units of the specified type currently being produced. */
-	int noInProduction(UnitType type);
+	int noInProduction(BWAPI::UnitType type);
 
 	/** Called each update to issue orders. */
 	void computeActions();
 
 	/** Notifies that an own unit has been destroyed. */
-	void buildingDestroyed(Unit* building);
+	void buildingDestroyed(BWAPI::Unit* building);
 
 	/** When a request to construct a new building is issued, no construction are
 	 * allowed until the worker has moved to the buildspot and started constructing
 	 * the building. This is to avoid that the needed resources are not used up by
 	 * other build orders. During this time the BuildPlanner is locked, and new 
 	 * construction can only be done when unlock has been called. */
-	void unlock(UnitType type);
+	void unlock(BWAPI::UnitType type);
 
 	/** Removes a building from the buildorder. */
-	void remove(UnitType type);
+	void remove(BWAPI::UnitType type);
 
 	/** Called when a worker that is constructing a building is destroyed. */
-	void handleWorkerDestroyed(UnitType type, int workerID);
+	void handleWorkerDestroyed(BWAPI::UnitType type, int workerID);
 
 	/** Sets that a new command center has been built. */
 	void commandCenterBuilt();
@@ -79,7 +76,7 @@ public:
 
 	/** Is called when no buildspot has been found for the specified type. Gives each buildplanner
 	 * an opportunity to handle it. */
-	void handleNoBuildspotFound(UnitType toBuild);
+	void handleNoBuildspotFound(BWAPI::UnitType toBuild);
 
 	/** Checks if more supply buildings are needed. */
 	bool shallBuildSupply();
@@ -89,28 +86,28 @@ public:
 
 	/** Returns true if next in buildorder is of the specified type. Returns false if
 	 * buildorder is empty. */
-	bool nextIsOfType(UnitType type);
+	bool nextIsOfType(BWAPI::UnitType type);
 
 	/** Returns true if buildorder contains a unit of the specified type. */
-	bool containsType(UnitType type);
+	bool containsType(BWAPI::UnitType type);
 
 	/** Adds a building to the buildorder queue. */
-	void addBuilding(UnitType type);
+	void addBuilding(BWAPI::UnitType type);
 
 	/** Adds a building first in the buildorder queue. */
-	void addBuildingFirst(UnitType type);
+	void addBuildingFirst(BWAPI::UnitType type);
 
 	/** Requests to expand the base. */
-	void expand(UnitType commandCenterUnit);
+	void expand(BWAPI::UnitType commandCenterUnit);
 
 	/** Adds a refinery to the buildorder list. */
 	void addRefinery();
 
-	/** Checks if the specified TilePosition is covered by a detector buildings sight radius. */
-	static bool coveredByDetector(TilePosition pos);
+	/** Checks if the specified BWAPI::TilePosition is covered by a detector buildings sight radius. */
+	static bool coveredByDetector(BWAPI::TilePosition pos);
 
 	/** Morphs a Zerg drone to a building. */
-	bool executeMorph(UnitType target, UnitType evolved);
+	bool executeMorph(BWAPI::UnitType target, BWAPI::UnitType evolved);
 
 	/** Returns true if the player is Terran. */
 	static bool isTerran();

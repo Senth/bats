@@ -1,5 +1,8 @@
 #include "PFFunctions.h"
 
+using namespace BWAPI;
+using namespace std;
+
 float PFFunctions::getDistance(Position p1, Position p2)
 {
 	return (float)p1.getDistance(p2);

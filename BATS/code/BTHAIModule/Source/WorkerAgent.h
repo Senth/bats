@@ -2,8 +2,6 @@
 #define __WORKERAGENT_H__
 
 #include "BaseAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The WorkerAgent class handles all tasks that a worker, for example a Terran SCV, can perform. The tasks
  * involves gathering minerals and gas, move to a selected buildspot and construct the specified building,
@@ -16,18 +14,18 @@ class WorkerAgent : public BaseAgent {
 private:
 	int currentState;
 
-	UnitType toBuild;
-	TilePosition buildSpot;
-	TilePosition startSpot;
+	BWAPI::UnitType toBuild;
+	BWAPI::TilePosition buildSpot;
+	BWAPI::TilePosition startSpot;
 	bool buildSpotExplored();
 	bool areaFree();
 	bool isBuilt();
 	int startBuildFrame;
 
 	void handleKitingWorker();
-	Unit* getEnemyUnit();
-	Unit* getEnemyBuilding();
-	Unit* getEnemyWorker();
+	BWAPI::Unit* getEnemyUnit();
+	BWAPI::Unit* getEnemyBuilding();
+	BWAPI::Unit* getEnemyWorker();
 
 	int lastFrame;
 
@@ -48,7 +46,7 @@ public:
 	static const int ATTACKING = 6;
 
 	/** Constructor. */
-	WorkerAgent(Unit* mUnit);
+	WorkerAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -64,19 +62,19 @@ public:
 	int getState();
 
 	/** Returns true if the Worker agent can create units of the specified type. */
-	bool canBuild(UnitType type);
+	bool canBuild(BWAPI::UnitType type);
 
 	/** Assigns the agent to repair a building or tank. */
-	bool assignToRepair(Unit* building);
+	bool assignToRepair(BWAPI::Unit* building);
 
 	/** Assigns the unit to construct a building of the specified type. */
-	bool assignToBuild(UnitType type);
+	bool assignToBuild(BWAPI::UnitType type);
 
 	/** Assigns the agent to continue building a non-finished building. */
-	bool assignToFinishBuild(Unit* building);
+	bool assignToFinishBuild(BWAPI::Unit* building);
 
 	/** Returns the state of the agent as text. Good for printouts. */
-	string getStateAsText();
+	std::string getStateAsText();
 
 	/** Called when the unit assigned to this agent is destroyed. */
 	void destroyed();
@@ -86,7 +84,7 @@ public:
 
 	/** Returns true if this worker is in any of the build states, and is constructing
 	 * the specified building. */
-	bool isConstructing(UnitType type);
+	bool isConstructing(BWAPI::UnitType type);
 };
 
 #endif

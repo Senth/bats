@@ -3,15 +3,12 @@
 
 #include <BWAPI.h>
 
-using namespace BWAPI;
-using namespace std;
-
 struct ResourceLock {
-	UnitType unit;
+	BWAPI::UnitType unit;
 	int mineralCost;
 	int gasCost;
 
-	ResourceLock(UnitType mUnit)
+	ResourceLock(BWAPI::UnitType mUnit)
 	{
 		unit = mUnit;
 		mineralCost = mUnit.mineralPrice();
@@ -36,7 +33,7 @@ private:
 
 	bool hasProductionBuilding();
 	
-	vector<ResourceLock> locks;
+	std::vector<ResourceLock> locks;
 
 	int calcLockedMinerals();
 	int calcLockedGas();
@@ -52,22 +49,22 @@ public:
 	bool needWorker();
 
 	/** Checks if we have enough resources free to build the specified unit. */
-	bool hasResources(UnitType type);
+	bool hasResources(BWAPI::UnitType type);
 
 	/** Checks if we have enough resources free for the specified upgrade. */
-	bool hasResources(UpgradeType type);
+	bool hasResources(BWAPI::UpgradeType type);
 
 	/** Checks if we have enough resources free for the specified research. */
-	bool hasResources(TechType type);
+	bool hasResources(BWAPI::TechType type);
 
 	/** Checks if we have enough resources free. */
 	bool hasResources(int neededMinerals, int neededGas);
 
 	/** Locks resources for use. */
-	void lockResources(UnitType type);
+	void lockResources(BWAPI::UnitType type);
 
 	/** Unlocks resources for use. */
-	void unlockResources(UnitType type);
+	void unlockResources(BWAPI::UnitType type);
 
 	/** Shows some debug info on screen. */
 	void printInfo();

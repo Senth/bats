@@ -7,6 +7,9 @@
 #include "WorkerAgent.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace std;
+
 int AgentManager::StartFrame = 0;
 bool AgentManager::instanceFlag = false;
 AgentManager* AgentManager::instance = NULL;

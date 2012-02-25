@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The BattlecruiserAgent handles Terran Battlecruiser flying units.
  *
@@ -20,7 +18,7 @@ private:
 	int lastUseFrame;
 	
 public:
-	BattlecruiserAgent(Unit* mUnit);
+	BattlecruiserAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

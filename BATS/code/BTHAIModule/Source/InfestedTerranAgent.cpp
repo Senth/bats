@@ -2,6 +2,9 @@
 #include "PFManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 InfestedTerranAgent::InfestedTerranAgent(Unit* mUnit)
 {
 	unit = mUnit;

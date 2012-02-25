@@ -49,6 +49,9 @@
 #include "ScourgeAgent.h"
 #include "InfestedTerranAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 bool AgentFactory::instanceFlag = false;
 AgentFactory* AgentFactory::instance = NULL;
 

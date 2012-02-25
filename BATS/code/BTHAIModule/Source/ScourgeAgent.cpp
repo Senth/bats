@@ -2,6 +2,9 @@
 #include "PFManager.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ScourgeAgent::ScourgeAgent(Unit* mUnit)
 {
 	unit = mUnit;

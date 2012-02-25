@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 bool Pathfinder::instanceFlag = false;
 Pathfinder* Pathfinder::instance = NULL;
 

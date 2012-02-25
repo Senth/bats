@@ -4,6 +4,9 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ValkyrieAgent::ValkyrieAgent(Unit* mUnit)
 {
 	unit = mUnit;

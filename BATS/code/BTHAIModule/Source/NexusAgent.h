@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "StructureAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The NexusAgent handles Protoss Nexus buildings.
  *
@@ -19,7 +17,7 @@ private:
 	bool hasSentWorkers;
 
 public:
-	NexusAgent(Unit* mUnit);
+	NexusAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

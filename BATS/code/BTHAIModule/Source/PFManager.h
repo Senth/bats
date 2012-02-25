@@ -4,9 +4,6 @@
 #include <BWAPI.h>
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** In the bot unit navigation uses two techniques; if no enemy units are close units navigate using the built in pathfinder in
  * Starcraft. If enemy units are close, own units uses potential fields to engage and surround the enemy.
  * The PFManager class is the main class for the potential fields navigation system, and it shall be used compute and execute
@@ -40,15 +37,15 @@ public:
 
 	/** Is used to compute and execute movement commands for attacking units using the potential field
 	 * navigation system. */
-	void computeAttackingUnitActions(BaseAgent* agent, TilePosition goal, bool defensive);
+	void computeAttackingUnitActions(BaseAgent* agent, BWAPI::TilePosition goal, bool defensive);
 
 	/** Is used to compute and execute movement commands for attacking units using the potential field
 	 * navigation system. If forceMove is set to true, units always move even if they can attack. */
-	void computeAttackingUnitActions(BaseAgent* agent, TilePosition goal, bool defensive, bool forceMove);
+	void computeAttackingUnitActions(BaseAgent* agent, BWAPI::TilePosition goal, bool defensive, bool forceMove);
 
 	/** Moves a unit to the specified goal using the pathfinder, and stops at a distance where the
 	* potential field navigation system should be used instead. */
-	bool moveToGoal(BaseAgent* agent, TilePosition checkpoint, TilePosition goal);
+	bool moveToGoal(BaseAgent* agent, BWAPI::TilePosition checkpoint, BWAPI::TilePosition goal);
 	
 };
 

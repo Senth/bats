@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ValkyrieAgent handles Terran Valkyrie flying units.
  *
@@ -18,7 +16,7 @@ class ValkyrieAgent : public UnitAgent {
 private:
 
 public:
-	ValkyrieAgent(Unit* mUnit);
+	ValkyrieAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

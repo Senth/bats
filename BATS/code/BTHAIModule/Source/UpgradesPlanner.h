@@ -4,9 +4,6 @@
 #include <BWAPI.h>
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** UpgradesPlanner contains which updates/techs to be research and in
  * which order.
  *
@@ -22,15 +19,15 @@ private:
 
 	UpgradesPlanner();
 	
-	vector<UpgradeType> upgradesP1;
-	vector<UpgradeType> upgradesP2;
-	vector<UpgradeType> upgradesP3;
-	vector<TechType> techsP1;
-	vector<TechType> techsP2;
-	vector<TechType> techsP3;
+	std::vector<BWAPI::UpgradeType> upgradesP1;
+	std::vector<BWAPI::UpgradeType> upgradesP2;
+	std::vector<BWAPI::UpgradeType> upgradesP3;
+	std::vector<BWAPI::TechType> techsP1;
+	std::vector<BWAPI::TechType> techsP2;
+	std::vector<BWAPI::TechType> techsP3;
 
-	bool canUpgrade(UpgradeType type, Unit* unit);
-	bool canResearch(TechType type, Unit* unit);
+	bool canUpgrade(BWAPI::UpgradeType type, BWAPI::Unit* unit);
+	bool canResearch(BWAPI::TechType type, BWAPI::Unit* unit);
 
 public:
 	/** Destructor. */

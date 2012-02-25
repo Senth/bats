@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The FirebatAgent handles Terran Firebat units.
  *
@@ -19,7 +17,7 @@ class FirebatAgent : public UnitAgent {
 private:
 
 public:
-	FirebatAgent(Unit* mUnit);
+	FirebatAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

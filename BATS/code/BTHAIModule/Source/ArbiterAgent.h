@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The ArbiterAgent handles Protoss Arbiter flying units.
  *
@@ -18,7 +16,7 @@ class ArbiterAgent : public UnitAgent {
 private:
 
 public:
-	ArbiterAgent(Unit* mUnit);
+	ArbiterAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

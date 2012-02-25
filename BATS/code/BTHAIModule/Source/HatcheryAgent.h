@@ -4,9 +4,6 @@
 #include <BWAPI.h>
 #include "StructureAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** The HatcheryAgent handles Zerg Hatchery/Lair/Hive buildings.
  *
  * Implemented abilities:
@@ -19,10 +16,10 @@ class HatcheryAgent : public StructureAgent {
 
 private:
 	bool hasSentWorkers;
-	bool checkBuildUnit(UnitType type);
+	bool checkBuildUnit(BWAPI::UnitType type);
 
 public:
-	HatcheryAgent(Unit* mUnit);
+	HatcheryAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

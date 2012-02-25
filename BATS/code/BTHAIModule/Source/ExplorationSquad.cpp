@@ -2,6 +2,9 @@
 #include "UnitAgent.h"
 #include "ExplorationManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 ExplorationSquad::ExplorationSquad(int mId, string mName, int mPriority)
 {
 	this->id = mId;

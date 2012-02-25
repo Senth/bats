@@ -1,6 +1,9 @@
 #include "UnitSetup.h"
 #include "Squad.h"
 
+using namespace BWAPI;
+using namespace std;
+
 UnitSetup::UnitSetup()
 {
 

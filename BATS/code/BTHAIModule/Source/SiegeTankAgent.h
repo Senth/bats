@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The SiegeTankAgent handles Terran Siege Tank units.
  *
@@ -16,7 +14,7 @@ using namespace std;
 class SiegeTankAgent : public UnitAgent {
 	
 public:
-	SiegeTankAgent(Unit* mUnit);
+	SiegeTankAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

@@ -4,9 +4,6 @@
 #include "BaseAgent.h"
 #include "Squad.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This class handle squads used to explore the game world. Any unit type
  * can be used as explorer.
  *
@@ -19,7 +16,7 @@ private:
 	
 public:
 	/** Constructor. See Squad.h for more details. */
-	ExplorationSquad(int mId, string mName, int mPriority);
+	ExplorationSquad(int mId, std::string mName, int mPriority);
 
 	/** Returns true if this Squad is active, or false if not.
 	 * A Squad is active when it first has been filled with agents.
@@ -30,20 +27,20 @@ public:
 	void computeActions();
 
 	/** Orders this squad to defend a position. */
-	void defend(TilePosition mGoal);
+	void defend(BWAPI::TilePosition mGoal);
 
 	/** Orders this squad to launch an attack at a position. */
-	void attack(TilePosition mGoal);
+	void attack(BWAPI::TilePosition mGoal);
 
 	/** Orders this squad to assist units at a position. */
-	void assist(TilePosition mGoal);
+	void assist(BWAPI::TilePosition mGoal);
 
 	/** Clears the goal for this Squad, i.e. sets the goal
-	 * to TilePosition(-1,-1). */
+	 * to BWAPI::TilePosition(-1,-1). */
 	void clearGoal();
 
 	/** Returns the current goal of this Squad. */
-	TilePosition getGoal();
+	BWAPI::TilePosition getGoal();
 
 	/** Returns true if this squad has an assigned goal. */
 	bool hasGoal();

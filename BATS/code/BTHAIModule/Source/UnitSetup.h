@@ -3,9 +3,6 @@
 
 #include "BaseAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This class is used by the Squad class to handle the number of units of a specified type is
  * in the squad.
  *
@@ -20,17 +17,17 @@ public:
 	UnitSetup();
 
 	/** Type of unit. */
-	UnitType type;
+	BWAPI::UnitType type;
 	/** Wanted number of the unit. */
 	int no;
 	/** Current number of the unit. */
 	int current;
 
 	/** Checks if this setup equals to the specified type. */
-	bool equals(UnitType mType);
+	bool equals(BWAPI::UnitType mType);
 
 	/** Checks if unittypes matches. Needed for morphing units like Siege Tanks and Lurkers. */
-	static bool equals(UnitType t1, UnitType t2);
+	static bool equals(BWAPI::UnitType t1, BWAPI::UnitType t2);
 
 };
 

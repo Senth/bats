@@ -3,6 +3,9 @@
 #include "AgentManager.h"
 #include "Commander.h"
 
+using namespace BWAPI;
+using namespace std;
+
 HighTemplarAgent::HighTemplarAgent(Unit* mUnit)
 {
 	unit = mUnit;

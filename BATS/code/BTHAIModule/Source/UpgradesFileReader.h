@@ -4,10 +4,6 @@
 #include <BWAPI.h>
 #include "FileReaderUtils.h"
 
-using namespace BWAPI;
-using namespace std;
-
-
 /** This class reads the Upgrade/Techs scriptfile.
  * Upgrades/techs are in three priorities, 1 2 and 3. 1 is highest.
  *
@@ -16,14 +12,14 @@ using namespace std;
 class UpgradesFileReader : public FileReaderUtils {
 
 private:
-	void addUpgrade(string line);
+	void addUpgrade(std::string line);
 	
-	vector<UpgradeType> upgradesP1;
-	vector<UpgradeType> upgradesP2;
-	vector<UpgradeType> upgradesP3;
-	vector<TechType> techsP1;
-	vector<TechType> techsP2;
-	vector<TechType> techsP3;
+	std::vector<BWAPI::UpgradeType> upgradesP1;
+	std::vector<BWAPI::UpgradeType> upgradesP2;
+	std::vector<BWAPI::UpgradeType> upgradesP3;
+	std::vector<BWAPI::TechType> techsP1;
+	std::vector<BWAPI::TechType> techsP2;
+	std::vector<BWAPI::TechType> techsP3;
 
 public:
 	/** Constructor. */
@@ -33,17 +29,17 @@ public:
 	void readUpgrades();
 
 	/** Returns upgrades prio 1. */
-	vector<UpgradeType> getUpgradesP1();
+	std::vector<BWAPI::UpgradeType> getUpgradesP1();
 	/** Returns upgrades prio 2. */
-	vector<UpgradeType> getUpgradesP2();
+	std::vector<BWAPI::UpgradeType> getUpgradesP2();
 	/** Returns upgrades prio 3. */
-	vector<UpgradeType> getUpgradesP3();
+	std::vector<BWAPI::UpgradeType> getUpgradesP3();
 	/** Returns techs prio 1. */
-	vector<TechType> getTechsP1();
+	std::vector<BWAPI::TechType> getTechsP1();
 	/** Returns techs prio 2. */
-	vector<TechType> getTechsP2();
+	std::vector<BWAPI::TechType> getTechsP2();
 	/** Returns techs prio 3. */
-	vector<TechType> getTechsP3();
+	std::vector<BWAPI::TechType> getTechsP3();
 };
 
 #endif

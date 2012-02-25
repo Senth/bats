@@ -8,6 +8,9 @@
 #include "CoverMap.h"
 #include "Profiler.h"
 
+using namespace BWAPI;
+using namespace std;
+
 bool PFManager::instanceFlag = false;
 PFManager* PFManager::instance = NULL;
 

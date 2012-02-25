@@ -3,9 +3,6 @@
 
 #include "StructureAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** The ComsatAgent handles Terran Comsat Station buildings.
  *
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
@@ -15,7 +12,7 @@ class ComsatAgent : public StructureAgent {
 private:
 	
 public:
-	ComsatAgent(Unit* mUnit);
+	ComsatAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

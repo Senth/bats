@@ -6,6 +6,10 @@
 #include "Squad.h"
 #include "CoverMap.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 bool ExplorationManager::instanceFlag = false;
 ExplorationManager* ExplorationManager::instance = NULL;
 

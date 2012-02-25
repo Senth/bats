@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The OverlordAgent handles Zerg Overlord units.
  *
@@ -20,7 +18,7 @@ private:
 	void updateGoal();
 
 public:
-	OverlordAgent(Unit* mUnit);
+	OverlordAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

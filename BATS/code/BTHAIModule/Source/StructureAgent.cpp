@@ -7,6 +7,10 @@
 #include "ResourceManager.h"
 #include "ExplorationManager.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 StructureAgent::StructureAgent()
 {
 

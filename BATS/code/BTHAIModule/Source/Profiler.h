@@ -3,9 +3,6 @@
 #include "BaseAgent.h"
 #include "ProfilerObj.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** This class is used to measure the time (in milliseconds) it takes to execute a codeblock.
  * It also counts timeouts according to the rules from the AIIDE 2011 bot competition. If one of
  * the following three conditions are true, a bot is disqualified due to timeout:
@@ -13,7 +10,7 @@ using namespace std;
  * - 10 frames over 1 second execution time.
  * - 320 frames over 55 ms execution time.
  * 
- * The profiler can measure multiple parallell codeblocks. It uses an identifier string to differ
+ * The profiler can measure multiple parallell codeblocks. It uses an identifier std::string to differ
  * between different blocks.
  *
  * After a game is ended all profiling data is stored in a html file in the BTHAI-data folder.
@@ -23,8 +20,8 @@ using namespace std;
 class Profiler {
 
 	private:
-		vector<ProfilerObj*> obj;
-		ProfilerObj* getObj(string mId);
+		std::vector<ProfilerObj*> obj;
+		ProfilerObj* getObj(std::string mId);
 
 		Profiler();
 		static Profiler* instance;
@@ -39,17 +36,17 @@ class Profiler {
 
 		/** Starts measuring. Put at beginning of a codeblock. 
 		 * Make sure the startiId is the same as the end id. */
-		void start(string mId);
+		void start(std::string mId);
 
 		/** Stops measuring. Put at the end of a codeblock.
 		 * Make sure the startiId is the same as the end id. */
-		void end(string mId);
+		void end(std::string mId);
 
 		/** Returns the time elapsed between start and end. */
-		int getElapsed(string mId);
+		int getElapsed(std::string mId);
 
 		/** Outputs result to the in-game chat window. */
-		void show(string mId);
+		void show(std::string mId);
 		
 		/** Outputs result from all profiles to the in-game chat window. */
 		void showAll();

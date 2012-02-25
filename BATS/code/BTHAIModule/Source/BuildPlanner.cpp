@@ -9,6 +9,9 @@
 #include "BuildOrderFileReader.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 BuildPlanner* BuildPlanner::instance = NULL;
 
 BuildPlanner::BuildPlanner()

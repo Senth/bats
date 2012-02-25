@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The CorsairAgent handles Protoss Corsair flying units.
  *
@@ -19,7 +17,7 @@ private:
 	int lastUseFrame;
 
 public:
-	CorsairAgent(Unit* mUnit);
+	CorsairAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

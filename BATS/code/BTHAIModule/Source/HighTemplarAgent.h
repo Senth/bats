@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The HighTemplarAgent handles Protoss High Templar units.
  *
@@ -17,13 +15,13 @@ using namespace std;
 class HighTemplarAgent : public UnitAgent {
 
 private:
-	Unit* findPsiStormTarget();
+	BWAPI::Unit* findPsiStormTarget();
 	BaseAgent* findHallucinationTarget();
 	BaseAgent* findArchonTarget();
 	bool hasCastTransform;
 
 public:
-	HighTemplarAgent(Unit* mUnit);
+	HighTemplarAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

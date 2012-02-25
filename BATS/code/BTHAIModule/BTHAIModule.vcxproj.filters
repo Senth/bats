@@ -422,9 +422,6 @@
     <ClInclude Include="Source\ScoutAgent.h">
       <Filter>Header Files\UnitAgents\Protoss</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ShuttleAgent.h">
-      <Filter>Header Files\UnitAgents\Protoss</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ZealotAgent.h">
       <Filter>Header Files\UnitAgents\Protoss</Filter>
     </ClInclude>

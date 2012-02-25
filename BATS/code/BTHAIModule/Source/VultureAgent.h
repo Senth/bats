@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The VultureAgent handles Terran Vulture units.
  *
@@ -21,7 +19,7 @@ private:
 	int mineDropFrame;
 	
 public:
-	VultureAgent(Unit* mUnit);
+	VultureAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

@@ -4,6 +4,9 @@
 #include "AgentManager.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 UpgradesPlanner* UpgradesPlanner::instance = NULL;
 
 UpgradesPlanner::UpgradesPlanner()

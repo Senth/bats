@@ -3,6 +3,9 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 
+using namespace BWAPI;
+using namespace std;
+
 HydraliskAgent::HydraliskAgent(Unit* mUnit)
 {
 	unit = mUnit;

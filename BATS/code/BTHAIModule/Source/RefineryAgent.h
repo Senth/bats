@@ -3,9 +3,6 @@
 
 #include "StructureAgent.h"
 
-using namespace BWAPI;
-using namespace std;
-
 /** The RefineryAgent handles Refinery buildings for all races.
  *
  * Implemented abilities:
@@ -16,10 +13,10 @@ using namespace std;
 class RefineryAgent : public StructureAgent {
 
 private:
-	vector<BaseAgent*> assignedWorkers;
+	std::vector<BaseAgent*> assignedWorkers;
 
 public:
-	RefineryAgent(Unit* mUnit);
+	RefineryAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

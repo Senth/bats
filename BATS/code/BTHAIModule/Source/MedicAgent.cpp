@@ -2,6 +2,9 @@
 #include "PFManager.h"
 #include "AgentManager.h"
 
+using namespace BWAPI;
+using namespace std;
+
 MedicAgent::MedicAgent(Unit* mUnit)
 {
 	unit = mUnit;

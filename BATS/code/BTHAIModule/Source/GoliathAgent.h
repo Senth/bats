@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "UnitAgent.h"
-using namespace BWAPI;
-using namespace std;
 
 /** The GoliathAgent handles Terran Goliath units.
  *
@@ -18,7 +16,7 @@ class GoliathAgent : public UnitAgent {
 private:
 
 public:
-	GoliathAgent(Unit* mUnit);
+	GoliathAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
 	void computeActions();

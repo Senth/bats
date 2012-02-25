@@ -3,6 +3,10 @@
 #include "Profiler.h"
 #include "ResourceManager.h"
 
+using namespace BWAPI;
+using namespace BWTA;
+using namespace std;
+
 AIloop::AIloop()
 {
 	
