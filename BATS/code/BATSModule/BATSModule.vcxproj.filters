@@ -7,15 +7,24 @@
     <Filter Include="Squads">
       <UniqueIdentifier>{557d5c7b-0f1d-46d3-8925-d1349f5407a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BuildOrder">
+      <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BatsDll.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="BuildOrderManager.cpp">
+      <Filter>BuildOrder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Squad.h">
       <Filter>Squads</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildOrderManager.h">
+      <Filter>BuildOrder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
