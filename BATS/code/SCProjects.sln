@@ -6,7 +6,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BATSModule", "BATSModule\BATSModule.vcxproj", "{3C831479-F08A-4C45-9A91-549414902D23}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2E63AE74-758A-4607-9DE4-D28E814A6E13} = {2E63AE74-758A-4607-9DE4-D28E814A6E13}
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573} = {23B12E85-4B66-4E4F-818A-306B1B2AC573}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "Utilities\Utilities.vcxproj", "{23B12E85-4B66-4E4F-818A-306B1B2AC573}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +41,16 @@ Global
 		{3C831479-F08A-4C45-9A91-549414902D23}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{3C831479-F08A-4C45-9A91-549414902D23}.Release|Win32.ActiveCfg = Release|Win32
 		{3C831479-F08A-4C45-9A91-549414902D23}.Release|Win32.Build.0 = Release|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Debug|Win32.ActiveCfg = Debug|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Debug|Win32.Build.0 = Debug|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Release|Any CPU.ActiveCfg = Release|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Release|Win32.ActiveCfg = Release|Win32
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

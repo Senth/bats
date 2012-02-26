@@ -10,21 +10,33 @@
     <Filter Include="BuildOrder">
       <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{c69f46b3-e05a-441c-8efa-1a4827a712dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BatsDll.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="BuildOrderManager.cpp">
-      <Filter>BuildOrder</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Squad.h">
+    <ClInclude Include="include\Squad.h">
       <Filter>Squads</Filter>
     </ClInclude>
-    <ClInclude Include="BuildOrderManager.h">
+    <ClInclude Include="include\BuildOrderManager.h">
       <Filter>BuildOrder</Filter>
     </ClInclude>
+    <ClInclude Include="include\BatsModule.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Helper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BuildOrderManager.cpp">
+      <Filter>BuildOrder</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BatsDll.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BatsModule.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

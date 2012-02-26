@@ -48,13 +48,17 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..;../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../Debug;../../../BWAPI/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>BTHAIModuled.lib;mpfr-vc90-mt.lib;gmp-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;BWAPId.lib;BWTAd.lib;tinyxmld.lib;CGAL-vc90-mt-gd.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-gd-1_40.lib;gmp-vc90-mt-gd.lib;mpfr-vc90-mt-gd.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Utilitiesd.lib;BTHAIModuled.lib;mpfr-vc90-mt.lib;gmp-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;BWAPId.lib;BWTAd.lib;tinyxmld.lib;CGAL-vc90-mt-gd.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-gd-1_40.lib;gmp-vc90-mt-gd.lib;mpfr-vc90-mt-gd.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -65,26 +69,39 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..;../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;..;../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>BTHAIModule.lib;BWAPI.lib;BWTA.lib;tinyxml.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;gmp-vc90-mt.lib;mpfr-vc90-mt.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Utilities.lib;BTHAIModule.lib;BWAPI.lib;BWTA.lib;tinyxml.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;gmp-vc90-mt.lib;mpfr-vc90-mt.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalLibraryDirectories>../../../BWAPI/lib;../Release</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BatsDll.cpp" />
-    <ClCompile Include="BuildOrderManager.cpp" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BuildOrderManager.h" />
-    <ClInclude Include="Squad.h" />
+    <ClInclude Include="include\BatsModule.h" />
+    <ClInclude Include="include\BuildOrderManager.h" />
+    <ClInclude Include="include\Helper.h" />
+    <ClInclude Include="include\Squad.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BatsDll.cpp" />
+    <ClCompile Include="src\BatsModule.cpp" />
+    <ClCompile Include="src\BuildOrderManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

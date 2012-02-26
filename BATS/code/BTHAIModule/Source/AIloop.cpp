@@ -9,7 +9,7 @@ using namespace std;
 
 AIloop::AIloop()
 {
-	
+	debug_mode = 0;
 }
 
 AIloop::~AIloop()

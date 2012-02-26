@@ -2,10 +2,12 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include "BatsModule.h"
 
-/** @todo change to "BATSModule.h"  */
-#include "BTHAIModule/Source/BTHAIModule.h"
 namespace BWAPI { Game* Broodwar; }
+
+#pragma warning (push)
+#pragma warning (disable:4100)
 BOOL APIENTRY DllMain( HANDLE hModule, 
 	DWORD  reasonForCall, 
 	LPVOID pReserved
@@ -23,9 +25,10 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 
 	return TRUE;
 }
+#pragma warning (pop)
 
 extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar=game;
-	return new BTHAIModule();
+	return new bats::BatsModule();
 }

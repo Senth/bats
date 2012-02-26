@@ -1,4 +1,5 @@
 #include "BTHAIModule.h"
+#include "AgentManager.h"
 #include "BuildPlanner.h"
 #include "ExplorationManager.h"
 #include "CoverMap.h"
@@ -6,6 +7,8 @@
 #include "Pathfinder.h"
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
+#include "AIloop.h"
+#include "Statistics.h"
 #include "Profiler.h"
 #include "Config.h"
 #include <Shlwapi.h>
@@ -16,6 +19,20 @@ using namespace std;
 bool analyzed;
 bool analysis_just_finished;
 bool leader = false;
+
+BTHAIModule::BTHAIModule() : BWAPI::AIModule() {
+	statistics = NULL;
+	loop = NULL;
+
+	running = false;
+	profile = false;
+	speed = 8;
+}
+
+BTHAIModule::~BTHAIModule() {
+	delete statistics;
+	delete loop;
+}
 
 void BTHAIModule::onStart() 
 {

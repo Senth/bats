@@ -59,13 +59,14 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../../BWAPI/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>mpfr-vc90-mt.lib;gmp-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;BWAPI.lib;BWTA.lib;tinyxmld.lib;CGAL-vc90-mt-gd.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-gd-1_40.lib;gmp-vc90-mt-gd.lib;mpfr-vc90-mt-gd.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -87,6 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>BWAPI.lib;BWTA.lib;tinyxml.lib;CGAL-vc90-mt.lib;libboost_thread-vc90-mt-1_40.lib;gmp-vc90-mt.lib;mpfr-vc90-mt.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

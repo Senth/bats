@@ -28,6 +28,8 @@ Pathfinder::~Pathfinder()
 	{	
 		delete pathObj.at(i);
 	}
+
+	instance = NULL;
 }
 
 Pathfinder* Pathfinder::getInstance()

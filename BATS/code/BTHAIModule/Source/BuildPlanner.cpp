@@ -23,7 +23,7 @@ BuildPlanner::BuildPlanner()
 
 BuildPlanner::~BuildPlanner()
 {
-	delete instance;
+	instance = NULL;
 }
 
 BuildPlanner* BuildPlanner::getInstance()

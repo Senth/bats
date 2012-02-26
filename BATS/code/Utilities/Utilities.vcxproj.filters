@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{46f99c32-c197-45e0-aed8-33298cba5c4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{fb5c9a0e-5ba8-45ce-a39b-0b8b241c3f54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{f34aa0b7-26b0-44a0-81ca-9c8aac84af3c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Logger.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec3Float.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec3Float.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

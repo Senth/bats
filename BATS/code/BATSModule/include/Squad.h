@@ -1,6 +1,4 @@
-#ifndef __bats__SQUAD_H__
-#define __bats__SQUAD_H__
-
+#pragma once
 
 // Namespace for the project
 namespace bats {
@@ -28,4 +26,3 @@ private:
 
 };
 }
-#endif

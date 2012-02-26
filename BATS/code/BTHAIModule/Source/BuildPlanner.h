@@ -21,23 +21,21 @@ struct BuildQueueItem {
 class BuildPlanner {
 
 private:
-	static BuildPlanner* instance;
-
-protected:
-	BuildPlanner();
 	std::vector<BWAPI::UnitType> buildOrder;
 	std::vector<BuildQueueItem> buildQueue;
+	int lastCommandCenter;
+
+	int lastCallFrame;
+protected:
+	BuildPlanner();
 	void lock(int buildOrderIndex, int unitId);
 	bool executeOrder(BWAPI::UnitType type);
 	bool shallBuildSupplyDepot();
 	std::string format(BWAPI::UnitType type);
-
 	bool hasResourcesLeft();
-	int mineralsNearby(BWAPI::TilePosition center);
+	int mineralsNearby(BWAPI::TilePosition center);	
 
-	int lastCommandCenter;
-
-	int lastCallFrame;
+	static BuildPlanner* instance;
 
 public:
 	/** Destructor. */

@@ -72,6 +72,8 @@ public:
 	/** Returns the unique type name for the agent type. */
 	std::string getTypeName();
 
+#pragma warning (push)
+#pragma warning (disable:4100)
 	/** Assigns the agent to build the specified type of unit. */
 	virtual bool assignToBuild(BWAPI::UnitType type)
 	{
@@ -89,6 +91,7 @@ public:
 	{
 		return false;
 	}
+#pragma warning (pop)
 
 	/** Assigns this agent to explore the game world. */
 	virtual void assignToExplore()

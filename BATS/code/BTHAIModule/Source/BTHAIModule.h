@@ -1,7 +1,8 @@
 #pragma once
-#include "AgentManager.h"
-#include "Statistics.h"
-#include "AIloop.h"
+
+// Forward declarations
+class Statistics;
+class AIloop;
 
 #include <BWTA.h>
 #include <windows.h>
@@ -29,11 +30,28 @@ DWORD WINAPI AnalyzeThread();
 class BTHAIModule : public BWAPI::AIModule
 {
 private:
+	virtual void gameStopped();
+
+protected:
 	bool running;
 	bool profile;
-	void gameStopped();
+	int speed;
+	Statistics* statistics;
+	AIloop* loop;
 
 public:
+	/**
+	 * Default constructor to set variables if forgotten to set them manually
+	 * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+	 */
+	BTHAIModule();
+
+	/**
+	 * Virtual descructor to call destructors in derived classes.
+	 * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+	 */
+	virtual ~BTHAIModule();
+
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
@@ -50,8 +68,4 @@ public:
 	virtual void onUnitMorph(BWAPI::Unit* unit);
 	virtual void onUnitRenegade(BWAPI::Unit* unit);
 	virtual void onSaveGame(std::string gameName);
-
-	int speed;
-	Statistics* statistics;
-	AIloop* loop;
 };
