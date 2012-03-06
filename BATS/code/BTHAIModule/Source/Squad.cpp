@@ -909,7 +909,7 @@ bool Squad::isAir()
 
 void Squad::disband(TilePosition retreatPoint)
 {
-	for (int i = 1; i < (int)agents.size(); i++)
+	for (int i = 1; i < (int)(agents.size()); i++)
 	{
 		if (agents.at(i)->isAlive())
 		{

@@ -134,10 +134,13 @@ void setVerbosityLevel(LogLevels verbosity, int target);
 { \
 	std::stringstream ss; \
 	ss << message; \
-	printErrorMessage(ss.str(), __FILE__, __LINE__);\
+	printErrorMessage(ss.str(), __FILE__, __LINE__); \
+	__pragma(warning(push)); \
+	__pragma(warning(disable:4127)); \
 	if (forceQuit) { \
 		exit(EXIT_FAILURE); \
 	} \
+	__pragma(warning(pop));\
 }
 
 /**

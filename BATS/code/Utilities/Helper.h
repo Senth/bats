@@ -18,10 +18,8 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#ifndef HELPER_H_
-#define HELPER_H_
+#pragma once
 
-#include <cstddef>
 #include <cassert>
 
 #define SAFE_DELETE(pointer) \
@@ -31,5 +29,3 @@
 #define SAFE_DELETE_ARR(pointer) \
 	delete [] pointer; \
 	pointer = NULL;
-
-#endif /* HELPER_H_ */

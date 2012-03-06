@@ -47,7 +47,7 @@ const std::string ERROR_DEBUG_EXTENSION = ".txt";
 std::ofstream gErrorFile;
 std::ofstream gDebugMessageFile;
 
-void setOutputDirectory(const std::string& dirPath) {
+void utilities::setOutputDirectory(const std::string& dirPath) {
 	// Get date and time
 	std::string timeStamp = getTimeStamp(true);
 
@@ -85,7 +85,7 @@ void setOutputDirectory(const std::string& dirPath) {
 	gDebugMessageFile.open(debugPath.c_str());
 }
 
-void setVerbosityLevel(LogLevels verbosity, int target)
+void utilities::setVerbosityLevel(LogLevels verbosity, int target)
 {
 	if (target & OUTPUT_CONSOLE)
 	{
@@ -98,7 +98,7 @@ void setVerbosityLevel(LogLevels verbosity, int target)
 	}
 }
 
-void checkForErrors()
+void utilities::checkForErrors()
 {
 	if (gcError > 0)
 	{
@@ -117,7 +117,7 @@ void checkForErrors()
 	}
 }
 
-void printErrorMessage(const std::string& errorMessage, const char* file, long line) {
+void utilities::printErrorMessage(const std::string& errorMessage, const char* file, long line) {
 	std::string time = getTimeStamp();
 
 	gcError++;
@@ -139,7 +139,7 @@ void printErrorMessage(const std::string& errorMessage, const char* file, long l
 	}
 }
 
-void printDebugMessage(LogLevels verbosity, const std::string& debugMessage, bool stop)
+void utilities::printDebugMessage(LogLevels verbosity, const std::string& debugMessage, bool stop)
 {
 	std::string timeStamp = getTimeStamp();
 
@@ -164,7 +164,7 @@ void printDebugMessage(LogLevels verbosity, const std::string& debugMessage, boo
 	}
 }
 
-std::string getTimeStamp(bool filenameProof) {
+std::string utilities::getTimeStamp(bool filenameProof) {
 
 	std::stringstream timeStamp;
 

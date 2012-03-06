@@ -38,5 +38,8 @@
     <ClCompile Include="src\BatsModule.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="src\Squad.cpp">
+      <Filter>Squads</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
