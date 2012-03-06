@@ -43,8 +43,16 @@ public:
 
 	/**
 	 * Called when we want to send text
+	 * @param text the text that we're sending
 	 */
 	virtual void onSendText(std::string text);
+
+	/**
+	 * Called when a player leaves the game
+	 * @param player the player that left the game
+	 */
+	virtual void onPlayerLeft(BWAPI::Player* player);
+
 
 	/**
 	 * Called when a unit has been created

@@ -11,7 +11,6 @@ using namespace BWAPI;
 using namespace std;
 
 int AgentManager::StartFrame = 0;
-bool AgentManager::instanceFlag = false;
 AgentManager* AgentManager::instance = NULL;
 
 AgentManager::AgentManager()
@@ -21,20 +20,19 @@ AgentManager::AgentManager()
 
 AgentManager::~AgentManager()
 {
-	instanceFlag = false;
 	for (int i = 0; i < (int)agents.size(); i++)
 	{
 		delete agents.at(i);
 	}
-	delete instance;
+
+	instance = NULL;
 }
 
 AgentManager* AgentManager::getInstance()
 {
-	if (!instanceFlag)
+	if (instance == NULL)
 	{
 		instance = new AgentManager();
-		instanceFlag = true;
 	}
 	return instance;
 }

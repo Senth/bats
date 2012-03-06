@@ -1,5 +1,4 @@
 #include "SiegeTankAgent.h"
-#include "AgentManager.h"
 #include "PFManager.h"
 #include "TargetingAgent.h"
 

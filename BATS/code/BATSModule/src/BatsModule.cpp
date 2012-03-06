@@ -83,10 +83,10 @@ void BatsModule::onStart() {
 }
 
 void BatsModule::onEnd() {
-	//Pathfinder::getInstance()->stop();
-	//mpProfiler->dumpToFile();
+	Pathfinder::getInstance()->stop();
+	mpProfiler->dumpToFile();
 
-	//releaseGameClasses();
+	releaseGameClasses();
 }
 
 void BatsModule::onFrame() {
@@ -128,6 +128,17 @@ void BatsModule::onSendText(std::string text) {
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);
+	}
+}
+
+void BatsModule::onPlayerLeft(BWAPI::Player* player) {
+	// Stop game if we left the game
+	if (player->getID() == Broodwar->self()->getID()) {
+		onEnd();
+	}
+	// Print out the player that left the game
+	else {
+		Broodwar->sendText("%s left the game.",player->getName().c_str());
 	}
 }
 
@@ -231,12 +242,12 @@ void BatsModule::initGameClasses() {
 }
 
 void BatsModule::releaseGameClasses() {
-	//delete CoverMap::getInstance();
-	//delete BuildPlanner::getInstance();
-	//delete UpgradesPlanner::getInstance();
-	//delete ResourceManager::getInstance();
-	//delete Pathfinder::getInstance();
-	//SAFE_DELETE(mpAgentManager);
+	delete CoverMap::getInstance();
+	delete BuildPlanner::getInstance();
+	delete UpgradesPlanner::getInstance();
+	delete ResourceManager::getInstance();
+	delete Pathfinder::getInstance();
+	SAFE_DELETE(mpAgentManager);
 }
 
 void BatsModule::showDebug() const {

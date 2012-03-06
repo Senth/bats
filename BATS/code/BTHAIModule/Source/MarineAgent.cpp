@@ -1,9 +1,8 @@
 #include "MarineAgent.h"
 #include "PFManager.h"
-#include "AgentManager.h"
 #include "Commander.h"
-#include "Squad.h"
 #include "TargetingAgent.h"
+#include "AgentManager.h"
 
 using namespace BWAPI;
 using namespace std;

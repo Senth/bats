@@ -1,6 +1,5 @@
 #include "VultureAgent.h"
 #include "PFManager.h"
-#include "AgentManager.h"
 #include "Commander.h"
 #include "TargetingAgent.h"
 

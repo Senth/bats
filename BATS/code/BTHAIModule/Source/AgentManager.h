@@ -21,7 +21,6 @@ private:
 	std::vector<BaseAgent*> agents;
 	AgentManager();
 	static AgentManager* instance;
-	static bool instanceFlag;
 	int lastCallFrame;
 
 public:

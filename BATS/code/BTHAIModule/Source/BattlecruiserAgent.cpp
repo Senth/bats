@@ -1,6 +1,5 @@
 #include "BattlecruiserAgent.h"
 #include "PFManager.h"
-#include "AgentManager.h"
 #include "TargetingAgent.h"
 
 using namespace BWAPI;
