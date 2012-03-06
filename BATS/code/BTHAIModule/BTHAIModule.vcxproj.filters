@@ -28,9 +28,11 @@
     </Filter>
     <Filter Include="Source Files\UnitAgents\Protoss">
       <UniqueIdentifier>{9646d17e-5158-483e-8a3c-4c5cf4ade17e}</UniqueIdentifier>
+      <ParseFiles>true</ParseFiles>
     </Filter>
     <Filter Include="Source Files\UnitAgents\Zerg">
       <UniqueIdentifier>{a2e0599b-cc08-4b88-9b56-3e3e5b4e8d9c}</UniqueIdentifier>
+      <ParseFiles>true</ParseFiles>
     </Filter>
     <Filter Include="Source Files\MainAgents">
       <UniqueIdentifier>{35e859f9-4998-4bf6-8160-4605401839b4}</UniqueIdentifier>

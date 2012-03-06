@@ -141,7 +141,7 @@ BaseAgent* AgentFactory::createZergAgent(Unit* unit)
 	}
 	else
 	{
-#if DISABLE_UNIT_AI == 0
+#if DISABLE_UNIT_AI == 0 && !defined(DISABLE_ZERG_UNITS)
 		if (type.getID() == UnitTypes::Zerg_Overlord.getID())
 		{
 			return new OverlordAgent(unit);
@@ -236,7 +236,7 @@ BaseAgent* AgentFactory::createTerranAgent(Unit* unit)
 	}
 	else
 	{
-#if DISABLE_UNIT_AI == 0
+#if DISABLE_UNIT_AI == 0 && !defined(DISABLE_TERRAN_UNITS)
 		if (isOfType(unit, UnitTypes::Terran_Siege_Tank_Tank_Mode))
 		{
 			return new SiegeTankAgent(unit);
@@ -326,7 +326,7 @@ BaseAgent* AgentFactory::createProtossAgent(Unit* unit)
 	}
 	else
 	{
-#if DISABLE_UNIT_AI == 0
+#if DISABLE_UNIT_AI == 0 && !defined(DISABLE_PROTOSS_UNITS)
 		if (isOfType(unit, UnitTypes::Protoss_Zealot))
 		{
 			return new ZealotAgent(unit);

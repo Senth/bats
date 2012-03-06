@@ -53,7 +53,6 @@ public:
 	 */
 	virtual void onPlayerLeft(BWAPI::Player* player);
 
-
 	/**
 	 * Called when a unit has been created
 	 * @param pUnit the newly created unit
