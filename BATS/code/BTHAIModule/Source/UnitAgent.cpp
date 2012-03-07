@@ -24,6 +24,14 @@ UnitAgent::UnitAgent(Unit* mUnit)
 	goal = TilePosition(-1, -1);
 }
 
+void UnitAgent::setSquadId(utilities::KeyType<bats::Squad> squadId) {
+	this->squadId = squadId;
+}
+
+utilities::KeyType<bats::Squad> UnitAgent::getSquadId() const {
+	return squadId;
+}
+
 void UnitAgent::debug_showGoal()
 {
 	if (!isAlive()) return;

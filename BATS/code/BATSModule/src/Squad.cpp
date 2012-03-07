@@ -1,5 +1,6 @@
 #include "Squad.h"
 #include "Utilities/Helper.h"
+#include "BTHAIModule/Source/UnitAgent.h"
 
 using namespace bats;
 
@@ -107,17 +108,22 @@ void Squad::onGoalSucceeded() {
 }
 
 void Squad::forceDisband() {
-	///@todo implement forceDisband(), currently only a stub function
-
 	if (!mDisbanded) {
 		// Free all the units from a squad id.
+		for (size_t i = 0; i < mUnits.size(); ++i) {
+			mUnits[i]->setSquadId(utilities::KeyType<Squad>::INVALID_KEY);
+
+			///@todo maybe make the units retreat to a point?
+		}
 
 		mDisbanded = true;
 	}
 }
 
-Squad::GoalStates Squad::getGoalState() const {
-	///@todo implement Squad::getGoalState(), currently only a stub function.
-	
-	return GoalState_Success;
+void Squad::moveTo(const BWAPI::TilePosition& goalPosition, const std::vector<BWAPI::TilePosition>& via) {
+	mGoalPosition = goalPosition;
+
+	if (!via.empty()) {
+		mMoveVia = via;
+	}
 }

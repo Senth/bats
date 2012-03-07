@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <BWAPI/TilePosition.h>
 #include "Utilities/KeyType.h"
 #include "Utilities/KeyHandler.h"
 
@@ -101,6 +102,15 @@ protected:
 	 */
 	void forceDisband();
 
+	/**
+	 * Sets the position to move to as a goal and an additional path to go via
+	 * @param goalPosition the position the squad should move to
+	 * @param via positions to go via to the goalPosition, optional.
+	 */
+	void moveTo(
+		const BWAPI::TilePosition& goalPosition,
+		const std::vector<BWAPI::TilePosition>& via = std::vector<BWAPI::TilePosition>());
+
 private:
 	/**
 	 * Different goal states, should be moved later?
@@ -119,19 +129,20 @@ private:
 	virtual void createGoal() = 0;
 
 	/**
-	 * Checks whether the current goal is completed or not.
+	 * Checks whether the current goal is completed or not. The derived class
+	 * handles whether or not the goal has been completed or not
 	 * @return the current goal state
 	 */
-	GoalStates getGoalState() const;
+	virtual GoalStates getGoalState() const = 0;
 	
 	std::vector<UnitAgent*> mUnits;
+	BWAPI::TilePosition mGoalPosition;
+	std::vector<BWAPI::TilePosition> mMoveVia;
 
 	bool mNeedsFull; /**< Only make the squad active once full, e.g. full drops */
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
-	
 	SquadStates mState;
-
 	utilities::KeyType<Squad> mId;
 
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
