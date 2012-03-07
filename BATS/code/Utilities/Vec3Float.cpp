@@ -23,6 +23,8 @@
 #include <cmath>
 #include <climits>
 
+using namespace utilities;
+
 void Vec3Float::rotateAroundY(float radian)
 {
 	float tempX = cos(radian) * x - sin(radian) * z;

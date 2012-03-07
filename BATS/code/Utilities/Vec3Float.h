@@ -19,11 +19,12 @@
 * http://www.gnu.org/copyleft/gpl.html
 */
 
-#ifndef __VEC3_FLOAT_H__
-#define __VEC3_FLOAT_H__
+#pragma once
 
 #include <sstream>
 #include <iomanip>
+
+namespace utilities {
 
 /**
 * A struct that hold 3 floats with some extra functionalities.
@@ -227,6 +228,7 @@ typedef struct Vec3Float
 
 } Direction, Position;
 
+}
 
 /**
 * Global Stream right operator for Vec3Float
@@ -234,7 +236,7 @@ typedef struct Vec3Float
 * @param vec3Float the vector to write to
 * @return the istream object (in)
 */
-std::istream& operator>>(std::istream &in, Vec3Float& vec3Float);
+std::istream& operator>>(std::istream &in, utilities::Vec3Float& vec3Float);
 
 /**
 * Global Stream left operator for Vec3Float
@@ -242,7 +244,7 @@ std::istream& operator>>(std::istream &in, Vec3Float& vec3Float);
 * @param vec3Float the vector to read from
 * @return the ostream object (out)
 */
-std::ostream& operator<<(std::ostream &out, const Vec3Float& vec3Float);
+std::ostream& operator<<(std::ostream &out, const utilities::Vec3Float& vec3Float);
 
 /**
 * Global float multiplication operator for Vec3Float
@@ -250,6 +252,4 @@ std::ostream& operator<<(std::ostream &out, const Vec3Float& vec3Float);
 * @param vec3Float the vector to multiply with
 * @return a new Vec3Float with the vec3Float's value multiplied with fValue
 */
-Vec3Float operator*(float fValue, const Vec3Float& vec3Float);
-
-#endif
+utilities::Vec3Float operator*(float fValue, const utilities::Vec3Float& vec3Float);

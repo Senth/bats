@@ -120,8 +120,8 @@ void setOutputDirectory(const std::string& dirPath);
 * Sets the verbosity level.
 * @param verbosity the level of verbosity we want to set, between LEVEL_HIGHEST and LEVEL_LOWEST.
 * @param the target to set the verbosity level in, can be OUTPUT_CONSOLE or OUTPUT_FILE
-* @note LEVEL_HIGHEST only displays messages that are of highest priority and LEVEL_LOWEST
-* displays all messages
+* @note setting the verbosity level to LogLevel_Severe only displays messages that are of highest
+* priority (i.e. LogLevel_Sever) and LogLevel_Finest displays all messages.
 */
 void setVerbosityLevel(LogLevels verbosity, int target);
 
@@ -144,9 +144,8 @@ void setVerbosityLevel(LogLevels verbosity, int target);
 }
 
 /**
-* Checks for error. Should be called 'last' in the program. Checks if there
-* were any errors, prints how many there were and gives the option to open
-* the error_log file.
+* Checks for errors and prints them, if there were any. Should be called 'last' in the program.
+* Prints the number of errors and gives the option to open the error_log file.
 */
 void checkForErrors();
 
