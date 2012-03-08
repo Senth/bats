@@ -124,6 +124,7 @@ enum LogLevels {
 * DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
 * @param message the message to display, using streams are possible
 * @param verbosity the verbosity level to use
+* @see utilities::LogLevels for guidelines what levels to use when
 */
 #define DEBUG_MESSAGE(verbosity, message)
 /**
@@ -131,6 +132,7 @@ enum LogLevels {
 * Only active if _DEBUG is defined, and only stops for console verbosity.
 * @param message the message to display, using streams are possible
 * @param verbosity the verbosity level to use
+* @see utilities::LogLevels for guidelines what levels to use when
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message)
 #endif
