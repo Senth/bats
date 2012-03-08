@@ -78,10 +78,7 @@ enum LogLevels {
 	LogLevel_None
 };
 
-#ifndef _DEBUG
-#define DEBUG_MESSAGE(verbosity, message)
-#define DEBUG_MESSAGE_STOP(verbosity, message)
-#else
+#ifdef _DEBUG
 /**
 * Prints a debug message. Only active if _DEBUG is defined.
 * Does not process the message if verbosity level is too low.
@@ -118,6 +115,24 @@ enum LogLevels {
 	utilities::printDebugMessage(verbosity, ss.str(), true); \
 	} \
 }
+#else
+/**
+* Prints a debug message. Only active if _DEBUG is defined.
+* Does not process the message if verbosity level is too low.
+* Examples:
+* DEBUG_MESSAGE(LogLevel_Info, "This is a message"); // A regular
+* DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
+* @param message the message to display, using streams are possible
+* @param verbosity the verbosity level to use
+*/
+#define DEBUG_MESSAGE(verbosity, message)
+/**
+* Prints a debug message and waits for input after the message has been displayed.
+* Only active if _DEBUG is defined, and only stops for console verbosity.
+* @param message the message to display, using streams are possible
+* @param verbosity the verbosity level to use
+*/
+#define DEBUG_MESSAGE_STOP(verbosity, message)
 #endif
 
 // The types of output targets that are available
