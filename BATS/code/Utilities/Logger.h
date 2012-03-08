@@ -118,9 +118,9 @@ enum LogLevels {
 #else
 /**
 * Prints a debug message. Only active if _DEBUG is defined.
-* Does not process the message if verbosity level is too low.
-* Examples:
-* DEBUG_MESSAGE(LogLevel_Info, "This is a message"); // A regular
+* Does not process the message if verbosity level is too low. \n
+* Examples: \n
+* DEBUG_MESSAGE(LogLevel_Info, "This is a message"); // A regular \n
 * DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
 * @param verbosity tho verbosity level to use
 * @param message the message to display, using streams are possible
