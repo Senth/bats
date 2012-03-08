@@ -35,16 +35,47 @@
 namespace utilities {
 
 /**
- * Enumeration for logging levels
+ * Enumeration for logging levels. Guidelines have been given to help the user
+ * choose what LogLevel s/he can use.
  */
 enum LogLevels {
-	LogLevel_Finest, /**< Finest messages, lowest level of logging. Only seen if logging is set to this level. */
-	LogLevel_Finer, /** Finer messages */
-	LogLevel_Fine, /**< Fine messages to display, finer than info */
-	LogLevel_Info, /**< Displays info messages */
-	LogLevel_Warning, /**< Displays warning messages */
-	LogLevel_Severe, /**< Displays severe messages, highest level of logging */
-	LogLevel_None, /**< Only for disabling messages, never specify this for logging messages. */
+	/**
+	 * Messages that are called often and several times in a function.
+	 * For example loop messages.
+	 */
+	LogLevel_Finest,
+	/**
+	 * Messages inside functions, but not inside loops. More of information
+	 * what is happening inside the function.
+	 */
+	LogLevel_Finer,
+	/**
+	 * The first and last message (and statement) in a function to see that a function
+	 * has been called, and a function has ended. Could be in the middle of the function if 
+	 * you return from the middle.
+	 */
+	LogLevel_Fine,
+	/**
+	 * General messages that could be good to know. These include initialization successes for big
+	 * functions, e.g. window created.
+	 */
+	LogLevel_Info,
+	/**
+	 * Warning messages that, maybe an item wasn't found that should be found, but doesn't cause
+	 * any major error. Or that we could not create a window for the specific type so that we use
+	 * another one instead.
+	 */
+	LogLevel_Warning,
+	/**
+	 * Severe messages are in essential error messages. Although the error should not be that
+	 * great to crash the program itself. Consider using the macro ERROR_MESSAG(...) instead of
+	 * DEBUG_MESSAGE
+	 */
+	LogLevel_Severe,
+	/**
+	 * Disables all messages, never use this for logging messages.
+	 */
+	LogLevel_None
 };
 
 #ifdef _DEBUG
@@ -58,9 +89,13 @@ enum LogLevels {
 * @param verbosity the verbosity level to use
 */
 #define DEBUG_MESSAGE(verbosity, message) { \
-	if (verbosity >= gVerbosityLevelConsole || verbosity >= gVerbosityLevelFile) { \
-			std::stringstream ss; ss << message; \
-			printDebugMessage(verbosity, ss.str(), false); \
+	if (verbosity >= utilities::gVerbosityLevelConsole || \
+		verbosity >= utilities::gVerbosityLevelFile || \
+		verbosity >= utilities::gVerbosityLevelStarCraft) \
+	{ \
+			std::stringstream ss; \
+			ss << message; \
+			utilities::printDebugMessage(verbosity, ss.str(), false); \
 	} \
 }
 
@@ -71,9 +106,13 @@ enum LogLevels {
 * @param verbosity the verbosity level to use
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message) {  \
-	if (verbosity >= gVerbosityLevelConsole || verbosity >= gVerbosityLevelFile) { \
-			std::stringstream ss; ss << message << "  Press enter to continue..."; \
-			printDebugMessage(verbosity, ss.str(), true); \
+	if (verbosity >= utilities::gVerbosityLevelConsole || \
+	verbosity >= utilities::gVerbosityLevelFile || \
+	verbosity >= utilities::gVerbosityLevelStarCraft) \
+{ \
+	std::stringstream ss; \
+	ss << message; \
+	utilities::printDebugMessage(verbosity, ss.str(), true); \
 	} \
 }
 #else
@@ -84,9 +123,11 @@ enum LogLevels {
 // The types of output targets that are available
 #define OUTPUT_CONSOLE		0x0001	/**< Output messages to the console window */
 #define OUTPUT_FILE			0x0002	/**< Output messages to a file */
+#define OUTPUT_STARCRAFT	0x0004  /**< Output messages to StarCraft */
 
 extern int gVerbosityLevelConsole;
 extern int gVerbosityLevelFile;
+extern int gVerbosityLevelStarCraft;
 extern int gOutputTargetError;
 extern int gOutputTargetDebugMessage;
 extern int gcError;
@@ -96,7 +137,7 @@ extern int gcError;
 * with the binary | operator.
 * @param targets the specified output targets, can be OUTPUT_CONSOLE, OUTPUT_FILE.
 * @pre if OUTPUT_FILE is specified a directory for the file output must be set with
-* @setFileError(const std::string) first.
+* setFileError(const std::string) first.
 */
 inline void setOutputTargetError(int targets) {gOutputTargetError = targets;}
 
@@ -117,6 +158,17 @@ inline void setOutputTargetDebugMessage(int targets) {gOutputTargetDebugMessage 
 void setOutputDirectory(const std::string& dirPath);
 
 /**
+ * Reads the settings from the specified file. This file has the syntax
+ * DEBUG = TARGET | ANOTHER_TARGET; e.g. DEBUG = FILE | CONSOLE;
+ * ERROR = TARGET | ANOTHER_TARGET;
+ * TARGET = VERBOSITY; e.g. FILE = FINEST;
+ * @param settingsFile path to the settings file.
+ * @note the variables are not case sensitive, but the variables have been shortened
+ * for easier reading.
+ */
+void loadSettings(const std::string& settingsFile);
+
+/**
 * Sets the verbosity level.
 * @param verbosity the level of verbosity we want to set, between LEVEL_HIGHEST and LEVEL_LOWEST.
 * @param the target to set the verbosity level in, can be OUTPUT_CONSOLE or OUTPUT_FILE
@@ -134,7 +186,7 @@ void setVerbosityLevel(LogLevels verbosity, int target);
 { \
 	std::stringstream ss; \
 	ss << message; \
-	printErrorMessage(ss.str(), __FILE__, __LINE__); \
+	utilities::printErrorMessage(ss.str(), __FILE__, __LINE__); \
 	__pragma(warning(push)); \
 	__pragma(warning(disable:4127)); \
 	if (forceQuit) { \

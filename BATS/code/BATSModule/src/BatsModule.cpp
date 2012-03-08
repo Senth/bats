@@ -11,6 +11,7 @@
 #include "BTHAIModule/Source/Profiler.h"
 #include "BTHAIModule/Source/Config.h"
 #include "Utilities/Helper.h"
+#include "Utilities/Logger.h"
 #include <cassert>
 
 using namespace bats;
@@ -18,10 +19,16 @@ using namespace BWAPI;
 
 const int WORKER_MINERAL_PRICE = 50;
 const int GAME_STARTED_FRAME = 1;
+const std::string SETTINGS_FILE = "bwapi-data\\logs\\bats_config.ini";
+const std::string LOGGING_PATH = "bwapi-data\\logs\\bats";
 
 BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
 	mpAgentManager = NULL;
+
+	// Initialize logger
+	utilities::setOutputDirectory(LOGGING_PATH);
+	utilities::loadSettings(SETTINGS_FILE);
 
 	// Initialize singletons
 	mpProfiler = Profiler::getInstance();
@@ -32,6 +39,8 @@ BatsModule::~BatsModule() {
 
 	// Release game classes, if the game was ended abruptly onEnd() might not have been called.
 	releaseGameClasses();
+
+	utilities::checkForErrors();
 }
 
 void BatsModule::onStart() {
@@ -44,7 +53,6 @@ void BatsModule::onStart() {
 
 	BWTA::readMap();
 	BWTA::analyze();
-	//AnalyzeThread();
 
 	profile = false;
 

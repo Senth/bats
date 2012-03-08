@@ -4,7 +4,7 @@
 #include <tchar.h>
 #include "BatsModule.h"
 
-namespace BWAPI { Game* Broodwar; }
+namespace BWAPI { Game* Broodwar = NULL; }
 
 #pragma warning (push)
 #pragma warning (disable:4100)

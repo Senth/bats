@@ -23,6 +23,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
+#include <string>
 
 #if defined(__linux__) || defined(__APPLE__)
 #include <cstdio>
@@ -36,6 +38,7 @@ using namespace utilities;
 
 int utilities::gVerbosityLevelConsole = LogLevel_None;
 int utilities::gVerbosityLevelFile = LogLevel_None;
+int utilities::gVerbosityLevelStarCraft = LogLevel_None;
 int utilities::gOutputTargetError = OUTPUT_CONSOLE;
 int utilities::gOutputTargetDebugMessage = OUTPUT_CONSOLE;
 int utilities::gcError = 0;
@@ -44,20 +47,26 @@ const std::string ERROR_FILE_NAME = "error_log_";
 const std::string DEBUG_FILE_NAME = "debug_message_log_";
 const std::string ERROR_DEBUG_EXTENSION = ".txt";
 
+std::string gErrorPath;
 std::ofstream gErrorFile;
 std::ofstream gDebugMessageFile;
+
+#include <BWAPI/Game.h>
+namespace BWAPI{
+	extern Game* Broodwar;
+}
 
 void utilities::setOutputDirectory(const std::string& dirPath) {
 	// Get date and time
 	std::string timeStamp = getTimeStamp(true);
 
 
-	std::string errorPath;
+	gErrorPath;
 	std::string debugPath;
 
 	// If not empty: make sure the path is correct
 	if (dirPath != "") {
-		errorPath = dirPath;
+		gErrorPath = dirPath;
 		debugPath = dirPath;
 
 		// Should we add an ending / or not?
@@ -69,20 +78,162 @@ void utilities::setOutputDirectory(const std::string& dirPath) {
 		directoryDelimiter = '/';
 #endif
 		if (lastChar != directoryDelimiter) {
-			errorPath += directoryDelimiter;
+			gErrorPath += directoryDelimiter;
 			debugPath += directoryDelimiter;
 		}
 	}
 
-	errorPath += ERROR_FILE_NAME;
-	errorPath += timeStamp;
-	errorPath += ERROR_DEBUG_EXTENSION;
+	gErrorPath += ERROR_FILE_NAME;
+	gErrorPath += timeStamp;
+	gErrorPath += ERROR_DEBUG_EXTENSION;
 	debugPath += DEBUG_FILE_NAME;
 	debugPath += timeStamp;
 	debugPath += ERROR_DEBUG_EXTENSION;
 
-	gErrorFile.open(errorPath.c_str());
+	// Create the directory if it doesn't exist
+#ifdef WINDOWS
+	CreateDirectory(dirPath.c_str(), NULL);
+#endif
+	///@todo create directory for linux
+
+	gErrorFile.open(gErrorPath.c_str());
 	gDebugMessageFile.open(debugPath.c_str());
+}
+
+void utilities::loadSettings(const std::string& settingsFile) {
+	std::ifstream settings(settingsFile.c_str());
+	
+	if (settings.is_open()) {
+		// Read through all tokens
+		std::list<std::string> tokens;
+		while (settings.good()) {
+			std::string token;
+			settings >> token;
+
+			std::transform(token.begin(), token.end(), token.begin(), ::toupper);
+
+			// Complete the assignment
+			// Note, the token can be as the last char in the current token
+			if (token == ";" || token[token.size()-1] == ';') {
+				// Remove ; from the token (if it was at the end) and insert
+				// it as a token
+				if (token[token.size()-1] == ';') {
+					token = token.substr(0, token.size()-1);
+					tokens.push_back(token);
+				}
+
+				if (!tokens.empty()) {
+					std::string assigning = tokens.front();
+					tokens.pop_front();
+
+					// Next token should be assignment operator
+					// but for simplicity anything will do
+					tokens.pop_front();
+
+					if (assigning == "DEBUG") {
+						int targets = 0;
+						while (!tokens.empty()) {
+							if (tokens.front() == "FILE") {
+								targets |= OUTPUT_FILE;
+							} else if (tokens.front() == "CONSOLE") {
+								targets |= OUTPUT_CONSOLE;
+							} else if (tokens.front() == "STARCRAFT") {
+								targets |= OUTPUT_STARCRAFT;
+							}
+							tokens.pop_front();
+						}
+						utilities::setOutputTargetDebugMessage(targets);
+
+					} else if (assigning == "ERROR") {
+						int targets = 0;
+						while (!tokens.empty()) {
+							if (tokens.front() == "FILE") {
+								targets |= OUTPUT_FILE;
+							} else if (tokens.front() == "CONSOLE") {
+								targets |= OUTPUT_CONSOLE;
+							} else if (tokens.front() == "STARCRAFT") {
+								targets |= OUTPUT_STARCRAFT;
+							}
+							tokens.pop_front();
+						}
+						utilities::setOutputTargetError(targets);
+
+					} else if (assigning == "FILE") {
+						int target = OUTPUT_FILE;
+
+						// Should only be one verbosity level, so skip the rest
+						if (!tokens.empty()) {
+							if (tokens.front() == "FINEST") {
+								utilities::setVerbosityLevel(LogLevel_Finest, target);
+							} else if (tokens.front() == "FINER") {
+								utilities::setVerbosityLevel(LogLevel_Finer, target);
+							} else if (tokens.front() == "FINE") {
+								utilities::setVerbosityLevel(LogLevel_Fine, target);
+							} else if (tokens.front() == "INFO") {
+								utilities::setVerbosityLevel(LogLevel_Info, target);
+							} else if (tokens.front() == "WARNING") {
+								utilities::setVerbosityLevel(LogLevel_Warning, target);
+							} else if (tokens.front() == "SEVERE") {
+								utilities::setVerbosityLevel(LogLevel_Severe, target);
+							} else if (tokens.front() == "NONE") {
+								utilities::setVerbosityLevel(LogLevel_None, target);
+							}
+						}
+						tokens.clear();
+
+					} else if (assigning == "CONSOLE") {
+						int target = OUTPUT_CONSOLE;
+
+						// Should only be one verbosity level, so skip the rest
+						if (!tokens.empty()) {
+							if (tokens.front() == "FINEST") {
+								utilities::setVerbosityLevel(LogLevel_Finest, target);
+							} else if (tokens.front() == "FINER") {
+								utilities::setVerbosityLevel(LogLevel_Finer, target);
+							} else if (tokens.front() == "FINE") {
+								utilities::setVerbosityLevel(LogLevel_Fine, target);
+							} else if (tokens.front() == "INFO") {
+								utilities::setVerbosityLevel(LogLevel_Info, target);
+							} else if (tokens.front() == "WARNING") {
+								utilities::setVerbosityLevel(LogLevel_Warning, target);
+							} else if (tokens.front() == "SEVERE") {
+								utilities::setVerbosityLevel(LogLevel_Severe, target);
+							} else if (tokens.front() == "NONE") {
+								utilities::setVerbosityLevel(LogLevel_None, target);
+							}
+						}
+						tokens.clear();
+
+					} else if (assigning == "STARCRAFT") {
+						int target = OUTPUT_STARCRAFT;
+
+						// Should only be one verbosity level, so skip the rest
+						if (!tokens.empty()) {
+							if (tokens.front() == "FINEST") {
+								utilities::setVerbosityLevel(LogLevel_Finest, target);
+							} else if (tokens.front() == "FINER") {
+								utilities::setVerbosityLevel(LogLevel_Finer, target);
+							} else if (tokens.front() == "FINE") {
+								utilities::setVerbosityLevel(LogLevel_Fine, target);
+							} else if (tokens.front() == "INFO") {
+								utilities::setVerbosityLevel(LogLevel_Info, target);
+							} else if (tokens.front() == "WARNING") {
+								utilities::setVerbosityLevel(LogLevel_Warning, target);
+							} else if (tokens.front() == "SEVERE") {
+								utilities::setVerbosityLevel(LogLevel_Severe, target);
+							} else if (tokens.front() == "NONE") {
+								utilities::setVerbosityLevel(LogLevel_None, target);
+							}
+						}
+						tokens.clear();
+
+					}
+				}
+			} else {
+				tokens.push_back(token);
+			}
+		}
+	}
 }
 
 void utilities::setVerbosityLevel(LogLevels verbosity, int target)
@@ -96,6 +247,11 @@ void utilities::setVerbosityLevel(LogLevels verbosity, int target)
 	{
 		gVerbosityLevelFile = verbosity;
 	}
+
+	if (target & OUTPUT_STARCRAFT)
+	{
+		gVerbosityLevelStarCraft = verbosity;
+	}
 }
 
 void utilities::checkForErrors()
@@ -108,12 +264,12 @@ void utilities::checkForErrors()
 		if (choice == IDYES)
 		{
 			std::string command = "notepad ";
-			command += ERROR_FILE_NAME + ERROR_DEBUG_EXTENSION;
+			command += gErrorPath;
 			system(command.c_str());
 		}
 
 #endif
-	// TODO something for linux
+	///@TODO something for linux
 	}
 }
 
@@ -136,6 +292,11 @@ void utilities::printErrorMessage(const std::string& errorMessage, const char* f
 	if (gOutputTargetError & OUTPUT_CONSOLE)
 	{
 		std::cerr << outMessage.str() << std::endl;
+	}
+
+	if (gOutputTargetError & OUTPUT_STARCRAFT)
+	{
+		BWAPI::Broodwar->printf("%s", outMessage.str().c_str());
 	}
 }
 
@@ -161,6 +322,13 @@ void utilities::printDebugMessage(LogLevels verbosity, const std::string& debugM
 		{
 			std::cin.ignore(100, '\n');
 		}
+	}
+	// StarCraft
+	if (verbosity >= gVerbosityLevelStarCraft)
+	{
+		std::stringstream ss;
+		ss << std::left << std::setw(15) << timeStamp << debugMessage;
+		BWAPI::Broodwar->printf("%s", ss.str().c_str());
 	}
 }
 
