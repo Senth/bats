@@ -78,7 +78,10 @@ enum LogLevels {
 	LogLevel_None
 };
 
-#ifdef _DEBUG
+#ifndef _DEBUG
+#define DEBUG_MESSAGE(verbosity, message)
+#define DEBUG_MESSAGE_STOP(verbosity, message)
+#else
 /**
 * Prints a debug message. Only active if _DEBUG is defined.
 * Does not process the message if verbosity level is too low.
@@ -115,9 +118,6 @@ enum LogLevels {
 	utilities::printDebugMessage(verbosity, ss.str(), true); \
 	} \
 }
-#else
-#define DEBUG_MESSAGE(verbosity, message)
-#define DEBUG_MESSAGE_STOP(verbosity, message)
 #endif
 
 // The types of output targets that are available
@@ -158,9 +158,9 @@ inline void setOutputTargetDebugMessage(int targets) {gOutputTargetDebugMessage 
 void setOutputDirectory(const std::string& dirPath);
 
 /**
- * Reads the settings from the specified file. This file has the syntax
- * DEBUG = TARGET | ANOTHER_TARGET; e.g. DEBUG = FILE | CONSOLE;
- * ERROR = TARGET | ANOTHER_TARGET;
+ * Reads the settings from the specified file. This file has the syntax: \n
+ * DEBUG = TARGET | ANOTHER_TARGET; e.g. DEBUG = FILE | CONSOLE; \n
+ * ERROR = TARGET | ANOTHER_TARGET; \n
  * TARGET = VERBOSITY; e.g. FILE = FINEST;
  * @param settingsFile path to the settings file.
  * @note the variables are not case sensitive, but the variables have been shortened
