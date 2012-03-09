@@ -69,12 +69,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="IniReader.h" />
     <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyType.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Vec3Float.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IniReader.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Vec3Float.cpp" />
   </ItemGroup>

@@ -13,6 +13,9 @@
     <Filter Include="Keys">
       <UniqueIdentifier>{738e5527-c668-4343-8fff-4f7b812a07fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File">
+      <UniqueIdentifier>{224e132a-d3f2-4d29-8ded-6ed3f0b2d237}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Logger.h">
@@ -30,6 +33,9 @@
     <ClInclude Include="KeyType.h">
       <Filter>Keys</Filter>
     </ClInclude>
+    <ClInclude Include="IniReader.h">
+      <Filter>File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -37,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="Vec3Float.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="IniReader.cpp">
+      <Filter>File</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

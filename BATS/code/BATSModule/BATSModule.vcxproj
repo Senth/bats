@@ -97,12 +97,16 @@
     <ClInclude Include="include\BuildOrderManager.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\Squad.h" />
+    <ClInclude Include="include\UnitComposition.h" />
+    <ClInclude Include="include\UnitSet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp" />
     <ClCompile Include="src\BatsModule.cpp" />
     <ClCompile Include="src\BuildOrderManager.cpp" />
     <ClCompile Include="src\Squad.cpp" />
+    <ClCompile Include="src\UnitComposition.cpp" />
+    <ClCompile Include="src\UnitSet.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,7 @@
 #include <BWAPI/TilePosition.h>
 #include "Utilities/KeyType.h"
 #include "Utilities/KeyHandler.h"
+#include "UnitSet.h"
 
 // Forward declarations
 class UnitAgent;
@@ -23,12 +24,9 @@ public:
 	 * Constructs a squad with the specified units, can set certain options of the squad.
 	 * The default options actives the squad directly, the squad can be destroyed (and thus merged).
 	 * @param units vector of all units that should be in the class.
-	 * @param needsFull only activates and executes the goal once the squad is full,
-	 *		default is false
 	 * @param disbandable the squad can be destroyed, default is true
 	 */
 	Squad(std::vector<UnitAgent*> units,
-		bool needsFull = false,
 		bool disbandable = true);
 
 	/**
@@ -139,7 +137,6 @@ private:
 	BWAPI::TilePosition mGoalPosition;
 	std::vector<BWAPI::TilePosition> mMoveVia;
 
-	bool mNeedsFull; /**< Only make the squad active once full, e.g. full drops */
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
 	SquadStates mState;

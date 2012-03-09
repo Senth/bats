@@ -9,10 +9,9 @@ utilities::KeyHandler<Squad>* bats::Squad::mpsKeyHandler = NULL;
 
 const int MAX_KEYS = 100;
 
-Squad::Squad(std::vector<UnitAgent*> units, bool needsFull, bool disbandable) :
+Squad::Squad(std::vector<UnitAgent*> units, bool disbandable) :
 	mUnits(units),
 	mDisbandable(disbandable),
-	mNeedsFull(needsFull),
 	mDisbanded(false),
 	mId(utilities::KeyType<Squad>::INVALID_KEY)
 {
@@ -59,9 +58,10 @@ bool Squad::tryDisband() {
 void Squad::computeActions() {
 	switch (mState) {
 	case SquadState_Inactive:
-		if (mNeedsFull && isFull() || !mNeedsFull) {
-			createGoal();
-		}
+		///@todo needs full should be replaced with UnitComposition.
+		//if (mNeedsFull && isFull() || !mNeedsFull) {
+		//	createGoal();
+		//}
 		break;
 
 	case SquadState_Active:

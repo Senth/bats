@@ -13,6 +13,9 @@
     <Filter Include="Helpers">
       <UniqueIdentifier>{c69f46b3-e05a-441c-8efa-1a4827a712dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Squads\UnitComposition">
+      <UniqueIdentifier>{2d73c6cf-136e-4179-a467-f59cb5cd5646}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Squad.h">
@@ -27,6 +30,12 @@
     <ClInclude Include="include\Helper.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="include\UnitSet.h">
+      <Filter>Squads\UnitComposition</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UnitComposition.h">
+      <Filter>Squads\UnitComposition</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BuildOrderManager.cpp">
@@ -40,6 +49,12 @@
     </ClCompile>
     <ClCompile Include="src\Squad.cpp">
       <Filter>Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnitComposition.cpp">
+      <Filter>Squads\UnitComposition</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnitSet.cpp">
+      <Filter>Squads\UnitComposition</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
