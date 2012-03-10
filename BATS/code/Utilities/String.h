@@ -11,9 +11,16 @@ namespace string {
 	 * characters.
 	 * @return the string trimmed at the beginning.
 	 */
-	inline std::string trimLeft(const std::string& source, const std::string& remove = " \r\n") {
-		std::string trimmed = source;
-		return trimmed.erase(0, trimmed.find_first_not_of(remove));
+	inline std::string trimLeft(const std::string& source, const std::string& remove = " \t\r\n") {
+		if (source.empty()) {
+			return source;
+		}
+		size_t trimPos = source.find_first_not_of(remove);
+		if (trimPos == source.npos) {
+			return std::string();
+		} else {
+			return source.substr(trimPos);
+		}
 	}
 
 	/**
@@ -23,9 +30,16 @@ namespace string {
 	 * characters.
 	 * @return the string trimmed at the end.
 	 */
-	inline std::string trimRight(const std::string& source, const std::string& remove = " \r\n") {
-		std::string trimmed = source;
-		return trimmed.erase(trimmed.find_last_not_of(remove) + 1);
+	inline std::string trimRight(const std::string& source, const std::string& remove = " \t\r\n") {
+		if (source.empty()) {
+			return source;
+		}
+		size_t trimPos = source.find_last_not_of(remove);
+		if (trimPos == source.npos) {
+			return std::string();
+		} else {
+			return source.substr(0, trimPos + 1);
+		}
 	}
 
 	/**
@@ -36,7 +50,7 @@ namespace string {
 	 * characters.
 	 * @return the trimmed string
 	 */
-	inline std::string trim(const std::string& source, const std::string& remove = " \r\n") {
+	inline std::string trim(const std::string& source, const std::string& remove = " \t\r\n") {
 		return trimRight(trimLeft(source, remove), remove);
 	}
 }

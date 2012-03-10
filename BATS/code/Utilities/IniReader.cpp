@@ -166,27 +166,26 @@ void IniReader::readNext() {
 			size_t rightBracketPos = line.find_last_of(']');
 			if (rightBracketPos != line.npos) {
 				line = line.substr(0, rightBracketPos);
+
+				// Is it a subsection?
+				size_t dotPos = line.find_first_of('.');
+
+				// Section
+				if (dotPos == line.npos) {
+					mSectionCurrent = line;
+					mSubSectionCurrent.clear();
+				}
+				// Subsection
+				else {
+					// Split section and subsection and set both.
+					mSectionCurrent = line.substr(0, dotPos);
+					mSubSectionCurrent = line.substr(dotPos+1);
+				}
 			}
 			// Syntax error
 			else {
 				ERROR_MESSAGE(false, "IniReader::readNext() | Syntax error: could not find " <<
 					"ending ] for section: " << line);
-			}
-
-
-			// Is it a subsection?
-			size_t dotPos = line.find_first_of('.');
-
-			// Section
-			if (dotPos == line.npos) {
-				mSectionCurrent = line;
-				mSubSectionCurrent.clear();
-			}
-			// Subsection
-			else {
-				// Split section and subsection and set both.
-				mSectionCurrent = line.substr(0, dotPos);
-				mSubSectionCurrent = line.substr(dotPos+1);
 			}
 		} else {
 			// Check whether this is a variable name or an empty line with whitespace
@@ -198,8 +197,8 @@ void IniReader::readNext() {
 				mNextVariable.value = line.substr(equalPos+1);
 
 				// Trim whitespace
-				mNextVariable.name = utilities::string::trim(line);
-				mNextVariable.value = utilities::string::trim(line);
+				mNextVariable.name = utilities::string::trim(mNextVariable.name);
+				mNextVariable.value = utilities::string::trim(mNextVariable.value);
 
 				// Check so that there actually exists a variable name and value,
 				// Just skip the variable and try to read the rest, don't abort.
