@@ -73,6 +73,7 @@
     <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyType.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="Vec3Float.h" />
   </ItemGroup>
   <ItemGroup>

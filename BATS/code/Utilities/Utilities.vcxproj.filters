@@ -16,6 +16,9 @@
     <Filter Include="File">
       <UniqueIdentifier>{224e132a-d3f2-4d29-8ded-6ed3f0b2d237}</UniqueIdentifier>
     </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{45ca9b83-9ca8-4f72-9444-66e1613afc70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Logger.h">
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="IniReader.h">
       <Filter>File</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>String</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
