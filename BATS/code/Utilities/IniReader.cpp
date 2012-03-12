@@ -23,12 +23,11 @@ VariableInfo::operator bool() const {
 }
 
 VariableInfo::operator int() const {
-	stringstream ss;
-	ss << value;
+	stringstream ss(value);
 	int intValue = 0;
 	ss >> intValue;
 
-	if (!ss.good()) {
+	if (!ss.good() && !ss.eof()) {
 		ERROR_MESSAGE(false, "VariableInfo::int() | Could not transform string value '" <<
 			value << "' to int!");
 		return 0;
@@ -38,12 +37,11 @@ VariableInfo::operator int() const {
 }
 
 VariableInfo::operator float() const {
-	stringstream ss;
-	ss << value;
+	stringstream ss(value);
 	float floatValue = 0.0f;
 	ss >> floatValue;
 
-	if (!ss.good()) {
+	if (!ss.good() && !ss.eof()) {
 		ERROR_MESSAGE(false, "VariableInfo::int() | Could not transform string value '" <<
 			value << "' to float!");
 		return 0.0f;
@@ -53,12 +51,11 @@ VariableInfo::operator float() const {
 }
 
 VariableInfo::operator double() const {
-	stringstream ss;
-	ss << value;
+	stringstream ss(value);
 	double doubleValue = 0.0;
 	ss >> doubleValue;
 
-	if (!ss.good()) {
+	if (!ss.good() && !ss.eof()) {
 		ERROR_MESSAGE(false, "VariableInfo::int() | Could not transform string value '" <<
 			value << "' to double!");
 		return 0.0;
@@ -80,7 +77,7 @@ IniReader::~IniReader() {
 }
 
 void IniReader::open(const std::string& filePath) {
-	close();
+	mGood = true;
 	mFile.open(filePath.c_str());
 
 	mSectionCurrent = "";
@@ -94,7 +91,6 @@ void IniReader::open(const std::string& filePath) {
 void IniReader::close() {
 	mFile.close();
 	mFile.clear();
-	mGood = true;
 }
 
 bool IniReader::isOpen() const {

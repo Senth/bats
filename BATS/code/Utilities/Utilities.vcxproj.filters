@@ -42,6 +42,9 @@
     <ClInclude Include="String.h">
       <Filter>String</Filter>
     </ClInclude>
+    <ClInclude Include="MassIniReader.h">
+      <Filter>File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -51,6 +54,9 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="IniReader.cpp">
+      <Filter>File</Filter>
+    </ClCompile>
+    <ClCompile Include="MassIniReader.cpp">
       <Filter>File</Filter>
     </ClCompile>
   </ItemGroup>

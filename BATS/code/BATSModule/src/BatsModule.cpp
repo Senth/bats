@@ -19,7 +19,7 @@ using namespace BWAPI;
 
 const int WORKER_MINERAL_PRICE = 50;
 const int GAME_STARTED_FRAME = 1;
-const std::string SETTINGS_FILE = "bwapi-data\\logs\\bats_config.ini";
+const std::string LOG_SETTINGS_FILE = "bwapi-data\\logs\\bats_config.ini";
 const std::string LOGGING_PATH = "bwapi-data\\logs\\bats";
 
 BatsModule::BatsModule() : BTHAIModule() {
@@ -28,7 +28,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 
 	// Initialize logger
 	utilities::setOutputDirectory(LOGGING_PATH);
-	utilities::loadSettings(SETTINGS_FILE);
+	utilities::loadSettings(LOG_SETTINGS_FILE);
 
 	// Initialize singletons
 	mpProfiler = Profiler::getInstance();

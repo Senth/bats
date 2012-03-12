@@ -29,3 +29,10 @@
 #define SAFE_DELETE_ARR(pointer) \
 	delete [] pointer; \
 	pointer = NULL;
+
+#ifndef WINDOWS
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(_WINDOWS)
+#define WINDOWS
+#define WINDOWS_LEAN_AND_MEAN
+#endif
+#endif

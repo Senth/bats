@@ -18,19 +18,12 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
-
-#ifndef WINDOWS
-#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(_WINDOWS)
-#define WINDOWS
-#define WINDOWS_LEAN_AND_MEAN
-#endif
-#endif
+#pragma once
 
 #include <string>
 #include <sstream>
 #include <cstdlib>
+#include "Helper.h"
 
 namespace utilities {
 
@@ -243,5 +236,3 @@ void printDebugMessage(LogLevels verbosity, const std::string& debugMessage, boo
 std::string getTimeStamp(bool filenameProof = false);
 
 }
-
-#endif /* LOGGER_H_ */

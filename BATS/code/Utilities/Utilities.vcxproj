@@ -73,12 +73,14 @@
     <ClInclude Include="KeyHandler.h" />
     <ClInclude Include="KeyType.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MassIniReader.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Vec3Float.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IniReader.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MassIniReader.cpp" />
     <ClCompile Include="Vec3Float.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -86,12 +86,12 @@ public:
 	 * Opens the specified ini file.
 	 * @param[in] filPath path to the ini file to open
 	 */
-	void open(const std::string& filePath);
+	virtual void open(const std::string& filePath);
 
 	/**
 	 * Closes the opened ini file. Also clears any errors
 	 */
-	void close();
+	virtual void close();
 
 	/**
 	 * Checks whether the ini file is opened or not.
@@ -99,20 +99,21 @@ public:
 	 * @see isGood() for checking if a next variable exists; it also checks
 	 * whether the ini file is opened or not.
 	 */
-	bool isOpen() const;
+	virtual bool isOpen() const;
 
 	/**
 	 * Checks whether a next variable exists for reading; if the file isn't opened (
-	 * isOpen()) it will return false—no next variable exists.
+	 * isOpen()) it will return false—i.e. no next variable exists.
+	 * @return true if a next variable exists for reading, otherwise false.
 	 */
-	bool isGood() const;
+	virtual bool isGood() const;
 
 	/**
 	 * Reads the next variable and returns its values through variableInfo.
 	 * @param[out] variableInfo the variable it will place all the information to.
 	 * @return true if a variable was read, false if no next variable exists.
 	 */
-	bool readNext(VariableInfo& variableInfo);
+	virtual bool readNext(VariableInfo& variableInfo);
 
 protected:
 	/**
