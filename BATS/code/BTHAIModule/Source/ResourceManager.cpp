@@ -1,11 +1,12 @@
 #include "ResourceManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
 #include "Commander.h"
 #include "Squad.h"
 
 using namespace BWAPI;
 using namespace std;
+
 
 ResourceManager* ResourceManager::instance = NULL;
 
@@ -30,15 +31,15 @@ ResourceManager* ResourceManager::getInstance()
 
 bool ResourceManager::hasProductionBuilding()
 {
-	if (BuildPlanner::isTerran())
+	if (bats::BuildPlanner::isTerran())
 	{
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Barracks) > 0) return true;
 	}
-	if (BuildPlanner::isProtoss())
+	if (bats::BuildPlanner::isProtoss())
 	{
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Gateway) > 0) return true;
 	}
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Zerg_Hydralisk_Den) > 0) return true;
 	}
@@ -48,7 +49,7 @@ bool ResourceManager::hasProductionBuilding()
 bool ResourceManager::needWorker()
 {
 	int workersPerBase = 18;
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		workersPerBase = 10;
 	}

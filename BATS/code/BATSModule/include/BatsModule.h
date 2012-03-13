@@ -103,6 +103,11 @@ private:
 	virtual void updateGame();
 
 	/**
+	* custom function for finding if the string starts with the given token
+	*/
+	bool startsWith(const std::string& text,const std::string& token);
+
+	/**
 	 * Initializes all the game objects. Override this if you want to use your own classes.
 	 */
 	virtual void initGameClasses();

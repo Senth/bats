@@ -1,6 +1,6 @@
 #include "StructureAgent.h"
 #include "AgentManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "UpgradesPlanner.h"
 #include "Commander.h"
 #include "WorkerAgent.h"
@@ -133,7 +133,7 @@ void StructureAgent::computeActions()
 			return;
 		}
 
-		if (BuildPlanner::isTerran())
+		if (bats::BuildPlanner::isTerran())
 		{
 			//Check addons here
 			if (isOfType(UnitTypes::Terran_Science_Facility))

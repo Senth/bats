@@ -1,43 +1,69 @@
 #include "BuildPlanner.h"
-#include "WorkerAgent.h"
-#include "StructureAgent.h"
-#include "BaseAgent.h"
-#include "AgentManager.h"
-#include "CoverMap.h"
-#include "UnitSetup.h"
-#include "ExplorationManager.h"
+#include "BTHAIModule/Source/WorkerAgent.h"
+#include "BTHAIModule/Source/StructureAgent.h"
+#include "BTHAIModule/Source/BaseAgent.h"
+#include "BTHAIModule/Source/AgentManager.h"
+#include "BTHAIModule/Source/CoverMap.h"
+#include "BTHAIModule/Source/UnitSetup.h"
+#include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildOrderFileReader.h"
-#include "ResourceManager.h"
+#include "BTHAIModule/Source/ResourceManager.h"
 
+using namespace bats;
 using namespace BWAPI;
 using namespace std;
 
 BuildPlanner* BuildPlanner::instance = NULL;
-
-BuildPlanner::BuildPlanner()
-{
+string BuildPlanner::mCurrentPhase = "early";
+BuildPlanner::BuildPlanner(){
 	BuildOrderFileReader br = BuildOrderFileReader();
-	buildOrder = br.readBuildOrder();
+	mtransitionGraph = br.readTransitionFile("transition.txt");
+	buildOrder = br.readBuildOrder(mCurrentPhase, mtransitionGraph.early, buildOrder);	 // default is early
 	lastCallFrame = Broodwar->getFrameCount();
 }
 
-BuildPlanner::~BuildPlanner()
-{
+BuildPlanner::~BuildPlanner(){
 	instance = NULL;
 }
 
-BuildPlanner* BuildPlanner::getInstance()
-{
-	Broodwar->printf("~~Error~~");
-	if (instance == NULL)
-	{
+BuildPlanner* BuildPlanner::getInstance(){
+	if (instance == NULL){
 		instance = new BuildPlanner();
 	}
 	return instance;
 }
 
-void BuildPlanner::buildingDestroyed(Unit* building)
-{
+void BuildPlanner::switchToPhase(std::string fileName){
+	if(fileName == ""){
+		if(BuildPlanner::mCurrentPhase == "early"){
+			BuildOrderFileReader().readBuildOrder("mid", mtransitionGraph.mid, buildOrder);
+			BuildPlanner::mCurrentPhase = "mid";
+		}
+		else if(BuildPlanner::mCurrentPhase == "mid"){
+			BuildOrderFileReader().readBuildOrder("late", mtransitionGraph.mid, buildOrder);
+			BuildPlanner::mCurrentPhase = "late";
+		}
+	}
+	else if(fileName.length()>0){
+		if(BuildPlanner::mCurrentPhase == "early"){
+			if(BuildOrderFileReader().readBuildOrder("mid", fileName, buildOrder).size()>0)
+				BuildPlanner::mCurrentPhase = "mid";
+			else
+				Broodwar->printf("Error loading file %s", fileName);
+		}
+		else if(BuildPlanner::mCurrentPhase == "mid"){
+			if(BuildOrderFileReader().readBuildOrder("late", fileName, buildOrder).size()>0)
+				BuildPlanner::mCurrentPhase = "late";
+			else
+				Broodwar->printf("Error loading file %s", fileName);
+		}
+		else{
+			Broodwar->printf("All transition used");
+		}
+	}
+}
+
+void BuildPlanner::buildingDestroyed(Unit* building){
 	if (building->getType().getID() == UnitTypes::Protoss_Pylon.getID())
 	{
 		return;
@@ -53,8 +79,7 @@ void BuildPlanner::buildingDestroyed(Unit* building)
 	buildOrder.insert(buildOrder.begin(), building->getType());
 }
 
-void BuildPlanner::computeActions()
-{
+void BuildPlanner::computeActions(){
 	//Dont call too often
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - lastCallFrame < 40)
@@ -109,8 +134,7 @@ void BuildPlanner::computeActions()
 	}
 }
 
-bool BuildPlanner::hasResourcesLeft()
-{
+bool BuildPlanner::hasResourcesLeft(){
 	int totalMineralsLeft = 0;
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
@@ -130,8 +154,7 @@ bool BuildPlanner::hasResourcesLeft()
 	return true;
 }
 
-int BuildPlanner::mineralsNearby(TilePosition center)
-{
+int BuildPlanner::mineralsNearby(TilePosition center){
 	int mineralCnt = 0;
 
 	for(set<Unit*>::iterator m = Broodwar->getMinerals().begin(); m != Broodwar->getMinerals().end(); m++)
@@ -149,8 +172,7 @@ int BuildPlanner::mineralsNearby(TilePosition center)
 	return mineralCnt;
 }
 
-bool BuildPlanner::shallBuildSupply()
-{
+bool BuildPlanner::shallBuildSupply(){
 	UnitType supply = Broodwar->self()->getRace().getSupplyProvider();
 
 	//1. If command center is next in queue, dont build pylon
@@ -217,8 +239,7 @@ bool BuildPlanner::shallBuildSupply()
 	return true;
 }
 
-bool BuildPlanner::supplyBeingBuilt()
-{
+bool BuildPlanner::supplyBeingBuilt(){
 	//Zerg
 	if (isZerg())
 	{
@@ -265,8 +286,7 @@ bool BuildPlanner::supplyBeingBuilt()
 	return false;
 }
 
-void BuildPlanner::lock(int buildOrderIndex, int unitId)
-{
+void BuildPlanner::lock(int buildOrderIndex, int unitId){
 	UnitType type = buildOrder.at(buildOrderIndex);
 	buildOrder.erase(buildOrder.begin() + buildOrderIndex);
 
@@ -278,8 +298,7 @@ void BuildPlanner::lock(int buildOrderIndex, int unitId)
 	buildQueue.push_back(item);
 }
 
-void BuildPlanner::remove(UnitType type)
-{
+void BuildPlanner::remove(UnitType type){
 	for (int i = 0; i < (int)buildOrder.size(); i++)
 	{
 		if (buildOrder.at(i).getID() == type.getID())
@@ -290,8 +309,7 @@ void BuildPlanner::remove(UnitType type)
 	}
 }
 
-void BuildPlanner::unlock(UnitType type)
-{
+void BuildPlanner::unlock(UnitType type){
 	for (int i = 0; i < (int)buildQueue.size(); i++)
 	{
 		if (buildQueue.at(i).toBuild.getID() == type.getID())
@@ -302,8 +320,7 @@ void BuildPlanner::unlock(UnitType type)
 	}
 }
 
-void BuildPlanner::handleWorkerDestroyed(UnitType type, int workerID)
-{
+void BuildPlanner::handleWorkerDestroyed(UnitType type, int workerID){
 	for (int i = 0; i < (int)buildQueue.size(); i++)
 	{
 		if (buildQueue.at(i).assignedWorkerId == workerID)
@@ -315,8 +332,7 @@ void BuildPlanner::handleWorkerDestroyed(UnitType type, int workerID)
 	}
 }
 
-bool BuildPlanner::executeMorph(UnitType target, UnitType evolved)
-{
+bool BuildPlanner::executeMorph(UnitType target, UnitType evolved){
 	BaseAgent* agent = AgentManager::getInstance()->getClosestAgent(Broodwar->self()->getStartLocation(), target);
 	if (agent != NULL)
 	{
@@ -336,8 +352,7 @@ bool BuildPlanner::executeMorph(UnitType target, UnitType evolved)
 	return false;
 }
 
-bool BuildPlanner::executeOrder(UnitType type)
-{
+bool BuildPlanner::executeOrder(UnitType type){
 	//Max 3 concurrent buildings allowed at the same time
 	if ((int)buildQueue.size() >= 3)
 	{
@@ -430,8 +445,7 @@ bool BuildPlanner::executeOrder(UnitType type)
 	return false;
 }
 
-bool BuildPlanner::isTerran()
-{
+bool BuildPlanner::isTerran(){
 	if (Broodwar->self()->getRace().getID() == Races::Terran.getID())
 	{
 		return true;
@@ -439,8 +453,7 @@ bool BuildPlanner::isTerran()
 	return false;
 }
 
-bool BuildPlanner::isProtoss()
-{
+bool BuildPlanner::isProtoss(){
 	if (Broodwar->self()->getRace().getID() == Races::Protoss.getID())
 	{
 		return true;
@@ -448,8 +461,7 @@ bool BuildPlanner::isProtoss()
 	return false;
 }
 
-bool BuildPlanner::isZerg()
-{
+bool BuildPlanner::isZerg(){
 	if (Broodwar->self()->getRace().getID() == Races::Zerg.getID())
 	{
 		return true;
@@ -457,8 +469,7 @@ bool BuildPlanner::isZerg()
 	return false;
 }
 
-void BuildPlanner::addRefinery()
-{
+void BuildPlanner::addRefinery(){
 	UnitType refinery = Broodwar->self()->getRace().getRefinery();
 
 	if (!this->nextIsOfType(refinery))
@@ -467,21 +478,18 @@ void BuildPlanner::addRefinery()
 	}
 }
 
-void BuildPlanner::commandCenterBuilt()
-{
+void BuildPlanner::commandCenterBuilt(){
 	lastCommandCenter = Broodwar->getFrameCount();
 }
 
-string BuildPlanner::format(UnitType type)
-{
+string BuildPlanner::format(UnitType type){
 	string name = type.getName();
 	int i = name.find(" ");
 	string fname = name.substr(i + 1, name.length());
 	return fname;
 }
 
-void BuildPlanner::printInfo()
-{
+void BuildPlanner::printInfo(){
 	int max = 4;
 	if ((int)buildOrder.size() < 4)
 	{
@@ -511,8 +519,7 @@ void BuildPlanner::printInfo()
 	}
 }
 
-void BuildPlanner::handleNoBuildspotFound(UnitType toBuild)
-{
+void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 	bool removeOrder = false;
 	if (toBuild.getID() == UnitTypes::Protoss_Photon_Cannon) removeOrder = true;
 	if (toBuild.getID() == UnitTypes::Terran_Missile_Turret) removeOrder = true;
@@ -540,8 +547,7 @@ void BuildPlanner::handleNoBuildspotFound(UnitType toBuild)
 	}
 }
 
-bool BuildPlanner::nextIsOfType(UnitType type)
-{
+bool BuildPlanner::nextIsOfType(UnitType type){
 	if ((int)buildOrder.size() == 0)
 	{
 		return false;
@@ -556,8 +562,7 @@ bool BuildPlanner::nextIsOfType(UnitType type)
 	return false;
 }
 
-bool BuildPlanner::containsType(UnitType type)
-{
+bool BuildPlanner::containsType(UnitType type){
 	for (int i = 0; i < (int)buildOrder.size(); i++)
 	{
 		if (buildOrder.at(i).getID() == type.getID())
@@ -568,8 +573,7 @@ bool BuildPlanner::containsType(UnitType type)
 	return false;
 }
 
-bool BuildPlanner::coveredByDetector(TilePosition pos)
-{
+bool BuildPlanner::coveredByDetector(TilePosition pos){
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (int i = 0; i < (int)agents.size(); i++)
 	{
@@ -591,18 +595,15 @@ bool BuildPlanner::coveredByDetector(TilePosition pos)
 	return false;
 }
 
-void BuildPlanner::addBuilding(UnitType type)
-{
+void BuildPlanner::addBuilding(UnitType type){
 	buildOrder.push_back(type);
 }
 
-void BuildPlanner::addBuildingFirst(UnitType type)
-{
+void BuildPlanner::addBuildingFirst(UnitType type){
 	buildOrder.insert(buildOrder.begin(), type);
 }
 
-void BuildPlanner::expand(UnitType commandCenterUnit)
-{
+void BuildPlanner::expand(UnitType commandCenterUnit){
 	if (containsType(commandCenterUnit))
 	{
 		return;
@@ -618,8 +619,7 @@ void BuildPlanner::expand(UnitType commandCenterUnit)
 	buildOrder.insert(buildOrder.begin(), commandCenterUnit);
 }
 
-int BuildPlanner::noInProduction(UnitType type)
-{
+int BuildPlanner::noInProduction(UnitType type){
 	int no = 0;
 	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();

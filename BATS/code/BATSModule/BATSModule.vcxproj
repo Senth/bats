@@ -94,7 +94,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h" />
-    <ClInclude Include="include\BuildOrderManager.h" />
+    <ClInclude Include="include\BuildOrderFileReader.h" />
+    <ClInclude Include="include\BuildPlanner.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />
     <ClInclude Include="include\Squad.h" />
@@ -105,7 +106,8 @@
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp" />
     <ClCompile Include="src\BatsModule.cpp" />
-    <ClCompile Include="src\BuildOrderManager.cpp" />
+    <ClCompile Include="src\BuildOrderFileReader.cpp" />
+    <ClCompile Include="src\BuildPlanner.cpp" />
     <ClCompile Include="src\Squad.cpp" />
     <ClCompile Include="src\UnitComposition.cpp" />
     <ClCompile Include="src\UnitCompositionFactory.cpp" />

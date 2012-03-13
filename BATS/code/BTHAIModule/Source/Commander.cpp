@@ -3,7 +3,7 @@
 #include "ExplorationManager.h"
 #include "SpottedObject.h"
 #include "SquadFileReader.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "WorkerAgent.h"
 #include "Profiler.h"
 #include <algorithm>
@@ -209,7 +209,7 @@ void Commander::computeActions()
 	}
 
 	//Terran only: Check for repairs and finish unfinished buildings
-	if (BuildPlanner::isTerran())
+	if (bats::BuildPlanner::isTerran())
 	{
 		//Check if there are unfinished buildings we need
 		//to complete.

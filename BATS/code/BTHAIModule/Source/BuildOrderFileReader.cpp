@@ -1,6 +1,6 @@
 #include "BuildOrderFileReader.h"
 #include "ExplorationManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include <fstream>
 #include <sstream>
 
@@ -14,6 +14,7 @@ BuildOrderFileReader::BuildOrderFileReader()
 
 vector<UnitType> BuildOrderFileReader::readBuildOrder()
 {
+	Broodwar->printf("~~Error~~");
 	string filename = getFilename("buildorder");
 	vector<UnitType> buildOrder;
 

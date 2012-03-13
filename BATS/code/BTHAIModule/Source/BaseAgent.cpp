@@ -1,5 +1,5 @@
 #include "BaseAgent.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
 #include "ResourceManager.h"
 #include "ExplorationManager.h"
@@ -214,7 +214,7 @@ bool BaseAgent::isDetectorWithinRange(TilePosition pos, int range)
 
 bool BaseAgent::doScannerSweep(TilePosition pos)
 {
-	if (!BuildPlanner::isTerran())
+	if (!bats::BuildPlanner::isTerran())
 	{
 		return false;
 	}
@@ -238,7 +238,7 @@ bool BaseAgent::doScannerSweep(TilePosition pos)
 
 bool BaseAgent::doEnsnare(TilePosition pos)
 {
-	if (!BuildPlanner::isZerg())
+	if (!bats::BuildPlanner::isZerg())
 	{
 		return false;
 	}

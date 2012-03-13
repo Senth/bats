@@ -39,7 +39,7 @@ void AIloop::computeActions()
 	}
 
 	AgentManager::getInstance()->computeActions();
-	BuildPlanner::getInstance()->computeActions();
+	bats::BuildPlanner::getInstance()->computeActions();
 	Commander::getInstance()->computeActions();
 	ExplorationManager::getInstance()->computeActions();
 }
@@ -51,14 +51,14 @@ void AIloop::addUnit(Unit* unit)
 	//Remove from buildorder if this is a building
 	if (unit->getType().isBuilding())
 	{
-		BuildPlanner::getInstance()->unlock(unit->getType());
+		bats::BuildPlanner::getInstance()->unlock(unit->getType());
 	}
 }
 
 void AIloop::morphUnit(Unit* unit)
 {
 	AgentManager::getInstance()->morphDrone(unit);
-	BuildPlanner::getInstance()->unlock(unit->getType());
+	bats::BuildPlanner::getInstance()->unlock(unit->getType());
 }
 
 void AIloop::unitDestroyed(Unit* unit)
@@ -68,7 +68,7 @@ void AIloop::unitDestroyed(Unit* unit)
 		AgentManager::getInstance()->removeAgent(unit);
 		if (unit->getType().isBuilding())
 		{
-			BuildPlanner::getInstance()->buildingDestroyed(unit);
+			bats::BuildPlanner::getInstance()->buildingDestroyed(unit);
 		}
 
 		//Assist workers under attack
@@ -103,7 +103,7 @@ void AIloop::show_debug()
 			if (!agents.at(i)->isBuilding() && debug_mode >= 2) agents.at(i)->debug_showGoal();
 		}
 
-		BuildPlanner::getInstance()->printInfo();
+		bats::BuildPlanner::getInstance()->printInfo();
 		ExplorationManager::getInstance()->printInfo();
 		Commander::getInstance()->printInfo();
 		
@@ -180,7 +180,7 @@ void AIloop::drawTerrainData()
 	}
 
 	//locate zerg eggs and draw progress bars
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		for(std::set<Unit*>::const_iterator u = Broodwar->self()->getUnits().begin(); u != Broodwar->self()->getUnits().end(); u++)
 		{

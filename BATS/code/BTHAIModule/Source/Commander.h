@@ -12,8 +12,7 @@ struct SortSquadList {
 		{
 			return sq1->getPriority() < sq2->getPriority();
 		}
-		else
-		{
+		else{
 			if (sq1->isRequired() && !sq2->isRequired()) return true;
 			else return false;
 		}

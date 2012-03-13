@@ -2,7 +2,7 @@
 #include "AgentManager.h"
 #include "WorkerAgent.h"
 #include "PFManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "ResourceManager.h"
 
 using namespace BWAPI;
@@ -23,7 +23,7 @@ NexusAgent::NexusAgent(Unit* mUnit)
 		hasSentWorkers = true;
 	}
 	
-	BuildPlanner::getInstance()->commandCenterBuilt();
+	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 }
 
 void NexusAgent::computeActions()
@@ -35,12 +35,12 @@ void NexusAgent::computeActions()
 			sendWorkers();
 			hasSentWorkers = true;
 
-			BuildPlanner::getInstance()->addRefinery();
+			bats::BuildPlanner::getInstance()->addRefinery();
 
 			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Forge) > 0)
 			{
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Pylon);
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Photon_Cannon);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Pylon);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Photon_Cannon);
 			}
 		}
 	}

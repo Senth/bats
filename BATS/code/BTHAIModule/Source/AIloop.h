@@ -5,7 +5,7 @@
 #include "AgentManager.h"
 #include "ExplorationManager.h"
 #include "Commander.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 
 /** This class handles the main AI loop that is executed each frame. It is 
  * separated from the BTHAIModule::onFrame() to make it possible to use

@@ -4,7 +4,7 @@
 #include "ExplorationManager.h"
 #include "PFManager.h"
 #include "CoverMap.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "Commander.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
@@ -30,10 +30,10 @@ void WorkerAgent::destroyed()
 {
 	if (currentState == MOVE_TO_SPOT || currentState == CONSTRUCT || currentState == FIND_BUILDSPOT)
 	{
-		if (!BuildPlanner::isZerg())
+		if (!bats::BuildPlanner::isZerg())
 		{
 			//Broodwar->printf("Worker building %s destroyed", toBuild.getName().c_str());
-			BuildPlanner::getInstance()->handleWorkerDestroyed(toBuild, unitID);
+			bats::BuildPlanner::getInstance()->handleWorkerDestroyed(toBuild, unitID);
 			CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
 			setState(GATHER_MINERALS);
 		}

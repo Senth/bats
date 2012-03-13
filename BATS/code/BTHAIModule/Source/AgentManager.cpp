@@ -2,11 +2,11 @@
 #include "AgentFactory.h"
 #include "CoverMap.h"
 #include "Commander.h"
-#include "BuildPlanner.h"
+
 #include "ResourceManager.h"
 #include "WorkerAgent.h"
 #include "Profiler.h"
-
+#include "BatsModule/include/BuildPlanner.h"
 using namespace BWAPI;
 using namespace std;
 
@@ -171,7 +171,7 @@ void AgentManager::addAgent(Unit* unit)
 		if (newAgent->isBuilding())
 		{
 			CoverMap::getInstance()->addConstructedBuilding(unit);
-			BuildPlanner::getInstance()->unlock(unit->getType());
+			bats::BuildPlanner::getInstance()->unlock(unit->getType());
 			ResourceManager::getInstance()->unlockResources(unit->getType());
 		}
 		else

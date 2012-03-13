@@ -1,7 +1,8 @@
 #include "BatsModule.h"
 #include "Helper.h"
+#include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
-#include "BTHAIModule/Source/BuildPlanner.h"
+#include "BuildPlanner.h"
 #include "BTHAIModule/Source/ExplorationManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/Commander.h"
@@ -133,11 +134,30 @@ void BatsModule::onSendText(std::string text) {
 		mDebugLevel = 3;
 	} else if (text == "/d0" || text == "/debug off") {
 		mDebugLevel = 4;
+	} else if (text == "/transition") {
+		BuildPlanner::getInstance()->switchToPhase("");
+	}else if (startsWith(text,"/transition")) {				
+		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);
 	}
 }
+
+bool BatsModule::startsWith(const std::string& text,const std::string& token){
+	
+	if(text.length() < token.length() || text.length() == 0)
+		return false;
+
+	for(unsigned int i=0; i<token.length(); ++i)
+	{
+		if(text[i] != token[i])
+			return false;
+	}
+
+	return true;
+}
+
 
 void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 	// Stop game if we left the game
@@ -259,6 +279,7 @@ void BatsModule::releaseGameClasses() {
 }
 
 void BatsModule::showDebug() const {
+	BuildPlanner::getInstance()->printInfo();
 	if (mDebugLevel > 0) {
 		std::vector<BaseAgent*> agents = mpAgentManager->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++) {
@@ -266,7 +287,7 @@ void BatsModule::showDebug() const {
 			if (!agents.at(i)->isBuilding() && mDebugLevel >= 2) agents.at(i)->debug_showGoal();
 		}
 
-		BuildPlanner::getInstance()->printInfo();
+		
 		ExplorationManager::getInstance()->printInfo();
 		Commander::getInstance()->printInfo();
 

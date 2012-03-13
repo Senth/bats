@@ -1,7 +1,7 @@
 #include "UpgradesFileReader.h"
 #include "FileReaderUtils.h"
 #include "ExplorationManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include <fstream>
 #include <sstream>
 

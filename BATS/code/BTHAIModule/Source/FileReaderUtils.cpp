@@ -1,5 +1,5 @@
 #include "FileReaderUtils.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "ExplorationManager.h"
 #include "Config.h"
 #include <fstream>
@@ -17,7 +17,7 @@ string FileReaderUtils::getFilename(string subpath)
 {
 	string filename = "";
 
-	if (BuildPlanner::isProtoss())
+	if (bats::BuildPlanner::isProtoss())
 	{
 		if (ExplorationManager::enemyIsProtoss())
 		{
@@ -35,7 +35,7 @@ string FileReaderUtils::getFilename(string subpath)
 			if (!fileExists(subpath, filename)) filename = "PvX.txt";
 		}
 	}
-	else if (BuildPlanner::isTerran())
+	else if (bats::BuildPlanner::isTerran())
 	{
 		if (ExplorationManager::enemyIsProtoss())
 		{
@@ -53,7 +53,7 @@ string FileReaderUtils::getFilename(string subpath)
 			if (!fileExists(subpath, filename)) filename = "TvX.txt";
 		}
 	}
-	else if (BuildPlanner::isZerg())
+	else if (bats::BuildPlanner::isZerg())
 	{
 		if (ExplorationManager::enemyIsProtoss())
 		{

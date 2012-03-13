@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BTHAIModule", "BTHAIModule\BTHAIModule.vcxproj", "{2E63AE74-758A-4607-9DE4-D28E814A6E13}"
+	ProjectSection(ProjectDependencies) = postProject
+		{23B12E85-4B66-4E4F-818A-306B1B2AC573} = {23B12E85-4B66-4E4F-818A-306B1B2AC573}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BATSModule", "BATSModule\BATSModule.vcxproj", "{3C831479-F08A-4C45-9A91-549414902D23}"
 	ProjectSection(ProjectDependencies) = postProject

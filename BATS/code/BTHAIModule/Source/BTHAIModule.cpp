@@ -1,6 +1,6 @@
 #include "BTHAIModule.h"
 #include "AgentManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "ExplorationManager.h"
 #include "CoverMap.h"
 #include "Commander.h"
@@ -60,7 +60,7 @@ void BTHAIModule::onStart()
 
 	//Init our singleton agents
 	CoverMap::getInstance();
-	BuildPlanner::getInstance();
+	bats::BuildPlanner::getInstance();
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
@@ -229,6 +229,7 @@ void BTHAIModule::onSendText(std::string text)
 			
 		}
 	}
+
 	else 
 	{
 		Broodwar->printf("You typed '%s'!",text.c_str());
@@ -310,7 +311,7 @@ void BTHAIModule::onUnitMorph(BWAPI::Unit* unit)
 
 	if (unit->getPlayer()->getID() == Broodwar->self()->getID()) 
 	{
-		if (BuildPlanner::isZerg())
+		if (bats::BuildPlanner::isZerg())
 		{
 			loop->morphUnit(unit);
 		}

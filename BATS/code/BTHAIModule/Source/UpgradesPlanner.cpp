@@ -1,6 +1,6 @@
 #include "UpgradesPlanner.h"
 #include "UpgradesFileReader.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
 #include "ResourceManager.h"
 

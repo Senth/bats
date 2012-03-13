@@ -2,7 +2,7 @@
 #include "AgentManager.h"
 #include "WorkerAgent.h"
 #include "PFManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "ExplorationManager.h"
 #include "ResourceManager.h"
 
@@ -24,7 +24,7 @@ CommandCenterAgent::CommandCenterAgent(Unit* mUnit)
 	}
 
 	agentType = "CommandCenterAgent";
-	BuildPlanner::getInstance()->commandCenterBuilt();
+	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 }
 
 void CommandCenterAgent::computeActions()
@@ -36,15 +36,15 @@ void CommandCenterAgent::computeActions()
 			sendWorkers();
 			hasSentWorkers = true;
 
-			BuildPlanner::getInstance()->addRefinery();
+			bats::BuildPlanner::getInstance()->addRefinery();
 
 			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Barracks) > 0)
 			{
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Bunker);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Bunker);
 			}
 			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Engineering_Bay) > 0)
 			{
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Missile_Turret);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Missile_Turret);
 			}
 		}
 	}

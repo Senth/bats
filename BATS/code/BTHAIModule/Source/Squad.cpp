@@ -3,7 +3,7 @@
 #include "AgentManager.h"
 #include "ExplorationManager.h"
 #include "Commander.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "Pathfinder.h"
 #include "Profiler.h"
 
@@ -283,7 +283,7 @@ bool Squad::needUnit(UnitType type)
 	}
 
 	int noCreated = 1;
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		if (type.isTwoUnitsInOneEgg())
 		{
@@ -297,7 +297,7 @@ bool Squad::needUnit(UnitType type)
 		if (setup.at(i).equals(type))
 		{
 			//Found a matching setup, see if there is room
-			if (setup.at(i).current + BuildPlanner::getInstance()->noInProduction(type) + noCreated <= setup.at(i).no)
+			if (setup.at(i).current + bats::BuildPlanner::getInstance()->noInProduction(type) + noCreated <= setup.at(i).no)
 			{
 				return true;
 			}

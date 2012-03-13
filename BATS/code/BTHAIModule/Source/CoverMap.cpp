@@ -2,13 +2,14 @@
 #include "AgentManager.h"
 #include "ExplorationManager.h"
 #include "BaseAgent.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "Commander.h"
 #include "Profiler.h"
 
 using namespace BWAPI;
 using namespace BWTA;
 using namespace std;
+
 
 bool CoverMap::instanceFlag = false;
 CoverMap* CoverMap::instance = NULL;
@@ -200,7 +201,7 @@ bool CoverMap::canBuild(UnitType toBuild, TilePosition buildSpot)
 	}
 
 	//Step 5: If Protoss, check PSI coverage
-	if (BuildPlanner::isProtoss())
+	if (bats::BuildPlanner::isProtoss())
 	{
 		if (toBuild.requiresPsi())
 		{
@@ -212,7 +213,7 @@ bool CoverMap::canBuild(UnitType toBuild, TilePosition buildSpot)
 	}
 
 	//Step 6: If Zerg, check creep
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		if (UnitAgent::isOfType(toBuild, UnitTypes::Zerg_Hatchery))
 		{
@@ -341,15 +342,15 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 
 bool CoverMap::baseUnderConstruction(BaseAgent* base)
 {
-	if (BuildPlanner::isTerran())
+	if (bats::BuildPlanner::isTerran())
 	{
 		return base->getUnit()->isBeingConstructed();
 	}
-	if (BuildPlanner::isProtoss())
+	if (bats::BuildPlanner::isProtoss())
 	{
 		return base->getUnit()->isBeingConstructed();
 	}
-	if (BuildPlanner::isZerg())
+	if (bats::BuildPlanner::isZerg())
 	{
 		if (base->isOfType(UnitTypes::Zerg_Hatchery))
 		{
@@ -762,7 +763,7 @@ TilePosition CoverMap::findExpansionSite()
 				}
 			}
 		}
-		if (BuildPlanner::isZerg())
+		if (bats::BuildPlanner::isZerg())
 		{
 			if (noBases >= 2) taken = true;
 		}

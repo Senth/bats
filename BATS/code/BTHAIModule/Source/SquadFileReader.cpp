@@ -1,7 +1,7 @@
 #include "SquadFileReader.h"
 #include "FileReaderUtils.h"
 #include "ExplorationManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "RushSquad.h"
 #include "KiteSquad.h"
 #include "ChokeHarassSquad.h"
@@ -97,8 +97,7 @@ vector<Squad*> SquadFileReader::readSquadList()
 }
 
 void SquadFileReader::createSquad()
-{
-	
+{	
 	if (type == "Offensive")
 	{
 		cSquad = new Squad(id, Squad::OFFENSIVE, name, priority);

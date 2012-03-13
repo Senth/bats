@@ -2,7 +2,7 @@
 #include "AgentManager.h"
 #include "WorkerAgent.h"
 #include "PFManager.h"
-#include "BuildPlanner.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "Commander.h"
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
@@ -35,7 +35,7 @@ HatcheryAgent::HatcheryAgent(Unit* mUnit)
 	}
 	
 	agentType = "HatcheryAgent";
-	BuildPlanner::getInstance()->commandCenterBuilt();
+	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 }
 
 void HatcheryAgent::computeActions()
@@ -46,12 +46,12 @@ void HatcheryAgent::computeActions()
 		{
 			sendWorkers();
 			hasSentWorkers = true;
-			BuildPlanner::getInstance()->addRefinery();
+			bats::BuildPlanner::getInstance()->addRefinery();
 
 			/*if (AgentManager::getInstance()->countNoUnits(UnitTypes::Zerg_Spawning_Pool) > 0)
 			{
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Zerg_Creep_Colony);
-				BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Zerg_Sunken_Colony);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Zerg_Creep_Colony);
+				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Zerg_Sunken_Colony);
 			}*/
 		}
 	}
@@ -63,7 +63,7 @@ void HatcheryAgent::computeActions()
 	}
 	
 	//Build Overlords for supply
-	if (BuildPlanner::getInstance()->shallBuildSupply())
+	if (bats::BuildPlanner::getInstance()->shallBuildSupply())
 	{
 		if (canBuild(UnitTypes::Zerg_Overlord))
 		{
