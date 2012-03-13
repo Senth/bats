@@ -4,7 +4,7 @@
 #include <BWAPI.h>
 #include "BaseAgent.h"
 #include "Utilities/KeyType.h"
-#include "BATSModule/include/Squad.h"
+#include "BATSModule/include/IdTypes.h"
 
 #define DISABLE_UNIT_AI 0
 
@@ -17,7 +17,7 @@
  */
 class UnitAgent : public BaseAgent {
 private:
-	utilities::KeyType<bats::Squad> squadId;
+	bats::SquadId squadId;
 
 protected:
 	
@@ -31,13 +31,13 @@ public:
 	 * Set the squad id
 	 * @param squadId the squad id to set
 	 */ 
-	void setSquadId(utilities::KeyType<bats::Squad> squadId);
+	void setSquadId(bats::SquadId squadId);
 
 	/**
 	 * Get Squad id
 	 * @return the squad id
 	 */
-	utilities::KeyType<bats::Squad> getSquadId() const;
+	bats::SquadId getSquadId() const;
 
 	/** Called each update to issue orders. */
 	void computeActions();

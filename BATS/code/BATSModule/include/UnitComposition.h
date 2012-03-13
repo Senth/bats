@@ -10,12 +10,25 @@ namespace bats {
 class UnitCompositionFactory;
 
 /**
- * A composition of unit sets that creates a group of units that can be used for different squads.
+ * Enumeration of all UnitComposition types
+ */
+enum UnitCompositions {
+	UnitComposition_First = 0,
+	UnitComposition_Drop = UnitComposition_First,
+	UnitComposition_Scout,
+	UnitComposition_Harass,
+	UnitComposition_All,
+	UnitComposition_Lim
+};
+
+/**
+ * A composition of unit sets that creates a group of units that
+ * can be used for different squads. Only UnitCompositionFactory can create
+ * a new UnitComposition.
  * 
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
-class UnitComposition
-{
+class UnitComposition {
 public:
 	/**
 	 * Destructor
@@ -27,6 +40,12 @@ public:
 	 * @return true if the unit composition is full
 	 */
 	bool isFull() const;
+
+	/**
+	 * Checks whether this unit composition is valid, i.e. it has UnitSets.
+	 * @return true if this unit composition is valid, else false.
+	 */
+	bool isValid() const;
 
 	/**
 	 * Returns all the unit sets with vacant slots, thus you can call
@@ -88,10 +107,16 @@ private:
 		const std::vector<UnitSet>& unitSets
 	);
 
+	/**
+	 * Constructs an invalid unit composition.
+	 */
+	UnitComposition();
+
 	friend class UnitCompositionFactory;
 
 	std::string mType;
 	std::string mName;
 	std::vector<UnitSet> mUnitSets;
+	bool mValid;
 };
 }

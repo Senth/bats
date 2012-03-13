@@ -2,9 +2,12 @@
 
 #include <vector>
 #include <BWAPI/TilePosition.h>
+#include "IdTypes.h"
 #include "Utilities/KeyType.h"
 #include "Utilities/KeyHandler.h"
 #include "UnitSet.h"
+#include "UnitComposition.h"
+#include "UnitCompositionFactory.h"
 
 // Forward declarations
 class UnitAgent;
@@ -25,9 +28,13 @@ public:
 	 * The default options actives the squad directly, the squad can be destroyed (and thus merged).
 	 * @param units vector of all units that should be in the class.
 	 * @param disbandable the squad can be destroyed, default is true
+	 * @param unitComposition the composition of units to use, if this is specified
+	 * all units needs to be added directly in this constructor. Defaults to
+	 * INVALID_UNIT_COMPOSITON.
 	 */
 	Squad(std::vector<UnitAgent*> units,
-		bool disbandable = true);
+		bool disbandable = true,
+		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
 
 	/**
 	 * Destructor, automatically disbands the squad if it hasn't been disbanded.
@@ -61,8 +68,9 @@ public:
 	void computeActions();
 
 	/**
-	 * Returns true if the squad is full, only applicable on needsFull squads
-	 * @return true if the squad is full.
+	 * Returns true if the squad is full, only applicable on squads with a unit composition
+	 * @return true if the squad is full, false if not, and false if it does not have
+	 * a valid unit composition.
 	 */
 	bool isFull() const;
 
@@ -136,13 +144,14 @@ private:
 	std::vector<UnitAgent*> mUnits;
 	BWAPI::TilePosition mGoalPosition;
 	std::vector<BWAPI::TilePosition> mMoveVia;
+	UnitComposition mUnitComposition;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
 	SquadStates mState;
-	utilities::KeyType<Squad> mId;
+	SquadId mId;
 
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
-	static utilities::KeyHandler<Squad>* mpsKeyHandler;
+	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
 };
 }

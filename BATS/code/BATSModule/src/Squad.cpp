@@ -1,24 +1,30 @@
 #include "Squad.h"
 #include "Utilities/Helper.h"
 #include "BTHAIModule/Source/UnitAgent.h"
+#include "UnitComposition.h"
 
 using namespace bats;
 
 int bats::Squad::mcsInstance = 0;
-utilities::KeyHandler<Squad>* bats::Squad::mpsKeyHandler = NULL;
+utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
 
 const int MAX_KEYS = 100;
 
-Squad::Squad(std::vector<UnitAgent*> units, bool disbandable) :
+Squad::Squad(
+	std::vector<UnitAgent*> units,
+	bool disbandable,
+	const UnitComposition& unitComposition) 
+	:
 	mUnits(units),
+	mUnitComposition(unitComposition),
 	mDisbandable(disbandable),
 	mDisbanded(false),
-	mId(utilities::KeyType<Squad>::INVALID_KEY)
+	mId(SquadId::INVALID_KEY)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
-		utilities::KeyHandler<Squad>::init(MAX_KEYS);
-		mpsKeyHandler = utilities::KeyHandler<Squad>::getInstance();
+		utilities::KeyHandler<_SquadType>::init(MAX_KEYS);
+		mpsKeyHandler = utilities::KeyHandler<_SquadType>::getInstance();
 	}
 	mcsInstance++;
 
@@ -58,10 +64,9 @@ bool Squad::tryDisband() {
 void Squad::computeActions() {
 	switch (mState) {
 	case SquadState_Inactive:
-		///@todo needs full should be replaced with UnitComposition.
-		//if (mNeedsFull && isFull() || !mNeedsFull) {
-		//	createGoal();
-		//}
+		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
+			createGoal();
+		}
 		break;
 
 	case SquadState_Active:
@@ -89,8 +94,11 @@ void Squad::computeActions() {
 }
 
 bool Squad::isFull() const {
-	///@todo implement Squad::isFull(), currently only a stub function.
-	return false;
+	if (mUnitComposition.isValid()) {
+		return mUnitComposition.isFull();
+	} else {
+		return false;
+	}
 }
 
 void Squad::computeSquadSpecificActions() {
@@ -111,7 +119,7 @@ void Squad::forceDisband() {
 	if (!mDisbanded) {
 		// Free all the units from a squad id.
 		for (size_t i = 0; i < mUnits.size(); ++i) {
-			mUnits[i]->setSquadId(utilities::KeyType<Squad>::INVALID_KEY);
+			mUnits[i]->setSquadId(SquadId::INVALID_KEY);
 
 			///@todo maybe make the units retreat to a point?
 		}

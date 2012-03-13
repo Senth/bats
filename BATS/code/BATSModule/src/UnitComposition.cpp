@@ -2,13 +2,18 @@
 
 using namespace bats;
 
+UnitComposition::UnitComposition() : mValid(false) {
+	// Does nothing
+}
+
 UnitComposition::UnitComposition(
 	const std::string& type,
 	const std::string& name,
 	const std::vector<UnitSet>& unitSets) :
 		mType(type),
 		mName(name),
-		mUnitSets(unitSets)
+		mUnitSets(unitSets),
+		mValid(true)
 {
 		// Does nothing
 }
@@ -25,6 +30,10 @@ bool UnitComposition::isFull() const {
 	}
 
 	return true;
+}
+
+bool UnitComposition::isValid() const {
+	return mValid;
 }
 
 std::vector<const UnitSet> UnitComposition::getUnitSets() const {

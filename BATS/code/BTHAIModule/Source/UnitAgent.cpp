@@ -24,11 +24,11 @@ UnitAgent::UnitAgent(Unit* mUnit)
 	goal = TilePosition(-1, -1);
 }
 
-void UnitAgent::setSquadId(utilities::KeyType<bats::Squad> squadId) {
+void UnitAgent::setSquadId(bats::SquadId squadId) {
 	this->squadId = squadId;
 }
 
-utilities::KeyType<bats::Squad> UnitAgent::getSquadId() const {
+bats::SquadId UnitAgent::getSquadId() const {
 	return squadId;
 }
 
