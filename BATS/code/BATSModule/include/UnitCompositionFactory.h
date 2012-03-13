@@ -7,7 +7,8 @@
 namespace bats {
 
 /**
- * Creates UnitCompositions that other classes can use.
+ * Creates UnitCompositions that other classes can use. Reads from the UnitComposition
+ * directory in BATS-data for what configurations to use.
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
 class UnitCompositionFactory {
@@ -61,5 +62,6 @@ private:
 	UnitCompositionFactory();
 
 	static UnitCompositionFactory* mpsInstance;
+	std::vector<std::vector<UnitComposition> > mUnitCompositions;
 };
 }

@@ -42,6 +42,9 @@
     <ClInclude Include="include\IdTypes.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="include\Config.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BuildOrderManager.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="src\Squad.cpp">
       <Filter>Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Config.cpp">
+      <Filter>Helpers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

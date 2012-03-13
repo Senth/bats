@@ -3,11 +3,12 @@
 
 using namespace bats;
 
-UnitSet::UnitSet(const BWAPI::UnitType& unitType, int cMax, int cCurrent) {
-	assert(cMax >= cCurrent);
+UnitSet::UnitSet(const BWAPI::UnitType& unitType, int cMax, bool treatMorphAsSame) {
+	assert(cMax >= 1);
 	mUnitType = unitType;
 	mcUnitsMax = cMax;
-	mcUnitsCurrent = cCurrent;
+	mcUnitsCurrent = 0;
+	mTreatMorphAsSame = treatMorphAsSame;
 }
 
 UnitSet::~UnitSet() {
@@ -53,9 +54,23 @@ bool UnitSet::removeUnits(int cUnits) {
 }
 
 bool UnitSet::operator==(const BWAPI::UnitType& unitType) const {
-	return mUnitType == unitType;
+	if (!mTreatMorphAsSame) {
+		return mUnitType == unitType;
+	} else {
+		if ((mUnitType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
+			mUnitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+			&&
+			(unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
+			unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode))
+		{
+			return true;
+		} else {
+			return false;
+		}
+		///@todo implement other morph checks than just siege tanks
+	}
 }
 
 bool operator==(const BWAPI::UnitType& unitType, const bats::UnitSet& unitSet) {
-	return unitSet.getUnitType() == unitType;
+	return unitSet == unitType;
 }

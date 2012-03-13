@@ -14,8 +14,7 @@ class UnitCompositionFactory;
  * need to be full.
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
-class UnitSet
-{
+class UnitSet {
 public:
 	/**
 	 * Destructor
@@ -84,11 +83,15 @@ private:
 	 * shall exist. This information can not be changed later.
 	 * @param unitType the type of unit we want to specify a limit on
 	 * @param cMax how many units we max can have
-	 * @param cCurrent how many units we have now, defaults to 0
+	 * @param treatMorphAsSame set this to true if the unit set should treat morphed units
+	 * as same, e.g. "Terran Siege Tank Tank Mode" and "Terran Siege Tank Siege Mode" will
+	 * be treated as the same unit. Defaults to false
+	 * @todo only the Siege Tank check has been implemented at the moment. Implement the rest.
 	 */
-	UnitSet(const BWAPI::UnitType& unitType, int cMax, int cCurrent = 0);
+	UnitSet(const BWAPI::UnitType& unitType, int cMax, bool treatMorphAsSame = false);
 
 	BWAPI::UnitType mUnitType;
+	bool mTreatMorphAsSame;
 	int mcUnitsMax;
 	int mcUnitsCurrent;
 };
