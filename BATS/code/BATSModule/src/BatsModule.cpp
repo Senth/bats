@@ -27,7 +27,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpAgentManager = NULL;
 
 	// Initialize logger
-	utilities::setOutputDirectory(config::log::LOGGING_PATH);
+	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
 	utilities::loadSettings(config::log::SETTINGS_FILE);
 
 	// Initialize singletons

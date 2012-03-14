@@ -117,8 +117,8 @@ enum LogLevels {
 * // Prints a regular message
 * DEBUG_MESSAGE(LogLevel_Info, "This is a message");
 * 
-* // You can also use "cout" syntax to create more complex messages
-* DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
+* // You can also use "cout" syntax to create more complex messages.
+* DEBUG_MESSAGE(LogLevel_Warning, "Value of " << strMessage << " is: " << intValue);
 * \endcode
 * @param verbosity tho verbosity level to use
 * @param message the message to display, using streams are possible

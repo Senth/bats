@@ -10,7 +10,7 @@ namespace bats {
 
 		namespace log {
 			extern const std::string SETTINGS_FILE;
-			extern const std::string LOGGING_PATH;
+			extern const std::string OUTPUT_DIR;
 		}
 	}
 }

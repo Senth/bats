@@ -8,7 +8,7 @@ namespace config {
 
 	namespace log {
 		const std::string SETTINGS_FILE = CONFIG_DIR + "log_settings.ini";
-		const std::string LOGGING_PATH = ROOT_DIR + "logs\\bats";
+		const std::string OUTPUT_DIR = ROOT_DIR + "logs\\bats";
 	}
 }
 }
