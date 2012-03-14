@@ -3,6 +3,7 @@
 #include "UnitCompositionFactory.h"
 #include "Config.h"
 #include <BWAPI/Race.h>
+#include <BWAPI/UnitType.h>
 
 using namespace bats;
 
@@ -54,7 +55,7 @@ void UnitCompositionFactory::reloadConfigs() {
 	}
 
 	std::string typeNameCurrent;
-	UnitCompositions typeCurrent;
+	UnitCompositions typeCurrent = UnitComposition_Lim;
 	std::string nameCurrent;
 	std::vector<UnitSet> unitSets;
 
@@ -68,14 +69,51 @@ void UnitCompositionFactory::reloadConfigs() {
 		if (variableInfo.section != nameCurrent || variableInfo.file != typeNameCurrent) {
 			if (typeCurrent != UnitComposition_Lim && !unitSets.empty()) {
 				mUnitCompositions[typeCurrent].push_back(
-					UnitComposition(typeNameCurrent, nameCurrent, unitSets));
+					UnitComposition(typeNameCurrent, nameCurrent, unitSets)
+				);
+				unitSets.clear();
 			}
 		}
 
+		
 		// New file
 		if (variableInfo.file != typeNameCurrent) {
-			///@todo
+			typeNameCurrent = variableInfo.file;
+			typeCurrent = toCompositionType(typeNameCurrent);
+
+			// No need to read the rest of this file's variables when the current type is invalid
+			if (typeCurrent == UnitComposition_Lim) {
+				unitCompositionReader.nextFile();
+				continue;
+			}
 		}
+
+		
+		// New UnitSet
+		BWAPI::UnitType unitType = BWAPI::UnitTypes::getUnitType(variableInfo.name);
+
+		if (unitType != BWAPI::UnitTypes::Unknown) {
+			int cUnits = variableInfo;
+			if (cUnits > 0) {
+
+				// Check for special morph units, like siege tank.
+				bool treatMorphAsSame = false;
+				if (unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
+					unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+				{
+					treatMorphAsSame = true;
+				}
+
+				unitSets.push_back(UnitSet(unitType, cUnits, treatMorphAsSame));
+			}
+		}
+	}
+
+	// Create the last UnitComposition
+	if (typeCurrent != UnitComposition_Lim) {
+		mUnitCompositions[typeCurrent].push_back(
+			UnitComposition(typeNameCurrent, nameCurrent, unitSets)
+		);
 	}
 }
 
@@ -83,9 +121,22 @@ std::vector<UnitComposition> UnitCompositionFactory::getUnitCompositionsByType(
 	std::vector<UnitAgent*> availableUnits,
 	UnitCompositions type) const
 {
+	assert(type >= UnitComposition_First);
+	assert(type < UnitComposition_Lim);
+
 	std::vector<UnitComposition> availableCompositions;
 
-	///@todo 
+	// Create a copy of all unit compositions and check if they become full
+	// If they do not become full they are not available unit sets.
+	std::vector<UnitComposition> unitCompositions = mUnitCompositions[type];
+	for (size_t i = 0; i < unitCompositions.size(); ++i) {
+		unitCompositions[i].addUnits(availableUnits);
+
+		if (unitCompositions[i].isFull()) {
+			unitCompositions[i].clear();
+			availableCompositions.push_back(unitCompositions[i]);
+		}
+	}
 
 	return availableCompositions;
 }

@@ -97,6 +97,12 @@ public:
 	 * @return true if a variable was read, false i no next variable exists.
 	 */
 	virtual bool readNext(VariableInfo& variableInfo);
+
+	/**
+	 * Skips directly to the next file. The next call to readNext will thus be
+	 * in another file than the current.
+	 */
+	virtual void nextFile();
 private:
 	/**
 	 * Find all ini files to read from and put them into the file queue.

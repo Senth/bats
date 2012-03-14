@@ -68,6 +68,11 @@ public:
 	bool removeUnits(int cUnits);
 
 	/**
+	 * Clears all current units from this UnitSet.
+	 */
+	void clear();
+
+	/**
 	 * Checks whether the instance contains and keeps track of units of the
 	 * specified UnitType.
 	 * @param unitType the UnitType to test with.

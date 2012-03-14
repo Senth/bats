@@ -49,7 +49,7 @@ public:
 
 	/**
 	 * Returns all the unit sets with vacant slots, thus you can call
-	 * UnitSets::getSlotsVacant() to see how many units are missing for each unit set.
+	 * UnitSet::getSlotsVacant() to see how many units are missing for each unit set.
 	 * @return all unit sets with vacant slots.
 	 * @note you cannot add units to these unit sets directly, but have
 	 * to add it through UnitComposition's addUnits(), the same goes for removing
@@ -111,6 +111,12 @@ private:
 	 * Constructs an invalid unit composition.
 	 */
 	UnitComposition();
+
+	/**
+	 * Clears all units from the UnitComposition, a helper function for
+	 * UnitCompositionFactory.
+	 */
+	void clear();
 
 	friend class UnitCompositionFactory;
 

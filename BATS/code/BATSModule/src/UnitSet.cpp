@@ -53,6 +53,10 @@ bool UnitSet::removeUnits(int cUnits) {
 	}
 }
 
+void UnitSet::clear() {
+	mcUnitsCurrent = 0;
+}
+
 bool UnitSet::operator==(const BWAPI::UnitType& unitType) const {
 	if (!mTreatMorphAsSame) {
 		return mUnitType == unitType;

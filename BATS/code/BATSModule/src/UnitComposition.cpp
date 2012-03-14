@@ -111,3 +111,9 @@ std::vector<UnitAgent*> UnitComposition::removeUnits(const std::vector<UnitAgent
 
 	return notRemovedUnits;
 }
+
+void UnitComposition::clear() {
+	for (size_t i = 0; i < mUnitSets.size(); ++i) {
+		mUnitSets[i].clear();
+	}
+}

@@ -69,6 +69,15 @@ bool MassIniReader::readNext(VariableInfo& variableInfo) {
 	return isGood();
 }
 
+void MassIniReader::nextFile() {
+	IniReader::close();
+
+	if (!mFileQueue.empty()) {
+		IniReader::open(mFileQueue.front());
+		mFileQueue.pop_front();
+	}
+}
+
 void MassIniReader::findAllFiles(const std::string& directory) {
 #ifdef WINDOWS
 	HANDLE hFile = NULL;
