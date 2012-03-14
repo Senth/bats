@@ -40,7 +40,7 @@ void BuildPlanner::switchToPhase(std::string fileName){
 			BuildPlanner::mCurrentPhase = "mid";
 		}
 		else if(BuildPlanner::mCurrentPhase == "mid"){
-			BuildOrderFileReader().readBuildOrder("late", mtransitionGraph.mid, buildOrder);
+			BuildOrderFileReader().readBuildOrder("late", mtransitionGraph.late, buildOrder);
 			BuildPlanner::mCurrentPhase = "late";
 		}
 	}
