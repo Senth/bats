@@ -57,8 +57,16 @@ struct VariableInfo {
  * including section and possible subsection, if there is no variables left or if an error
  * occurred, false is returned; good() will also return false. Close the file by either
  * calling close()—needed if you want to open another file—or when the object is deleted
- * it will close itself. Does not support escaped characters, such as \; and \#
- * 
+ * it will close itself. Does not support escaped characters, such as \; and \#\n
+ * \n
+ * Ini file syntax:\n
+ * [section]\n
+ * variableName = variableValue # Comment\n
+ * [section.subsection] ; another comment\n
+ * ; line comment\n
+ * # line comment\n
+ * variable name for sub		=	variable value for sub\n
+ * variable name for sub 2		=	variable value for sub 2\n
  * @see MassIniReader if you want to read many ini-files from a directory.
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
