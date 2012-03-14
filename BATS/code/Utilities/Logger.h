@@ -111,10 +111,15 @@ enum LogLevels {
 #else
 /**
 * Prints a debug message. Only active if _DEBUG is defined.
-* Does not process the message if verbosity level is too low. \n
-* Examples: \n
-* DEBUG_MESSAGE(LogLevel_Info, "This is a message"); // A regular \n
+* Does not process the message if verbosity level is too low.
+* @section Examples
+* \code
+* // Prints a regular message
+* DEBUG_MESSAGE(LogLevel_Info, "This is a message");
+* 
+* // You can also use "cout" syntax to create more complex messages
 * DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
+* \endcode
 * @param verbosity tho verbosity level to use
 * @param message the message to display, using streams are possible
 * @see utilities::LogLevels for guidelines what levels to use when
@@ -126,6 +131,7 @@ enum LogLevels {
 * @param verbosity the verbosity level to use
 * @param message the message to display, using streams are possible
 * @see utilities::LogLevels for guidelines what levels to use when
+* @see DEBUG_MESSAGE() for examples how to this function.
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message)
 #endif
@@ -168,10 +174,26 @@ inline void setOutputTargetDebugMessage(int targets) {gOutputTargetDebugMessage 
 void setOutputDirectory(const std::string& dirPath);
 
 /**
- * Reads the settings from the specified file. This file has the syntax: \n
- * DEBUG = TARGET | ANOTHER_TARGET; e.g. DEBUG = FILE | CONSOLE; \n
- * ERROR = TARGET | ANOTHER_TARGET; \n
+ * Reads the settings from the specified file. This file has the syntax:
+ * \code
+ * DEBUG = TARGET | ANOTHER_TARGET; e.g. DEBUG = FILE | CONSOLE;
+ * ERROR = TARGET | ANOTHER_TARGET;
  * TARGET = VERBOSITY; e.g. FILE = FINEST;
+ * \endcode
+ * @section Example
+ * \code
+ * // config.ini - Note comments are not allowed in the ini-file.
+ * DEBUG = CONSOLE | FILE;	// Print debug messages to console and file.
+ * ERROR = FILE;			// Print error messages only to file
+ * 
+ * // Set the debug message verbosity to info for console. Finer debug messages than info will
+ * // not be displayed in the console.
+ * CONSOLE = INFO;
+ * // Set the debug message verbosity to finest for file. All debug messages will
+ * // be added to the file.
+ * FILE = FINEST;
+ * \endcode
+ * 
  * @param settingsFile path to the settings file.
  * @note the variables are not case sensitive, but the variables have been shortened
  * for easier reading.

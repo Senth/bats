@@ -13,6 +13,7 @@
 #include "BTHAIModule/Source/Config.h"
 #include "Utilities/Helper.h"
 #include "Utilities/Logger.h"
+#include "Config.h"
 #include <cassert>
 
 using namespace bats;
@@ -20,16 +21,14 @@ using namespace BWAPI;
 
 const int WORKER_MINERAL_PRICE = 50;
 const int GAME_STARTED_FRAME = 1;
-const std::string LOG_SETTINGS_FILE = "bwapi-data\\logs\\bats_config.ini";
-const std::string LOGGING_PATH = "bwapi-data\\logs\\bats";
 
 BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
 	mpAgentManager = NULL;
 
 	// Initialize logger
-	utilities::setOutputDirectory(LOGGING_PATH);
-	utilities::loadSettings(LOG_SETTINGS_FILE);
+	utilities::setOutputDirectory(config::log::LOGGING_PATH);
+	utilities::loadSettings(config::log::SETTINGS_FILE);
 
 	// Initialize singletons
 	mpProfiler = Profiler::getInstance();
