@@ -6,20 +6,33 @@
 // Namespace for the project
 namespace utilities {
 
+/** to get it as an bool, int, float, or double
+ * please use bool(), int(), float(), double(). Which means that it automatically tries
+ * to convert the variable. If the variable has the wrong syntax it will fail and return
+ * false or 0 (depending on the type) and print out an error using ERROR_MESSAGE().\n
+ * <b>Example</b> Convert the value to an int
+ * \code
+ * VariableInfo info;
+ * info.value = "13";
+ * int intValue = info; // intValue now is now 13
+ * \endcode
+ * <b>Example</b> Convert the value to a bool
+ * \code
+ * VariableInfo info;
+ * info.value = "true";
+ * bool boolValue = info; // boolValue now is true
+ * \endcode
+ */
 struct VariableInfo {
 	std::string file; /**< The file the variable is in (does not include .ini) */
 	std::string section; /**< The section the variable belongs to */
 	std::string subsection; /**< The subsection the variable belongs to, if no exists the string is empty */
 	std::string name; /**< The name of the variable */
 	/**
-	 * The value of the variable as a string, to get it as an bool, int, float, or double
-	 * please use bool(), int(), float(), double(). Which means that it automatically tries
-	 * to convert the variable. If the variable has the wrong syntax it will fail and return
-	 * false or 0 (depending on the type). It will however print out an error using ERROR_MESSAGE().
-	 * For example you can use info.value = "13" and then use int intValue = info; to convert
-	 * it to an int.
+	 * The value of the variable as a string. @see VariableInfo how to get the value as, bool, int
+	 * float, or double.
 	 */	
-	std::string value;
+	std::string value; 
 
 	/**
 	 * Converts the value to a bool. Usage: bool yourBool = variableInfoStruct;
