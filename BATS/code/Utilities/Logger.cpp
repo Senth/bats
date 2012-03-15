@@ -100,7 +100,7 @@ void utilities::setOutputDirectory(const std::string& dirPath) {
 	gDebugMessageFile.open(debugPath.c_str());
 }
 
-void utilities::loadSettings(const std::string& settingsFile) {
+void utilities::loadLogSettings(const std::string& settingsFile) {
 	std::ifstream settings(settingsFile.c_str());
 	
 	if (settings.is_open()) {

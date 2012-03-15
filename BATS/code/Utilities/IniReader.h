@@ -95,8 +95,12 @@ public:
 	 * Constructor that takes a string with the filepath to open.
 	 * Equivalent to calling the default constructor and then open().
 	 * @param[in] filePath path to the ini file to open
+	 * @param[in] nameToLower if all variable names <b>and sections</b> shall be converted
+	 * to lowercase, defaults to false.
+	 * @param[in] valueToLower if all variable values shall be converted to lowercase,
+	 * default to false.
 	 */
-	IniReader(const std::string& filePath);
+	IniReader(const std::string& filePath, bool nameToLower = false, bool valueToLower = false);
 
 	/**
 	 * Destructor
@@ -106,8 +110,12 @@ public:
 	/**
 	 * Opens the specified ini file.
 	 * @param[in] filPath path to the ini file to open
+	 * @param[in] nameToLower if all variable names <b>and sections</b> shall be converted
+	 * to lowercase, defaults to false. 
+	 * @param[in] valueToLower if all variable values shall be converted to lowercase,
+	 * default to false.
 	 */
-	virtual void open(const std::string& filePath);
+	virtual void open(const std::string& filePath, bool nameToLower = false, bool valueToLower = false);
 
 	/**
 	 * Closes the opened ini file. Also clears any errors
@@ -164,6 +172,8 @@ private:
 	std::string mSubSectionCurrent;
 	std::ifstream mFile;
 	bool mGood;
+	bool mNameToLower;
+	bool mValueToLower;
 
 	VariableInfo mNextVariable;
 };

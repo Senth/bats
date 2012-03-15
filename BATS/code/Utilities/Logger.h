@@ -198,7 +198,7 @@ void setOutputDirectory(const std::string& dirPath);
  * @note the variables are not case sensitive, but the variables have been shortened
  * for easier reading.
  */
-void loadSettings(const std::string& settingsFile);
+void loadLogSettings(const std::string& settingsFile);
 
 /**
 * Sets the verbosity level.
@@ -210,8 +210,8 @@ void loadSettings(const std::string& settingsFile);
 void setVerbosityLevel(LogLevels verbosity, int target);
 
 /**
-* Error messages, uses streams so you can use it in the same manner as DEBUG_MESSAGE
-* @param forceQuit if the program should forcequit.
+* Error messages, uses streams so you can use it in the same manner as DEBUG_MESSAGE()
+* @param forceQuit if the program should force a quit.
 * @param message is the error message to display
 */
 #define ERROR_MESSAGE(forceQuit, message) \

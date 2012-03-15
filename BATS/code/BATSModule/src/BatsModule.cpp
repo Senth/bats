@@ -28,7 +28,8 @@ BatsModule::BatsModule() : BTHAIModule() {
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
-	utilities::loadSettings(config::log::SETTINGS_FILE);
+	utilities::loadLogSettings(config::log::SETTINGS_FILE);
+	config::loadConfig();
 
 	// Initialize singletons
 	mpProfiler = Profiler::getInstance();

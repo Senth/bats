@@ -96,6 +96,7 @@
     <ClInclude Include="include\BatsModule.h" />
     <ClInclude Include="include\BuildOrderFileReader.h" />
     <ClInclude Include="include\BuildPlanner.h" />
+    <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="src\BatsModule.cpp" />
     <ClCompile Include="src\BuildOrderFileReader.cpp" />
     <ClCompile Include="src\BuildPlanner.cpp" />
+    <ClCompile Include="src\Commander.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Squad.cpp" />
     <ClCompile Include="src\UnitComposition.cpp" />

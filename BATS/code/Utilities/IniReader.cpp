@@ -68,16 +68,18 @@ IniReader::IniReader() {
 	// Does nothing
 }
 
-IniReader::IniReader(const std::string& filePath) {
-	open(filePath);
+IniReader::IniReader(const std::string& filePath, bool nameToLower, bool valueToLower) {
+	open(filePath, nameToLower, valueToLower);
 }
 
 IniReader::~IniReader() {
 	// Does nothing
 }
 
-void IniReader::open(const std::string& filePath) {
+void IniReader::open(const std::string& filePath, bool nameToLower, bool valueToLower) {
 	mGood = true;
+	mNameToLower = nameToLower;
+	mValueToLower = valueToLower;
 	mFile.open(filePath.c_str());
 
 	mSectionCurrent = "";
@@ -170,12 +172,24 @@ void IniReader::readNext() {
 				if (dotPos == line.npos) {
 					mSectionCurrent = line;
 					mSubSectionCurrent.clear();
+
+					if (mNameToLower) {
+						std::transform(mSectionCurrent.begin(), mSectionCurrent.end(),
+							mSectionCurrent.begin(), ::tolower);
+					}
 				}
 				// Subsection
 				else {
 					// Split section and subsection and set both.
 					mSectionCurrent = line.substr(0, dotPos);
 					mSubSectionCurrent = line.substr(dotPos+1);
+
+					if (mNameToLower) {
+						std::transform(mSectionCurrent.begin(), mSectionCurrent.end(),
+							mSectionCurrent.begin(), ::tolower);
+						std::transform(mSubSectionCurrent.begin(), mSubSectionCurrent.end(),
+							mSubSectionCurrent.begin(), ::tolower);
+					}
 				}
 			}
 			// Syntax error
@@ -224,6 +238,15 @@ void IniReader::readNext() {
 				}
 				// Good variable name and value
 				else {
+					if (mNameToLower) {
+						std::transform(mNextVariable.name.begin(), mNextVariable.name.end(),
+							mNextVariable.name.begin(), ::tolower);
+					}
+					if (mValueToLower) {
+						std::transform(mNextVariable.value.begin(), mNextVariable.value.end(),
+							mNextVariable.value.begin(), ::tolower);
+					}
+
 					readVariable = true;
 				}
 			}

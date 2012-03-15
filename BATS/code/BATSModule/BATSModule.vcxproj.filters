@@ -16,6 +16,9 @@
     <Filter Include="Squads\UnitComposition">
       <UniqueIdentifier>{2d73c6cf-136e-4179-a467-f59cb5cd5646}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Commander">
+      <UniqueIdentifier>{568bd4ac-85d0-4c2e-8758-d7db9b22a09e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -48,6 +51,9 @@
     <ClInclude Include="include\BuildPlanner.h">
       <Filter>BuildOrder</Filter>
     </ClInclude>
+    <ClInclude Include="include\Commander.h">
+      <Filter>Commander</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -76,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="src\BuildPlanner.cpp">
       <Filter>BuildOrder</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Commander.cpp">
+      <Filter>Commander</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

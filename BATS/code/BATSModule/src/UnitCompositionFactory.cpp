@@ -43,7 +43,7 @@ void UnitCompositionFactory::reloadConfigs() {
 
 	utilities::MassIniReader unitCompositionReader;
 
-	std::string iniPath = config::UNIT_COMPOSITION_DIR;
+	std::string iniPath = config::squad::UNIT_COMPOSITION_DIR;
 
 	iniPath += "\\" + BWAPI::Broodwar->self()->getRace().getName();
 
