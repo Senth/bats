@@ -3,6 +3,9 @@
 namespace utilities
 {
 
+template <typename T>
+class KeyHandler;
+
 /**
 * Key type for a specific type
 * @author Matteus Magnusson <matteus.magnusson@gmail.com>
@@ -11,12 +14,6 @@ template <typename T>
 class KeyType
 {
 public:
-	/**
-	* Default Constructor for Key Type
-	* @param key the key value, default INVALID_KEY
-	*/
-	inline explicit KeyType(int key = INVALID_KEY.mKey) : mKey(key) {}
-
 	/**
 	* Assignment operator
 	* @param key assigns a new key value to the key
@@ -71,8 +68,23 @@ public:
 	 */
 	inline bool isInvalid() const {return (*this) == INVALID_KEY;}
 
+	/**
+	 * Convert the key to an int. Although we don't want this feature in general,
+	 * it's very useful for indexing in vectors, and thus very fast.
+	 * @return the integer value of the key
+	 */
+	inline operator int() const {return mKey;}
+
 	static const KeyType<T> INVALID_KEY;
 private:
+
+	/**
+	* Default Constructor for Key Type
+	* @param key the key value, default INVALID_KEY
+	*/
+	inline explicit KeyType(int key = INVALID_KEY.mKey) : mKey(key) {}
+
+	friend class KeyHandler<T>;
 
 	int mKey;
 };
