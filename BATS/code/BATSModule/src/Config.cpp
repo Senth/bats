@@ -3,9 +3,11 @@
 #include "Utilities/IniReader.h"
 #include "Utilities/Logger.h"
 
+
 namespace bats {
 namespace config {
 
+//--------- Constants ---------//
 const std::string ROOT_DIR = "bwapi-data\\";
 const std::string CONFIG_DIR = ROOT_DIR + "AI\\BATS-data\\";
 
@@ -20,12 +22,14 @@ namespace log {
 	const std::string OUTPUT_DIR = ROOT_DIR + "logs\\bats";
 }
 
+
+//--------- Function Definitions ---------//
 void readConfig(const std::string& configFile);
 void handleVariable(const utilities::VariableInfo& variableInfo);
 bool setSquad(const utilities::VariableInfo& variableInfo);
 
 
-//--------- Functions ---------//
+//--------- Function Declarations ---------//
 void loadConfig() {
 	// Default configuration
 	readConfig(CONFIG_DIR + "config_default.ini");

@@ -45,17 +45,27 @@ void Commander::computeActions() {
 bool Commander::issueCommand(const std::string& command) {
 	/// @todo Commander try to issue command.
 
-	if (mpSquadWaiting != NULL) {
-		finishWaitingSquad();
-	}
+	/// @todo implement when we have onMinimapPing event.
+	//if (mpSquadWaiting != NULL) {
+	//	finishWaitingSquad();
+	//}
 
 	if (command == "attack") {
-		// TODO
+		/// @todo attack
 	} else if (command == "drop") {
-		// TODO
+		/// @todo drop
 	} else if (command == "harass") {
-		// TODO
+		/// @todo harass
+	} else if (command == "counter-attack") {
+		/// @todo counter-attack
+	} else if (command == "expand") {
+		/// @todo expand
+	} else if (command == "move") {
+		/// @todo move
+	} else if (command == "scout") {
+		/// @todo scout
 	}
+	/// @todo abort
 
 	return true;
 }
@@ -63,6 +73,8 @@ bool Commander::issueCommand(const std::string& command) {
 void Commander::finishWaitingSquad() {
 	/// @todo finish the waiting squad
 
+
+	/// @todo implement when we have onMinimapPing event.
 	// If we have a path
 	
 	// No path, do we create a path or do we let the squad create the path?

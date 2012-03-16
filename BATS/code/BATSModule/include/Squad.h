@@ -109,13 +109,40 @@ protected:
 	void forceDisband();
 
 	/**
-	 * Sets the position to move to as a goal and an additional path to go via
-	 * @param goalPosition the position the squad should move to
-	 * @param via positions to go via to the goalPosition, optional.
+	 * Sets the position to move to as a goal. This will reset all current goal positions.
+	 * @param position the new goal position to move to.
+	 * @see setGoalPositions() to set a list of positions, and reset current positions.
+	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
+	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
 	 */
-	void moveTo(
-		const BWAPI::TilePosition& goalPosition,
-		const std::vector<BWAPI::TilePosition>& via = std::vector<BWAPI::TilePosition>());
+	void setGoalPosition(const BWAPI::TilePosition& position);
+
+	/**
+	 * Sets the positions to move to as goals. This will reset all current goal positions.
+	 * @param positions the new goal positions to move to.
+	 * @see setGoalPosition() to set one position, and reset current positions.
+	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
+	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
+	 */
+	void setGoalPositions(const std::list<BWAPI::TilePosition>& positions);
+
+	/**
+	 * Adds the position at the back of the queue.
+	 * @param position the goal position to add at the back of the queue.
+	 * @see setGoalPosition() to set one position, and reset current positions.
+	 * @see setGoalPositions() to set a list of positions, and reset current positions.
+	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
+	 */
+	void addGoalPosition(const BWAPI::TilePosition& position);
+
+	/**
+	 * Adds the positions at the back of the queue.
+	 * @param positions the goal positions to add at the back of the queue.
+	 * @see setGoalPosition() to set one position, and reset current positions.
+	 * @see setGoalPositions() to set a list of positions, and reset current positions.
+	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
+	 */
+	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
 
 private:
 	/**
@@ -142,8 +169,7 @@ private:
 	virtual GoalStates getGoalState() const = 0;
 	
 	std::vector<UnitAgent*> mUnits;
-	BWAPI::TilePosition mGoalPosition;
-	std::vector<BWAPI::TilePosition> mMoveVia;
+	std::list<BWAPI::TilePosition> mGoalPositions;
 	UnitComposition mUnitComposition;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */

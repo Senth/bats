@@ -128,10 +128,19 @@ void Squad::forceDisband() {
 	}
 }
 
-void Squad::moveTo(const BWAPI::TilePosition& goalPosition, const std::vector<BWAPI::TilePosition>& via) {
-	mGoalPosition = goalPosition;
+void Squad::setGoalPosition(const BWAPI::TilePosition& position) {
+	mGoalPositions.clear();
+	mGoalPositions.push_back(position);
+}
 
-	if (!via.empty()) {
-		mMoveVia = via;
-	}
+void Squad::setGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
+	mGoalPositions = positions;
+}
+
+void Squad::addGoalPosition(const BWAPI::TilePosition& position) {
+	mGoalPositions.push_back(position);
+}
+
+void Squad::addGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
+	mGoalPositions.insert(mGoalPositions.end(), positions.begin(), positions.end());
 }
