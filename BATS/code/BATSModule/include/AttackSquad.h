@@ -14,11 +14,6 @@ namespace bats {
 class AttackSquad : public Squad {
 public:
 	/**
-	 * Default constructor
-	 */
-	AttackSquad();
-
-	/**
 	 * Constructor that takes units to be used with the squad.
 	 * @param units all units to be added to the squad.
 	 */
@@ -29,7 +24,9 @@ public:
 	 */
 	virtual ~AttackSquad();
 
-	
+protected:
+	virtual void computeSquadSpecificActions();
+
 private:
 
 };

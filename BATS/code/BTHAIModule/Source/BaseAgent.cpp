@@ -264,12 +264,12 @@ bool BaseAgent::doEnsnare(TilePosition pos)
 	return false;
 }
 
-void BaseAgent::setSquadID(int id)
+void BaseAgent::_deprecated_setSquadID(int id)
 {
 	squadID = id;
 }
 
-int BaseAgent::getSquadID()
+int BaseAgent::_deprecated_getSquadID()
 {
 	return squadID;
 }

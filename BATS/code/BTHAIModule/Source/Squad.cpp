@@ -341,7 +341,7 @@ bool Squad::addMember(BaseAgent* agent)
 			{
 				//Yes we have, add it to the squad
 				agents.push_back(agent);
-				agent->setSquadID(id);
+				agent->_deprecated_setSquadID(id);
 				setup.at(i).current++;
 				
 				if (goal.x() >= 0)
@@ -436,7 +436,7 @@ void Squad::removeMember(BaseAgent* agent)
 	{
 		if (agents.at(i)->getUnitID() == agent->getUnitID())
 		{
-			agents.at(i)->setSquadID(-1);
+			agents.at(i)->_deprecated_setSquadID(-1);
 			agents.at(i)->assignToDefend();
 			agents.erase(agents.begin() + i);
 			break;

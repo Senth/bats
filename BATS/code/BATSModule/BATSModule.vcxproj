@@ -108,6 +108,7 @@
     <ClInclude Include="include\UnitSet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AttackSquad.cpp" />
     <ClCompile Include="src\BatsDll.cpp" />
     <ClCompile Include="src\BatsModule.cpp" />
     <ClCompile Include="src\BuildOrderFileReader.cpp" />

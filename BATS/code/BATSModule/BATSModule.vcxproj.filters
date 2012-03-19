@@ -19,7 +19,7 @@
     <Filter Include="Commander">
       <UniqueIdentifier>{568bd4ac-85d0-4c2e-8758-d7db9b22a09e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Squads\Commands">
+    <Filter Include="Squads\Types">
       <UniqueIdentifier>{4e74ec7c-549d-4b4e-a10e-4921034a7410}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -58,7 +58,7 @@
       <Filter>Commander</Filter>
     </ClInclude>
     <ClInclude Include="include\AttackSquad.h">
-      <Filter>Squads\Commands</Filter>
+      <Filter>Squads\Types</Filter>
     </ClInclude>
     <ClInclude Include="include\SquadManager.h">
       <Filter>Squads</Filter>
@@ -97,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="src\SquadManager.cpp">
       <Filter>Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttackSquad.cpp">
+      <Filter>Squads\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

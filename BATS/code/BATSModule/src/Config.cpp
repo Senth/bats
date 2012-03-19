@@ -15,6 +15,8 @@ namespace squad {
 	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitComposition";
 	float PING_WAIT_TIME_FIRST = 0.0f;
 	float PING_WAIT_TIME_AFTER_FIRST = 0.0f;
+	float REGROUP_DISTANCE_BEGIN = 0.0f;
+	float REGROUP_DISTANCE_END = 0.0f;
 }
 
 namespace log {
@@ -74,6 +76,10 @@ bool setSquad(const utilities::VariableInfo& variableInfo) {
 		squad::PING_WAIT_TIME_FIRST = variableInfo;
 	} else if (variableInfo.name == "ping_wait_time_after_first") {
 		squad::PING_WAIT_TIME_AFTER_FIRST = variableInfo;
+	} else if (variableInfo.name == "regroup_distance_begin") {
+		squad::REGROUP_DISTANCE_BEGIN = variableInfo;
+	} else if (variableInfo.name == "regroup_distance_end") {
+		squad::REGROUP_DISTANCE_END = variableInfo;
 	} else {
 		return false;
 	}

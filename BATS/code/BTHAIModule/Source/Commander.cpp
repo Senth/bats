@@ -237,7 +237,7 @@ void Commander::checkNoSquadUnits()
 		if (agent->isOfType(UnitTypes::Zerg_Overlord)) notAssigned = false;
 		if (agent->getUnitType().isBuilding()) notAssigned = false;
 		if (agent->getUnitType().isAddon()) notAssigned = false;
-		if (agent->getSquadID() != -1) notAssigned = false;
+		if (agent->_deprecated_getSquadID() != -1) notAssigned = false;
 
 		if (notAssigned)
 		{
@@ -369,7 +369,7 @@ int Commander::noOffensiveSquadsWithin(TilePosition center, int maxRange)
 
 void Commander::unitDestroyed(BaseAgent* agent)
 {
-	int squadID = agent->getSquadID();
+	int squadID = agent->_deprecated_getSquadID();
 	if (squadID != -1)
 	{
 		Squad* squad = getSquad(squadID);
@@ -907,7 +907,7 @@ void Commander::assistBuilding(BaseAgent* building)
 
 void Commander::assistWorker(BaseAgent* worker)
 {
-	if (worker->getSquadID() != -1)
+	if (worker->_deprecated_getSquadID() != -1)
 	{
 		//Worker is in a squad. Do nothing.
 		return;

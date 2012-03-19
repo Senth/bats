@@ -189,11 +189,11 @@ public:
 	static bool doEnsnare(BWAPI::TilePosition pos);
 
 	/** Assigns this agent to the squad with the specified id. */
-	void setSquadID(int id);
+	void _deprecated_setSquadID(int id);
 
 	/** Returns the squad this agent belongs to, or -1 if it doesnt
 	 * belong to any squad. */
-	int getSquadID();
+	int _deprecated_getSquadID();
 
 };
 

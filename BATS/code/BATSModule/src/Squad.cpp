@@ -67,6 +67,7 @@ void Squad::computeActions() {
 	case SquadState_Inactive:
 		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
 			createGoal();
+			mState = SquadState_Active;
 		}
 		break;
 
@@ -87,6 +88,8 @@ void Squad::computeActions() {
 		default:
 			break;
 		}
+
+		/// @todo implement regroup functionality to the squads.
 
 	default:
 		// Do nothing

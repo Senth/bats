@@ -101,9 +101,9 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
 	//EndPF
 
 	TilePosition checkpoint = goal;
-	if (agent->getSquadID() >= 0)
+	if (agent->_deprecated_getSquadID() >= 0)
 	{
-		Squad* sq = Commander::getInstance()->getSquad(agent->getSquadID());
+		Squad* sq = Commander::getInstance()->getSquad(agent->_deprecated_getSquadID());
 		if (sq != NULL)
 		{
 			checkpoint = sq->nextMovePosition();
