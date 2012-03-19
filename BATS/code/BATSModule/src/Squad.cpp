@@ -2,6 +2,7 @@
 #include "Utilities/Helper.h"
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "UnitComposition.h"
+#include <algorithm>
 
 using namespace bats;
 
@@ -99,6 +100,33 @@ bool Squad::isFull() const {
 	} else {
 		return false;
 	}
+}
+
+void Squad::addUnit(UnitAgent* pUnit) {
+	// Check so that the unit agent doesn't have a squad already.
+	assert(pUnit->getSquadId() == SquadId::INVALID_KEY);
+	mUnits.push_back(pUnit);
+}
+
+void Squad::addUnits(const std::vector<UnitAgent*>& units) {
+	for (size_t i = 0; i < units.size(); ++i) {
+		// Check so that the unit doesn't have a squad already.
+		assert(units[i]->getSquadId() == SquadId::INVALID_KEY);
+		mUnits.push_back(units[i]);
+	}
+}
+
+void Squad::removeUnit(UnitAgent* pUnit) {
+	std::vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), pUnit);
+	if (foundUnit != mUnits.end()) {
+		mUnits.erase(foundUnit);
+	} else {
+		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
+	}
+}
+
+const SquadId & Squad::getSquadId() const {
+	return mId;
 }
 
 void Squad::computeSquadSpecificActions() {

@@ -2,6 +2,7 @@
 #include "Utilities/Logger.h"
 #include "Commander.h"
 #include "Squad.h"
+#include "SquadManager.h"
 #include "UnitCompositionFactory.h"
 
 using namespace bats;
@@ -11,7 +12,9 @@ Commander* Commander::mpsInstance = NULL;
 Commander::Commander() {
 	mpUnitCompositionFactory = NULL;
 	mpSquadWaiting = NULL;
+	mpSquadManager = NULL;
 
+	mpSquadManager = SquadManager::getInstance();
 	mpUnitCompositionFactory = UnitCompositionFactory::getInstance();
 }
 
@@ -19,9 +22,7 @@ Commander::~Commander() {
 	SAFE_DELETE(mpUnitCompositionFactory);
 
 	// Delete squads
-	for (size_t i = 0; i < mSquads.size(); ++i) {
-		SAFE_DELETE(mSquads[i]);
-	}
+	SAFE_DELETE(mpSquadManager);
 	SAFE_DELETE(mpSquadWaiting);
 
 	mpsInstance = NULL;
@@ -37,9 +38,7 @@ Commander* Commander::getInstance() {
 void Commander::computeActions() {
 	/// @todo Commander computer actions more complex actions
 
-	for (size_t i = 0; i < mSquads.size(); ++i) {
-		mSquads[i]->computeActions();
-	}
+	mpSquadManager->computeActions();
 }
 
 bool Commander::issueCommand(const std::string& command) {
@@ -79,6 +78,6 @@ void Commander::finishWaitingSquad() {
 	
 	// No path, do we create a path or do we let the squad create the path?
 
-	mSquads.push_back(mpSquadWaiting);
+	mpSquadManager->addSquad(mpSquadWaiting);
 	mpSquadWaiting = NULL;
 }

@@ -14,18 +14,8 @@
 namespace utilities
 {
 
-//template<typename T>
-//class KeyType<T> {
-//public:
-//	static const KeyType<T> INVALID_KEY;
-//private:
-//	inline explicit KeyType(int key = INVALID_KEY.mKey);
-//
-//	int mKey;
-//};
-
 /**
-* Generates keys for the sprites
+* Generates keys for the specified type
 * @author Matteus Magnusson <matteus.magnusson@gmail.com>
 */
 template <typename T>

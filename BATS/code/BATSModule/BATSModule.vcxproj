@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AttackSquad.h" />
     <ClInclude Include="include\BatsModule.h" />
     <ClInclude Include="include\BuildOrderFileReader.h" />
     <ClInclude Include="include\BuildPlanner.h" />
@@ -101,6 +102,7 @@
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />
     <ClInclude Include="include\Squad.h" />
+    <ClInclude Include="include\SquadManager.h" />
     <ClInclude Include="include\UnitComposition.h" />
     <ClInclude Include="include\UnitCompositionFactory.h" />
     <ClInclude Include="include\UnitSet.h" />
@@ -113,6 +115,7 @@
     <ClCompile Include="src\Commander.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Squad.cpp" />
+    <ClCompile Include="src\SquadManager.cpp" />
     <ClCompile Include="src\UnitComposition.cpp" />
     <ClCompile Include="src\UnitCompositionFactory.cpp" />
     <ClCompile Include="src\UnitSet.cpp" />

@@ -37,7 +37,7 @@ public:
 	 * Get Squad id
 	 * @return the squad id
 	 */
-	bats::SquadId getSquadId() const;
+	const bats::SquadId& getSquadId() const;
 
 	/** Called each update to issue orders. */
 	void computeActions();

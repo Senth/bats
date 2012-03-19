@@ -19,6 +19,9 @@
     <Filter Include="Commander">
       <UniqueIdentifier>{568bd4ac-85d0-4c2e-8758-d7db9b22a09e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Squads\Commands">
+      <UniqueIdentifier>{4e74ec7c-549d-4b4e-a10e-4921034a7410}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -54,6 +57,12 @@
     <ClInclude Include="include\Commander.h">
       <Filter>Commander</Filter>
     </ClInclude>
+    <ClInclude Include="include\AttackSquad.h">
+      <Filter>Squads\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SquadManager.h">
+      <Filter>Squads</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -85,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="src\Commander.cpp">
       <Filter>Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SquadManager.cpp">
+      <Filter>Squads</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

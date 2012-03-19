@@ -7,12 +7,12 @@
 using namespace BWAPI;
 using namespace std;
 
-UnitAgent::UnitAgent()
+UnitAgent::UnitAgent() : squadId(bats::SquadId::INVALID_KEY)
 {
 	
 }
 
-UnitAgent::UnitAgent(Unit* mUnit)
+UnitAgent::UnitAgent(Unit* mUnit) : squadId(bats::SquadId::INVALID_KEY)
 {
 	unit = mUnit;
 	type = unit->getType();
@@ -28,7 +28,7 @@ void UnitAgent::setSquadId(bats::SquadId squadId) {
 	this->squadId = squadId;
 }
 
-bats::SquadId UnitAgent::getSquadId() const {
+const bats::SquadId& UnitAgent::getSquadId() const {
 	return squadId;
 }
 

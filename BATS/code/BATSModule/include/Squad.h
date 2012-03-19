@@ -75,6 +75,30 @@ public:
 	bool isFull() const;
 
 	/**
+	 * Adds a unit to the squad.
+	 * @param pUnit the unit to add.
+	 */
+	void addUnit(UnitAgent* pUnit);
+
+	/**
+	 * Adds many units to the squad.
+	 * @param units vector with units to add
+	 */
+	void addUnits(const std::vector<UnitAgent*>& units);
+
+	/**
+	 * Removes a unit from the squad. This should be called when a unit dies too.
+	 * @param pUnit the unit to remove.
+	 */
+	void removeUnit(UnitAgent* pUnit);
+
+	/**
+	 * Returns the squad's id.
+	 * @return squad's id.
+	 */
+	const SquadId& getSquadId() const;
+
+	/**
 	 * States of the squad
 	 */
 	enum SquadStates {

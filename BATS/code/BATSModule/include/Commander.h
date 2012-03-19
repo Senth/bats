@@ -7,6 +7,7 @@ namespace bats {
 
 // Forward declarations
 class Squad;
+class SquadManager;
 class UnitCompositionFactory;
 
 /**
@@ -63,7 +64,7 @@ private:
 	void finishWaitingSquad();
 
 	Squad* mpSquadWaiting;
-	std::vector<Squad*> mSquads;
+	SquadManager* mpSquadManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;
 
 	static Commander* mpsInstance;
