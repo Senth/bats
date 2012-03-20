@@ -4,11 +4,11 @@
 
 // Forward declarations
 class Profiler;
-class AgentManager;
 
 // Namespace for the project
 namespace bats {
 
+class UnitManager;
 class Commander;
 
 /**
@@ -89,7 +89,7 @@ protected:
 	virtual bool areWePlaying() const;
 
 	Profiler* mpProfiler;
-	AgentManager* mpAgentManager;
+	UnitManager* mpUnitManager;
 	Commander* mpCommander;
 
 private:

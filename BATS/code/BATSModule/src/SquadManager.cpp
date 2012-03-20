@@ -74,7 +74,7 @@ void SquadManager::computeActions() {
 
 void SquadManager::addSquad(Squad* pSquad) {
 	assert(pSquad != NULL);
-	mSquads[pSquad->getSquadId()];
+	mSquads[pSquad->getSquadId()] = pSquad;
 }
 
 void SquadManager::removeSquad(const SquadId& squadId) {

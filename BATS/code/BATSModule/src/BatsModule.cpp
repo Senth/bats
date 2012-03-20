@@ -2,6 +2,8 @@
 #include "BuildPlanner.h"
 #include "Commander.h"
 #include "Helper.h"
+#include "SquadManager.h"
+#include "UnitManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/ExplorationManager.h"
@@ -10,9 +12,9 @@
 #include "BTHAIModule/Source/UpgradesPlanner.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "BTHAIModule/Source/Profiler.h"
-#include "BTHAIModule/Source/Config.h"
 #include "Utilities/Helper.h"
 #include "Utilities/Logger.h"
+#include "Utilities/String.h"
 #include "Config.h"
 #include <cassert>
 
@@ -24,7 +26,7 @@ const int GAME_STARTED_FRAME = 1;
 
 BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
-	mpAgentManager = NULL;
+	mpUnitManager = NULL;
 	mpCommander = NULL;
 
 	// Initialize logger
@@ -32,7 +34,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	utilities::loadLogSettings(config::log::SETTINGS_FILE);
 	config::loadConfig();
 
-	// Initialize singletons
+	// Initialize singletons that stays throughout multiple games
 	mpProfiler = Profiler::getInstance();
 }
 
@@ -80,7 +82,7 @@ void BatsModule::onStart() {
 			unitIt != Broodwar->self()->getUnits().end();
 			++unitIt)
 		{
-			mpAgentManager->addAgent(*unitIt);
+			mpUnitManager->addAgent(*unitIt);
 		}
 	}
 
@@ -113,8 +115,6 @@ void BatsModule::onFrame() {
 	updateGame();
 	showDebug();
 
-	Config::getInstance()->displayBotName();
-
 	mpProfiler->end("OnFrame");
 
 	// Show profiler information if profiling is on
@@ -124,8 +124,9 @@ void BatsModule::onFrame() {
 }
 
 void BatsModule::onSendText(std::string text) {
+	utilities::string::toLower(text);
 
-	// /d# needs to be over-riden because base class calls a class we don't initialize
+	// /d# needs to be overridden because base class calls a class we don't initialize
 	if (text == "/d1" || text == "/debug low") {
 		mDebugLevel = 1;
 	} else if (text == "/d2" || text == "/debug medium") {
@@ -136,8 +137,10 @@ void BatsModule::onSendText(std::string text) {
 		mDebugLevel = 4;
 	} else if (text == "/transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
-	}else if (startsWith(text,"/transition")) {				
+	} else if (startsWith(text,"/transition")) {				
 		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
+	} else if (mpCommander->isCommandAvailable(text)) {
+		mpCommander->issueCommand(text);
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);
@@ -172,7 +175,7 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 
 void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
-		mpAgentManager->addAgent(pUnit);
+		mpUnitManager->addAgent(pUnit);
 
 		// Remove from build order if it's a building
 		if (pUnit->getType().isBuilding()) {
@@ -185,7 +188,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 
 		if (OUR(pUnit)) {
-			mpAgentManager->removeAgent(pUnit);
+			mpUnitManager->removeAgent(pUnit);
 
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(pUnit);
@@ -197,7 +200,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 				/// Commander::getInstance()->assistWorker(mpAgentManager->getAgent(pUnit->getID()));
 			}
 
-			mpAgentManager->cleanup();
+			mpUnitManager->cleanup();
 		}
 		// Enemies
 		else if (!pUnit->getType().isNeutral()) {
@@ -221,7 +224,7 @@ void BatsModule::onMorphUnit(BWAPI::Unit* pUnit) {
 
 bool BatsModule::isGameLost() const {
 	// Check if we have at least one attacking unit
-	const std::vector<BaseAgent*>& agents = mpAgentManager->getAgents();
+	const std::vector<BaseAgent*>& agents = mpUnitManager->getAgents();
 	std::vector<BaseAgent*>::const_iterator agentIt = agents.begin();
 	bool attackingUnitExist = false;
 	while(!attackingUnitExist && agentIt != agents.end()) {
@@ -232,7 +235,7 @@ bool BatsModule::isGameLost() const {
 		++agentIt;
 	}
 
-	if (mpAgentManager->getNoWorkers() == 0 &&
+	if (mpUnitManager->getNoWorkers() == 0 &&
 		Broodwar->self()->minerals() <= WORKER_MINERAL_PRICE &&
 		!attackingUnitExist)
 	{
@@ -255,36 +258,39 @@ void BatsModule::updateGame() {
 		return;
 	}
 
-	mpAgentManager->computeActions();
+	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
 	ExplorationManager::getInstance()->computeActions();
 }
 
 void BatsModule::initGameClasses() {
+	SquadManager::getInstance();
+	mpUnitManager = UnitManager::getInstance();
+	mpCommander = Commander::getInstance();
 	CoverMap::getInstance();
 	BuildPlanner::getInstance();
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
-	mpAgentManager = AgentManager::getInstance();
-	mpCommander = Commander::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
-	delete CoverMap::getInstance();
-	delete BuildPlanner::getInstance();
-	delete UpgradesPlanner::getInstance();
-	delete ResourceManager::getInstance();
+	
 	delete Pathfinder::getInstance();
+	delete ResourceManager::getInstance();
+	delete UpgradesPlanner::getInstance();
+	delete BuildPlanner::getInstance();
+	delete CoverMap::getInstance();
 	SAFE_DELETE(mpCommander);
-	SAFE_DELETE(mpAgentManager);
+	SAFE_DELETE(mpUnitManager);
+	delete SquadManager::getInstance();
 }
 
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (mDebugLevel > 0) {
-		std::vector<BaseAgent*> agents = mpAgentManager->getAgents();
+		std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++) {
 			if (agents.at(i)->isBuilding()) agents.at(i)->debug_showGoal();
 			if (!agents.at(i)->isBuilding() && mDebugLevel >= 2) agents.at(i)->debug_showGoal();

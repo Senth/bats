@@ -63,6 +63,9 @@
     <ClInclude Include="include\SquadManager.h">
       <Filter>Squads</Filter>
     </ClInclude>
+    <ClInclude Include="include\UnitManager.h">
+      <Filter>Commander</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="src\AttackSquad.cpp">
       <Filter>Squads\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnitManager.cpp">
+      <Filter>Commander</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -168,7 +168,6 @@ protected:
 	 */
 	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
 
-private:
 	/**
 	 * Different goal states, should be moved later?
 	 */
@@ -180,6 +179,7 @@ private:
 		GoalState_Lim
 	};
 
+private:
 	/**
 	 * Called when a new goal should be created.
 	 */

@@ -13,3 +13,12 @@ AttackSquad::~AttackSquad() {
 void AttackSquad::computeSquadSpecificActions() {
 
 }
+
+void AttackSquad::createGoal() {
+	// TODO
+}
+
+Squad::GoalStates AttackSquad::getGoalState() const {
+	/// @todo remove this function, add the goal checking in compute squad specific actions instead.
+	return GoalState_NotCompleted;
+}

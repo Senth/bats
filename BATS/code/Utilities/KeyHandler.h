@@ -95,13 +95,13 @@ KeyHandler<T>::~KeyHandler() {
 
 template<typename T>
 void KeyHandler<T>::init(int maxKeys) {
-	assert(mpsInstance != NULL);
+	assert(mpsInstance == NULL);
 	mpsInstance = new KeyHandler<T>(maxKeys);
 }
 
 template<typename T> 
 KeyHandler<T>* KeyHandler<T>::getInstance() {
-	assert(mpsInstance == NULL);
+	assert(mpsInstance != NULL);
 	return mpsInstance;
 }
 

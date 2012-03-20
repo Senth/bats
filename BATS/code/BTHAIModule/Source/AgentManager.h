@@ -17,16 +17,16 @@
 
 class AgentManager {
 
-private:
+protected:
 	std::vector<BaseAgent*> agents;
+	int lastCallFrame;
 	AgentManager();
 	static AgentManager* instance;
-	int lastCallFrame;
 
 public:
 	static int StartFrame;
 
-	~AgentManager();
+	virtual ~AgentManager();
 
 	/** Returns the instance to the AgentManager. */
 	static AgentManager* getInstance();

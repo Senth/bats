@@ -41,7 +41,7 @@ Squad::~Squad() {
 	mpsKeyHandler->freeKey(mId);
 
 	if (mcsInstance == 0) {
-		delete utilities::KeyHandler<Squad>::getInstance();
+		SAFE_DELETE(mpsKeyHandler);
 	}
 }
 

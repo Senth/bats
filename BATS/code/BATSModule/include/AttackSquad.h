@@ -24,6 +24,10 @@ public:
 	 */
 	virtual ~AttackSquad();
 
+	void createGoal();
+	
+	Squad::GoalStates getGoalState() const;
+
 protected:
 	virtual void computeSquadSpecificActions();
 

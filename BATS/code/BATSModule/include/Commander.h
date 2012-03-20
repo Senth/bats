@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <set>
 
 // Namespace for the project
 namespace bats {
@@ -9,6 +10,7 @@ namespace bats {
 class Squad;
 class SquadManager;
 class UnitCompositionFactory;
+class UnitManager;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -25,6 +27,7 @@ class Commander {
 public:
 	/**
 	 * Destructor
+	 * @pre ScoutManager has not been deleted
 	 */
 	virtual ~Commander();
 
@@ -45,12 +48,21 @@ public:
 	 * or adding a new goal to an existing squad.
 	 * @param command the command to try to issue.
 	 * @return true if the command will be issued, false otherwise.
+	 * @pre the command needs to be an available command, check with isCommandAvailable(), else
+	 * nothing will happen and either true or false will be returned.
 	 * @note The command will not be issued immediately; although it will assemble the
 	 * squad (if it can). It will first wait for a ping for x seconds (specified in)
 	 * BATS-data\config.ini, if a ping has been assigned it will then wait for a second ping
 	 * for y seconds. If a new command is specified it will complete the current command.
 	 */
 	bool issueCommand(const std::string& command);
+
+	/**
+	 * Checks whether the command is an available command that the Commander should handle.
+	 * @param command the command to check if it is an command for the Commander.
+	 * @return true if the command is available, else false.
+	 */
+	bool isCommandAvailable(const std::string& command) const;
 	
 private:
 	/**
@@ -65,7 +77,9 @@ private:
 
 	Squad* mpSquadWaiting;
 	SquadManager* mpSquadManager;
+	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;
+	std::set<const std::string> mAvailableCommands;
 
 	static Commander* mpsInstance;
 };

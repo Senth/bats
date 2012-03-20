@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <algorithm>
 
 namespace utilities {
 namespace string {
@@ -52,6 +53,22 @@ namespace string {
 	 */
 	inline std::string trim(const std::string& source, const std::string& remove = " \t\r\n") {
 		return trimRight(trimLeft(source, remove), remove);
+	}
+
+	/**
+	 * Converts the text string to lowercase characters.
+	 * @param text the text to convert to lowercase.
+	 */
+	inline void toLower(std::string& text) {
+		std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+	}
+
+	/**
+	 * Converts the text string to uppercase characters.
+	 * @param text the text to convert to lowercase.
+	 */
+	inline void toUpper(std::string& text) {
+		std::transform(text.begin(), text.end(), text.begin(), ::toupper);
 	}
 }
 }
