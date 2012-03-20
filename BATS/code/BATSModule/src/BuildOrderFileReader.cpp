@@ -1,6 +1,7 @@
 #include "BuildOrderFileReader.h"
 #include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildPlanner.h"
+#include "Utilities/Logger.h"
 #include <fstream>
 #include <sstream>
 
@@ -27,7 +28,7 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 
 	if (!inFile)
 	{
-		Broodwar->printf("Unable to open file %s", filePath.c_str());
+		ERROR_MESSAGE(false, "Unable to open file" << filePath);
 	}
 	else
 	{
@@ -117,5 +118,5 @@ void BuildOrderFileReader::addUnitType(string line, vector<UnitType> &buildOrder
 	}
 
 	//No UnitType match found
-	Broodwar->printf("Error: No matching UnitType found for %s", line.c_str());
+	ERROR_MESSAGE(false, "No matching UnitType found for " << line);
 }

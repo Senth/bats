@@ -11,8 +11,12 @@ namespace config {
 const std::string ROOT_DIR = "bwapi-data\\";
 const std::string CONFIG_DIR = ROOT_DIR + "AI\\BATS-data\\";
 
+namespace game {
+	int SPEED = 8;
+}
+
 namespace squad {
-	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitComposition";
+	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitCompositions";
 	float PING_WAIT_TIME_FIRST = 0.0f;
 	float PING_WAIT_TIME_AFTER_FIRST = 0.0f;
 	float REGROUP_DISTANCE_BEGIN = 0.0f;
@@ -29,6 +33,7 @@ namespace log {
 void readConfig(const std::string& configFile);
 void handleVariable(const utilities::VariableInfo& variableInfo);
 bool setSquad(const utilities::VariableInfo& variableInfo);
+bool setGame(const utilities::VariableInfo& variableInfo);
 
 
 //--------- Function Declarations ---------//
@@ -60,6 +65,8 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 	bool noErrors = true;
 	if (variableInfo.section == "squad") {
 		noErrors = setSquad(variableInfo);
+	} else if (variableInfo.section == "game") {
+		noErrors = setGame(variableInfo);	
 	} else {
 		ERROR_MESSAGE(false, "Unknown section '" << variableInfo.section
 			<< "' in " << variableInfo.file << ".ini");
@@ -80,6 +87,16 @@ bool setSquad(const utilities::VariableInfo& variableInfo) {
 		squad::REGROUP_DISTANCE_BEGIN = variableInfo;
 	} else if (variableInfo.name == "regroup_distance_end") {
 		squad::REGROUP_DISTANCE_END = variableInfo;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+bool setGame(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "speed") {
+		game::SPEED = variableInfo;
 	} else {
 		return false;
 	}

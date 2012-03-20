@@ -7,6 +7,10 @@ namespace bats {
 		extern const std::string ROOT_DIR;
 		extern const std::string CONFIG_DIR;
 
+		namespace game {
+			extern int SPEED;
+		}
+
 		namespace squad {
 			extern const std::string UNIT_COMPOSITION_DIR;
 			/** How long shall the Commander wait for the first ping */

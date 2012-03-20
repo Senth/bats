@@ -22,11 +22,10 @@ public:
 	BuildOrderFileReader();
 
 	/** Reads the buildorder from script file. 
-	* phase : same as folder name
-	* buildOrder : in order to queue the next phase if theres is left overs from previous phase
+	* @param phase same as folder name
+	* @param buildOrder in order to queue the next phase if theres is left overs from previous phase
 	*/
 	vector<BWAPI::UnitType> readBuildOrder(string phase, string fileName, vector<BWAPI::UnitType> &buildOrder);
 	TransitionGraph readTransitionFile(string fileName);
-		
 };
 }

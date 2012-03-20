@@ -9,6 +9,8 @@ class AgentManager;
 // Namespace for the project
 namespace bats {
 
+class Commander;
+
 /**
  * Main module for BATS
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
@@ -88,6 +90,7 @@ protected:
 
 	Profiler* mpProfiler;
 	AgentManager* mpAgentManager;
+	Commander* mpCommander;
 
 private:
 	/**

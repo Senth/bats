@@ -1,11 +1,11 @@
 #include "BatsModule.h"
+#include "BuildPlanner.h"
+#include "Commander.h"
 #include "Helper.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
-#include "BuildPlanner.h"
 #include "BTHAIModule/Source/ExplorationManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
-#include "BTHAIModule/Source/Commander.h"
 #include "BTHAIModule/Source/PathFinder.h"
 #include "BTHAIModule/Source/UpgradesPlanner.h"
 #include "BTHAIModule/Source/ResourceManager.h"
@@ -25,6 +25,7 @@ const int GAME_STARTED_FRAME = 1;
 BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
 	mpAgentManager = NULL;
+	mpCommander = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -49,8 +50,7 @@ void BatsModule::onStart() {
 
 	Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	// Set default speed
-	speed = 8;
-	Broodwar->setLocalSpeed(speed);
+	Broodwar->setLocalSpeed(config::game::SPEED);
 
 	BWTA::readMap();
 	BWTA::analyze();
@@ -193,7 +193,8 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 
 			// Assist workers under attack
 			if (pUnit->getType().isWorker()) {
-				Commander::getInstance()->assistWorker(mpAgentManager->getAgent(pUnit->getID()));
+				/// @todo assist worker.
+				/// Commander::getInstance()->assistWorker(mpAgentManager->getAgent(pUnit->getID()));
 			}
 
 			mpAgentManager->cleanup();
@@ -256,7 +257,7 @@ void BatsModule::updateGame() {
 
 	mpAgentManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
-	Commander::getInstance()->computeActions();
+	mpCommander->computeActions();
 	ExplorationManager::getInstance()->computeActions();
 }
 
@@ -267,6 +268,7 @@ void BatsModule::initGameClasses() {
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
 	mpAgentManager = AgentManager::getInstance();
+	mpCommander = Commander::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
@@ -275,6 +277,7 @@ void BatsModule::releaseGameClasses() {
 	delete UpgradesPlanner::getInstance();
 	delete ResourceManager::getInstance();
 	delete Pathfinder::getInstance();
+	SAFE_DELETE(mpCommander);
 	SAFE_DELETE(mpAgentManager);
 }
 
@@ -289,12 +292,12 @@ void BatsModule::showDebug() const {
 
 		
 		ExplorationManager::getInstance()->printInfo();
-		Commander::getInstance()->printInfo();
+		/// @todo Commander::getInstance()->printInfo();
 
 		if (mDebugLevel >= 3) CoverMap::getInstance()->debug();
 		if (mDebugLevel >= 2) ResourceManager::getInstance()->printInfo();
 
-		Commander::getInstance()->debug_showGoal();
+		/// @todo Commander::getInstance()->debug_showGoal();
 
 		if (mDebugLevel >= 1) {
 			drawTerrainData();

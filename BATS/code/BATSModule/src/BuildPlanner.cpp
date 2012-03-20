@@ -8,6 +8,7 @@
 #include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildOrderFileReader.h"
 #include "BTHAIModule/Source/ResourceManager.h"
+#include "Utilities/Logger.h"
 
 using namespace bats;
 using namespace BWAPI;
@@ -49,13 +50,13 @@ void BuildPlanner::switchToPhase(std::string fileName){
 			if(BuildOrderFileReader().readBuildOrder("mid", fileName, buildOrder).size()>0)
 				BuildPlanner::mCurrentPhase = "mid";
 			else
-				Broodwar->printf("Error loading file %s", fileName);
+				ERROR_MESSAGE(false, "Error loading file " << fileName);
 		}
 		else if(BuildPlanner::mCurrentPhase == "mid"){
 			if(BuildOrderFileReader().readBuildOrder("late", fileName, buildOrder).size()>0)
 				BuildPlanner::mCurrentPhase = "late";
 			else
-				Broodwar->printf("Error loading file %s", fileName);
+				ERROR_MESSAGE(false, "Error loading file %s" << fileName);
 		}
 		else{
 			Broodwar->printf("All transition used");
