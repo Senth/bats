@@ -23,6 +23,24 @@ protected:
 	AgentManager();
 	static AgentManager* instance;
 
+	/** Called when an agent of our type is created. I.e. it will first create an agent through
+	 * addAgent then call this with the newly created agent. This function can be overridden.
+	 * This function shall handle agent specific functionality.
+	 * @param newAgent the new agent that has been added.
+	 * @author Matteus Magnusson <matteus.magnusson@gmail.com>
+	 * @note the agent has already been added to the unit vector.
+	 */
+	virtual void onAgentAdded(BaseAgent* newAgent);
+
+	/**
+	 * Called when an agent of our type has been destroyed. I.e. it will first make sure we
+	 * have this agent and then call this function; can be overridden.
+	 * @param destroyedAgent the destroyed agent
+	 * @author Matteus Magnusson <matteus.magnusson@gmail.com>
+	 */
+	virtual void onAgentDestroyed(BaseAgent* destroyedAgent);
+	 
+
 public:
 	static int StartFrame;
 

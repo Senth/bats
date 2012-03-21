@@ -65,6 +65,9 @@ protected:
 	 */
 	UnitManager();
 
+	//virtual void onAgentAdded(BaseAgent* newAgent);
+	virtual void onAgentDestroyed(BaseAgent* destroyedAgent);
+
 	SquadManager* mpSquadManager;
 };
 }

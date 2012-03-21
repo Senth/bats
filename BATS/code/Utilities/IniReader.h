@@ -109,7 +109,7 @@ public:
 
 	/**
 	 * Opens the specified ini file.
-	 * @param[in] filPath path to the ini file to open
+	 * @param[in] filePath path to the ini file to open
 	 * @param[in] nameToLower if all variable names <b>and sections</b> shall be converted
 	 * to lowercase, defaults to false. 
 	 * @param[in] valueToLower if all variable values shall be converted to lowercase,

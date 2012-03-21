@@ -20,7 +20,9 @@ Squad::Squad(
 	mUnitComposition(unitComposition),
 	mDisbandable(disbandable),
 	mDisbanded(false),
-	mId(SquadId::INVALID_KEY)
+	mId(SquadId::INVALID_KEY),
+	mGoalState(GoalState_Lim),
+	mState(SquadState_Inactive)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
@@ -66,13 +68,15 @@ void Squad::computeActions() {
 	switch (mState) {
 	case SquadState_Inactive:
 		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
-			createGoal();
-			mState = SquadState_Active;
+			bool goalCreated = createGoal();
+			if (goalCreated) {
+				mState = SquadState_Active;
+			}
 		}
 		break;
 
 	case SquadState_Active:
-		switch (getGoalState()) {
+		switch (mGoalState) {
 		case GoalState_Success:
 			onGoalSucceeded();
 			break;
@@ -137,12 +141,14 @@ void Squad::computeSquadSpecificActions() {
 }
 
 void Squad::onGoalFailed() {
-	// Disbands the squad, even if it's not disbandable.
+	/// @todo use the next goal, if no goals are available either disband or create new goal
+	/// which one should be the default?
 	forceDisband();
 }
 
 void Squad::onGoalSucceeded() {
-	// Disbands the squad, even if it's not disbandable.
+	/// @todo use the next goal, if no goals are available either disband or create new goal
+	/// which one should be the default?
 	forceDisband();
 }
 
@@ -162,16 +168,32 @@ void Squad::forceDisband() {
 void Squad::setGoalPosition(const BWAPI::TilePosition& position) {
 	mGoalPositions.clear();
 	mGoalPositions.push_back(position);
+	updateUnitGoals();
 }
 
 void Squad::setGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
 	mGoalPositions = positions;
+	updateUnitGoals();
 }
 
 void Squad::addGoalPosition(const BWAPI::TilePosition& position) {
 	mGoalPositions.push_back(position);
+	updateUnitGoals();
 }
 
 void Squad::addGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
 	mGoalPositions.insert(mGoalPositions.end(), positions.begin(), positions.end());
+	updateUnitGoals();
+}
+
+void Squad::updateUnitGoals() {
+	BWAPI::TilePosition newGoal = BWAPI::TilePositions::Invalid;
+	
+	if (!mGoalPositions.empty()) {
+		newGoal = mGoalPositions.front();
+	}
+
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		mUnits[i]->setGoal(newGoal);
+	}
 }

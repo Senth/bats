@@ -203,7 +203,7 @@ void loadLogSettings(const std::string& settingsFile);
 /**
 * Sets the verbosity level.
 * @param verbosity the level of verbosity we want to set, between LEVEL_HIGHEST and LEVEL_LOWEST.
-* @param the target to set the verbosity level in, can be OUTPUT_CONSOLE or OUTPUT_FILE
+* @param target the target to set the verbosity level in, can be OUTPUT_CONSOLE or OUTPUT_FILE
 * @note setting the verbosity level to LogLevel_Severe only displays messages that are of highest
 * priority (i.e. LogLevel_Sever) and LogLevel_Finest displays all messages.
 */
@@ -238,7 +238,6 @@ void checkForErrors();
 * @param errorMessage the error message
 * @param file the file which the error is in
 * @param line the line on which the error message appeared on
-* @param time the timestamp of the error
 */
 void printErrorMessage(const std::string& errorMessage, const char* file, long line);
 

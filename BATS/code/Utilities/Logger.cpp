@@ -269,7 +269,7 @@ void utilities::checkForErrors()
 		}
 
 #endif
-	///@TODO something for linux
+	/// @todo something for linux
 	}
 }
 

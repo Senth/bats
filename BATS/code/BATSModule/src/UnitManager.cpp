@@ -69,3 +69,19 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 
 	return foundUnits;
 }
+
+void UnitManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
+	AgentManager::onAgentDestroyed(destroyedAgent);
+
+	// Is it a UnitAgent?
+	UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(destroyedAgent);
+	
+	if (pUnitAgent != NULL) {
+		// Delete from squad if the unit had any
+		SquadId unitSquad = pUnitAgent->getSquadId();
+		if (unitSquad != SquadId::INVALID_KEY) {
+			bats::Squad* pSquad = mpSquadManager->getSquad(unitSquad);
+			pSquad->removeUnit(pUnitAgent);
+		}
+	}
+}

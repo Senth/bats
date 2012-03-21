@@ -7,6 +7,7 @@
 #include "WorkerAgent.h"
 #include "Profiler.h"
 #include "BatsModule/include/BuildPlanner.h"
+#include "BatsModule/include/Commander.h"
 using namespace BWAPI;
 using namespace std;
 
@@ -168,16 +169,20 @@ void AgentManager::addAgent(Unit* unit)
 		BaseAgent* newAgent = AgentFactory::getInstance()->createAgent(unit);
 		agents.push_back(newAgent);
 
-		if (newAgent->isBuilding())
-		{
-			CoverMap::getInstance()->addConstructedBuilding(unit);
-			bats::BuildPlanner::getInstance()->unlock(unit->getType());
-			ResourceManager::getInstance()->unlockResources(unit->getType());
-		}
-		else
-		{
-			Commander::getInstance()->unitCreated(newAgent);
-		}
+		onAgentAdded(newAgent);
+	}
+}
+
+void AgentManager::onAgentAdded(BaseAgent* newAgent) {
+	if (newAgent->isBuilding())
+	{
+		CoverMap::getInstance()->addConstructedBuilding(newAgent->getUnit());
+		bats::BuildPlanner::getInstance()->unlock(newAgent->getUnit()->getType());
+		ResourceManager::getInstance()->unlockResources(newAgent->getUnit()->getType());
+	}
+	else
+	{
+		//Commander::getInstance()->unitCreated(newAgent);
 	}
 }
 
@@ -185,21 +190,24 @@ void AgentManager::removeAgent(Unit* unit)
 {
 	for (int i = 0; i < (int)agents.size(); i++)
 	{
-		if (agents.at(i)->matches(unit))
+		if (agents[i]->matches(unit))
 		{
-			
-			if (agents.at(i)->isBuilding())
-			{
-				CoverMap::getInstance()->buildingDestroyed(unit);
-			}
-
-			agents.at(i)->destroyed();
-
-			Commander::getInstance()->unitDestroyed(agents.at(i));
-
-			return;
+			onAgentDestroyed(agents[i]);	
 		}
 	}
+}
+
+void AgentManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
+	if (destroyedAgent->isBuilding())
+	{
+		CoverMap::getInstance()->buildingDestroyed(destroyedAgent->getUnit());
+	}
+
+	destroyedAgent->destroyed();
+
+	//Commander::getInstance()->unitDestroyed(agents.at(i));
+
+	return;
 }
 
 void AgentManager::morphDrone(Unit* unit)

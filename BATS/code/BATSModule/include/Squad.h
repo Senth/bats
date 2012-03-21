@@ -179,18 +179,20 @@ protected:
 		GoalState_Lim
 	};
 
+	GoalStates mGoalState;
+
 private:
 	/**
 	 * Called when a new goal should be created.
+	 * @returns true a goal was successfully created.
 	 */
-	virtual void createGoal() = 0;
+	virtual bool createGoal() = 0;
 
 	/**
-	 * Checks whether the current goal is completed or not. The derived class
-	 * handles whether or not the goal has been completed or not
-	 * @return the current goal state
+	 * Update the current goal on all the squad's units to the current goal in the list.
+	 * If no goal exists, set an invalid goal
 	 */
-	virtual GoalStates getGoalState() const = 0;
+	void updateUnitGoals();
 	
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mGoalPositions;
