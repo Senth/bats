@@ -169,11 +169,11 @@ void AgentManager::addAgent(Unit* unit)
 		BaseAgent* newAgent = AgentFactory::getInstance()->createAgent(unit);
 		agents.push_back(newAgent);
 
-		onAgentAdded(newAgent);
+		onAgentCreated(newAgent);
 	}
 }
 
-void AgentManager::onAgentAdded(BaseAgent* newAgent) {
+void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 	if (newAgent->isBuilding())
 	{
 		CoverMap::getInstance()->addConstructedBuilding(newAgent->getUnit());

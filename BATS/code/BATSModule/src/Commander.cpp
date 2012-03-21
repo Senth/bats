@@ -66,11 +66,22 @@ bool Commander::issueCommand(const std::string& command) {
 
 	if (command == "attack") {
 		// Get free units
-		std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter();
+		std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_NoSquad);
 
 		// Only add if we have free units
 		if (!freeUnits.empty()) {
-			mpSquadWaiting = new AttackSquad(freeUnits);
+			// Add the units to the old attack squad if it exists
+			AttackSquad* pOldSquad = NULL;
+			std::map<SquadId, Squad*>::iterator squadIt = mpSquadManager->begin();
+			while (pOldSquad == NULL && squadIt != mpSquadManager->end()) {
+				pOldSquad = dynamic_cast<AttackSquad*>(squadIt->second);
+			}
+
+			if (pOldSquad != NULL) {
+				pOldSquad->addUnits(freeUnits);
+			} else {
+				mpSquadWaiting = new AttackSquad(freeUnits);
+			}
 		}
 	} else if (command == "drop") {
 		/// @todo drop

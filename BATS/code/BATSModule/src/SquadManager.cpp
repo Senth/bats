@@ -27,15 +27,8 @@ SquadManager* SquadManager::getInstance() {
 }
 
 Squad* SquadManager::getSquad(const SquadId& squadId) {
-	std::map<SquadId, Squad*>::iterator foundSquad;
-	foundSquad = mSquads.find(squadId);
-	if (foundSquad != mSquads.end()) {
-		return foundSquad->second;
-	} else {
-		DEBUG_MESSAGE(utilities::LogLevel_Warning, "SquadManager::getSquad() | Could not find " <<
-			"squad with squad id: " << squadId);
-		return NULL;
-	}
+	Squad const * const pConstSquad = const_cast<const SquadManager*>(this)->getSquad(squadId);
+	return const_cast<Squad*>(pConstSquad);
 }
 
 Squad const * const SquadManager::getSquad(const SquadId& squadId) const {
@@ -66,9 +59,17 @@ std::map<SquadId, Squad*>::const_iterator SquadManager::end() const {
 }
 
 void SquadManager::computeActions() {
-	std::map<SquadId, Squad*>::iterator squadIt;
-	for (squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
-		squadIt->second->computeActions();
+	std::map<SquadId, Squad*>::iterator squadIt = mSquads.begin();
+	while(squadIt != mSquads.end()) {
+		if (!squadIt->second->isEmpty()) {
+			squadIt->second->computeActions();
+			++squadIt;
+		}
+		// Delete empty squads
+		else {
+			SAFE_DELETE(squadIt->second);
+			squadIt = mSquads.erase(squadIt);
+		}	
 	}
 }
 

@@ -40,14 +40,14 @@ public:
 	/**
 	 * Returns all units based on the specified filter. This call only returns units
 	 * of type UnitAgent, if you want all units including buildings call getAgents.
-	 * instead.
+	 * instead. Does not support limiting the filter to all filter at the moment, it will use
+	 * OR on all filters.
 	 * @param filter what filter to use. Defaults to UnitFilter_NoFilter. You can combine filters:
 	 * \code
 	 * std::vector<UnitAgent*> units;
 	 * units = UnitManager::getUnitsByFilter(UnitFilter_NoSquad | UnitFilter_DisbandableSquad);
 	 * \endcode
 	 * This will return units that are either in no squads or in a squad that is disbandable.
-	 * @note you cannot AND filters.
 	 * @return all attacking, supporting movable units (i.e. non-building and non-worker) that match
 	 * the specified filter.
 	 * @todo Maybe optimize the function, it's very inefficient at the moment.
@@ -65,7 +65,6 @@ protected:
 	 */
 	UnitManager();
 
-	//virtual void onAgentAdded(BaseAgent* newAgent);
 	virtual void onAgentDestroyed(BaseAgent* destroyedAgent);
 
 	SquadManager* mpSquadManager;

@@ -30,7 +30,7 @@ protected:
 	 * @author Matteus Magnusson <matteus.magnusson@gmail.com>
 	 * @note the agent has already been added to the unit vector.
 	 */
-	virtual void onAgentAdded(BaseAgent* newAgent);
+	virtual void onAgentCreated(BaseAgent* newAgent);
 
 	/**
 	 * Called when an agent of our type has been destroyed. I.e. it will first make sure we

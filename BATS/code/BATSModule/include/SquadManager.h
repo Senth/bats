@@ -34,9 +34,7 @@ public:
 	Squad* getSquad(const SquadId& squadId);
 
 	/**
-	 * Returns the specified squad.
-	 * @param squadId the squad id of the squad to return
-	 * @return pointer to the squad.
+	 * \copydoc getSquad()
 	 */
 	Squad const * const getSquad(const SquadId& squadId) const;
 
@@ -47,7 +45,7 @@ public:
 	std::map<SquadId, Squad*>::iterator begin();
 
 	/**
-	 * Get the beginning of the squad iterator
+	 * Get the beginning of the squad iterator as const
 	 * @return beginning of the const_iterator
 	 */
 	std::map<SquadId, Squad*>::const_iterator begin() const;

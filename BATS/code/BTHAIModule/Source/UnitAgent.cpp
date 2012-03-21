@@ -602,7 +602,6 @@ void UnitAgent::setGoal(TilePosition goal)
 	}
 }
 
-
 void UnitAgent::clearGoal()
 {
 	goal = TilePosition(-1, -1);

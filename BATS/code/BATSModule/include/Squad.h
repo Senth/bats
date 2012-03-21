@@ -27,12 +27,14 @@ public:
 	 * Constructs a squad with the specified units, can set certain options of the squad.
 	 * The default options actives the squad directly, the squad can be destroyed (and thus merged).
 	 * @param units vector of all units that should be in the class.
+	 * @param avoidEnemyUnits if the squad shall avoid enemy units at all costs. Defaults to false.
 	 * @param disbandable the squad can be destroyed, default is true
 	 * @param unitComposition the composition of units to use, if this is specified
 	 * all units needs to be added directly in this constructor. Defaults to
 	 * INVALID_UNIT_COMPOSITON.
 	 */
 	Squad(std::vector<UnitAgent*> units,
+		bool avoidEnemyUnits = false,
 		bool disbandable = true,
 		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
 
@@ -53,6 +55,12 @@ public:
 	 * @return true if the squad can be disbanded.
 	 */
 	bool isDisbandable() const;
+
+	/**
+	 * Returns true if the squad is empty
+	 * @return true if the squad is empty
+	 */
+	bool isEmpty() const;
 
 	/**
 	 * Tries to disband the squad.
@@ -200,6 +208,7 @@ private:
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
+	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
 	SquadStates mState;
 	SquadId mId;
 

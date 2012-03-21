@@ -13,13 +13,14 @@ const int MAX_KEYS = 100;
 
 Squad::Squad(
 	std::vector<UnitAgent*> units,
+	bool avoidEnemyUnits,
 	bool disbandable,
 	const UnitComposition& unitComposition) 
 	:
-	mUnits(units),
 	mUnitComposition(unitComposition),
 	mDisbandable(disbandable),
 	mDisbanded(false),
+	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mGoalState(GoalState_Lim),
 	mState(SquadState_Inactive)
@@ -32,6 +33,9 @@ Squad::Squad(
 	mcsInstance++;
 
 	mId = mpsKeyHandler->allocateKey();
+
+	// Add all units
+	addUnits(units);
 }
 
 Squad::~Squad() {
@@ -55,6 +59,10 @@ bool Squad::isDisbandable() const {
 	return mDisbandable;
 }
 
+bool Squad::isEmpty() const {
+	return mUnits.empty();
+}
+
 bool Squad::tryDisband() {
 	if (mDisbandable) {
 		forceDisband();
@@ -65,6 +73,12 @@ bool Squad::tryDisband() {
 }
 
 void Squad::computeActions() {
+	/// @todo avoid enemy units
+	if (mAvoidEnemyUnits) {
+
+	}
+
+
 	switch (mState) {
 	case SquadState_Inactive:
 		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
@@ -113,13 +127,18 @@ void Squad::addUnit(UnitAgent* pUnit) {
 	// Check so that the unit agent doesn't have a squad already.
 	assert(pUnit->getSquadId() == SquadId::INVALID_KEY);
 	mUnits.push_back(pUnit);
+	pUnit->setSquadId(mId);
+	
+	// Update goal position if we have one
+	if (!mGoalPositions.empty()) {
+		pUnit->setGoal(mGoalPositions.front());
+	}
 }
 
 void Squad::addUnits(const std::vector<UnitAgent*>& units) {
 	for (size_t i = 0; i < units.size(); ++i) {
 		// Check so that the unit doesn't have a squad already.
-		assert(units[i]->getSquadId() == SquadId::INVALID_KEY);
-		mUnits.push_back(units[i]);
+		addUnit(units[i]);
 	}
 }
 
