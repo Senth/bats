@@ -4,6 +4,7 @@
 #include "Helper.h"
 #include "SquadManager.h"
 #include "UnitManager.h"
+#include "GameTime.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/ExplorationManager.h"
@@ -265,6 +266,7 @@ void BatsModule::updateGame() {
 }
 
 void BatsModule::initGameClasses() {
+	GameTime::getInstance();
 	SquadManager::getInstance();
 	mpUnitManager = UnitManager::getInstance();
 	mpCommander = Commander::getInstance();
@@ -285,6 +287,7 @@ void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mpCommander);
 	SAFE_DELETE(mpUnitManager);
 	delete SquadManager::getInstance();
+	delete GameTime::getInstance();
 }
 
 void BatsModule::showDebug() const {

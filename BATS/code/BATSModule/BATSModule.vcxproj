@@ -93,12 +93,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\GameTime.cpp" />
+    <ClCompile Include="src\WaitGoal.cpp" />
+    <ClCompile Include="src\WaitReadySquad.cpp" />
     <ClInclude Include="include\AttackSquad.h" />
     <ClInclude Include="include\BatsModule.h" />
     <ClInclude Include="include\BuildOrderFileReader.h" />
     <ClInclude Include="include\BuildPlanner.h" />
     <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
+    <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />
     <ClInclude Include="include\Squad.h" />
@@ -110,6 +114,8 @@
     <ClCompile Include="src\UnitManager.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="include\WaitGoal.h" />
+    <ClInclude Include="include\WaitReadySquad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AttackSquad.cpp" />

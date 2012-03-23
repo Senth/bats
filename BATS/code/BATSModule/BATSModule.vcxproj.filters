@@ -22,6 +22,9 @@
     <Filter Include="Squads\Types">
       <UniqueIdentifier>{4e74ec7c-549d-4b4e-a10e-4921034a7410}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WaitGoal">
+      <UniqueIdentifier>{b9ca02e2-2530-49c1-a8cc-6277d79303fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -66,6 +69,15 @@
     <ClInclude Include="include\UnitManager.h">
       <Filter>Commander</Filter>
     </ClInclude>
+    <ClInclude Include="include\WaitGoal.h">
+      <Filter>WaitGoal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WaitReadySquad.h">
+      <Filter>WaitGoal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameTime.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -106,6 +118,15 @@
     </ClCompile>
     <ClCompile Include="src\UnitManager.cpp">
       <Filter>Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaitReadySquad.cpp">
+      <Filter>WaitGoal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaitGoal.cpp">
+      <Filter>WaitGoal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameTime.cpp">
+      <Filter>Helpers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
