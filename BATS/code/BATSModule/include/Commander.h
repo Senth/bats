@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <set>
+#include <memory.h>
 
 // Namespace for the project
 namespace bats {
@@ -75,7 +76,7 @@ private:
 	 */
 	void finishWaitingSquad();
 
-	Squad* mpSquadWaiting;
+	std::tr1::shared_ptr<Squad> mSquadWaiting;
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;

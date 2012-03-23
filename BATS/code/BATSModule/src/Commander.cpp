@@ -6,17 +6,18 @@
 #include "SquadManager.h"
 #include "UnitManager.h"
 #include "UnitCompositionFactory.h"
+#include <memory.h>
 
 #include "AttackSquad.h"
 
 using namespace bats;
+using namespace std::tr1;
 
 Commander* Commander::mpsInstance = NULL;
 
 Commander::Commander() {
 	mpUnitCompositionFactory = NULL;
 	mpUnitManager = NULL;
-	mpSquadWaiting = NULL;
 	mpSquadManager = NULL;
 
 	mpSquadManager = SquadManager::getInstance();
@@ -34,9 +35,6 @@ Commander::Commander() {
 
 Commander::~Commander() {
 	SAFE_DELETE(mpUnitCompositionFactory);
-
-	// Delete squads
-	SAFE_DELETE(mpSquadWaiting);
 
 	mpSquadManager = NULL;
 	mpUnitManager = NULL;
@@ -71,16 +69,16 @@ bool Commander::issueCommand(const std::string& command) {
 		// Only add if we have free units
 		if (!freeUnits.empty()) {
 			// Add the units to the old attack squad if it exists
-			AttackSquad* pOldSquad = NULL;
-			std::map<SquadId, Squad*>::iterator squadIt = mpSquadManager->begin();
-			while (pOldSquad == NULL && squadIt != mpSquadManager->end()) {
-				pOldSquad = dynamic_cast<AttackSquad*>(squadIt->second);
+			shared_ptr<AttackSquad> oldSquad;
+			std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mpSquadManager->begin();
+			while (oldSquad == NULL && squadIt != mpSquadManager->end()) {
+				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 			}
 
-			if (pOldSquad != NULL) {
-				pOldSquad->addUnits(freeUnits);
+			if (oldSquad != NULL) {
+				oldSquad->addUnits(freeUnits);
 			} else {
-				mpSquadWaiting = new AttackSquad(freeUnits);
+				mSquadWaiting = shared_ptr<Squad>(new AttackSquad(freeUnits));
 			}
 		}
 	} else if (command == "drop") {
@@ -110,7 +108,7 @@ bool Commander::isCommandAvailable(const std::string& command) const {
 }
 
 void Commander::finishWaitingSquad() {
-	if (mpSquadWaiting == NULL) {
+	if (mSquadWaiting == NULL) {
 		return;
 	}
 
@@ -122,6 +120,6 @@ void Commander::finishWaitingSquad() {
 	
 	// No path, do we create a path or do we let the squad create the path?
 
-	mpSquadManager->addSquad(mpSquadWaiting);
-	mpSquadWaiting = NULL;
+	mpSquadManager->addSquad(mSquadWaiting);
+	mSquadWaiting = shared_ptr<Squad>();
 }

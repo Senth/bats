@@ -3,12 +3,11 @@
 #include "IdTypes.h"
 #include <vector>
 #include <map>
+#include <memory.h>
+#include "Squad.h"
 
 // Namespace for the project
 namespace bats {
-
-// Forward declarations
-class Squad;
 
 /**
  * Handles all squads.
@@ -31,36 +30,36 @@ public:
 	 * @param squadId the squad id of the squad to return
 	 * @return pointer to the squad, NULL if the squad was not found.
 	 */
-	Squad* getSquad(const SquadId& squadId);
+	std::tr1::shared_ptr<Squad> getSquad(const SquadId& squadId);
 
 	/**
 	 * \copydoc getSquad()
 	 */
-	Squad const * const getSquad(const SquadId& squadId) const;
+	std::tr1::shared_ptr<const Squad> getSquad(const SquadId& squadId) const;
 
 	/**
 	 * Get the beginning of the squad iterator
 	 * @return beginning of the iterator
 	 */
-	std::map<SquadId, Squad*>::iterator begin();
+	std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator begin();
 
 	/**
 	 * Get the beginning of the squad iterator as const
 	 * @return beginning of the const_iterator
 	 */
-	std::map<SquadId, Squad*>::const_iterator begin() const;
+	std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator begin() const;
 
 	/**
 	 * Get the end of the squad iterator
 	 * @return end of the squad iterator
 	 */
-	std::map<SquadId, Squad*>::iterator end();
+	std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator end();
 
 	/**
 	 * Get the end of the squad iterator as const
 	 * @return end of the squad const_iterator
 	 */
-	std::map<SquadId, Squad*>::const_iterator end() const;
+	std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator end() const;
 
 	/**
 	 * Called every frame. Calls all squad's bats::Squad::computeActions() to update the squads.
@@ -71,7 +70,7 @@ public:
 	 * Add a new squad.
 	 * @param pSquad pointer to the new squad.
 	 */
-	void addSquad(Squad* pSquad);
+	void addSquad(const std::tr1::shared_ptr<Squad>& pSquad);
 
 	/**
 	 * Removes a squad from the squad handler.
@@ -85,7 +84,7 @@ private:
 	 */
 	SquadManager();
 
-	std::map<SquadId, Squad*> mSquads;
+	std::map<SquadId, std::tr1::shared_ptr<Squad>> mSquads;
 	static SquadManager* mpsInstance;
 };
 }

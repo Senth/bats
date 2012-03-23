@@ -2,8 +2,10 @@
 #include "SquadManager.h"
 #include "Squad.h"
 #include <cassert>
+#include <memory.h>
 
 using namespace bats;
+using std::tr1::shared_ptr;
 
 UnitManager::UnitManager() {
 	mpSquadManager = NULL;
@@ -80,7 +82,7 @@ void UnitManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 		// Delete from squad if the unit had any
 		SquadId unitSquad = pUnitAgent->getSquadId();
 		if (unitSquad != SquadId::INVALID_KEY) {
-			bats::Squad* pSquad = mpSquadManager->getSquad(unitSquad);
+			const shared_ptr<Squad>& pSquad = mpSquadManager->getSquad(unitSquad);
 			pSquad->removeUnit(pUnitAgent);
 		}
 	}

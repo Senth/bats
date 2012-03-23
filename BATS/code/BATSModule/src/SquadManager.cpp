@@ -2,6 +2,8 @@
 #include "Squad.h"
 
 using namespace bats;
+using std::tr1::shared_ptr;
+using std::tr1::const_pointer_cast;
 
 SquadManager* SquadManager::mpsInstance = NULL;
 
@@ -10,11 +12,7 @@ SquadManager::SquadManager() {
 }
 
 SquadManager::~SquadManager() {
-	// Remove all squads
-	std::map<SquadId, Squad*>::iterator squadIt;
-	for (squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
-		SAFE_DELETE(squadIt->second);
-	}
+	// Using shared pointer so no need deleting squads :)
 
 	mpsInstance = NULL;
 }
@@ -26,40 +24,42 @@ SquadManager* SquadManager::getInstance() {
 	return mpsInstance;
 }
 
-Squad* SquadManager::getSquad(const SquadId& squadId) {
-	Squad const * const pConstSquad = const_cast<const SquadManager*>(this)->getSquad(squadId);
-	return const_cast<Squad*>(pConstSquad);
+shared_ptr<Squad> SquadManager::getSquad(const SquadId& squadId) {
+	const shared_ptr<const Squad> constPtr = const_cast<const SquadManager*>(this)->getSquad(squadId);
+	const shared_ptr<Squad> squad = const_pointer_cast<Squad>(constPtr);
+	return squad;
 }
 
-Squad const * const SquadManager::getSquad(const SquadId& squadId) const {
-	std::map<SquadId, Squad*>::const_iterator foundSquad;
+shared_ptr<const Squad> SquadManager::getSquad(const SquadId& squadId) const {
+	std::map<SquadId, shared_ptr<Squad>>::const_iterator foundSquad;
 	foundSquad = mSquads.find(squadId);
 	if (foundSquad != mSquads.end()) {
-		return foundSquad->second;
+		const shared_ptr<const Squad>& constPtr = const_pointer_cast<const Squad>(foundSquad->second);
+		return constPtr;
 	} else {
 		ERROR_MESSAGE(false, "Could not find squad with squad id: "	<< squadId);
-		return NULL;
+		return shared_ptr<Squad>();
 	}
 }
 
-std::map<SquadId, Squad*>::iterator SquadManager::begin() {
+std::map<SquadId, shared_ptr<Squad>>::iterator SquadManager::begin() {
 	return mSquads.begin();
 }
 
-std::map<SquadId, Squad*>::const_iterator SquadManager::begin() const {
+std::map<SquadId, shared_ptr<Squad>>::const_iterator SquadManager::begin() const {
 	return mSquads.begin();
 }
 
-std::map<SquadId, Squad*>::iterator SquadManager::end() {
+std::map<SquadId, shared_ptr<Squad>>::iterator SquadManager::end() {
 	return mSquads.end();
 }
 
-std::map<SquadId, Squad*>::const_iterator SquadManager::end() const {
+std::map<SquadId, shared_ptr<Squad>>::const_iterator SquadManager::end() const {
 	return mSquads.end();
 }
 
 void SquadManager::computeActions() {
-	std::map<SquadId, Squad*>::iterator squadIt = mSquads.begin();
+	std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mSquads.begin();
 	while(squadIt != mSquads.end()) {
 		if (!squadIt->second->isEmpty()) {
 			squadIt->second->computeActions();
@@ -67,13 +67,12 @@ void SquadManager::computeActions() {
 		}
 		// Delete empty squads
 		else {
-			SAFE_DELETE(squadIt->second);
 			squadIt = mSquads.erase(squadIt);
 		}	
 	}
 }
 
-void SquadManager::addSquad(Squad* pSquad) {
+void SquadManager::addSquad(const shared_ptr<Squad>& pSquad) {
 	assert(pSquad != NULL);
 	mSquads[pSquad->getSquadId()] = pSquad;
 }
