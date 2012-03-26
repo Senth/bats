@@ -16,8 +16,7 @@ StructureAgent::StructureAgent()
 
 }
 
-StructureAgent::StructureAgent(Unit* mUnit)
-{
+StructureAgent::StructureAgent(Unit* mUnit){
 	unit = mUnit;
 	type = unit->getType();
 	unitID = unit->getID();
@@ -149,14 +148,7 @@ void StructureAgent::computeActions()
 				{
 					unit->buildAddon(UnitTypes::Terran_Control_Tower);
 				}
-			}
-			if (isOfType(UnitTypes::Terran_Starport))
-			{
-				if (unit->getAddon() == NULL)
-				{
-					unit->buildAddon(UnitTypes::Terran_Control_Tower);
-				}
-			}
+			}			
 			if (isOfType(UnitTypes::Terran_Factory))
 			{
 				if (unit->getAddon() == NULL)
@@ -215,23 +207,25 @@ bool StructureAgent::canBuildUnit(UnitType type)
 		return false;
 	}
 
-	//3. Check if we need the unit in a squad
+	/*3. Check if we need the unit in a squad
 	if (!Commander::getInstance()->needUnit(type))
 	{
 		return false;
 	}
-	
+	*/
+
 	//4. Check canBuild
 	if (!Broodwar->canMake(unit, type))
-	{
+	{			
 		return false;
 	}
 
-	//5. Check if we have enough resources
+	// 5. Check if we have enough resources
 	if (!ResourceManager::getInstance()->hasResources(type))
 	{
 		return false;
 	}
+	
 
 	//All clear. Build the unit.
 	return true;

@@ -20,6 +20,7 @@
 #include "GhostAgent.h"
 #include "GoliathAgent.h"
 #include "ValkyrieAgent.h"
+#include "BatsModule/include/TerranProductionBuilding.h"
 
 /** Protoss agents */
 #include "NexusAgent.h"
@@ -96,8 +97,7 @@ BaseAgent* AgentFactory::createAgent(Unit* unit)
 	{
 		return new WorkerAgent(unit);
 	}
-	else if (unit->getType().isBuilding())
-	{
+	else if (unit->getType().isBuilding()){		
 		return new StructureAgent(unit);
 	}
 	else
@@ -228,6 +228,13 @@ BaseAgent* AgentFactory::createTerranAgent(Unit* unit)
 			Commander::getInstance()->addBunkerSquad();
 			return new StructureAgent(unit);
 		}
+		/**
+		 * Subclass of Structure agent for Terran production buildings
+		 * @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+		 */
+		else if(unit->getType() == UnitTypes::Terran_Barracks || 
+			unit->getType() == UnitTypes::Terran_Factory || unit->getType() == UnitTypes::Terran_Starport)
+			return new bats::TerranProductionBuilding(unit);
 		else
 		{
 			//Default structure agent
