@@ -16,12 +16,36 @@ In reality, RTS games resembles more a battle field than a game of chess—you c
 There is no real standard how RTS games they all work a bit different but have the
 %: Continue here
 
-and a set of workers, these workers can build buildings and collect resources—used to build buildings, upgrades, and units. Various versions of how you collect and build buildings exists, some games does not use workers for building buildings, and some gets resources from buildings placed at specific points.
+and a set of workers, these workers can build structures and collect resources—used to build structures, upgrades, and units. Various games have collects and build structures in different ways, some games does not use workers for building buildings, and some gets resources from buildings placed at specific points.
 %: Find source for games that doesn’t use workers for gathering resources
 
 %: Import a StarCraft image
 
 \subsection{StarCraft}
+The AI is implemented in an RTS game: StarCraft, more specifically StarCraft : Brood War—an expansion to StarCraft that introduced new units. Henceforth StarCraft: Brood War will be referenced as StarCraft for simplicity..
+
+
+\subsubsection{Gameplay}
+StarCraft has three races—Terran, Protoss, and Zerg—which the player can choose from. Each of these races have their own unique type of units and their playstyles are very different to each other.
+
+\paragraph{Commonalities between races}
+Common for all races is that they all have a worker unit that collects minerals and gas—minerals and gas are the games resources used to build structures, units and upgrades. Minerals and gas are usually located in clusters where the player can build a base. This makes the distance short from the resources to the base which all resources has to be carried to. Only one worker can simultaneously collect minerals from a mineral field, or gas from a gas depot. Minerals have a fixed number of resources to them that can be mined before they disappear; gas on the other hand too have a number of resources, but after that limit is reached gas can still be mined, but now the worker only harvest 2 gas instead of 7. To harvest gas a structure needs to be built on top of the gas depot.
+
+Each unit occupies an amount of supply, ranging from a half supply (Zerglings) to 8 supplies (Carriers). Zerg's Overlord is the only unit that doesn't take any supplies, in fact it gives supplies, this is described in the following text. The maximum supply of units is 200 for all races. To get more supplies than the starting amount, the races have to either build a new base structure or a special supply structure, or unit in the Zerg's case.
+
+\paragraph{Terran}
+Terran's worker unit 'SVC' can repair structures, and vehicle units. When they construct a structure they becomes occupied with that task and cannot do anything else. The SVC can however abort the building and let another SVC continue with the construction.
+
+While Protoss's supply structure and Zerg's supply unit has special abilities the Terran's supply unit does nothing more than take up place and give 8 supply to the player.
+
+\paragraph{Protoss}
+Protoss units and structures have two health bars oppossed to Terran's and Zerg's one health bar. The first health bar is the base health of the unit, the other is a shield that recharges ones the unit or structure is out of battle. This makes the units and structures strong against small attacks that only damage the units shields, since they can retreat and regain full health again. Note that not all occaissions allow this, since the enemy is usually reluctant to let a protoss army flee to regain full health.
+
+Protoss's worker unit 'Probe' can only mine resources and summon structures, it cannot repair any units as Terran's SVC can. While SVC's are occupied the whole time they construct structures a Probe can simply start to summon a building and it will construct itself. Protoss structures, however, has one restriction, structures needs to be placed under the power of a pylon, pylons are Protoss supply structure and power source. A pylon emits a circle of power and if a structure becomes powerless—the pylon has been destroyed—it will not function and a new pylon has to be built. Pylons, Nexuses (Protoss base), and Assimilator (gas structure) can function without a pylon.
+
+\paragraph{Zerg}
+
+\subsubsection{Balanced}
 
 \section{Teammate}
 
