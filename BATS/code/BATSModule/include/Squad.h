@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory.h>
 #include <BWAPI/TilePosition.h>
 #include "IdTypes.h"
 #include "Utilities/KeyType.h"
@@ -8,6 +9,7 @@
 #include "UnitSet.h"
 #include "UnitComposition.h"
 #include "UnitCompositionFactory.h"
+#include "WaitGoal.h"
 
 // Forward declarations
 class UnitAgent;
@@ -101,6 +103,25 @@ public:
 	void removeUnit(UnitAgent* pUnit);
 
 	/**
+	 * Adds a WaitGoal to the Squad. While this doesn't do anything in itself the derived
+	 * Squad can implement a feature that waits for this WaitGoal to complete before it
+	 * executes an option. AttackSquad and DropSquad uses this feature together with
+	 * WaitReadySquad to coordinate an attack to start attacking on different places at
+	 * the same time. This function will call onWaitGoalAdded() that can be overloaded in
+	 * the derived classes.
+	 * @param waitGoal the goal to add.
+	 */
+	void addWaitGoal(const std::tr1::shared_ptr<WaitGoal>& waitGoal);
+
+	/**
+	* Adds several WaitGoal(s) to the Squad.
+	* Will call onWaitGoalAdded() for each WaitGoal in the vector.
+	* @param waitGoals all WaitGoal(s) to add.
+	* @see addWaitGoal() for a more detailed description.
+	*/
+	void addWaitGoals(const std::vector<std::tr1::shared_ptr<WaitGoal>>& waitGoals);
+
+	/**
 	 * Returns the squad's id.
 	 * @return squad's id.
 	 */
@@ -134,6 +155,22 @@ protected:
 	 * create a new goal repeating goal.
 	 */
 	virtual void onGoalSucceeded();
+
+	/**
+	 * Called when a new WaitGoal has been added. Does nothing in the base class Squad.
+	 * @param newWaitGoal the new WaitGoal that has been added. This is the same goal as
+	 * the last goal in the wait goal vector.
+	 */
+	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
+
+	/**
+	 * Called when a wait goal has finished. This can be either by success or failure.
+	 * The reason of why it finished can be returned by WaitGoal::getWaitState(). Does
+	 * nothing in the base class Squad.
+	 * @param finishedWaitGoal the wait goal that has recently finished. This goal is
+	 * no longer in the wait goal vector.
+	 */
+	virtual void onWaitGoalFinished(const std::tr1::shared_ptr<WaitGoal>& finishedWaitGoal);
 
 	/**
 	 * Force disband on the squad
@@ -177,7 +214,7 @@ protected:
 	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
 
 	/**
-	 * Different goal states, should be moved later?
+	 * Different goal states.
 	 */
 	enum GoalStates {
 		GoalState_First = 0,
@@ -191,7 +228,7 @@ protected:
 
 private:
 	/**
-	 * Called when a new goal should be created.
+	 * Called when a new goal shall be created.
 	 * @returns true a goal was successfully created.
 	 */
 	virtual bool createGoal() = 0;
@@ -202,6 +239,7 @@ private:
 	 */
 	void updateUnitGoals();
 	
+	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mGoalPositions;
 	UnitComposition mUnitComposition;

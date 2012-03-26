@@ -5,6 +5,8 @@
 #include <algorithm>
 
 using namespace bats;
+using namespace std;
+using std::tr1::shared_ptr;
 
 int bats::Squad::mcsInstance = 0;
 utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
@@ -78,6 +80,19 @@ void Squad::computeActions() {
 
 	}
 
+	// Remove finished WaitGoals and call onWaitGoalFinished for finished events.
+	vector<shared_ptr<WaitGoal>>::iterator waitGoalIt;
+	waitGoalIt = mWaitGoals.begin();
+	while (mWaitGoals.end() != waitGoalIt) {
+		if ((*waitGoalIt)->getWaitState() != WaitState_Waiting) {
+			shared_ptr<WaitGoal> finishedWaitGoal = *waitGoalIt;
+			waitGoalIt = mWaitGoals.erase(waitGoalIt);
+			onWaitGoalFinished(finishedWaitGoal);
+		} else {
+			++waitGoalIt;
+		}
+	}
+
 
 	switch (mState) {
 	case SquadState_Inactive:
@@ -135,7 +150,7 @@ void Squad::addUnit(UnitAgent* pUnit) {
 	}
 }
 
-void Squad::addUnits(const std::vector<UnitAgent*>& units) {
+void Squad::addUnits(const vector<UnitAgent*>& units) {
 	for (size_t i = 0; i < units.size(); ++i) {
 		// Check so that the unit doesn't have a squad already.
 		addUnit(units[i]);
@@ -143,11 +158,25 @@ void Squad::addUnits(const std::vector<UnitAgent*>& units) {
 }
 
 void Squad::removeUnit(UnitAgent* pUnit) {
-	std::vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), pUnit);
+	vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), pUnit);
 	if (foundUnit != mUnits.end()) {
 		mUnits.erase(foundUnit);
 	} else {
 		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
+	}
+}
+
+void Squad::addWaitGoal(const shared_ptr<WaitGoal>& waitGoal) {
+	assert(NULL != waitGoal);
+	mWaitGoals.push_back(waitGoal);
+	onWaitGoalAdded(waitGoal);
+}
+
+void Squad::addWaitGoals(const vector<shared_ptr<WaitGoal>>& waitGoals) {
+	for (size_t i = 0; i < waitGoals.size(); ++i) {
+		assert(NULL == waitGoals[i]);
+		mWaitGoals.push_back(waitGoals[i]);
+		onWaitGoalAdded(waitGoals[i]);
 	}
 }
 
@@ -170,6 +199,17 @@ void Squad::onGoalSucceeded() {
 	/// which one should be the default?
 	forceDisband();
 }
+
+#pragma warning(push)
+#pragma warning(disable:4100)
+void Squad::onWaitGoalAdded(const shared_ptr<WaitGoal>& newWaitGoal) {
+	// Does nothing
+}
+
+void Squad::onWaitGoalFinished(const shared_ptr<WaitGoal>& finishedWaitGoal) {
+	// Does nothing
+}
+#pragma warning(pop)
 
 void Squad::forceDisband() {
 	if (!mDisbanded) {
