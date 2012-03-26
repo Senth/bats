@@ -1,0 +1,5 @@
+; This file states the transition graph
+; e.g early > mid > late
+; 
+
+early-x>mid-y>late-z

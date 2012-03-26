@@ -5,8 +5,13 @@ This is description
 <available-transitions>
 mid-Y
 <build-order>
-Terran_Refinery
+Terran_Barracks
+Terran_Supply_Depot
 Terran_Bunker
+Terran_StarPort
 <units>
-80% marines
-20% medics
+20% Terran_Siege_Tank_Tank_Mode
+20% Terran_Medic
+60% Terran_Marine
+<must-have>
+2 Terran_Dropship
