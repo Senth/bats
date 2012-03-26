@@ -1,11 +1,14 @@
 #pragma once
 
 #include <BWAPI.h>
+#include "UnitCreator.h"
+
 // Namespace for the project
 namespace bats {
 
 /**
  * Manages build orders in three phases: early, mid, and late game.
+ * Handles user command "transition"
  * @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
  */
 struct BuildQueueItem {
@@ -22,9 +25,9 @@ class BuildPlanner {
 private:
 	std::vector<BWAPI::UnitType> buildOrder;
 	std::vector<BuildQueueItem> buildQueue;
-	int lastCommandCenter;
-	
+	int lastCommandCenter;	
 	int lastCallFrame;
+	std::vector<bats::CoreUnit> mCoreUnitsList;
 protected:
 	BuildPlanner();
 	void lock(int buildOrderIndex, int unitId);
@@ -44,6 +47,11 @@ public:
 	static std::string mCurrentPhase;
 	/** Returns the instance to the BuildPlanner that is currently used. */
 	static BuildPlanner* getInstance();
+
+	/**
+	Used to get the unit list created from the BuildOrderFileReader instance
+	*/
+	std::vector<bats::CoreUnit> getUnitList();
 
 	/** Called on user command to switch phase. */	
 	void switchToPhase(std::string fileName);
