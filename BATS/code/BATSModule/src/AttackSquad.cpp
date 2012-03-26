@@ -24,3 +24,17 @@ bool AttackSquad::createGoal() {
 	setGoalPosition(position);
 	return true;
 }
+
+bool AttackSquad::isInPosition() const {
+	/// @todo check if squad is in position
+	return true;
+}
+
+bool AttackSquad::isAttacking() const {
+	/// @todo check if squad is attacking or under attack
+	return true;
+}
+
+bool AttackSquad::isReadyToAttack() const {
+	return isInPosition() || isAttacking();
+}

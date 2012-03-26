@@ -29,7 +29,7 @@ WaitGoal::~WaitGoal() {
 }
 
 void WaitGoal::computeActions() {
-	if (mUsesTimeout) {
+	if (mWaitState == WaitState_Waiting && mUsesTimeout) {
 		float currentTime = mpGameTime->getElapsedTime();
 		float diffTime = currentTime - mStartTime;
 		if (diffTime > mTimeout) {
