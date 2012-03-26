@@ -19,7 +19,7 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 	ifstream inFile;
 	TransitionGraph graph;
 	stringstream ss;
-	ss << getScriptPath();
+	ss << "bwapi-data\\AI\\BATS-data\\";
 	ss << "buildorder\\";
 	ss << fileName;
 	string filePath = ss.str();
@@ -56,7 +56,11 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 	return graph;
 }
 
-vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileName, vector<UnitType> &buildOrder){				
+vector<bats::CoreUnit> BuildOrderFileReader::getUnitList(){
+	return mCoreUnitsList;
+}
+
+vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileName, vector<UnitType> &buildOrder){
 	//string filename = getFilename("buildorder\\" + phase + "\\");
 	//vector<UnitType> buildOrder;
 	Broodwar->printf("~~~Build Order changed to phase %s", phase);
@@ -79,6 +83,7 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 	{
 		string line;
 		char buffer[256];
+				
 		while (!inFile.eof())
 		{
 			inFile.getline(buffer, 100);
@@ -90,9 +95,15 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 				if (line == "<build-order>")
 					type = "build-order";
 				else if(line == "<units>")
-					type = "none";
+					type = "units";
+				else if(line == "<must-have>")
+					type = "must-have";
 				else if(type == "build-order")
-					addUnitType(line, buildOrder);				
+					addBuildingType(line, buildOrder);				
+				else if(type == "units")			
+					addUnitType(line, mCoreUnitsList, false);
+				else if(type == "must-have")
+					addUnitType(line, mCoreUnitsList, true);
 			}
 		}
 		inFile.close();
@@ -102,21 +113,51 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 	return buildOrder;
 }
 
-void BuildOrderFileReader::addUnitType(string line, vector<UnitType> &buildOrder){
-	if (line == "") return;
+void BuildOrderFileReader::addUnitType(string line, vector<bats::CoreUnit> &coreUnits, bool mustHave){
+	if (line == "") return;	
+	Tokens token;			
+	string quantity;
+	token = split(line, " ");
+	line = token.value;
+	quantity = token.key;
+	// remove the percentage symbol
+	if(!mustHave)
+	quantity.erase(quantity.length()-2, quantity.length()-1);
 
 	//Replace all _ with whitespaces, or they wont match
 	replace(line);
-	
+
+	CoreUnit unit;
 	for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
 	{
-		if ((*i).getName() == line)
-		{
-			buildOrder.push_back((*i));
+		if ((*i).getName() == line){
+			//Compose the unit
+			unit.mustHave = mustHave;
+			unit.quantity = toInt(quantity);
+			unit.unit = (*i);
+			//Add unit to list | vector
+			coreUnits.push_back(unit);
 			return;
 		}
 	}
 
 	//No UnitType match found
 	ERROR_MESSAGE(false, "No matching UnitType found for " << line);
+}
+
+void BuildOrderFileReader::addBuildingType(string line, vector<UnitType> &buildOrder){
+	if (line == "") return;
+
+	//Replace all _ with whitespaces, or they wont match
+	replace(line);
+	
+	for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++){
+		if ((*i).getName() == line){
+			buildOrder.push_back((*i));
+			return;
+		}
+	}
+
+	//No Building match found
+	Broodwar->printf("Error: No matching Building found for %s", line.c_str());
 }

@@ -20,6 +20,7 @@ BuildPlanner::BuildPlanner(){
 	BuildOrderFileReader br = BuildOrderFileReader();
 	mtransitionGraph = br.readTransitionFile("transition.txt");
 	buildOrder = br.readBuildOrder(mCurrentPhase, mtransitionGraph.early, buildOrder);	 // default is early
+	mCoreUnitsList = br.getUnitList();
 	lastCallFrame = Broodwar->getFrameCount();
 }
 
@@ -34,27 +35,42 @@ BuildPlanner* BuildPlanner::getInstance(){
 	return instance;
 }
 
+vector<bats::CoreUnit> BuildPlanner::getUnitList(){
+	return mCoreUnitsList;
+}
+
 void BuildPlanner::switchToPhase(std::string fileName){
+	BuildOrderFileReader br = BuildOrderFileReader();
 	if(fileName == ""){
 		if(BuildPlanner::mCurrentPhase == "early"){
-			BuildOrderFileReader().readBuildOrder("mid", mtransitionGraph.mid, buildOrder);
+			br.readBuildOrder("mid", mtransitionGraph.mid, buildOrder);
 			BuildPlanner::mCurrentPhase = "mid";
+			BuildPlanner::mCoreUnitsList = br.getUnitList();
+			UnitCreator::getInstance()->switchPhase();
 		}
 		else if(BuildPlanner::mCurrentPhase == "mid"){
-			BuildOrderFileReader().readBuildOrder("late", mtransitionGraph.late, buildOrder);
+			br.readBuildOrder("late", mtransitionGraph.late, buildOrder);
 			BuildPlanner::mCurrentPhase = "late";
+			BuildPlanner::mCoreUnitsList = br.getUnitList();
+			UnitCreator::getInstance()->switchPhase();
 		}
 	}
 	else if(fileName.length()>0){
 		if(BuildPlanner::mCurrentPhase == "early"){
-			if(BuildOrderFileReader().readBuildOrder("mid", fileName, buildOrder).size()>0)
+			if(br.readBuildOrder("mid", fileName, buildOrder).size()>0){
+				BuildPlanner::mCoreUnitsList = br.getUnitList();
 				BuildPlanner::mCurrentPhase = "mid";
+				UnitCreator::getInstance()->switchPhase();
+			}
 			else
 				ERROR_MESSAGE(false, "Error loading file " << fileName);
 		}
 		else if(BuildPlanner::mCurrentPhase == "mid"){
-			if(BuildOrderFileReader().readBuildOrder("late", fileName, buildOrder).size()>0)
+			if(br.readBuildOrder("late", fileName, buildOrder).size()>0){
 				BuildPlanner::mCurrentPhase = "late";
+				BuildPlanner::mCoreUnitsList = br.getUnitList();
+				UnitCreator::getInstance()->switchPhase();
+			}
 			else
 				ERROR_MESSAGE(false, "Error loading file %s" << fileName);
 		}
@@ -117,6 +133,7 @@ void BuildPlanner::computeActions(){
 	//Check if we can build next building in the buildorder
 	if ((int)buildOrder.size() > 0)
 	{
+		//TODO check with unitcreator ?
 		executeOrder(buildOrder.at(0));
 	}
 
@@ -419,7 +436,9 @@ bool BuildPlanner::executeOrder(UnitType type){
 	{
 		return false;
 	}
-
+	//TODO check with unitcreator?
+	//if(UnitCreator::sLockForQueue)
+	//	return false;
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (int i = 0; i < (int)agents.size(); i++)
 	{

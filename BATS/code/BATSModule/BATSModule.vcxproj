@@ -94,6 +94,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GameTime.cpp" />
+    <ClCompile Include="src\TerranProductionBuilding.cpp" />
+    <ClCompile Include="src\UnitCreator.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
     <ClInclude Include="include\AttackSquad.h" />
@@ -107,8 +109,10 @@
     <ClInclude Include="include\IdTypes.h" />
     <ClInclude Include="include\Squad.h" />
     <ClInclude Include="include\SquadManager.h" />
+    <ClInclude Include="include\TerranProductionBuilding.h" />
     <ClInclude Include="include\UnitComposition.h" />
     <ClInclude Include="include\UnitCompositionFactory.h" />
+    <ClInclude Include="include\UnitCreator.h" />
     <ClInclude Include="include\UnitManager.h" />
     <ClInclude Include="include\UnitSet.h" />
     <ClCompile Include="src\UnitManager.cpp">

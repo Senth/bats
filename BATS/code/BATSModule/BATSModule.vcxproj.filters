@@ -25,6 +25,9 @@
     <Filter Include="WaitGoal">
       <UniqueIdentifier>{b9ca02e2-2530-49c1-a8cc-6277d79303fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UnitCreator">
+      <UniqueIdentifier>{081d25e1-c37c-41d9-b11e-c02bacf49e65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -78,6 +81,12 @@
     <ClInclude Include="include\GameTime.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="include\UnitCreator.h">
+      <Filter>UnitCreator</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TerranProductionBuilding.h">
+      <Filter>UnitCreator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -127,6 +136,12 @@
     </ClCompile>
     <ClCompile Include="src\GameTime.cpp">
       <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnitCreator.cpp">
+      <Filter>UnitCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TerranProductionBuilding.cpp">
+      <Filter>UnitCreator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
