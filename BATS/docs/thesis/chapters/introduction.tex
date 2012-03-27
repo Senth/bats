@@ -13,23 +13,22 @@ An RTS game is a computer game that heavily relies on strategy and fast executin
 
 In reality, RTS games resembles more a battle field than a game of chess—you control the army and it’s unit and on what the resources shall be spent on. From the start of the game you have a single base and your goal is to build up the technology to create powerful units by collecting resources, but you cannot go straight for the best technology because it takes time and if the opponent comes with any attack you will be defenseless against it.
 
-There is no real standard how RTS games they all work a bit different but have the
-%: Continue here
-
-and a set of workers, these workers can build structures and collect resources—used to build structures, upgrades, and units. Various games have collects and build structures in different ways, some games does not use workers for building buildings, and some gets resources from buildings placed at specific points.
-%: Find source for games that doesn’t use workers for gathering resources
-
-%: Import a StarCraft image
+There is no real standard for RTS games, they all work a bit different from each other. Instead of covering all different types of RTS games a short description how StarCraft works will be given to make the reader familiar with the game before talking about more specific problems and solutions.
 
 \subsection{StarCraft}
 The AI is implemented in an RTS game: StarCraft, more specifically StarCraft : Brood War—an expansion to StarCraft that introduced new units. Henceforth StarCraft: Brood War will be referenced as StarCraft for simplicity..
 
+%: Import a StarCraft image
 
 \subsubsection{Gameplay}
-StarCraft has three races—Terran, Protoss, and Zerg—which the player can choose from. Each of these races have their own unique type of units and their playstyles are very different to each other.
+StarCraft has three races—Terran, Protoss, and Zerg—which the player can choose from. Each of these races have their own unique type of units and their play styles are very different to each other.
 
 \paragraph{Commonalities between races}
-Common for all races is that they all have a worker unit that collects minerals and gas—minerals and gas are the games resources used to build structures, units and upgrades. Minerals and gas are usually located in clusters where the player can build a base. This makes the distance short from the resources to the base which all resources has to be carried to. Only one worker can simultaneously collect minerals from a mineral field, or gas from a gas depot. Minerals have a fixed number of resources to them that can be mined before they disappear; gas on the other hand too have a number of resources, but after that limit is reached gas can still be mined, but now the worker only harvest 2 gas instead of 7. To harvest gas a structure needs to be built on top of the gas depot.
+All races have worker units that collect minerals and gas—minerals and gas are the games resources used to build structures, units and upgrades. Minerals and gas are usually located in clusters of several mineral fields and maybe one gas. The player always starts at a base with both mineral fields and a gas depot. To mine minerals and gas workers go to the fields and then return to the base building—you can have multiple base buildings. Because of the travel distance you usually want to place your base close to the resource clusters.
+
+Minerals fields have a fixed number of resources they can yield, when all those have been mined the mineral field disappears.
+
+This makes the distance short from the resources to the base which all resources has to be carried to. Only one worker can simultaneously collect minerals from a mineral field, or gas from a gas depot. Minerals have a fixed number of resources to them that can be mined before they disappear; gas on the other hand too have a number of resources, but after that limit is reached gas can still be mined, but now the worker only harvest 2 gas instead of 7. To harvest gas a structure needs to be built on top of the gas depot.
 
 Each unit occupies an amount of supply, ranging from a half supply (Zerglings) to 8 supplies (Carriers). Zerg's Overlord is the only unit that doesn't take any supplies, in fact it gives supplies, this is described in the following text. The maximum supply of units is 200 for all races. To get more supplies than the starting amount, the races have to either build a new base structure or a special supply structure, or unit in the Zerg's case.
 
