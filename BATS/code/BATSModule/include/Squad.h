@@ -78,11 +78,37 @@ public:
 	void computeActions();
 
 	/**
+	 * Returns the center of the squad.
+	 * @return center of the squad.
+	 * @note Can be very wrong if it newly added units from all over the map to the squad.
+	 * Because it will then use the median of all units.
+	 */
+	BWAPI::TilePosition getCenter() const;
+
+	/**
 	 * Returns true if the squad is full, only applicable on squads with a unit composition
 	 * @return true if the squad is full, false if not, and false if it does not have
 	 * a valid unit composition.
 	 */
 	bool isFull() const;
+
+	/**
+	 * Returns true if this squad travels by ground. This squad can have flying units.
+	 * It just means that some units travels have to travel by ground.
+	 * @return true if this squad travels by ground.
+	 * @see The direct opposite of travelsByAir()
+	 */
+	bool travelsByGround() const;
+
+	/**
+	 * Returns true if this squad travels by air. This squad can have ground units,
+	 * but these are always loaded into a transportation ship when traveling. Meaning
+	 * that the squad can reach all places. 
+	 * @return True if the squad travels by air. Will return false if some units aren't
+	 * meant to get loaded into the transportation ship. Will also return false if there
+	 * aren't enough of transportation ships to load all ground units.
+	 */
+	bool travelsByAir() const;
 
 	/**
 	 * Adds a unit to the squad.
@@ -128,6 +154,14 @@ public:
 	const SquadId& getSquadId() const;
 
 	/**
+	 * Returns the current goal position. If the squad has several goal positions
+	 * it will only return the first one.
+	 * @return current goal position.  If the squad has no goal it will return
+	 * BWAPI::TilePositions::Invalid.
+	 */
+	const BWAPI::TilePosition& getGoal() const;
+
+	/**
 	 * States of the squad
 	 */
 	enum SquadStates {
@@ -143,6 +177,17 @@ protected:
 	 * Implement this function to create specific squad behavior.
 	 */
 	virtual void computeSquadSpecificActions();
+
+	/**
+	 * Sets whether the squad shall mainly be used for air transportation.
+	 * @param usesAir set this to true if the squad shall mainly be used for air transportation.
+	 * False if it not only uses air transportation.
+	 * @note This does not assure that the squad always will use air transportation. It is merely
+	 * used for calculating if it can travel by air or not. If it is set to false, it will never
+	 * try to check if it can travel by air or not.
+	 * @see travelsByAir() for how it is calculated if it travelsy by air or not.
+	 */
+	void setAirTransportation(bool usesAir);
 
 	/**
 	 * Called when a goal fails. Disbands the squad, derive this function if you want to
@@ -246,6 +291,7 @@ private:
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
+	bool mTravelsByAir;
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
 	SquadStates mState;
 	SquadId mId;

@@ -75,37 +75,71 @@ enum LogLevels {
 /**
 * Prints a debug message. Only active if _DEBUG is defined.
 * Does not process the message if verbosity level is too low.
-* Examples:
-* DEBUG_MESSAGE(LogLevel_Info, "This is a message"); // A regular
-* DEBUG_MESSAGE(LogLevel_Debug, "Value of " << strMessage << " is: " << intValue);
+* @section Examples
+* \code
+* // Prints a regular message
+* DEBUG_MESSAGE(LogLevel_Info, "This is a message");
+* 
+* // You can also use "cout" syntax to create more complex messages.
+* DEBUG_MESSAGE(LogLevel_Warning, "Value of " << strMessage << " is: " << intValue);
+* \endcode
+* @param verbosity tho verbosity level to use
 * @param message the message to display, using streams are possible
-* @param verbosity the verbosity level to use
+* @see utilities::LogLevels for guidelines what levels to use when
 */
 #define DEBUG_MESSAGE(verbosity, message) { \
 	if (verbosity >= utilities::gVerbosityLevelConsole || \
 		verbosity >= utilities::gVerbosityLevelFile || \
 		verbosity >= utilities::gVerbosityLevelStarCraft) \
 	{ \
-			std::stringstream ss; \
-			ss << message; \
-			utilities::printDebugMessage(verbosity, ss.str(), false); \
+		std::stringstream ss; \
+		ss << message; \
+		utilities::printDebugMessage(verbosity, ss.str(), false); \
 	} \
 }
 
 /**
 * Prints a debug message and waits for input after the message has been displayed.
 * Only active if _DEBUG is defined, and only stops for console verbosity.
-* @param message the message to display, using streams are possible
 * @param verbosity the verbosity level to use
+* @param message the message to display, using streams are possible
+* @see utilities::LogLevels for guidelines what levels to use when
+* @see DEBUG_MESSAGE() for examples how to this function.
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message) {  \
 	if (verbosity >= utilities::gVerbosityLevelConsole || \
 	verbosity >= utilities::gVerbosityLevelFile || \
 	verbosity >= utilities::gVerbosityLevelStarCraft) \
-{ \
-	std::stringstream ss; \
-	ss << message; \
-	utilities::printDebugMessage(verbosity, ss.str(), true); \
+	{ \
+		std::stringstream ss; \
+		ss << message; \
+		utilities::printDebugMessage(verbosity, ss.str(), true); \
+	} \
+}
+
+/**
+ * Prints a debug message if the conditional is true.
+ * 
+ * Example:
+ * \code
+ * DEBUG_MESSAGE_CONDITION(result != SUCCESS, LogLevel_Warning, "Your message :D");
+ * \endcode
+ * 
+ * @param condition the condition that needs to be true for the message to appear.
+ * @param verbosity the verbosity level to use
+ * @param message the message to display, using streams are possible
+ * @see utilities::LogLevels for guidelines what levels to use when
+ */
+#define DEBUG_MESSAGE_CONDITION(condition, verbosity, message) { \
+	if (condition) { \
+		if (verbosity >= utilities::gVerbosityLevelConsole || \
+			verbosity >= utilities::gVerbosityLevelFile || \
+			verbosity >= utilities::gVerbosityLevelStarCraft) \
+		{ \
+			std::stringstream ss; \
+			ss << message; \
+			utilities::printDebugMessage(verbosity, ss.str(), false); \
+		} \
 	} \
 }
 #else
@@ -134,6 +168,20 @@ enum LogLevels {
 * @see DEBUG_MESSAGE() for examples how to this function.
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message)
+
+/**
+ * Prints a debug message if the conditional is true.
+ * 
+ * Example:
+ * \code
+ * DEBUG_MESSAGE_CONDITION(result != SUCCESS, LogLevel_Warning, "Your message :D");
+ * \endcode
+ * 
+ * @param condition the condition that needs to be true for the message to appear.
+ * @param verbosity the verbosity level to use
+ * @param message the message to display, using streams are possible
+ */
+#define DEBUG_MESSAGE_CONDITION(condition, verbosity, message)
 #endif
 
 // The types of output targets that are available

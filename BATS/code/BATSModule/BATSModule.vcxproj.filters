@@ -81,6 +81,9 @@
     <ClInclude Include="include\GameTime.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="include\ExplorationManager.h">
+      <Filter>Commander</Filter>
+    </ClInclude>
     <ClInclude Include="include\UnitCreator.h">
       <Filter>UnitCreator</Filter>
     </ClInclude>
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="src\GameTime.cpp">
       <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExplorationManager.cpp">
+      <Filter>Commander</Filter>
     </ClCompile>
     <ClCompile Include="src\UnitCreator.cpp">
       <Filter>UnitCreator</Filter>

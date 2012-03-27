@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="include\BuildPlanner.h" />
     <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
+    <ClInclude Include="include\ExplorationManager.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />

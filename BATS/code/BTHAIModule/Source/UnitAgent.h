@@ -55,6 +55,24 @@ public:
 	/** Clears the goal for this unit. */
 	virtual void clearGoal();
 
+	/**
+	 * Returns true if the unit is an air unit
+	 * @return true if the unit travels by air
+	 */
+	bool isAir() const;
+
+	/**
+	 * Returns true if the unit is a ground unit.
+	 * @return true if the unit travels by ground.
+	 */
+	bool isGround() const;
+
+	/**
+	 * Returns true if the unit can transport ground units.
+	 * @return true if the unit can transport ground units.
+	 */
+	bool isTransport() const;
+
 	/** Returns the number of own units that are within 6 tiles range of the agent. */
 	int friendlyUnitsWithinRange();
 

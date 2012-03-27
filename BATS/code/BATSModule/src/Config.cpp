@@ -11,8 +11,17 @@ namespace config {
 const std::string ROOT_DIR = "bwapi-data\\";
 const std::string CONFIG_DIR = ROOT_DIR + "AI\\BATS-data\\";
 
+namespace frame_distribution {
+	int EXPLORATION_MANAGER = 61;
+}
+
 namespace game {
 	int SPEED = 8;
+}
+
+namespace log {
+	const std::string SETTINGS_FILE = CONFIG_DIR + "log_settings.ini";
+	const std::string OUTPUT_DIR = ROOT_DIR + "logs\\bats";
 }
 
 namespace squad {
@@ -23,17 +32,13 @@ namespace squad {
 	float REGROUP_DISTANCE_END = 0.0f;
 }
 
-namespace log {
-	const std::string SETTINGS_FILE = CONFIG_DIR + "log_settings.ini";
-	const std::string OUTPUT_DIR = ROOT_DIR + "logs\\bats";
-}
-
 
 //--------- Function Definitions ---------//
 void readConfig(const std::string& configFile);
 void handleVariable(const utilities::VariableInfo& variableInfo);
-bool setSquad(const utilities::VariableInfo& variableInfo);
+bool setFrameDistribution(const utilities::VariableInfo& variableInfo);
 bool setGame(const utilities::VariableInfo& variableInfo);
+bool setSquad(const utilities::VariableInfo& variableInfo);
 
 
 //--------- Function Declarations ---------//
@@ -63,10 +68,12 @@ void readConfig(const std::string& configFile) {
 
 void handleVariable(const utilities::VariableInfo& variableInfo) {
 	bool noErrors = true;
-	if (variableInfo.section == "squad") {
-		noErrors = setSquad(variableInfo);
+	if (variableInfo.section == "frame_distribution") {
+		noErrors = setFrameDistribution(variableInfo);
 	} else if (variableInfo.section == "game") {
 		noErrors = setGame(variableInfo);	
+	} else if (variableInfo.section == "squad") {
+		noErrors = setSquad(variableInfo);
 	} else {
 		ERROR_MESSAGE(false, "Unknown section '" << variableInfo.section
 			<< "' in " << variableInfo.file << ".ini");
@@ -78,15 +85,9 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 	}
 }
 
-bool setSquad(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "ping_wait_time_first") {
-		squad::PING_WAIT_TIME_FIRST = variableInfo;
-	} else if (variableInfo.name == "ping_wait_time_after_first") {
-		squad::PING_WAIT_TIME_AFTER_FIRST = variableInfo;
-	} else if (variableInfo.name == "regroup_distance_begin") {
-		squad::REGROUP_DISTANCE_BEGIN = variableInfo;
-	} else if (variableInfo.name == "regroup_distance_end") {
-		squad::REGROUP_DISTANCE_END = variableInfo;
+bool setFrameDistribution(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "exploration_manager") {
+		frame_distribution::EXPLORATION_MANAGER = variableInfo;
 	} else {
 		return false;
 	}
@@ -97,6 +98,22 @@ bool setSquad(const utilities::VariableInfo& variableInfo) {
 bool setGame(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "speed") {
 		game::SPEED = variableInfo;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+bool setSquad(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "ping_wait_time_first") {
+		squad::PING_WAIT_TIME_FIRST = variableInfo;
+	} else if (variableInfo.name == "ping_wait_time_after_first") {
+		squad::PING_WAIT_TIME_AFTER_FIRST = variableInfo;
+	} else if (variableInfo.name == "regroup_distance_begin") {
+		squad::REGROUP_DISTANCE_BEGIN = variableInfo;
+	} else if (variableInfo.name == "regroup_distance_end") {
+		squad::REGROUP_DISTANCE_END = variableInfo;
 	} else {
 		return false;
 	}

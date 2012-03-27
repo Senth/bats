@@ -22,6 +22,7 @@ Squad::Squad(
 	mUnitComposition(unitComposition),
 	mDisbandable(disbandable),
 	mDisbanded(false),
+	mTravelsByAir(false),
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mGoalState(GoalState_Lim),
@@ -130,9 +131,54 @@ void Squad::computeActions() {
 	}
 }
 
+BWAPI::TilePosition Squad::getCenter() const {
+	if (mUnits.empty()) {
+		return BWAPI::TilePositions::Invalid;
+	}
+
+	BWAPI::TilePosition center(0,0);
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		center += mUnits[i]->getUnit()->getTilePosition();
+	}
+	center.x() /= mUnits.size();
+	center.y() /= mUnits.size();
+
+	return center;
+}
+
 bool Squad::isFull() const {
 	if (mUnitComposition.isValid()) {
 		return mUnitComposition.isFull();
+	} else {
+		return false;
+	}
+}
+
+bool Squad::travelsByGround() const {
+	return !travelsByAir();
+}
+
+bool Squad::travelsByAir() const {
+	// Skip if it never shall travel by air
+	if (!mTravelsByAir) {
+		return false;
+	}
+
+	// Calculate if it can travel by air.
+	int groundSlotsRequired = 0;
+	int transportationSlots = 0;
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		if (mUnits[i]->isGround()) {
+			groundSlotsRequired += mUnits[i]->getUnitType().spaceRequired();
+		}
+		// Note, it must be air since it's not a ground unit. No need to check that
+		else if (mUnits[i]->isTransport()) {
+			transportationSlots += mUnits[i]->getUnitType().spaceProvided();
+		}
+	}
+
+	if (groundSlotsRequired <= transportationSlots) {
+		return true;
 	} else {
 		return false;
 	}
@@ -184,8 +230,20 @@ const SquadId & Squad::getSquadId() const {
 	return mId;
 }
 
+const BWAPI::TilePosition& Squad::getGoal() const {
+	if (!mGoalPositions.empty()) {
+		return mGoalPositions.front();
+	} else {
+		return BWAPI::TilePositions::Invalid;
+	}
+}
+
 void Squad::computeSquadSpecificActions() {
 	// Does nothing
+}
+
+void Squad::setAirTransportation(bool usesAir) {
+	mTravelsByAir = usesAir;
 }
 
 void Squad::onGoalFailed() {

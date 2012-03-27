@@ -29,7 +29,7 @@ SpottedObject::SpottedObject(Position pos)
 	active = true;
 }
 
-bool SpottedObject::isActive()
+bool SpottedObject::isActive() const
 {
 	return active;
 }
@@ -39,27 +39,27 @@ void SpottedObject::setInactive()
 	active = false;
 }
 
-int SpottedObject::getUnitID()
+int SpottedObject::getUnitID() const
 {
 	return unitID;
 }
 
-UnitType SpottedObject::getType()
+UnitType SpottedObject::getType() const
 {
 	return type;
 }
 
-Position SpottedObject::getPosition()
+Position SpottedObject::getPosition() const
 {
 	return position;
 }
 
-TilePosition SpottedObject::getTilePosition()
+TilePosition SpottedObject::getTilePosition() const
 {
 	return tilePosition;
 }
 
-bool SpottedObject::isAt(TilePosition tilePos)
+bool SpottedObject::isAt(TilePosition tilePos) const
 {
 	if (tilePos.x() == tilePosition.x() && tilePos.y() == tilePosition.y())
 	{
@@ -68,12 +68,12 @@ bool SpottedObject::isAt(TilePosition tilePos)
 	return false;
 }
 
-double SpottedObject::getDistance(Position pos)
+double SpottedObject::getDistance(Position pos) const
 {
 	return position.getDistance(pos);
 }
 
-double SpottedObject::getDistance(TilePosition tilePos)
+double SpottedObject::getDistance(TilePosition tilePos) const
 {
 	return tilePosition.getDistance(tilePos);
 }

@@ -13,7 +13,7 @@ struct ForceData {
 
 	int noRefineries;
 	int noCommandCenters;
-	int noFactories;
+	int cFactories;
 	int noAirports;
 	int noBarracks;
 	int noDefenseStructures;
@@ -29,7 +29,7 @@ struct ForceData {
 
 		noRefineries = 0;
 		noCommandCenters = 0;
-		noFactories = 0;
+		cFactories = 0;
 		noAirports = 0;
 		noBarracks = 0;
 		noDefenseStructures = 0;
@@ -73,7 +73,7 @@ struct ForceData {
 		}
 		if (type.getID() == BWAPI::UnitTypes::Terran_Factory.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Gateway.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Robotics_Facility.getID())
 		{
-			noFactories++;
+			cFactories++;
 		}
 	}
 };
@@ -125,7 +125,7 @@ struct ExploreData {
  * The ExplorationManager is implemented as a singleton class. Each class that needs to access ExplorationManager can request an instance,
  * and all classes shares the same ExplorationManager instance.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
  */
 class ExplorationManager {
 

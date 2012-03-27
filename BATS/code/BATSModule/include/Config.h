@@ -7,8 +7,17 @@ namespace bats {
 		extern const std::string ROOT_DIR;
 		extern const std::string CONFIG_DIR;
 
+		namespace frame_distribution {
+			extern int EXPLORATION_MANAGER;
+		}
+
 		namespace game {
 			extern int SPEED;
+		}
+
+		namespace log {
+			extern const std::string OUTPUT_DIR;
+			extern const std::string SETTINGS_FILE;
 		}
 
 		namespace squad {
@@ -30,11 +39,6 @@ namespace bats {
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
 			extern float REGROUP_DISTANCE_END;
-		}
-
-		namespace log {
-			extern const std::string OUTPUT_DIR;
-			extern const std::string SETTINGS_FILE;
 		}
 
 		/**

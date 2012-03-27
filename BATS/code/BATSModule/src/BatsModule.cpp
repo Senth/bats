@@ -5,9 +5,9 @@
 #include "SquadManager.h"
 #include "UnitManager.h"
 #include "GameTime.h"
+#include "ExplorationManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
-#include "BTHAIModule/Source/ExplorationManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/PathFinder.h"
 #include "BTHAIModule/Source/UpgradesPlanner.h"
@@ -275,10 +275,11 @@ void BatsModule::initGameClasses() {
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
+	ExplorationManager::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
-	
+	delete ExplorationManager::getInstance();
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
 	delete UpgradesPlanner::getInstance();

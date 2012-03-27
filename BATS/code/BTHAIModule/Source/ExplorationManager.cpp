@@ -250,7 +250,7 @@ void ExplorationManager::showIntellData()
 	Broodwar->drawTextScreen(250,16*5, "GroundDefendStr: %d (%d)", enemyForce.groundDefendStr, ownForce.groundDefendStr);
 
 	Broodwar->drawTextScreen(250,16*6, "CommandCenters: %d (%d)", enemyForce.noCommandCenters, ownForce.noCommandCenters);
-	Broodwar->drawTextScreen(250,16*7, "Factories: %d (%d)", enemyForce.noFactories, ownForce.noFactories);
+	Broodwar->drawTextScreen(250,16*7, "Factories: %d (%d)", enemyForce.cFactories, ownForce.cFactories);
 	Broodwar->drawTextScreen(250,16*8, "Airports: %d (%d)", enemyForce.noAirports, ownForce.noAirports);
 	Broodwar->drawTextScreen(250,16*9, "DefenseStructures: %d (%d)", enemyForce.noDefenseStructures, ownForce.noDefenseStructures);
 	Broodwar->drawTextScreen(250,16*10, "DetectorStructures: %d (%d)", enemyForce.noDetectorStructures, ownForce.noDetectorStructures);

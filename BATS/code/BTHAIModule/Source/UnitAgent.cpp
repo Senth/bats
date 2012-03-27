@@ -607,6 +607,33 @@ void UnitAgent::clearGoal()
 	goal = TilePosition(-1, -1);
 }
 
+bool UnitAgent::isAir() const
+{
+	return unit->getType().isFlyer();
+}
+
+bool UnitAgent::isGround() const
+{
+	return !unit->getType().isFlyer();
+}
+
+bool UnitAgent::isTransport() const 
+{
+	UnitType unitType = unit->getType();
+	bool isTransportType = unitType == UnitTypes::Terran_Dropship ||
+		unitType == UnitTypes::Protoss_Shuttle;
+
+	// Special case for Zerg overlord, they need to have the upgrade
+	if (!isTransportType) {
+		if (unitType == UnitTypes::Zerg_Overlord && unit->upgrade(UpgradeTypes::Ventral_Sacs)) {
+			isTransportType = true;
+		} else {
+			isTransportType = false;
+		}
+	}
+	return isTransportType;
+}
+
 void UnitAgent::printInfo()
 {
 	Broodwar->printf("[%s-%d] SquadID: %d (%d,%d) -> (%d,%d)", agentType.c_str(), unitID, squadID, unit->getTilePosition().x(), unit->getTilePosition().y(), goal.x(), goal.y());
