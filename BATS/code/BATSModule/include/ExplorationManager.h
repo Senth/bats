@@ -49,35 +49,42 @@ struct ForceData {
 		{
 			cRefineries++;
 		}
-		if (type.isResourceDepot())
+		else if (type.isResourceDepot())
 		{
 			cCommandCenters++;
 		}
-		if (type.isBuilding() && type.isDetector())
+		else if (type.isBuilding() && type.isDetector())
 		{
 			cDetectorStructures++;
 		}
-		if (!type.isBuilding() && type.isDetector())
+		else if (!type.isBuilding() && type.isDetector())
 		{
 			cDetectorUnits++;
 		}
-		if (type.isBuilding() && type.canAttack())
+		else if (type.isBuilding() && type.canAttack())
 		{
 			cDefenseStructures++;
 		}
-		if (type.getID() == BWAPI::UnitTypes::Terran_Bunker.getID())
+		else if (type == BWAPI::UnitTypes::Terran_Bunker ||
+			type == BWAPI::UnitTypes::Terran_Missile_Turret ||
+			type == BWAPI::UnitTypes::Protoss_Photon_Cannon ||
+			type == BWAPI::UnitTypes::Zerg_Sunken_Colony ||
+			type == BWAPI::UnitTypes::Zerg_Spore_Colony)
 		{
 			cDefenseStructures++;
 		}
-		if (type.getID() == BWAPI::UnitTypes::Terran_Starport.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Stargate.getID())
+		else if (type == BWAPI::UnitTypes::Terran_Starport ||
+			type == BWAPI::UnitTypes::Protoss_Stargate)
 		{
 			cAirports++;	
 		}
-		if (type.getID() == BWAPI::UnitTypes::Terran_Barracks.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Gateway.getID())
+		else if (type == BWAPI::UnitTypes::Terran_Barracks ||
+			type == BWAPI::UnitTypes::Protoss_Gateway)
 		{
 			cBarracks++;
 		}
-		if (type.getID() == BWAPI::UnitTypes::Terran_Factory.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Gateway.getID() || type.getID() == BWAPI::UnitTypes::Protoss_Robotics_Facility.getID())
+		else if (type == BWAPI::UnitTypes::Terran_Factory || 
+			type == BWAPI::UnitTypes::Protoss_Robotics_Facility)
 		{
 			cFactories++;
 		}
@@ -196,7 +203,9 @@ public:
 	 */
 	const std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings() const;
 
-	/** \codydoc getSpottedBuildings() */
+	/**
+	 * \codydoc getSpottedBuildings()
+	 */
 	std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings();
 
 	/** Returns the closest enemy spotted building from a start position, or BWAPI::TilePosition(-1,-1) if 
@@ -255,7 +264,9 @@ public:
 	 */
 	bool isEnemyDetectorCovering(BWAPI::TilePosition position);
 
-	/** \copydoc isEnemyDetectorCovering() */
+	/**
+	 * \copydoc isEnemyDetectorCovering()
+	 */
 	bool isEnemyDetectorCovering(BWAPI::Position position);
 
 private:
