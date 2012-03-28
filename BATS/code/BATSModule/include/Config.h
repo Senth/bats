@@ -7,6 +7,40 @@ namespace bats {
 		extern const std::string ROOT_DIR;
 		extern const std::string CONFIG_DIR;
 
+		namespace attack_coordinator {
+			/** Time until an expansion shall be considered not checked. In seconds */
+			extern double EXPANSION_NOT_CHECKED_TIME;
+
+
+			namespace weights {
+				/** Weight of the not checked expansions */
+				extern double EXPANSION_NOT_CHECKED;
+				/** The maximum weight an expansion can have. */
+				extern double EXPANSION_MAX;
+				/** The minimum weight an expansion can have. If this is set to something else
+				 * than 0, its usage will depend on if EXPANSION_CEIL is set to true or
+				 * false.
+				 * 
+				 * Example: If EXPANSION_MIN is set to 0.2,EXPANSION_MAX to 1.0,
+				 * and EXPANSION_CEIL to true it will ceil expansions with less than 20%
+				 * to a weight value of 0.2. If EXPANSION_CEIL is false and an expansion
+				 * is at 20% it will now treat 20% as 20% from 0.2 to 1.0
+				 * (i.e. a weight of 0.36). */
+				extern double EXPANSION_MIN;
+				/** Enables/Disable the use of ceil function for EXPANSION_MIN.
+				 * @see EXPANSION_MIN for usage. */
+				extern bool EXPANSION_CEIL;
+				/** Addon weight */
+				extern double ADDON_STRUCTURE;
+				/** Supply weight */
+				extern double UPGRADE_STRUCTURE;
+				/** Unit producing structure weights */
+				extern double UNIT_PRODUCING_STRUCTURE;
+				/** Other structures weight */
+				extern double OTHER_STRUCTURE;
+			}
+		}
+
 		namespace frame_distribution {
 			extern int EXPLORATION_MANAGER;
 		}

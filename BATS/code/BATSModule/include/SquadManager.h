@@ -4,10 +4,11 @@
 #include <vector>
 #include <map>
 #include <memory.h>
-#include "Squad.h"
 
 // Namespace for the project
 namespace bats {
+
+class Squad;
 
 /**
  * Handles all squads.

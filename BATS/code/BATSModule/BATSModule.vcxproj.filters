@@ -90,6 +90,9 @@
     <ClInclude Include="include\TerranProductionBuilding.h">
       <Filter>UnitCreator</Filter>
     </ClInclude>
+    <ClInclude Include="include\AttackCoordinator.h">
+      <Filter>Commander</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -148,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="src\TerranProductionBuilding.cpp">
       <Filter>UnitCreator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttackCoordinator.cpp">
+      <Filter>Commander</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
