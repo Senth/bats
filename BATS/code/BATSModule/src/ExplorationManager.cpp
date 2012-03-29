@@ -1,11 +1,13 @@
 #include "ExplorationManager.h"
 #include "UnitManager.h"
 //#include "VultureAgent.h"
-#include "BTHAIModule/Source/UnitAgent.h"
 #include "Commander.h"
 #include "Squad.h"
 #include "BTHAIModule/Source/CoverMap.h"
+#include "BTHAIModule/Source/UnitAgent.h"
+#include "BTHAIModule/Source/SpottedObject.h"
 #include "Config.h"
+#include <set>
 
 using namespace BWAPI;
 using namespace BWTA;
@@ -14,6 +16,8 @@ using std::tr1::shared_ptr;
 using namespace bats;
 
 ExplorationManager* ExplorationManager::mpsInstance = NULL;
+
+const double CLOSE_BASE_DISTANCE = 12.0;
 
 ExplorationManager::ExplorationManager() {
 	mActive = true;
@@ -232,7 +236,8 @@ int ExplorationManager::getLastVisitFrame(BWTA::Region* region)
 	
 	//Error: No region found
 	TilePosition goal = TilePosition(region->getCenter());
-	Broodwar->printf("FATAL GetLastVF: Unable to find region for tile (%d,%d)", goal.x(), goal.y());
+	DEBUG_MESSAGE(utilities::LogLevel_Warning, "ExplorationManager::getLastVisitFrame() | " <<
+		"Unable to find region for tile (" << goal.x() << ", " << goal.y() << ")!");
 	return -1;
 }
 
@@ -438,7 +443,7 @@ void ExplorationManager::cleanup() {
 	}
 }
 
-int ExplorationManager::spottedBuildingsWithinRange(TilePosition pos, int range)
+int ExplorationManager::spottedBuildingsWithinRange(const TilePosition& position, int range)
 {
 	cleanup();
 
@@ -447,7 +452,7 @@ int ExplorationManager::spottedBuildingsWithinRange(TilePosition pos, int range)
 	{
 		if (mSpottedStructures.at(i)->isActive())
 		{
-			if (pos.getDistance(mSpottedStructures.at(i)->getTilePosition()) <= range)
+			if (position.getDistance(mSpottedStructures.at(i)->getTilePosition()) <= range)
 			{
 				eCnt++;
 			}
@@ -457,18 +462,18 @@ int ExplorationManager::spottedBuildingsWithinRange(TilePosition pos, int range)
 	return eCnt;
 }
 
-TilePosition ExplorationManager::getClosestSpottedBuilding(TilePosition start)
+TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& startPosition)
 {
 	cleanup();
 
-	TilePosition pos = TilePosition(-1, -1);
+	TilePosition pos = BWAPI::TilePositions::Invalid;
 	double bestDist = 100000;
 
 	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
 	{
 		if (mSpottedStructures.at(i)->isActive())
 		{
-			double cDist = start.getDistance(mSpottedStructures.at(i)->getTilePosition());
+			double cDist = startPosition.getDistance(mSpottedStructures.at(i)->getTilePosition());
 			if (cDist < bestDist)
 			{
 				bestDist = cDist;
@@ -560,4 +565,85 @@ bool ExplorationManager::isEnemyDetectorCovering(Position position) {
 		}
 	}
 	return false;
+}
+
+vector<TilePosition> ExplorationManager::findNotCheckedExpansions() const {
+	vector<TilePosition> foundPositions;
+
+	// Iterate through all expansions sites
+	const set<BWTA::BaseLocation*>& baseLocations = BWTA::getBaseLocations();
+	set<BWTA::BaseLocation*>::const_iterator baseLocationIt;
+	for (baseLocationIt = baseLocations.begin(); baseLocationIt != baseLocations.end(); ++baseLocationIt) {
+		TilePosition basePosition = (*baseLocationIt)->getTilePosition();
+
+		// Search all regions for the base position
+		ExploreData foundRegion(TilePositions::Invalid);
+		vector<ExploreData>::const_iterator exploreRegionIt = mExploreData.begin();
+		while (foundRegion.center != TilePositions::Invalid && exploreRegionIt != mExploreData.end()) {
+			if (exploreRegionIt->isWithin(basePosition)) {
+				foundRegion = *exploreRegionIt;
+			}
+		}
+
+		DEBUG_MESSAGE_CONDITION(foundRegion.center == TilePositions::Invalid,
+			utilities::LogLevel_Severe,
+			"ExplorationManager::findNotCheckdExpansions() | Did not find any region for " <<
+			"expansion located at (" << basePosition.x() << ", " << basePosition.y() << ")!");
+
+		// Add the region if it hasn't been visited for a "long" time
+		if (foundRegion.center != TilePositions::Invalid && 
+			foundRegion.secondsSinceLastVisit() >= config::attack_coordinator::EXPANSION_NOT_CHECKED_TIME)
+		{
+			foundPositions.push_back(basePosition);	
+		}
+	}
+
+	return foundPositions;
+}
+
+void ExplorationManager::removeOccupiedExpansions(vector<TilePosition>& expansionPositions) const {
+	vector<TilePosition>::iterator expIt = expansionPositions.begin();
+
+	while (expIt != expansionPositions.end()) {
+		const TilePosition& expPosition = (*expIt);
+
+		// Check if our own buildings are close
+		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+		bool baseTaken = false;
+		for (size_t i = 0; agents.size(); ++i) {
+			BaseAgent* currentAgent = agents[i];
+
+			if (currentAgent->getUnitType().isResourceDepot() && currentAgent->isAlive()) {
+				double distance = expPosition.getDistance(currentAgent->getUnit()->getTilePosition());
+				if (distance <= CLOSE_BASE_DISTANCE) {
+					baseTaken = true;
+					break; // BREAK for agents
+				}
+			}
+		}
+
+		if (baseTaken) {
+			expIt = expansionPositions.erase(expIt);
+			continue; // CONTINUE for expansion positions
+		}
+
+		/// @todo remove teammate player expansions
+		
+
+		// Remove enemy bases
+		for (size_t i = 0; i < mSpottedStructures.size(); ++i) {
+			if (mSpottedStructures[i]->getType().isResourceDepot()) {
+				double distance = expPosition.getDistance(mSpottedStructures[i]->getTilePosition());
+				if (distance <= CLOSE_BASE_DISTANCE) {
+					baseTaken = true;
+					break;
+				}
+			}
+		}
+
+		if (baseTaken) {
+			expIt = expansionPositions.erase(expIt);
+			continue; // CONTINUE for expansion positions
+		}
+	}
 }

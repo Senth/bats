@@ -20,6 +20,7 @@ namespace attack_coordinator {
 		double EXPANSION_MIN = 0.0;
 		bool EXPANSION_CEIL = true;
 		double ADDON_STRUCTURE = 1.0;
+		double SUPPLY_STRUCTURE = 1.0;
 		double UPGRADE_STRUCTURE = 1.0;
 		double UNIT_PRODUCING_STRUCTURE = 1.0;
 		double OTHER_STRUCTURE = 1.0;
@@ -137,6 +138,8 @@ bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInf
 		EXPANSION_CEIL = variableInfo;
 	} else if (variableInfo.name == "addon_structure") {
 		ADDON_STRUCTURE = variableInfo;
+	} else if (variableInfo.name == "supply_structure") {
+		SUPPLY_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "upgrade_structure") {
 		UPGRADE_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "unit_producing_structure") {

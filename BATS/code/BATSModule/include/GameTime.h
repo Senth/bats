@@ -32,8 +32,15 @@ public:
 	 * speed with /speed -1 and then setting the fastest game speed in the options.
 	 * @return elapsed game seconds since start of game.
 	 */
-	float getElapsedTime() const;
+	double getElapsedTime() const;
 
+	/**
+	 * Returns the number of seconds since the specified frame. One second corresponds to one
+	 * game second with the fastest game speed.
+	 * @param sinceFrame from what frame we want to calculate the elapsed seconds
+	 * @return elapsed game seconds since the specified frame
+	 */
+	double getElapsedTime(int sinceFrame) const;
 	
 private:
 	/**
@@ -42,7 +49,7 @@ private:
 	GameTime();
 
 	int mStartFrame;
-	float mElapsedTime;
+	double mElapsedTime;
 
 	static GameTime* mpsInstance;
 };

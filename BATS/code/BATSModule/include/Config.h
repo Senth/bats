@@ -33,6 +33,8 @@ namespace bats {
 				/** Addon weight */
 				extern double ADDON_STRUCTURE;
 				/** Supply weight */
+				extern double SUPPLY_STRUCTURE;
+				/** Upgrade weight */
 				extern double UPGRADE_STRUCTURE;
 				/** Unit producing structure weights */
 				extern double UNIT_PRODUCING_STRUCTURE;

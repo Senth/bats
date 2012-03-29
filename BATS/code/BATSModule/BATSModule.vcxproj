@@ -96,6 +96,9 @@
     <ClCompile Include="src\AttackCoordinator.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
+    <ClCompile Include="src\Resource.cpp" />
+    <ClCompile Include="src\ResourceCounter.cpp" />
+    <ClCompile Include="src\ResourceGroup.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
@@ -111,6 +114,9 @@
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\IdTypes.h" />
+    <ClInclude Include="include\Resource.h" />
+    <ClInclude Include="include\ResourceCounter.h" />
+    <ClInclude Include="include\ResourceGroup.h" />
     <ClInclude Include="include\Squad.h" />
     <ClInclude Include="include\SquadManager.h" />
     <ClInclude Include="include\TerranProductionBuilding.h" />

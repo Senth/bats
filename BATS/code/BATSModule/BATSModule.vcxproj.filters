@@ -28,6 +28,9 @@
     <Filter Include="UnitCreator">
       <UniqueIdentifier>{081d25e1-c37c-41d9-b11e-c02bacf49e65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExplorationAndMap">
+      <UniqueIdentifier>{6caf01de-2aac-47d0-95bb-9dd29e4d9f04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -81,9 +84,6 @@
     <ClInclude Include="include\GameTime.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="include\ExplorationManager.h">
-      <Filter>Commander</Filter>
-    </ClInclude>
     <ClInclude Include="include\UnitCreator.h">
       <Filter>UnitCreator</Filter>
     </ClInclude>
@@ -92,6 +92,18 @@
     </ClInclude>
     <ClInclude Include="include\AttackCoordinator.h">
       <Filter>Commander</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ExplorationManager.h">
+      <Filter>ExplorationAndMap</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource.h">
+      <Filter>ExplorationAndMap</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceGroup.h">
+      <Filter>ExplorationAndMap</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceCounter.h">
+      <Filter>ExplorationAndMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +155,6 @@
     <ClCompile Include="src\GameTime.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="src\ExplorationManager.cpp">
-      <Filter>Commander</Filter>
-    </ClCompile>
     <ClCompile Include="src\UnitCreator.cpp">
       <Filter>UnitCreator</Filter>
     </ClCompile>
@@ -154,6 +163,18 @@
     </ClCompile>
     <ClCompile Include="src\AttackCoordinator.cpp">
       <Filter>Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExplorationManager.cpp">
+      <Filter>ExplorationAndMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource.cpp">
+      <Filter>ExplorationAndMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceGroup.cpp">
+      <Filter>ExplorationAndMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceCounter.cpp">
+      <Filter>ExplorationAndMap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ WaitGoal::WaitGoal(int timeout) {
 
 	mpGameTime = GameTime::getInstance();
 	mWaitState = WaitState_Timeout;
-	mTimeout = static_cast<float>(timeout);
+	mTimeout = static_cast<double>(timeout);
 	mUsesTimeout = true;
 	mStartTime = mpGameTime->getElapsedTime();
 }
@@ -30,8 +30,8 @@ WaitGoal::~WaitGoal() {
 
 void WaitGoal::computeActions() {
 	if (mWaitState == WaitState_Waiting && mUsesTimeout) {
-		float currentTime = mpGameTime->getElapsedTime();
-		float diffTime = currentTime - mStartTime;
+		double currentTime = mpGameTime->getElapsedTime();
+		double diffTime = currentTime - mStartTime;
 		if (diffTime > mTimeout) {
 			mWaitState = WaitState_Timeout;
 		}

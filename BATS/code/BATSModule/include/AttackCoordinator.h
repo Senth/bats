@@ -71,9 +71,10 @@ private:
 	/**
 	 * Calculates and returns the highest priority position depending on the state of the
 	 * game.
+	 * @param useDefendedWeight if the calculation shall include defended weight.
 	 * @return a TilePosition with the highest priority for attacking.
 	 */
-	BWAPI::TilePosition calculateAttackPosition() const;
+	BWAPI::TilePosition calculateAttackPosition(bool useDefendedWeight) const;
 
 	/**
 	 * Calculates the distance weight depending on other attack squad positions. The
@@ -155,6 +156,16 @@ private:
 		 */
 		inline double getTotalWeight() const {
 			return mTotalWeight;
+		}
+
+		/**
+		 * Operator for sorting by the total weight.
+		 * @param right the other WeightedPosition to check with
+		 * @return true if this (left) WeightedPosition is smaller than the other
+		 * (right) WeightedPosition
+		 */
+		inline bool operator<(const WeightedPosition& right) {
+			return mTotalWeight < right.mTotalWeight;
 		}
 
 	private:

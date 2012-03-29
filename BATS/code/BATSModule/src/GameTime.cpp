@@ -3,7 +3,7 @@
 
 using namespace bats;
 
-const float SECONDS_PER_FRAME_FASTEST = 0.042f;
+const double SECONDS_PER_FRAME_FASTEST = 0.042;
 
 GameTime* GameTime::mpsInstance = NULL;
 
@@ -25,9 +25,14 @@ GameTime* GameTime::getInstance() {
 
 void GameTime::update() {
 	int currentFrame = BWAPI::Broodwar->getFrameCount();
-	mElapsedTime = static_cast<float>(currentFrame - mStartFrame) * SECONDS_PER_FRAME_FASTEST;
+	mElapsedTime = static_cast<double>(currentFrame - mStartFrame) * SECONDS_PER_FRAME_FASTEST;
 }
 
-float GameTime::getElapsedTime() const {
+double GameTime::getElapsedTime() const {
 	return mElapsedTime;
+}
+
+double GameTime::getElapsedTime(int sinceFrame) const {
+	int frameDiff = BWAPI::Broodwar->getFrameCount() - sinceFrame;
+	return static_cast<double>(frameDiff) * SECONDS_PER_FRAME_FASTEST;
 }

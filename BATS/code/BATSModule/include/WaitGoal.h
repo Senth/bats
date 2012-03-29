@@ -63,8 +63,8 @@ protected:
 	GameTime* mpGameTime;
 
 private:
-	float mStartTime;
-	float mTimeout;
+	double mStartTime;
+	double mTimeout;
 	bool mUsesTimeout;
 };
 }

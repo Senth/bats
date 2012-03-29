@@ -1,11 +1,14 @@
 #pragma once
 
 #include "BTHAIModule/Source/UnitAgent.h"
-#include "BTHAIModule/Source/SpottedObject.h"
-#include "Squad.h"
+#include "GameTime.h"
 #include <memory.h>
 
+class SpottedObject;
+
 namespace bats {
+
+class Squad;
 
 /**
  * What a player's force is, includes both units and structures.
@@ -95,23 +98,27 @@ struct ExploreData {
 	BWAPI::TilePosition center;
 	int lastVisitFrame;
 	
-	ExploreData(BWAPI::Position tCenter)
+	ExploreData(const BWAPI::Position& tCenter)
 	{
 		center = BWAPI::TilePosition(tCenter);
 		lastVisitFrame = 0;
 	}
 
-	int getX()
+	ExploreData(const BWAPI::TilePosition& tCenter) {
+		center = tCenter;
+	}
+
+	int getX() const
 	{
 		return center.x();
 	}
 
-	int getY()
+	int getY() const
 	{
 		return center.y();
 	}
 
-	bool matches(BWTA::Region* region)
+	bool matches(BWTA::Region* region) const
 	{
 		if (region == NULL)
 		{
@@ -121,7 +128,7 @@ struct ExploreData {
 		return matches(tCenter);
 	}
 
-	bool matches(BWAPI::TilePosition tCenter)
+	bool matches(const BWAPI::TilePosition& tCenter) const
 	{
 		double dist = tCenter.getDistance(center);
 		if (dist <= 2)
@@ -129,6 +136,28 @@ struct ExploreData {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether the specified TilePosition is within this exploration region
+	 * @param position the position we want to check whether it's within this region.
+	 * @return true if the position is within this region.
+	 */
+	bool isWithin(const BWAPI::TilePosition& position) const {
+		BWTA::Region* pPositionRegion = BWTA::getRegion(position);
+		if (pPositionRegion != NULL) {
+			return pPositionRegion->getCenter() == center;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Returns how many seconds (in fastest speed) since the location was checked.
+	 * @return number of seconds since last visit.
+	 */
+	double secondsSinceLastVisit() const {
+		return GameTime::getInstance()->getElapsedTime(lastVisitFrame);
 	}
 };
 
@@ -209,15 +238,19 @@ public:
 	std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings();
 
 	/** Returns the closest enemy spotted building from a start position, or BWAPI::TilePosition(-1,-1) if 
-	 * none was found. */
-	BWAPI::TilePosition getClosestSpottedBuilding(BWAPI::TilePosition start);
+	 * none was found.
+	 * @param startPosition the position we want to start searching from
+	 * @return the closest building that was spotted. If no building was found it will
+	 * return BWAPI::TilePositions::Invalid.
+	 */
+	BWAPI::TilePosition getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition);
 
 	/** Calculates the number of spotted enemy structure within the specified range (in tiles).
 	 * @param position the position to check if there are any enemy buildings in range.
 	 * @param range the radius to check from the position
 	 * @return number of enemy structures in range.
 	 */
-	int spottedBuildingsWithinRange(BWAPI::TilePosition position, int range);
+	int spottedBuildingsWithinRange(const BWAPI::TilePosition& position, int range);
 
 	/**
 	 * Returns true if any enemy structures have been spotted.
@@ -268,6 +301,24 @@ public:
 	 * \copydoc isEnemyDetectorCovering()
 	 */
 	bool isEnemyDetectorCovering(BWAPI::Position position);
+
+	/**
+	 * Find expansions that haven't been scouted for X seconds. X is specified by
+	 * config::attack_coordinator::EXPANSION_NOT_CHECKED_TIME and can be overridden in
+	 * the config file. This function can return occupied bases.
+	 * If you want to only get empty expansions. Use removeOccupiedExpansions() and use
+	 * the return vector from this function as an argument to removeOccupiedExpansions().
+	 * @return a vector with all expansions that haven't been scouted
+	 * for the specified amount of time.
+	 */
+	std::vector<BWAPI::TilePosition> findNotCheckedExpansions() const;
+
+	/**
+	 * Removes expansions locations that are occupied.
+	 * @param[in,out] expansionPositions a list with all expansion positions. Will remove all
+	 * occupied expansions from this parameter.
+	 */
+	void removeOccupiedExpansions(std::vector<BWAPI::TilePosition>& expansionPositions) const;
 
 private:
 	/**
