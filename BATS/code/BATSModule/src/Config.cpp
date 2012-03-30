@@ -13,6 +13,7 @@ const std::string CONFIG_DIR = ROOT_DIR + "AI\\BATS-data\\";
 
 namespace attack_coordinator {
 	double EXPANSION_NOT_CHECKED_TIME = 60.0;
+	double WAIT_GOAL_TIMEOUT = 30.0;
 
 	namespace weights {
 		double EXPANSION_NOT_CHECKED = 1.0;
@@ -33,6 +34,7 @@ namespace attack_coordinator {
 
 namespace frame_distribution {
 	int EXPLORATION_MANAGER = 61;
+	int RESOURCE_COUNTER = 23;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -50,12 +52,16 @@ namespace log {
 
 namespace squad {
 	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitCompositions";
-	float PING_WAIT_TIME_FIRST = 0.0f;
-	float PING_WAIT_TIME_AFTER_FIRST = 0.0f;
-	float REGROUP_DISTANCE_BEGIN = 0.0f;
-	float REGROUP_DISTANCE_END = 0.0f;
+	double PING_WAIT_TIME_FIRST = 0.0f;
+	double PING_WAIT_TIME_AFTER_FIRST = 0.0f;
+	double REGROUP_DISTANCE_BEGIN = 0.0f;
+	double REGROUP_DISTANCE_END = 0.0f;
 
 	bool set(const utilities::VariableInfo& variableInfo);
+}
+
+namespace wait_goals {
+	const std::string ATTACK_COORDINATION = "attack_coordinaton";
 }
 
 
@@ -116,6 +122,8 @@ bool attack_coordinator::set(const utilities::VariableInfo& variableInfo) {
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "expansion_not_checked_time") {
 			EXPANSION_NOT_CHECKED_TIME = variableInfo;
+		} else if (variableInfo.name == "wait_goal_timeout") {
+			WAIT_GOAL_TIMEOUT = variableInfo;
 		} else {
 			return false;
 		} 
@@ -156,6 +164,8 @@ bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInf
 bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "exploration_manager") {
 		EXPLORATION_MANAGER = variableInfo;
+	} else if (variableInfo.name == "resource_counter") {
+		RESOURCE_COUNTER = variableInfo;
 	} else {
 		return false;
 	}

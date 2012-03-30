@@ -102,6 +102,7 @@
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
+    <ClCompile Include="src\WaitGoalManager.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
     <ClInclude Include="include\AttackCoordinator.h" />
     <ClInclude Include="include\AttackSquad.h" />
@@ -129,6 +130,7 @@
       <FileType>CppHeader</FileType>
     </ClCompile>
     <ClInclude Include="include\WaitGoal.h" />
+    <ClInclude Include="include\WaitGoalManager.h" />
     <ClInclude Include="include\WaitReadySquad.h" />
   </ItemGroup>
   <ItemGroup>

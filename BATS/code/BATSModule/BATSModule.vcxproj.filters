@@ -7,9 +7,6 @@
     <Filter Include="Squads">
       <UniqueIdentifier>{557d5c7b-0f1d-46d3-8925-d1349f5407a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BuildOrder">
-      <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Helpers">
       <UniqueIdentifier>{c69f46b3-e05a-441c-8efa-1a4827a712dd}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,9 @@
     </Filter>
     <Filter Include="ExplorationAndMap">
       <UniqueIdentifier>{6caf01de-2aac-47d0-95bb-9dd29e4d9f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BuildOrder">
+      <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +105,9 @@
     <ClInclude Include="include\ResourceCounter.h">
       <Filter>ExplorationAndMap</Filter>
     </ClInclude>
+    <ClInclude Include="include\WaitGoalManager.h">
+      <Filter>WaitGoal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -175,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="src\ResourceCounter.cpp">
       <Filter>ExplorationAndMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaitGoalManager.cpp">
+      <Filter>WaitGoal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

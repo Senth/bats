@@ -4,8 +4,8 @@ using namespace bats;
 using BWAPI::TilePosition;
 using BWAPI::Broodwar;
 
-AttackSquad::AttackSquad(const std::vector<UnitAgent*> units) : Squad(units) {
-	// Does nothing
+AttackSquad::AttackSquad(const std::vector<UnitAgent*> units, bool distracting) : Squad(units) {
+	mDistraction = distracting;
 }
 
 AttackSquad::~AttackSquad() {
@@ -13,7 +13,9 @@ AttackSquad::~AttackSquad() {
 }
 
 void AttackSquad::computeSquadSpecificActions() {
+	/// @todo check if we have a wait goal, then create a wait position.
 
+	/// @todo check if we're done with the goal
 }
 
 bool AttackSquad::createGoal() {
@@ -37,4 +39,8 @@ bool AttackSquad::isAttacking() const {
 
 bool AttackSquad::isReadyToAttack() const {
 	return isInPosition() || isAttacking();
+}
+
+bool AttackSquad::isDistracting() const {
+	return mDistraction;
 }

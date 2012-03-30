@@ -3,7 +3,7 @@
 using namespace bats;
 using std::tr1::shared_ptr;
 
-WaitReadySquad::WaitReadySquad(const shared_ptr<AttackSquad>& squad, int timeout) : WaitGoal(timeout) {
+WaitReadySquad::WaitReadySquad(const shared_ptr<AttackSquad>& squad, double timeout) : WaitGoal(timeout) {
 	mSquad = squad;
 }
 
@@ -11,12 +11,14 @@ WaitReadySquad::~WaitReadySquad() {
 	// Does nothing
 }
 
-void WaitReadySquad::computeActions() {
-	WaitGoal::computeActions();
+void WaitReadySquad::update() {
+	WaitGoal::update();
 
 	if (mWaitState == WaitState_Waiting) {
 		if (mSquad->isReadyToAttack()) {
 			mWaitState = WaitState_Success;
+		} else if (mSquad->isEmpty()) {
+			mWaitState = WaitState_Failed;
 		}
 	}
 }

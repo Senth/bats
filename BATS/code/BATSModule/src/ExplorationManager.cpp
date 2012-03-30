@@ -60,14 +60,12 @@ void ExplorationManager::computeActions()
 {
 	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
-	if (cFrame - mFrameLastCall < config::frame_distribution::EXPLORATION_MANAGER)
-	{
+	if (cFrame - mFrameLastCall < config::frame_distribution::EXPLORATION_MANAGER) {
 		return;
 	}
 	mFrameLastCall = cFrame;
 
-	if (!mActive)
-	{
+	if (!mActive) {
 		return;
 	}
 	

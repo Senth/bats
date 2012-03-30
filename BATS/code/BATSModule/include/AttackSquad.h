@@ -16,8 +16,9 @@ public:
 	/**
 	 * Constructor that takes units to be used with the squad.
 	 * @param units all units to be added to the squad.
+	 * @param distracting if the attack squad is distracting or not. Defaults to false
 	 */
-	AttackSquad(const std::vector<UnitAgent*> units);
+	AttackSquad(const std::vector<UnitAgent*> units, bool distracting = false);
 
 	/**
 	 * Destructor
@@ -50,10 +51,17 @@ public:
 	 */
 	bool isReadyToAttack() const;
 
+	/**
+	 * Checks whether the AttackSquad is a distracting or frontal attack.
+	 * @return true if the attack is distracting, false if it is a frontal attack.
+	 */
+	bool isDistracting() const;
+
 protected:
 	virtual void computeSquadSpecificActions();
 
 private:
+	bool mDistraction;	/**< If the attack is a distracting attack or not */
 
 };
 }

@@ -10,6 +10,7 @@ namespace bats {
 
 class UnitManager;
 class Commander;
+class ResourceCounter;
 
 /**
  * Main module for BATS
@@ -91,6 +92,7 @@ protected:
 	Profiler* mpProfiler;
 	UnitManager* mpUnitManager;
 	Commander* mpCommander;
+	ResourceCounter* mpResourceCounter;
 
 private:
 	/**

@@ -6,6 +6,9 @@
 #include "UnitManager.h"
 #include "GameTime.h"
 #include "ExplorationManager.h"
+#include "ResourceCounter.h"
+#include "AttackCoordinator.h"
+#include "WaitGoalManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
@@ -29,6 +32,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
 	mpUnitManager = NULL;
 	mpCommander = NULL;
+	mpResourceCounter = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -259,6 +263,7 @@ void BatsModule::updateGame() {
 		return;
 	}
 
+	mpResourceCounter->update();
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
@@ -267,7 +272,10 @@ void BatsModule::updateGame() {
 
 void BatsModule::initGameClasses() {
 	GameTime::getInstance();
+	WaitGoalManager::getInstance();
 	SquadManager::getInstance();
+	AttackCoordinator::getInstance();
+	mpResourceCounter = ResourceCounter::getInstance();
 	mpUnitManager = UnitManager::getInstance();
 	mpCommander = Commander::getInstance();
 	CoverMap::getInstance();
@@ -287,7 +295,10 @@ void BatsModule::releaseGameClasses() {
 	delete CoverMap::getInstance();
 	SAFE_DELETE(mpCommander);
 	SAFE_DELETE(mpUnitManager);
+	SAFE_DELETE(mpResourceCounter);
+	delete AttackCoordinator::getInstance();
 	delete SquadManager::getInstance();
+	delete WaitGoalManager::getInstance();
 	delete GameTime::getInstance();
 }
 

@@ -40,7 +40,7 @@ public:
 	 * many seconds it will timeout and returned failed.
 	 * @param timeout how long time it shall take for the goal to timeout.
 	 */
-	WaitGoal(int timeout);
+	WaitGoal(double timeout);
 
 	/**
 	 * Destructor.
@@ -50,7 +50,7 @@ public:
 	/**
 	 * Updates the wait goal. Don't forget to call this function from the derived class.
 	 */
-	virtual void computeActions();
+	virtual void update();
 
 	/**
 	 * Returns the state of the goal

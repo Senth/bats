@@ -3,6 +3,10 @@
 #include "Squad.h"
 #include "AttackSquad.h"
 #include "ExplorationManager.h"
+#include "ResourceCounter.h"
+#include "ResourceGroup.h"
+#include "WaitGoalManager.h"
+#include "WaitReadySquad.h"
 #include "Config.h"
 #include <cstdlib>
 #include <algorithm>
@@ -13,6 +17,7 @@ using namespace std;
 using std::tr1::shared_ptr;
 using std::tr1::dynamic_pointer_cast;
 using namespace BWAPI;
+using namespace config::attack_coordinator;
 
 const double MAP_WIDTH_MAX = 256.0;
 const double MAP_HEIGHT_MAX = 256.0;
@@ -55,9 +60,13 @@ bool structureCanUpgrade(UnitType structure) {
 AttackCoordinator::AttackCoordinator() {
 	mpSquadManager = NULL;
 	mpExplorationManager = NULL;
+	mpResourceCounter = NULL;
+	mpWaitGoalManager = NULL;
 
 	mpSquadManager = SquadManager::getInstance();
 	mpExplorationManager = ExplorationManager::getInstance();
+	mpResourceCounter = ResourceCounter::getInstance();
+	mpWaitGoalManager = WaitGoalManager::getInstance();
 }
 
 AttackCoordinator::~AttackCoordinator() {
@@ -71,10 +80,45 @@ AttackCoordinator* AttackCoordinator::getInstance() {
 	return mpsInstance;
 }
 
-#pragma warning(push) // REMOVE
-#pragma warning(disable:4100) // REMOVE
-void AttackCoordinator::requestAttack(const std::tr1::shared_ptr<Squad>& squad) {
-	/// @todo
+void AttackCoordinator::requestAttack(shared_ptr<AttackSquad>& squad) {
+	/// @todo Check whether player is attacking
+
+
+	// Attack position
+	TilePosition bestAttackPosition = calculateAttackPosition(squad->isDistracting());
+	squad->setGoalPosition(bestAttackPosition);
+
+
+	// Add existing wait goals to new squad
+	pair<
+		multimap<string, shared_ptr<WaitGoal>>::const_iterator,
+		multimap<string, shared_ptr<WaitGoal>>::const_iterator
+	> waitGoalIterators;
+
+	waitGoalIterators = mpWaitGoalManager->getWaitGoalsBySet(config::wait_goals::ATTACK_COORDINATION);
+
+	multimap<string, shared_ptr<WaitGoal>>::const_iterator waitGoalIt;
+	for (waitGoalIt = waitGoalIterators.first; waitGoalIt != waitGoalIterators.second; ++waitGoalIt) {
+		squad->addWaitGoal(waitGoalIt->second);
+	}
+
+	
+	// Create new wait goal for other squads
+	shared_ptr<WaitGoal> newWaitGoal = shared_ptr<WaitGoal>(
+		new WaitReadySquad(squad, config::attack_coordinator::WAIT_GOAL_TIMEOUT)
+	);
+	mpWaitGoalManager->addWaitGoal(newWaitGoal);
+
+
+	// Add new wait goal to existing squads
+	map<SquadId, shared_ptr<Squad>>::iterator squadIt;
+	for (squadIt = mpSquadManager->begin(); squadIt != mpSquadManager->end(); ++squadIt) {
+		shared_ptr<AttackSquad> currentAttackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+
+		if (NULL != currentAttackSquad) {
+			currentAttackSquad->addWaitGoal(newWaitGoal);
+		}
+	}
 }
 
 BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedWeight) const {
@@ -184,8 +228,6 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 	return distanceWeight;
 }
 
-using namespace config::attack_coordinator;
-
 double AttackCoordinator::calculateStructureTypeWeight(const SpottedObject& structure) const {
 	double weight = -1.0;
 	const BWAPI::UnitType& structureType = structure.getType();
@@ -228,7 +270,33 @@ double AttackCoordinator::calculateDefendedWeight(const BWAPI::TilePosition& att
 #pragma warning(pop) // REMOVE
 
 double AttackCoordinator::calculateExpansionTimeWeight(const BWAPI::TilePosition& expansionPosition) const {
-	/// @todo
-	return 1.0;
+	double weight = 1.0;
+
+	shared_ptr<const ResourceGroup> resourceGroup = mpResourceCounter->getResourceGroup(expansionPosition);
+
+	if (NULL != resourceGroup) {
+		// Calculate how much the interval is
+		double intervalLength = weights::EXPANSION_MAX;
+		if (false == weights::EXPANSION_CEIL) {
+			intervalLength -= weights::EXPANSION_MIN;
+		}
+
+		weight = resourceGroup->getResourcesLeftInFraction();
+		weight *= intervalLength;
+
+		// Shall we ceil or add it?
+		if (weights::EXPANSION_CEIL) {
+			if (weight < weights::EXPANSION_MIN) {
+				weight = weights::EXPANSION_MIN;
+			}
+		} else {
+			weight += weights::EXPANSION_MIN;
+		}
+	} else {
+		ERROR_MESSAGE(false, "Could not find Resource group for expansion position: (" <<
+			expansionPosition.x() << ", " << expansionPosition.y() << ")!"
+		);
+	}
+
+	return weight;
 }
-#pragma warning(pop) // REMOVE

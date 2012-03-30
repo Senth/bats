@@ -3,15 +3,27 @@
 #include <string>
 
 namespace bats {
+	/**
+	 * Configuration variables for BATS. Most of these can be configured in
+	 * the config files. config_default.ini and config_override.ini
+	 */
 	namespace config {
 		extern const std::string ROOT_DIR;
 		extern const std::string CONFIG_DIR;
 
+		/**
+		 * Configuration specific for attack_coordinator
+		 */
 		namespace attack_coordinator {
 			/** Time until an expansion shall be considered not checked. In seconds */
 			extern double EXPANSION_NOT_CHECKED_TIME;
+			/** Attack coordination wait goal time outs */
+			extern double WAIT_GOAL_TIMEOUT;
 
-
+			/**
+			 * All weights the attack coordinator uses to weight and prioritize
+			 * places to attack.
+			 */
 			namespace weights {
 				/** Weight of the not checked expansions */
 				extern double EXPANSION_NOT_CHECKED;
@@ -43,25 +55,38 @@ namespace bats {
 			}
 		}
 
+		/**
+		 * How often classes shall be called.
+		 */
 		namespace frame_distribution {
 			extern int EXPLORATION_MANAGER;
+			extern int RESOURCE_COUNTER;
 		}
 
+		/**
+		 * General configuration for the game
+		 */
 		namespace game {
 			extern int SPEED;
 		}
 
+		/**
+		 * Logger settings, these variables cannot be changed.
+		 */
 		namespace log {
 			extern const std::string OUTPUT_DIR;
 			extern const std::string SETTINGS_FILE;
 		}
 
+		/**
+		 * Specific variables for the squad.
+		 */
 		namespace squad {
 			extern const std::string UNIT_COMPOSITION_DIR;
 			/** How long shall the Commander wait for the first ping */
-			extern float PING_WAIT_TIME_FIRST;
+			extern double PING_WAIT_TIME_FIRST;
 			/** How long shall the Commander wait for pings after the first one */
-			extern float PING_WAIT_TIME_AFTER_FIRST;
+			extern double PING_WAIT_TIME_AFTER_FIRST;
 			/** Decides the distance away from the center a unit has to be until a group occurs.
 			 * If a unit is further away from each other than this distance from the squads
 			 * center then the squads will get a temporary goal to center of the squad to
@@ -69,12 +94,19 @@ namespace bats {
 			 * @see REGROUP_DISTANCE_END for when regrouping shall end. These two variables
 			 * should not have the same value since this can cause threshold errors.
 			 */
-			extern float REGROUP_DISTANCE_BEGIN;
+			extern double REGROUP_DISTANCE_BEGIN;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
-			extern float REGROUP_DISTANCE_END;
+			extern double REGROUP_DISTANCE_END;
+		}
+
+		/**
+		 * Different Wait Goal sets
+		 */
+		namespace wait_goals {
+			extern const std::string ATTACK_COORDINATION;
 		}
 
 		/**

@@ -11,7 +11,9 @@ namespace bats {
 // Forward declarations
 class ExplorationManager;
 class SquadManager;
-class Squad;
+class AttackSquad;
+class ResourceCounter;
+class WaitGoalManager;
 
 /**
  * Coordinates attack between squads making sure they attack at the same time and
@@ -60,7 +62,7 @@ public:
 	 * get ready (Squad::isReady()).
 	 * @param[in,out] squad the squad that requests an attack
 	 */
-	void requestAttack(const std::tr1::shared_ptr<Squad>& squad);
+	void requestAttack(std::tr1::shared_ptr<AttackSquad>& squad);
 
 private:
 	/**
@@ -174,6 +176,8 @@ private:
 
 	SquadManager* mpSquadManager;
 	ExplorationManager* mpExplorationManager;
+	ResourceCounter* mpResourceCounter;
+	WaitGoalManager* mpWaitGoalManager;
 
 	static AttackCoordinator* mpsInstance;
 };

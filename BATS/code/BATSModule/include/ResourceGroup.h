@@ -12,6 +12,9 @@ namespace BWAPI {
 // Namespace for the project
 namespace bats {
 
+// Forward declarations
+class ResourceCounter;
+
 /**
  * Groups together a bunch of resources located close to each other. This is done
  * by checking the units' resource group id. In addition the resource group is always
@@ -24,15 +27,6 @@ namespace bats {
  */
 class ResourceGroup {
 public:
-	/**
-	 * Creates and bind the resource group together with the specified expansion
-	 * position.
-	 * @param expPosition position of the expansion the resource group belongs to.
-	 * @param resourceGroupId the resource group id that all resources in this group
-	 * belongs to.
-	 */
-	ResourceGroup(const BWAPI::TilePosition& expPosition, int resourceGroupId);
-
 	/**
 	 * Destructor
 	 */
@@ -60,13 +54,25 @@ public:
 	 * Special case: When no resources have been found for this resource group yet it
 	 * will treat as though no resources have been mined, thus it will return 1.0.
 	 */
-	double getResourcesLeft() const;
+	double getResourcesLeftInFraction() const;
 
 	/**
 	 * Tries to update all resources in the resource group. They will only get
 	 * updated if they are visible.
 	 */
 	void update();
+
+	/**
+	 * Returns the expansion position of the ResourceGroup.
+	 * @return expansion position of the ResourceGroup.
+	 */
+	const BWAPI::TilePosition& getExpansionPosition() const;
+
+	/**
+	 * Returns the id of the resource group
+	 * @return id of the resource group. Same as Unit->getResourceGroup()
+	 */
+	int getId() const;
 
 	/**
 	 * Assignment operator, const makes it impossible for the standard assignment
@@ -77,6 +83,16 @@ public:
 	ResourceGroup& operator=(const ResourceGroup& resourceGroup);
 
 private:
+	/**
+	 * Creates and binds the resource group together with the specified expansion
+	 * position. Only available for ResourceCounter as it is a friend.
+	 * @param expPosition position of the expansion the resource group belongs to.
+	 * @param resourceGroupId the resource group id that all resources in this group
+	 * belongs to.
+	 */
+	ResourceGroup(const BWAPI::TilePosition& expPosition, int resourceGroupId);
+
+	friend class ResourceCounter;
 
 	std::map<int,Resource> mResources;
 

@@ -27,7 +27,7 @@ bool ResourceGroup::hasResource(int id) const {
 	return mResources.count(id) > 1;
 }
 
-double ResourceGroup::getResourcesLeft() const {
+double ResourceGroup::getResourcesLeftInFraction() const {
 	int initial = 0;
 	int current = 0;
 
@@ -50,6 +50,14 @@ void ResourceGroup::update() {
 	for (resourceIt = mResources.begin(); resourceIt != mResources.end(); ++resourceIt) {
 		resourceIt->second.update();
 	}
+}
+
+const TilePosition& ResourceGroup::getExpansionPosition() const {
+	return M_EXP_POSITION;
+}
+
+int ResourceGroup::getId() const {
+	return M_RESOURCE_GROUP_ID;
 }
 
 ResourceGroup& ResourceGroup::operator =(const ResourceGroup& resourceGroup) {

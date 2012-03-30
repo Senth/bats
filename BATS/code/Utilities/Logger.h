@@ -276,6 +276,28 @@ void setVerbosityLevel(LogLevels verbosity, int target);
 }
 
 /**
+ * Prints an error message if the condition is true. Can use streams in the same manner
+ * as DEBUG_MESSAGE() does.
+ * @param condition the condition to test. Example: NULL == pointer.
+ * @param forceQuit if the program shall force a quit if the condition is true.
+ * @param message the error message to display, can use streams.
+ */
+#define ERROR_MESSAGE_CONDITION(condition, forceQuit, message) \
+{ \
+	if (condition) { \
+		std::stringstream ss; \
+		ss << message; \
+		utilities::printErrorMessage(ss.str(), __FILE__, __LINE__); \
+		__pragma(warning(push)); \
+		__pragma(warning(disable:4127)); \
+		if (forceQuit) { \
+		exit(EXIT_FAILURE); \
+		} \
+		__pragma(warning(pop)); \
+	} \
+} 
+
+/**
 * Checks for errors and prints them, if there were any. Should be called 'last' in the program.
 * Prints the number of errors and gives the option to open the error_log file.
 */

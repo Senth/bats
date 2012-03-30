@@ -19,7 +19,7 @@ public:
 	 * @param timeout how many game seconds (on fastest speed) we max wait until the goal will
 	 * timeout.
 	 */
-	WaitReadySquad(const std::tr1::shared_ptr<AttackSquad>& squad, int timeout);
+	WaitReadySquad(const std::tr1::shared_ptr<AttackSquad>& squad, double timeout);
 
 	/**
 	 * Destructor
@@ -30,7 +30,7 @@ public:
 	 * Calculates whether the squad is ready or not, and if it has timed out.
 	 * @see getWaitState() for the current state.
 	 */
-	void computeActions();
+	void update();
 private:
 	std::tr1::shared_ptr<AttackSquad> mSquad;
 };
