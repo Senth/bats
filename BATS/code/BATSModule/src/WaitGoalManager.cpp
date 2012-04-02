@@ -43,11 +43,6 @@ void WaitGoalManager::addWaitGoal(const shared_ptr<WaitGoal>& waitGoal, const st
 	mWaitGoals.insert(make_pair(setName, waitGoal));
 }
 
-pair<
-	multimap<string, shared_ptr<WaitGoal>>::const_iterator,
-	multimap<string, shared_ptr<WaitGoal>>::const_iterator
->
-	WaitGoalManager::getWaitGoalsBySet(const string& setName) const
-{
+WaitGoalIterators WaitGoalManager::getWaitGoalsBySet(const string& setName) const {
 	return mWaitGoals.equal_range(setName);
 }

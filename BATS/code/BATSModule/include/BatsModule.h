@@ -11,6 +11,7 @@ namespace bats {
 class UnitManager;
 class Commander;
 class ResourceCounter;
+class ExplorationManager;
 
 /**
  * Main module for BATS
@@ -57,6 +58,12 @@ public:
 	virtual void onPlayerLeft(BWAPI::Player* player);
 
 	/**
+	 * Called when a new unit can be seen
+	 * @param pUnit the unit that has now become visible, includes our units
+	 */
+	virtual void onUnitShow(BWAPI::Unit* pUnit);
+
+	/**
 	 * Called when a unit has been created
 	 * @param pUnit the newly created unit
 	 */
@@ -93,6 +100,7 @@ protected:
 	UnitManager* mpUnitManager;
 	Commander* mpCommander;
 	ResourceCounter* mpResourceCounter;
+	ExplorationManager* mpExplorationManager;
 
 private:
 	/**

@@ -62,7 +62,7 @@ public:
 	 * get ready (Squad::isReady()).
 	 * @param[in,out] squad the squad that requests an attack
 	 */
-	void requestAttack(std::tr1::shared_ptr<AttackSquad>& squad);
+	void requestAttack(std::tr1::shared_ptr<AttackSquad> squad);
 
 private:
 	/**

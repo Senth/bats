@@ -56,8 +56,7 @@ ExplorationManager* ExplorationManager::getInstance() {
 	return mpsInstance;
 }
 
-void ExplorationManager::computeActions()
-{
+void ExplorationManager::computeActions() {
 	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - mFrameLastCall < config::frame_distribution::EXPLORATION_MANAGER) {
@@ -87,6 +86,11 @@ void ExplorationManager::computeActions()
 	if (mCalcTurnCurrent == CalcTurn_Lim) {
 		mCalcTurnCurrent = CalcTurn_First;
 	}
+
+
+	// Remove dead buildings
+	cleanup();
+
 
 	/// @todo update position on visible buildings that have moved.
 }
@@ -132,8 +136,7 @@ TilePosition ExplorationManager::getNextToExplore(const shared_ptr<Squad>& squad
 	TilePosition goal = squad->getGoal();
 
 	//Special case: No goal set, give the squad a new goal directly
-	if (goal == TilePositions::Invalid)
-	{
+	if (goal == TilePositions::Invalid) {
 		BWTA::Region* startRegion = getRegion(currentPos); 
 		goal = TilePosition(startRegion->getCenter());
 		return goal;
@@ -145,13 +148,11 @@ TilePosition ExplorationManager::getNextToExplore(const shared_ptr<Squad>& squad
 
 	/// @todo Move accept distance to config
 	double acceptDist = 4;
-	if (squad->travelsByGround())
-	{
+	if (squad->travelsByGround()) {
 		acceptDist = 6;
 	}
 
-	if (dist <= acceptDist)
-	{
+	if (dist <= acceptDist) {
 		//Squad is close to goal
 
 		//1. Set region to explored
@@ -215,20 +216,16 @@ void ExplorationManager::setExplored(const TilePosition& goal) {
 	}
 }
 
-int ExplorationManager::getLastVisitFrame(BWTA::Region* region)
-{
-	for (size_t i = 0; i < mExploreData.size(); i++)
-	{
-		if (mExploreData[i].matches(region))
-		{
+int ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
+	for (size_t i = 0; i < mExploreData.size(); i++) {
+		if (mExploreData[i].matches(region)) {
 
 			//Check if region is visible. If so, set lastVisitFrame to now
-			if (Broodwar->isVisible(mExploreData.at(i).center))
-			{
-				mExploreData.at(i).lastVisitFrame = Broodwar->getFrameCount();
+			if (Broodwar->isVisible(mExploreData[i].center)) {
+				mExploreData[i].lastVisitFrame = Broodwar->getFrameCount();
 			}
 
-			return mExploreData.at(i).lastVisitFrame;
+			return mExploreData[i].lastVisitFrame;
 		}
 	}
 	
@@ -239,8 +236,7 @@ int ExplorationManager::getLastVisitFrame(BWTA::Region* region)
 	return -1;
 }
 
-void ExplorationManager::showIntellData()
-{
+void ExplorationManager::showIntellData() {
 	Broodwar->drawTextScreen(250,16*2, "AirAttackStr: %d (%d)", mForceEnemy.airAttackStr, mForceOwn.airAttackStr);
 	Broodwar->drawTextScreen(250,16*3, "AirDefendStr: %d (%d)", mForceEnemy.airDefendStr, mForceOwn.airDefendStr);
 	Broodwar->drawTextScreen(250,16*4, "GroundAttackStr: %d (%d)", mForceEnemy.groundAttackStr, mForceOwn.groundAttackStr);
@@ -254,36 +250,26 @@ void ExplorationManager::showIntellData()
 	Broodwar->drawTextScreen(250,16*11, "DetectorUnits: %d (%d)", mForceEnemy.cDetectorUnits, mForceOwn.cDetectorUnits);
 }
 
-void ExplorationManager::calcOwnForceData()
-{
+void ExplorationManager::calcOwnForceData() {
 	mForceOwn.reset();
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
-	{
-		if (agents.at(i)->isAlive())
-		{
-			UnitType type = agents.at(i)->getUnitType();
-			if (type.canAttack() && !type.isWorker())
-			{
-				if (!type.isBuilding())
-				{
-					if (type.isFlyer())
-				{
+	for (size_t i = 0; i < agents.size(); i++) {
+		if (agents[i]->isAlive()) {
+			UnitType type = agents[i]->getUnitType();
+			if (type.canAttack() && !type.isWorker()) {
+				if (!type.isBuilding()) {
+					if (type.isFlyer()) {
 						mForceOwn.airAttackStr += type.destroyScore();
-					}
-					else
-				{
+					} else {
 						mForceOwn.groundAttackStr += type.destroyScore();
 					}
 				}
 
-				if (UnitAgent::getAirRange(type) >= 0)
-				{
+				if (UnitAgent::getAirRange(type) >= 0) {
 					mForceOwn.airDefendStr += type.destroyScore();
 				}
-				if (UnitAgent::getGroundRange(type) >= 0)
-				{
+				if (UnitAgent::getGroundRange(type) >= 0) {
 					mForceOwn.groundDefendStr += type.destroyScore();
 				}
 			}
@@ -293,35 +279,25 @@ void ExplorationManager::calcOwnForceData()
 	}
 }
 
-void ExplorationManager::calcEnemyForceData()
-{
+void ExplorationManager::calcEnemyForceData() {
 	mForceEnemy.reset();
 
-	for (int i = 0; i < (int)mSpottedUnits.size(); i++)
-	{
-		if (mSpottedUnits.at(i)->isActive())
-		{
-			UnitType type = mSpottedUnits.at(i)->getType();
-			if (type.canAttack() && !type.isWorker())
-			{
-				if (!type.isBuilding())
-				{
-					if (type.isFlyer())
-				{
+	for (size_t i = 0; i < mSpottedUnits.size(); i++) {
+		if (mSpottedUnits[i]->isActive()) {
+			UnitType type = mSpottedUnits[i]->getType();
+			if (type.canAttack() && !type.isWorker()) {
+				if (!type.isBuilding()) {
+					if (type.isFlyer()){
 						mForceEnemy.airAttackStr += type.destroyScore();
-					}
-					else
-				{
+					} else{
 						mForceEnemy.groundAttackStr += type.destroyScore();
 					}
 				}
 
-				if (UnitAgent::getAirRange(type) >= 0)
-				{
+				if (UnitAgent::getAirRange(type) >= 0) {
 					mForceEnemy.airDefendStr += type.destroyScore();
 				}
-				if (UnitAgent::getGroundRange(type) >= 0)
-				{
+				if (UnitAgent::getGroundRange(type) >= 0) {
 					mForceEnemy.groundDefendStr += type.destroyScore();
 				}
 			}
@@ -330,11 +306,9 @@ void ExplorationManager::calcEnemyForceData()
 		}
 	}
 
-	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
-	{
-		if (mSpottedStructures.at(i)->isActive() && mSpottedStructures.at(i)->getUnitID() != 10101)
-		{
-			UnitType type = mSpottedStructures.at(i)->getType();
+	for (size_t i = 0; i < mSpottedStructures.size(); i++) {
+		if (mSpottedStructures[i]->isActive() && mSpottedStructures[i]->getUnitID() != 10101) {
+			UnitType type = mSpottedStructures[i]->getType();
 			mForceEnemy.checkType(type);
 		}
 	}
@@ -345,10 +319,10 @@ void ExplorationManager::printInfo()
 	//Uncomment this if you want to draw a mark at detected enemy buildings.
 	/*for (int i = 0; i < (int)spottedBuildings.size(); i++)
 	{
-		if (spottedBuildings.at(i)->isActive())
+		if (spottedBuildings[i]->isActive())
 		{
-			int x1 = spottedBuildings.at(i)->getTilePosition().x() * 32;
-			int y1 = spottedBuildings.at(i)->getTilePosition().y() * 32;
+			int x1 = spottedBuildings[i]->getTilePosition().x() * 32;
+			int y1 = spottedBuildings[i]->getTilePosition().y() * 32;
 			int x2 = x1 + 32;
 			int y2 = y1 + 32;
 
@@ -378,7 +352,7 @@ void ExplorationManager::addSpottedUnit(Unit* unit) {
 	} else{
 		bool found = false;
 		for (size_t i = 0; i < mSpottedUnits.size(); i++) {
-			if (mSpottedUnits.at(i)->getUnitID() == unit->getID()) {
+			if (mSpottedUnits[i]->getUnitID() == unit->getID()) {
 				found = true;
 				break;
 			}
@@ -437,21 +411,17 @@ void ExplorationManager::cleanup() {
 			} else {
 				++structureIt;
 			}
+		} else {
+			++structureIt;
 		}
 	}
 }
 
-int ExplorationManager::spottedBuildingsWithinRange(const TilePosition& position, int range)
-{
-	cleanup();
-
+int ExplorationManager::spottedBuildingsWithinRange(const TilePosition& position, int range) {
 	int eCnt = 0;
-	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
-	{
-		if (mSpottedStructures.at(i)->isActive())
-		{
-			if (position.getDistance(mSpottedStructures.at(i)->getTilePosition()) <= range)
-			{
+	for (int i = 0; i < (int)mSpottedStructures.size(); i++) {
+		if (mSpottedStructures[i]->isActive()) {
+			if (position.getDistance(mSpottedStructures[i]->getTilePosition()) <= range) {
 				eCnt++;
 			}
 		}
@@ -460,22 +430,16 @@ int ExplorationManager::spottedBuildingsWithinRange(const TilePosition& position
 	return eCnt;
 }
 
-TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& startPosition)
-{
-	cleanup();
-
+TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& startPosition) {
 	TilePosition pos = BWAPI::TilePositions::Invalid;
 	double bestDist = 100000;
 
-	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
-	{
-		if (mSpottedStructures.at(i)->isActive())
-		{
-			double cDist = startPosition.getDistance(mSpottedStructures.at(i)->getTilePosition());
-			if (cDist < bestDist)
-			{
+	for (int i = 0; i < (int)mSpottedStructures.size(); i++) {
+		if (mSpottedStructures[i]->isActive()) {
+			double cDist = startPosition.getDistance(mSpottedStructures[i]->getTilePosition());
+			if (cDist < bestDist) {
 				bestDist = cDist;
-				pos = mSpottedStructures.at(i)->getTilePosition();
+				pos = mSpottedStructures[i]->getTilePosition();
 			}
 		}
 	}
@@ -484,12 +448,10 @@ TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& s
 }
 
 vector<shared_ptr<SpottedObject>>& ExplorationManager::getSpottedBuildings() {
-	cleanup();
 	return mSpottedStructures;
 }
 
 const vector<shared_ptr<SpottedObject>>& ExplorationManager::getSpottedBuildings() const {
-	const_cast<ExplorationManager*>(this)->cleanup();
 	return mSpottedStructures;
 }
 
@@ -523,9 +485,9 @@ bool ExplorationManager::canReach(UnitAgent* pAgent, TilePosition destination) {
 //	TilePosition spot = TilePosition(-1, -1);
 //	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
 //	{
-//		if (mSpottedStructures.at(i)->isActive())
+//		if (mSpottedStructures[i]->isActive())
 //		{
-//			SpottedObject* obj = mSpottedStructures.at(i);
+//			SpottedObject* obj = mSpottedStructures[i];
 //			if (obj->getType().isResourceDepot())
 //			{
 //				if (!isEnemyDetectorCovering(obj->getTilePosition()))
@@ -577,10 +539,11 @@ vector<TilePosition> ExplorationManager::findNotCheckedExpansions() const {
 		// Search all regions for the base position
 		ExploreData foundRegion(TilePositions::Invalid);
 		vector<ExploreData>::const_iterator exploreRegionIt = mExploreData.begin();
-		while (foundRegion.center != TilePositions::Invalid && exploreRegionIt != mExploreData.end()) {
+		while (foundRegion.center == TilePositions::Invalid && exploreRegionIt != mExploreData.end()) {
 			if (exploreRegionIt->isWithin(basePosition)) {
 				foundRegion = *exploreRegionIt;
 			}
+			++exploreRegionIt;
 		}
 
 		DEBUG_MESSAGE_CONDITION(foundRegion.center == TilePositions::Invalid,
@@ -608,7 +571,7 @@ void ExplorationManager::removeOccupiedExpansions(vector<TilePosition>& expansio
 		// Check if our own buildings are close
 		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 		bool baseTaken = false;
-		for (size_t i = 0; agents.size(); ++i) {
+		for (size_t i = 0; i < agents.size(); ++i) {
 			BaseAgent* currentAgent = agents[i];
 
 			if (currentAgent->getUnitType().isResourceDepot() && currentAgent->isAlive()) {
@@ -643,5 +606,7 @@ void ExplorationManager::removeOccupiedExpansions(vector<TilePosition>& expansio
 			expIt = expansionPositions.erase(expIt);
 			continue; // CONTINUE for expansion positions
 		}
+
+		++expIt;
 	}
 }

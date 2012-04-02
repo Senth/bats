@@ -10,6 +10,11 @@ namespace bats {
 // Forward declarations
 class WaitGoal;
 
+typedef std::pair<
+	std::multimap<std::string, std::tr1::shared_ptr<WaitGoal>>::const_iterator,
+	std::multimap<std::string, std::tr1::shared_ptr<WaitGoal>>::const_iterator
+> WaitGoalIterators;
+
 /**
  * Handles all the wait goals. I.e. it updates them and removes completed
  * wait goals. Note that other pointers will still be valid since
@@ -49,11 +54,7 @@ public:
 	 * Returns all wait goals that belongs to a set.
 	 * @param setName name of the set the wait goals belong to
 	 */
-	std::pair<
-		std::multimap<std::string, std::tr1::shared_ptr<WaitGoal>>::const_iterator,
-		std::multimap<std::string, std::tr1::shared_ptr<WaitGoal>>::const_iterator
-	>
-		getWaitGoalsBySet(const std::string& setName) const;
+	WaitGoalIterators getWaitGoalsBySet(const std::string& setName) const;
 
 private:
 	/**

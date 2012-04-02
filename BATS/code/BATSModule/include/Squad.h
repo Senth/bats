@@ -17,9 +17,12 @@ class UnitAgent;
 // Namespace for the project
 namespace bats {
 
+class SquadManager;
+
 /**
  * Base class for all BATS squads. Represents a squad of units with a shared goal.
- * The squad is composed of different unit types. 
+ * The squad is composed of different unit types. The squad must always be activated using
+ * activate() function, else it won't do anything.
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
 class Squad
@@ -63,6 +66,18 @@ public:
 	 * @return true if the squad is empty
 	 */
 	bool isEmpty() const;
+
+	/**
+	 * Deactivates the squad. This will cause the squad to do nothing. Also
+	 * the initial state of the squad.
+	 */
+	void deactivate();
+
+	/**
+	 * Activates the squad. This will at least process the squad, depending on if
+	 * it needs a unit composition or not it might not do anything...
+	 */
+	void activate();
 
 	/**
 	 * Tries to disband the squad.
@@ -198,14 +213,27 @@ public:
 	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
 
 	/**
+	 * Returns this pointer to the squad as an shared_ptr instead of just this
+	 * @return shared_ptr to this squad
+	 */
+	std::tr1::shared_ptr<Squad> getThis() const;
+
+	/**
 	 * States of the squad
 	 */
-	enum SquadStates {
-		SquadState_First = 0,
-		SquadState_Active = SquadState_First,
-		SquadState_Inactive,
-		SquadState_Lim
+	enum States {
+		State_First = 0,
+		State_Active = State_First,
+		State_Initializing,
+		State_Inactive,
+		State_Lim
 	};
+
+	/**
+	 * Returns the current state of the Squad
+	 * @return current state of the Squad
+	 */
+	States getState() const;
 	
 protected:
 	/**
@@ -293,10 +321,13 @@ private:
 	bool mDisbanded;
 	bool mTravelsByAir;
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
-	SquadStates mState;
+	States mState;
 	SquadId mId;
+
+	std::tr1::weak_ptr<Squad> mThis;
 
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
 	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
+	static SquadManager* mpsSquadManager;
 };
 }

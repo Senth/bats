@@ -6,6 +6,8 @@
 // Namespace for the project
 namespace bats {
 
+class AttackCoordinator;
+
 /**
  * Attacks a point on the map. The squad will intercept all enemy units on the way to
  * the point. If no point is specified it will choose a point it thinks is good for attacking.
@@ -60,6 +62,8 @@ public:
 protected:
 	virtual void computeSquadSpecificActions();
 
+
+	static AttackCoordinator* mpsAttackCoordinator;
 private:
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 

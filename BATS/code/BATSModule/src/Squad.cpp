@@ -2,14 +2,17 @@
 #include "Utilities/Helper.h"
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "UnitComposition.h"
+#include "SquadManager.h"
 #include <algorithm>
 
 using namespace bats;
 using namespace std;
 using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 int bats::Squad::mcsInstance = 0;
 utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
+SquadManager* bats::Squad::mpsSquadManager = NULL;
 
 const int MAX_KEYS = 100;
 
@@ -26,7 +29,7 @@ Squad::Squad(
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mGoalState(GoalState_Lim),
-	mState(SquadState_Inactive)
+	mState(State_Inactive)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
@@ -35,10 +38,19 @@ Squad::Squad(
 	}
 	mcsInstance++;
 
+	if (NULL == mpsSquadManager) {
+		mpsSquadManager = SquadManager::getInstance();
+	}
+
 	mId = mpsKeyHandler->allocateKey();
 
 	// Add all units
 	addUnits(units);
+
+	// Add to squad manager
+	shared_ptr<Squad> strongPtr = shared_ptr<Squad>(this);
+	mThis = weak_ptr<Squad>(strongPtr);
+	mpsSquadManager->addSquad(strongPtr);
 }
 
 Squad::~Squad() {
@@ -64,6 +76,14 @@ bool Squad::isDisbandable() const {
 
 bool Squad::isEmpty() const {
 	return mUnits.empty();
+}
+
+void Squad::deactivate() {
+	mState = State_Inactive;
+}
+
+void Squad::activate() {
+	mState = State_Initializing;
 }
 
 bool Squad::tryDisband() {
@@ -96,16 +116,16 @@ void Squad::computeActions() {
 
 
 	switch (mState) {
-	case SquadState_Inactive:
+	case State_Initializing:
 		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
 			bool goalCreated = createGoal();
 			if (goalCreated) {
-				mState = SquadState_Active;
+				mState = State_Active;
 			}
 		}
 		break;
 
-	case SquadState_Active:
+	case State_Active:
 		switch (mGoalState) {
 		case GoalState_Success:
 			onGoalSucceeded();
@@ -238,6 +258,10 @@ const BWAPI::TilePosition& Squad::getGoal() const {
 	}
 }
 
+shared_ptr<Squad> Squad::getThis() const {
+	return mThis.lock();
+}
+
 void Squad::computeSquadSpecificActions() {
 	// Does nothing
 }
@@ -313,4 +337,8 @@ void Squad::updateUnitGoals() {
 	for (size_t i = 0; i < mUnits.size(); ++i) {
 		mUnits[i]->setGoal(newGoal);
 	}
+}
+
+Squad::States Squad::getState() const {
+	return mState;
 }

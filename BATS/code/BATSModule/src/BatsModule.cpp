@@ -33,6 +33,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpUnitManager = NULL;
 	mpCommander = NULL;
 	mpResourceCounter = NULL;
+	mpExplorationManager = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -178,6 +179,20 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 	}
 }
 
+void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
+	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= GAME_STARTED_FRAME) {
+		return;
+	}
+
+	// Only add enemy units to exploration manager
+	if (pUnit->getPlayer()->getID() != Broodwar->self()->getID() &&
+		pUnit->getPlayer()->isNeutral() == false &&
+		pUnit->getPlayer()->isAlly(Broodwar->self()) == false)
+	{
+		mpExplorationManager->addSpottedUnit(pUnit);
+	}
+}
+
 void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 		mpUnitManager->addAgent(pUnit);
@@ -283,11 +298,11 @@ void BatsModule::initGameClasses() {
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
-	ExplorationManager::getInstance();
+	mpExplorationManager = ExplorationManager::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
-	delete ExplorationManager::getInstance();
+	SAFE_DELETE(mpExplorationManager);
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
 	delete UpgradesPlanner::getInstance();

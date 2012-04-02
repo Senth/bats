@@ -62,7 +62,10 @@ void SquadManager::computeActions() {
 	std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mSquads.begin();
 	while(squadIt != mSquads.end()) {
 		if (!squadIt->second->isEmpty()) {
-			squadIt->second->computeActions();
+			// Only compute squads that aren't inactive
+			if (squadIt->second->getState() != Squad::State_Inactive) {
+				squadIt->second->computeActions();
+			}
 			++squadIt;
 		}
 		// Delete empty squads

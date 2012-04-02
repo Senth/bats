@@ -78,7 +78,8 @@ bool Commander::issueCommand(const std::string& command) {
 			if (oldSquad != NULL) {
 				oldSquad->addUnits(freeUnits);
 			} else {
-				mSquadWaiting = shared_ptr<Squad>(new AttackSquad(freeUnits));
+				AttackSquad* attackSquad = new AttackSquad(freeUnits);
+				mSquadWaiting = attackSquad->getThis();
 			}
 		}
 	} else if (command == "drop") {
@@ -120,6 +121,6 @@ void Commander::finishWaitingSquad() {
 	
 	// No path, do we create a path or do we let the squad create the path?
 
-	mpSquadManager->addSquad(mSquadWaiting);
-	mSquadWaiting = shared_ptr<Squad>();
+	mSquadWaiting->activate();
+	mSquadWaiting.reset();
 }

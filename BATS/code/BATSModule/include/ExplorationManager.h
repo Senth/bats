@@ -146,7 +146,8 @@ struct ExploreData {
 	bool isWithin(const BWAPI::TilePosition& position) const {
 		BWTA::Region* pPositionRegion = BWTA::getRegion(position);
 		if (pPositionRegion != NULL) {
-			return pPositionRegion->getCenter() == center;
+			BWAPI::TilePosition regionCenter = BWAPI::TilePosition(pPositionRegion->getCenter());
+			return regionCenter == center;
 		} else {
 			return false;
 		}

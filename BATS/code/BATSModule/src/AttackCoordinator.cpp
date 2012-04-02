@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <memory.h>
 
 using namespace bats;
 using namespace std;
@@ -80,7 +81,7 @@ AttackCoordinator* AttackCoordinator::getInstance() {
 	return mpsInstance;
 }
 
-void AttackCoordinator::requestAttack(shared_ptr<AttackSquad>& squad) {
+void AttackCoordinator::requestAttack(shared_ptr<AttackSquad> squad) {
 	/// @todo Check whether player is attacking
 
 
@@ -90,10 +91,7 @@ void AttackCoordinator::requestAttack(shared_ptr<AttackSquad>& squad) {
 
 
 	// Add existing wait goals to new squad
-	pair<
-		multimap<string, shared_ptr<WaitGoal>>::const_iterator,
-		multimap<string, shared_ptr<WaitGoal>>::const_iterator
-	> waitGoalIterators;
+	WaitGoalIterators waitGoalIterators;
 
 	waitGoalIterators = mpWaitGoalManager->getWaitGoalsBySet(config::wait_goals::ATTACK_COORDINATION);
 
@@ -115,7 +113,7 @@ void AttackCoordinator::requestAttack(shared_ptr<AttackSquad>& squad) {
 	for (squadIt = mpSquadManager->begin(); squadIt != mpSquadManager->end(); ++squadIt) {
 		shared_ptr<AttackSquad> currentAttackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 
-		if (NULL != currentAttackSquad) {
+		if (NULL != currentAttackSquad && currentAttackSquad->getState() == Squad::State_Active) {
 			currentAttackSquad->addWaitGoal(newWaitGoal);
 		}
 	}
@@ -123,6 +121,9 @@ void AttackCoordinator::requestAttack(shared_ptr<AttackSquad>& squad) {
 
 BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedWeight) const {
 	WeightedPosition highestWeight(BWAPI::TilePositions::Invalid);
+
+	highestWeight.distanceWeight = 0.0;
+	highestWeight.calculateTotalWeight();
 
 
 	// Get all expansions that haven't been checked for the last X seconds
@@ -195,8 +196,8 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 	for (squadIt = mpSquadManager->begin(); squadIt != mpSquadManager->end(); ++squadIt) {
 		shared_ptr<AttackSquad> attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 
-		// It's an attack squad
-		if (NULL != attackSquad) {
+		// It's an active attack squad
+		if (NULL != attackSquad && attackSquad->getState() == Squad::State_Active) {
 			DEBUG_MESSAGE_CONDITION(attackSquad->getGoal() == BWAPI::TilePositions::Invalid,
 				utilities::LogLevel_Severe, "AttackCoordinator::calculateDistanceWeight() | " <<
 				"AttackSquad doesn't have a valid goal!");
@@ -220,7 +221,7 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 		// Normalize by maximum map distance to get answer in [0.0,1.0]
 		distanceWeight /= MAP_DISTANCE_MAX_SQUARED;
 	}
-	// No attacking squads, set distance weight to 1 to avoid it affecting others.
+	// No attacking squads, set distance weight to 1 to avoid it affecting other weights
 	else {
 		distanceWeight = 1.0;
 	}
