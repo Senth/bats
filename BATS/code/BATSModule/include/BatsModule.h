@@ -12,6 +12,8 @@ class UnitManager;
 class Commander;
 class ResourceCounter;
 class ExplorationManager;
+class WaitGoalManager;
+class SquadManager;
 
 /**
  * Main module for BATS
@@ -101,6 +103,8 @@ protected:
 	Commander* mpCommander;
 	ResourceCounter* mpResourceCounter;
 	ExplorationManager* mpExplorationManager;
+	WaitGoalManager* mpWaitGoalManager;
+	SquadManager* mpSquadManager;
 
 private:
 	/**

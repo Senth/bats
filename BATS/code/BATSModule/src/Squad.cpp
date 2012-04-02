@@ -9,6 +9,7 @@ using namespace bats;
 using namespace std;
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
+using namespace BWAPI;
 
 int bats::Squad::mcsInstance = 0;
 utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
@@ -28,6 +29,7 @@ Squad::Squad(
 	mTravelsByAir(false),
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
+	mTempGoalPosition(TilePositions::Invalid),
 	mGoalState(GoalState_Lim),
 	mState(State_Inactive)
 {
@@ -306,29 +308,29 @@ void Squad::forceDisband() {
 	}
 }
 
-void Squad::setGoalPosition(const BWAPI::TilePosition& position) {
+void Squad::setGoalPosition(const TilePosition& position) {
 	mGoalPositions.clear();
 	mGoalPositions.push_back(position);
 	updateUnitGoals();
 }
 
-void Squad::setGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
+void Squad::setGoalPositions(const std::list<TilePosition>& positions) {
 	mGoalPositions = positions;
 	updateUnitGoals();
 }
 
-void Squad::addGoalPosition(const BWAPI::TilePosition& position) {
+void Squad::addGoalPosition(const TilePosition& position) {
 	mGoalPositions.push_back(position);
 	updateUnitGoals();
 }
 
-void Squad::addGoalPositions(const std::list<BWAPI::TilePosition>& positions) {
+void Squad::addGoalPositions(const std::list<TilePosition>& positions) {
 	mGoalPositions.insert(mGoalPositions.end(), positions.begin(), positions.end());
 	updateUnitGoals();
 }
 
 void Squad::updateUnitGoals() {
-	BWAPI::TilePosition newGoal = BWAPI::TilePositions::Invalid;
+	BWAPI::TilePosition newGoal = TilePositions::Invalid;
 	
 	if (!mGoalPositions.empty()) {
 		newGoal = mGoalPositions.front();
@@ -337,8 +339,31 @@ void Squad::updateUnitGoals() {
 	for (size_t i = 0; i < mUnits.size(); ++i) {
 		mUnits[i]->setGoal(newGoal);
 	}
+
+	mTempGoalPosition = TilePositions::Invalid;
 }
 
 Squad::States Squad::getState() const {
 	return mState;
+}
+
+const vector<UnitAgent*> Squad::getUnits() const {
+	return mUnits;
+}
+
+void Squad::setTemporaryGoalPosition(const TilePosition& temporaryPosition) {
+	if (mTempGoalPosition != TilePositions::Invalid) {
+		mTempGoalPosition = temporaryPosition;
+		for (size_t i = 0; i < mUnits.size(); ++i) {
+			mUnits[i]->setGoal(mTempGoalPosition);
+		}
+	}	
+}
+
+const TilePosition& Squad::getTemporaryGoalPosition() const {
+	return mTempGoalPosition;
+}
+
+bool Squad::hasTemporaryGoalPosition() const {
+	return mTempGoalPosition != TilePositions::Invalid;
 }

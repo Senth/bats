@@ -213,6 +213,12 @@ public:
 	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
 
 	/**
+	 * Returns all the squad's units
+	 * @return all squad's units
+	 */
+	const std::vector<UnitAgent*> getUnits() const;
+
+	/**
 	 * Returns this pointer to the squad as an shared_ptr instead of just this
 	 * @return shared_ptr to this squad
 	 */
@@ -287,6 +293,33 @@ protected:
 	void forceDisband();
 
 	/**
+	 * Update the current goal on all the squad's units to the current goal in the list.
+	 * If no goal exists, set an invalid goal. This also removes any temporary goal positions.
+	 */
+	void updateUnitGoals();
+
+	/**
+	 * Overrides the squad's units' goal with a temporary goal position. Can be used to wait in a
+	 * certain position before attacking. To go back to the main goal, call updateUnitGoals().
+	 * @param temporaryPosition the new temporary goal position of the units. Nothing happens
+	 * if the temporary goal is set to BWAPI::TilePositions::Invalid.
+	 */
+	void setTemporaryGoalPosition(const BWAPI::TilePosition& temporaryPosition);
+
+	/**
+	 * Returns the current temporary position if one exists.
+	 * @return current temporary position, if no one exists it returns
+	 * BWAPI::TilePositions::Invalid.
+	 */
+	const BWAPI::TilePosition& getTemporaryGoalPosition() const;
+
+	/**
+	 * Returns whether the squad has a temporary position or not
+	 * @return true if the squad has a temporary goal position.
+	 */ 
+	bool hasTemporaryGoalPosition() const;
+
+	/**
 	 * Different goal states.
 	 */
 	enum GoalStates {
@@ -305,17 +338,12 @@ private:
 	 * @returns true a goal was successfully created.
 	 */
 	virtual bool createGoal() = 0;
-
-	/**
-	 * Update the current goal on all the squad's units to the current goal in the list.
-	 * If no goal exists, set an invalid goal
-	 */
-	void updateUnitGoals();
 	
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mGoalPositions;
 	UnitComposition mUnitComposition;
+	BWAPI::TilePosition mTempGoalPosition;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;

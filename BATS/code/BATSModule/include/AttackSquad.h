@@ -59,6 +59,14 @@ public:
 	 */
 	bool isDistracting() const;
 
+	/**
+	 * Returns an AttackSquad shared_ptr instead of the original Squad shared_ptr.
+	 * @note This function is not overridden, but more a helper function to return the
+	 * right pointer for an attackSquad.
+	 * @return shared_ptr to this AttackSquad
+	 */
+	std::tr1::shared_ptr<AttackSquad> getThis() const;
+
 protected:
 	virtual void computeSquadSpecificActions();
 
@@ -66,6 +74,5 @@ protected:
 	static AttackCoordinator* mpsAttackCoordinator;
 private:
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
-
 };
 }

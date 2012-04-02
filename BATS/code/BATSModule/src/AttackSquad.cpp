@@ -27,13 +27,7 @@ void AttackSquad::computeSquadSpecificActions() {
 }
 
 bool AttackSquad::createGoal() {
-	// Go to center of map for now
-	//TilePosition position;
-	//position.x() = Broodwar->mapWidth() / 2;
-	//position.y() = Broodwar->mapHeight() / 2;
-	//setGoalPosition(position);
-
-	shared_ptr<AttackSquad> thisAttackSquad = dynamic_pointer_cast<AttackSquad>(getThis());
+	shared_ptr<AttackSquad> thisAttackSquad = getThis();
 	mpsAttackCoordinator->requestAttack(thisAttackSquad);
 	return true;
 }
@@ -44,8 +38,16 @@ bool AttackSquad::isInPosition() const {
 }
 
 bool AttackSquad::isAttacking() const {
-	/// @todo check if squad is attacking or under attack
-	return true;
+	const std::vector<UnitAgent*> units = getUnits();
+
+	for (size_t i = 0; i < units.size(); ++i) {
+		BWAPI::Unit* currentUnit = units[i]->getUnit();
+		if (currentUnit->isAttacking() || currentUnit->isUnderAttack()) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool AttackSquad::isReadyToAttack() const {
@@ -54,4 +56,8 @@ bool AttackSquad::isReadyToAttack() const {
 
 bool AttackSquad::isDistracting() const {
 	return mDistraction;
+}
+
+shared_ptr<AttackSquad> AttackSquad::getThis() const {
+	return static_pointer_cast<AttackSquad>(Squad::getThis());
 }

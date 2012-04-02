@@ -34,6 +34,8 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpCommander = NULL;
 	mpResourceCounter = NULL;
 	mpExplorationManager = NULL;
+	mpWaitGoalManager = NULL;
+	mpSquadManager = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -224,7 +226,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 		}
 		// Enemies
 		else if (!pUnit->getType().isNeutral()) {
-			ExplorationManager::getInstance()->unitDestroyed(pUnit);
+			mpExplorationManager->unitDestroyed(pUnit);
 		}
 	}
 }
@@ -233,7 +235,7 @@ void BatsModule::onMorphUnit(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 		if (OUR(pUnit)) {
 			if (BuildPlanner::isZerg()) {
-				AgentManager::getInstance()->morphDrone(pUnit);
+				mpUnitManager->morphDrone(pUnit);
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			} else {
 				onUnitCreate(pUnit);
@@ -279,16 +281,18 @@ void BatsModule::updateGame() {
 	}
 
 	mpResourceCounter->update();
+	mpWaitGoalManager->update();
+
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
-	ExplorationManager::getInstance()->computeActions();
+	mpExplorationManager->computeActions();
 }
 
 void BatsModule::initGameClasses() {
 	GameTime::getInstance();
-	WaitGoalManager::getInstance();
-	SquadManager::getInstance();
+	mpWaitGoalManager = WaitGoalManager::getInstance();
+	mpSquadManager = SquadManager::getInstance();
 	AttackCoordinator::getInstance();
 	mpResourceCounter = ResourceCounter::getInstance();
 	mpUnitManager = UnitManager::getInstance();
@@ -312,8 +316,8 @@ void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mpUnitManager);
 	SAFE_DELETE(mpResourceCounter);
 	delete AttackCoordinator::getInstance();
-	delete SquadManager::getInstance();
-	delete WaitGoalManager::getInstance();
+	SAFE_DELETE(mpSquadManager);
+	SAFE_DELETE(mpWaitGoalManager);
 	delete GameTime::getInstance();
 }
 

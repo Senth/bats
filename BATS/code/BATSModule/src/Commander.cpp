@@ -55,8 +55,6 @@ void Commander::computeActions() {
 }
 
 bool Commander::issueCommand(const std::string& command) {
-	/// @todo Commander try to issue command.
-
 	/// @todo implement when we have onMinimapPing event.
 	//if (mpSquadWaiting != NULL) {
 	//	finishWaitingSquad();
@@ -83,21 +81,21 @@ bool Commander::issueCommand(const std::string& command) {
 			}
 		}
 	} else if (command == "drop") {
-		/// @todo drop
+		/// @todo drop command
 	} else if (command == "harass") {
-		/// @todo harass
+		/// @todo harass command
 	} else if (command == "counter-attack") {
-		/// @todo counter-attack
+		/// @todo counter-attack command
 	} else if (command == "expand") {
-		/// @todo expand
+		/// @todo expand command
 	} else if (command == "move") {
-		/// @todo move
+		/// @todo move command
 	} else if (command == "scout") {
-		/// @todo scout
+		/// @todo scout command
 	}
 	/// @todo abort
 
-	/// @todo remove adding squad directly to squad manager
+	/// @todo remove activating squad directly 
 	finishWaitingSquad();
 
 	return true;
