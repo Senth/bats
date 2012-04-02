@@ -1,5 +1,6 @@
 #include "BatsModule.h"
 #include "BuildPlanner.h"
+#include "UnitCreator.h"
 #include "Commander.h"
 #include "Helper.h"
 #include "SquadManager.h"
@@ -210,12 +211,11 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 
 		if (OUR(pUnit)) {
-			mpUnitManager->removeAgent(pUnit);
-
+			mpUnitManager->removeAgent(pUnit);			
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(pUnit);
 			}
-
+			UnitCreator::getInstance()->updatePopulation(pUnit->getType());
 			// Assist workers under attack
 			if (pUnit->getType().isWorker()) {
 				/// @todo assist worker.
@@ -299,6 +299,7 @@ void BatsModule::initGameClasses() {
 	mpCommander = Commander::getInstance();
 	CoverMap::getInstance();
 	BuildPlanner::getInstance();
+	UnitCreator::getInstance();
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
@@ -324,6 +325,7 @@ void BatsModule::releaseGameClasses() {
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (mDebugLevel > 0) {
+		UnitCreator::getInstance()->printInfo();
 		std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++) {
 			if (agents.at(i)->isBuilding()) agents.at(i)->debug_showGoal();
