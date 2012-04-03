@@ -7,6 +7,7 @@
 namespace bats {
 
 class AttackCoordinator;
+class ExplorationManager;
 
 /**
  * Attacks a point on the map. The squad will intercept all enemy units on the way to
@@ -27,7 +28,6 @@ public:
 	 */
 	virtual ~AttackSquad();
 
-	virtual bool createGoal();
 
 	/**
 	 * Checks whether the attack squad is "in position". In position means the squad is
@@ -69,10 +69,14 @@ public:
 
 protected:
 	virtual void computeSquadSpecificActions();
-
+	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
+	virtual bool createGoal();
+	virtual GoalStates checkGoalState() const;
 
 	static AttackCoordinator* mpsAttackCoordinator;
+	static ExplorationManager* mpsExplorationManager;
 private:
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
+	bool mWaitInPosition;
 };
 }

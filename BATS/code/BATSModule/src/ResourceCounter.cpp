@@ -50,7 +50,7 @@ shared_ptr<const ResourceGroup> ResourceCounter::getResourceGroup(int groupId) c
 	}
 }
 
-shared_ptr<const ResourceGroup> ResourceCounter::getResourceGroup(const TilePosition& expansionPosition) {
+shared_ptr<const ResourceGroup> ResourceCounter::getResourceGroup(const BWAPI::TilePosition& expansionPosition) {
 	const map<TilePosition, shared_ptr<ResourceGroup>>::const_iterator& groupIt =
 		mGroupsByPosition.find(expansionPosition);
 

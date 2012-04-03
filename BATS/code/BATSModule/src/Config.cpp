@@ -52,10 +52,19 @@ namespace log {
 
 namespace squad {
 	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitCompositions";
-	double PING_WAIT_TIME_FIRST = 0.0f;
-	double PING_WAIT_TIME_AFTER_FIRST = 0.0f;
-	double REGROUP_DISTANCE_BEGIN = 0.0f;
-	double REGROUP_DISTANCE_END = 0.0f;
+	double PING_WAIT_TIME_FIRST = 0.0;
+	double PING_WAIT_TIME_AFTER_FIRST = 0.0;
+	double REGROUP_DISTANCE_BEGIN = 0.0;
+	double REGROUP_DISTANCE_END = 0.0;
+	double CALC_FURTHEST_AWAY_TIME = 1.0;
+	double CLOSE_DISTANCE = 0.0;
+
+	namespace attack {
+		double WAITING_POSITION_DISTANCE_FROM_GOAL = 0.0;
+		double STRUCTURES_DESTROYED_GOAL_DISTANCE = 0.0;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -184,18 +193,41 @@ bool game::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool squad::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "ping_wait_time_first") {
-		PING_WAIT_TIME_FIRST = variableInfo;
-	} else if (variableInfo.name == "ping_wait_time_after_first") {
-		PING_WAIT_TIME_AFTER_FIRST = variableInfo;
-	} else if (variableInfo.name == "regroup_distance_begin") {
-		REGROUP_DISTANCE_BEGIN = variableInfo;
-	} else if (variableInfo.name == "regroup_distance_end") {
-		REGROUP_DISTANCE_END = variableInfo;
+	if (variableInfo.subsection == "attack") {
+		return attack::set(variableInfo);
+	} else if (variableInfo.subsection.empty()) {
+		if (variableInfo.name == "ping_wait_time_first") {
+			PING_WAIT_TIME_FIRST = variableInfo;
+		} else if (variableInfo.name == "ping_wait_time_after_first") {
+			PING_WAIT_TIME_AFTER_FIRST = variableInfo;
+		} else if (variableInfo.name == "regroup_distance_begin") {
+			REGROUP_DISTANCE_BEGIN = variableInfo;
+		} else if (variableInfo.name == "regroup_distance_end") {
+			REGROUP_DISTANCE_END = variableInfo;
+		} else if (variableInfo.name == "calc_furthest_away_time") {
+			CALC_FURTHEST_AWAY_TIME = variableInfo;
+		} else if (variableInfo.name == "close_distance") {
+			CLOSE_DISTANCE = variableInfo;
+		} else {
+			return false;
+		}
+	} else {
+		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
+			"' in " <<variableInfo.file << ".ini");
+	}
+
+	return true;
+}
+
+bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "waiting_position_distance_from_goal") {
+		WAITING_POSITION_DISTANCE_FROM_GOAL = variableInfo;
+	} else if (variableInfo.name == "structures_destroyed_goal_distance") {
+		STRUCTURES_DESTROYED_GOAL_DISTANCE = variableInfo;
 	} else {
 		return false;
 	}
-
+	
 	return true;
 }
 

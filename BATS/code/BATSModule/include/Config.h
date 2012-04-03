@@ -87,10 +87,9 @@ namespace bats {
 			extern double PING_WAIT_TIME_FIRST;
 			/** How long shall the Commander wait for pings after the first one */
 			extern double PING_WAIT_TIME_AFTER_FIRST;
-			/** Decides the distance away from the center a unit has to be until a group occurs.
-			 * If a unit is further away from each other than this distance from the squads
-			 * center then the squads will get a temporary goal to center of the squad to
-			 * regroup. 
+			/** Decides the distance away from the center a unit has to be until a regroup occurs.
+			 * If a unit is further away than this it will get a regroup goal to the center of
+			 * the squad to regroup.
 			 * @see REGROUP_DISTANCE_END for when regrouping shall end. These two variables
 			 * should not have the same value since this can cause threshold errors.
 			 */
@@ -100,6 +99,26 @@ namespace bats {
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
 			extern double REGROUP_DISTANCE_END;
+			/** How long time before recalculating the distance to the unit furthest away
+			 * from the squad. This is the minimum time and the distance will not be
+			 * recalculated until the function is called again. */
+			extern double CALC_FURTHEST_AWAY_TIME;
+			/** The default range when calculating distance between the center of the squad
+			 * and a position to test whether the squad is close to this position or not. */
+			extern double CLOSE_DISTANCE;
+
+			/**
+			 * Variables for AttackSquad only
+			 */
+			namespace attack {
+				/** The distance from the goal that the waiting position will be set. If
+				 * the squad is a ground squad it will use ground distance and flying units
+				 * will use direct distance. */
+				extern double WAITING_POSITION_DISTANCE_FROM_GOAL;
+				/** The distance from the goal position to check if all buildings have
+				 * been destroyed to complete the goal. */
+				extern double STRUCTURES_DESTROYED_GOAL_DISTANCE;
+			}
 		}
 
 		/**
@@ -110,7 +129,8 @@ namespace bats {
 		}
 
 		/**
-		 * Loads settings from CONFIG_DIR\config.ini.
+		 * Loads settings from CONFIG_DIR\config_default.ini and CONFIG_DIR\config_override.ini, in
+		 * that order.
 		 */
 		void loadConfig();
 	}

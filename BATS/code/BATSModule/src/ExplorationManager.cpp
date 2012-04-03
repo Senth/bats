@@ -7,7 +7,9 @@
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "BTHAIModule/Source/SpottedObject.h"
 #include "Config.h"
+#include "Helper.h"
 #include <set>
+#include <cfloat>
 
 using namespace BWAPI;
 using namespace BWTA;
@@ -15,11 +17,11 @@ using namespace std;
 using std::tr1::shared_ptr;
 using namespace bats;
 
-ExplorationManager* ExplorationManager::mpsInstance = NULL;
+ExplorationManager* bats::ExplorationManager::mpsInstance = NULL;
 
 const double CLOSE_BASE_DISTANCE = 12.0;
 
-ExplorationManager::ExplorationManager() {
+bats::ExplorationManager::ExplorationManager() {
 	mActive = true;
 	
 	mForceOwn.reset();
@@ -37,26 +39,26 @@ ExplorationManager::ExplorationManager() {
 	mFrameLastCall = Broodwar->getFrameCount();
 }
 
-ExplorationManager::~ExplorationManager() {
+bats::ExplorationManager::~ExplorationManager() {
 	mpsInstance = NULL;
 }
 
-void ExplorationManager::setInactive() {
+void bats::ExplorationManager::setInactive() {
 	mActive = false;
 }
 
-bool ExplorationManager::isActive() {
+bool bats::ExplorationManager::isActive() const {
 	return mActive;
 }
 
-ExplorationManager* ExplorationManager::getInstance() {
+ExplorationManager* bats::ExplorationManager::getInstance() {
 	if (mpsInstance == NULL) {
 		mpsInstance = new ExplorationManager();
 	}
 	return mpsInstance;
 }
 
-void ExplorationManager::computeActions() {
+void bats::ExplorationManager::computeActions() {
 	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - mFrameLastCall < config::frame_distribution::EXPLORATION_MANAGER) {
@@ -95,7 +97,7 @@ void ExplorationManager::computeActions() {
 	/// @todo update position on visible buildings that have moved.
 }
 
-//TilePosition ExplorationManager::searchExpansionSite()
+//TilePosition bats::ExplorationManager::searchExpansionSite()
 //{
 //	getExpansionSite();
 //
@@ -109,7 +111,7 @@ void ExplorationManager::computeActions() {
 //	return mExpansionSite;
 //}
 //
-//TilePosition ExplorationManager::getExpansionSite()
+//TilePosition bats::ExplorationManager::getExpansionSite()
 //{
 //	if (mExpansionSite.x() >= 0)
 //	{
@@ -122,7 +124,7 @@ void ExplorationManager::computeActions() {
 //	return mExpansionSite;
 //}
 
-//void ExplorationManager::setExpansionSite(TilePosition pos)
+//void bats::ExplorationManager::setExpansionSite(TilePosition pos)
 //{
 //	if (pos.x() >= 0)
 //	{
@@ -131,7 +133,7 @@ void ExplorationManager::computeActions() {
 //	}
 //}
 
-TilePosition ExplorationManager::getNextToExplore(const shared_ptr<Squad>& squad) {
+TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_ptr<Squad>& squad) {
 	TilePosition currentPos = squad->getCenter();
 	TilePosition goal = squad->getGoal();
 
@@ -141,8 +143,6 @@ TilePosition ExplorationManager::getNextToExplore(const shared_ptr<Squad>& squad
 		goal = TilePosition(startRegion->getCenter());
 		return goal;
 	}
-	
-
 
 	double dist = currentPos.getDistance(goal);
 
@@ -206,7 +206,7 @@ TilePosition ExplorationManager::getNextToExplore(const shared_ptr<Squad>& squad
 	return TilePositions::Invalid;
 }
 
-void ExplorationManager::setExplored(const TilePosition& goal) {
+void bats::ExplorationManager::setExplored(const BWAPI::TilePosition& goal) {
 	bool found = false;
 	for (size_t i = 0; i < mExploreData.size(); i++) {
 		if (mExploreData[i].matches(goal)) {
@@ -216,7 +216,7 @@ void ExplorationManager::setExplored(const TilePosition& goal) {
 	}
 }
 
-int ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
+int bats::ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
 	for (size_t i = 0; i < mExploreData.size(); i++) {
 		if (mExploreData[i].matches(region)) {
 
@@ -236,7 +236,7 @@ int ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
 	return -1;
 }
 
-void ExplorationManager::showIntellData() {
+void bats::ExplorationManager::showIntellData() const {
 	Broodwar->drawTextScreen(250,16*2, "AirAttackStr: %d (%d)", mForceEnemy.airAttackStr, mForceOwn.airAttackStr);
 	Broodwar->drawTextScreen(250,16*3, "AirDefendStr: %d (%d)", mForceEnemy.airDefendStr, mForceOwn.airDefendStr);
 	Broodwar->drawTextScreen(250,16*4, "GroundAttackStr: %d (%d)", mForceEnemy.groundAttackStr, mForceOwn.groundAttackStr);
@@ -250,7 +250,7 @@ void ExplorationManager::showIntellData() {
 	Broodwar->drawTextScreen(250,16*11, "DetectorUnits: %d (%d)", mForceEnemy.cDetectorUnits, mForceOwn.cDetectorUnits);
 }
 
-void ExplorationManager::calcOwnForceData() {
+void bats::ExplorationManager::calcOwnForceData() {
 	mForceOwn.reset();
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
@@ -279,7 +279,7 @@ void ExplorationManager::calcOwnForceData() {
 	}
 }
 
-void ExplorationManager::calcEnemyForceData() {
+void bats::ExplorationManager::calcEnemyForceData() {
 	mForceEnemy.reset();
 
 	for (size_t i = 0; i < mSpottedUnits.size(); i++) {
@@ -314,7 +314,7 @@ void ExplorationManager::calcEnemyForceData() {
 	}
 }
 
-void ExplorationManager::printInfo()
+void bats::ExplorationManager::printInfo() const
 {
 	//Uncomment this if you want to draw a mark at detected enemy buildings.
 	/*for (int i = 0; i < (int)spottedBuildings.size(); i++)
@@ -333,7 +333,7 @@ void ExplorationManager::printInfo()
 	//Draw a circle around detectors
 }
 
-void ExplorationManager::addSpottedUnit(Unit* unit) {
+void bats::ExplorationManager::addSpottedUnit(BWAPI::Unit* unit) {
 	if (unit->getType().isBuilding()) {
 		
 		//Check if we already have seen this building
@@ -364,7 +364,7 @@ void ExplorationManager::addSpottedUnit(Unit* unit) {
 	}
 }
 
-void ExplorationManager::unitDestroyed(Unit* unit) {
+void bats::ExplorationManager::unitDestroyed(BWAPI::Unit* unit) {
 	TilePosition unitPos = unit->getTilePosition();
 	if (unit->getType().isBuilding()) {
 		bool removed = false;
@@ -397,7 +397,7 @@ void ExplorationManager::unitDestroyed(Unit* unit) {
 	}
 }
 
-void ExplorationManager::cleanup() {
+void bats::ExplorationManager::cleanup() {
 	// Remove buildings that have been moved or destroyed
 	vector<shared_ptr<SpottedObject>>::iterator structureIt = mSpottedStructures.begin();
 
@@ -417,28 +417,41 @@ void ExplorationManager::cleanup() {
 	}
 }
 
-int ExplorationManager::spottedBuildingsWithinRange(const TilePosition& position, int range) {
-	int eCnt = 0;
-	for (int i = 0; i < (int)mSpottedStructures.size(); i++) {
+int bats::ExplorationManager::countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, double range) const {
+	int cStructuresInRange = 0;
+	for (size_t i = 0; i < mSpottedStructures.size(); i++) {
 		if (mSpottedStructures[i]->isActive()) {
 			if (position.getDistance(mSpottedStructures[i]->getTilePosition()) <= range) {
-				eCnt++;
+				cStructuresInRange++;
 			}
 		}
 	}
 
-	return eCnt;
+	return cStructuresInRange;
 }
 
-TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& startPosition) {
-	TilePosition pos = BWAPI::TilePositions::Invalid;
-	double bestDist = 100000;
-
-	for (int i = 0; i < (int)mSpottedStructures.size(); i++) {
+bool bats::ExplorationManager::hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, double range) const {
+	for (size_t i = 0; i < mSpottedStructures.size(); ++i) {
 		if (mSpottedStructures[i]->isActive()) {
-			double cDist = startPosition.getDistance(mSpottedStructures[i]->getTilePosition());
-			if (cDist < bestDist) {
-				bestDist = cDist;
+			double squaredDistance = getSquaredDistance(mSpottedStructures[i]->getTilePosition(), position);
+			if (range * range <= squaredDistance) {
+				return true; // QUICK RETURN
+			}
+		}
+	}
+
+	return false;
+}
+
+TilePosition bats::ExplorationManager::getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const {
+	TilePosition pos = BWAPI::TilePositions::Invalid;
+	double bestDist = DBL_MAX;
+
+	for (size_t i = 0; i < mSpottedStructures.size(); i++) {
+		if (mSpottedStructures[i]->isActive()) {
+			double squaredDistance = getSquaredDistance(startPosition, mSpottedStructures[i]->getTilePosition());
+			if (squaredDistance < bestDist) {
+				bestDist = squaredDistance;
 				pos = mSpottedStructures[i]->getTilePosition();
 			}
 		}
@@ -447,22 +460,22 @@ TilePosition ExplorationManager::getClosestSpottedBuilding(const TilePosition& s
 	return pos;
 }
 
-vector<shared_ptr<SpottedObject>>& ExplorationManager::getSpottedBuildings() {
+vector<shared_ptr<SpottedObject>>& bats::ExplorationManager::getSpottedBuildings() {
 	return mSpottedStructures;
 }
 
-const vector<shared_ptr<SpottedObject>>& ExplorationManager::getSpottedBuildings() const {
+const vector<shared_ptr<SpottedObject>>& bats::ExplorationManager::getSpottedBuildings() const {
 	return mSpottedStructures;
 }
 
-bool ExplorationManager::buildingsSpotted() {
+bool bats::ExplorationManager::hasSpottedBuilding() const {
 	if (mSpottedStructures.size() > 0) {
 		return true;
 	}
 	return false;
 }
 
-bool ExplorationManager::canReach(TilePosition source, TilePosition destination) {
+bool bats::ExplorationManager::canReach(BWAPI::TilePosition source, BWAPI::TilePosition destination) {
 	int mapWidth = Broodwar->mapWidth();
 	int mapHeight = Broodwar->mapHeight();
 	if (source.x() < 0 || source.x() >= mapWidth || source.y() < 0 || source.y() >= mapHeight) {
@@ -476,11 +489,11 @@ bool ExplorationManager::canReach(TilePosition source, TilePosition destination)
 	return pathOk;
 }
 
-bool ExplorationManager::canReach(UnitAgent* pAgent, TilePosition destination) {
+bool bats::ExplorationManager::canReach(UnitAgent* pAgent, BWAPI::TilePosition destination) {
 	return pAgent->getUnit()->hasPath(Position(destination));
 }
 
-//TilePosition ExplorationManager::scanForVulnerableBase()
+//TilePosition bats::ExplorationManager::scanForVulnerableBase()
 //{
 //	TilePosition spot = TilePosition(-1, -1);
 //	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
@@ -507,12 +520,12 @@ bool ExplorationManager::canReach(UnitAgent* pAgent, TilePosition destination) {
 //	return spot;
 //}
 
-bool ExplorationManager::isEnemyDetectorCovering(TilePosition position) {
+bool bats::ExplorationManager::isEnemyDetectorCovering(const BWAPI::TilePosition& position) const {
 	return isEnemyDetectorCovering(Position(position));
 }
 
 
-bool ExplorationManager::isEnemyDetectorCovering(Position position) {
+bool bats::ExplorationManager::isEnemyDetectorCovering(const BWAPI::Position& position) const {
 	for (int i = 0; i < (int)mSpottedStructures.size(); i++) {
 		if (mSpottedStructures[i]->isActive()) {
 			shared_ptr<SpottedObject> spottedObject = mSpottedStructures[i];
@@ -527,7 +540,7 @@ bool ExplorationManager::isEnemyDetectorCovering(Position position) {
 	return false;
 }
 
-vector<TilePosition> ExplorationManager::findNotCheckedExpansions() const {
+vector<TilePosition> bats::ExplorationManager::findNotCheckedExpansions() const {
 	vector<TilePosition> foundPositions;
 
 	// Iterate through all expansions sites
@@ -562,7 +575,7 @@ vector<TilePosition> ExplorationManager::findNotCheckedExpansions() const {
 	return foundPositions;
 }
 
-void ExplorationManager::removeOccupiedExpansions(vector<TilePosition>& expansionPositions) const {
+void bats::ExplorationManager::removeOccupiedExpansions(std::vector<BWAPI::TilePosition>& expansionPositions) const {
 	vector<TilePosition>::iterator expIt = expansionPositions.begin();
 
 	while (expIt != expansionPositions.end()) {

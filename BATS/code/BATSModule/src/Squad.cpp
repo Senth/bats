@@ -3,7 +3,11 @@
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "UnitComposition.h"
 #include "SquadManager.h"
+#include "GameTime.h"
+#include "Config.h"
+#include "Helper.h"
 #include <algorithm>
+#include <cmath>
 
 using namespace bats;
 using namespace std;
@@ -30,6 +34,9 @@ Squad::Squad(
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mTempGoalPosition(TilePositions::Invalid),
+	mRegroupPosition(TilePositions::Invalid),
+	mFurthestUnitAwayDistance(0.0),
+	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
 	mGoalState(GoalState_Lim),
 	mState(State_Inactive)
 {
@@ -74,6 +81,10 @@ bool Squad::isDisbanded() const {
 
 bool Squad::isDisbandable() const {
 	return mDisbandable;
+}
+
+bool Squad::isRegrouping() const {
+	return mRegroupPosition != TilePositions::Invalid;
 }
 
 bool Squad::isEmpty() const {
@@ -128,17 +139,16 @@ void Squad::computeActions() {
 		break;
 
 	case State_Active:
+		computeSquadSpecificActions();
+		mGoalState = checkGoalState();
+
 		switch (mGoalState) {
-		case GoalState_Success:
+		case GoalState_Succeeded:
 			onGoalSucceeded();
 			break;
 
 		case GoalState_Failed:
 			onGoalFailed();
-			break;
-
-		case GoalState_NotCompleted:
-			computeSquadSpecificActions();
 			break;
 
 		default:
@@ -166,6 +176,34 @@ BWAPI::TilePosition Squad::getCenter() const {
 	center.y() /= mUnits.size();
 
 	return center;
+}
+
+double Squad::getFurthestUnitAwayDistance(bool forceRecalculate) const {
+	double furthestAway = 0.0;
+
+	double currentGameTime = GameTime::getInstance()->getElapsedTime();
+	if (forceRecalculate ||
+		currentGameTime - mFurthestUnitAwayLastTime >= config::squad::CALC_FURTHEST_AWAY_TIME)
+	{
+		mFurthestUnitAwayLastTime = currentGameTime;
+
+		const BWAPI::TilePosition& center = getCenter();
+
+		for (size_t i = 0; i < mUnits.size(); ++i) {
+			double squaredDistance = getSquaredDistance(center, mUnits[i]->getUnit()->getTilePosition());
+
+			if (squaredDistance > furthestAway) {
+				furthestAway = squaredDistance;
+			}
+		}
+
+		// return actual distance and not squared
+		if (furthestAway > 0.0) {
+			furthestAway = sqrt(furthestAway);
+		}
+	}
+
+	return furthestAway;
 }
 
 bool Squad::isFull() const {
@@ -248,6 +286,10 @@ void Squad::addWaitGoals(const vector<shared_ptr<WaitGoal>>& waitGoals) {
 	}
 }
 
+bool Squad::hasWaitGoals() const {
+	return !mWaitGoals.empty();
+}
+
 const SquadId & Squad::getSquadId() const {
 	return mId;
 }
@@ -262,6 +304,29 @@ const BWAPI::TilePosition& Squad::getGoal() const {
 
 shared_ptr<Squad> Squad::getThis() const {
 	return mThis.lock();
+}
+
+bool Squad::isCloseTo(const TilePosition& position) const {
+	return isCloseTo(position, config::squad::CLOSE_DISTANCE);
+}
+
+bool Squad::isCloseTo(const TilePosition& position, double range) const {
+	// Skip when regrouping
+	if (isRegrouping()) {
+		return false;
+	}
+
+	bool bClose = false;
+
+	if (travelsByGround()) {
+		double squaredDistance = getSquaredDistance(position, getCenter());
+		bClose = range * range <= squaredDistance;
+	} else {
+		double groundDistance = BWTA::getGroundDistance(getCenter(), position);
+		bClose = range <= groundDistance;
+	}
+
+	return bClose;
 }
 
 void Squad::computeSquadSpecificActions() {

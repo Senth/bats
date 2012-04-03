@@ -94,6 +94,10 @@ struct ForceData {
 	}
 };
 
+/**
+ * A region we have viseted, and when we visited it.
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ */
 struct ExploreData {
 	BWAPI::TilePosition center;
 	int lastVisitFrame;
@@ -171,9 +175,9 @@ struct ExploreData {
  * and all classes shares the same ExplorationManager instance.
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
- * 
- * Matteus Magnusson changed the code so that it works better with BATS. Updated the documentation
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+ * Matteus Magnusson changed the code so that it works better with BATS.
+ * Updated the documentation, added, and removed functions.
  */
 class ExplorationManager {
 public:
@@ -192,7 +196,7 @@ public:
 	 ** be active if no perfect information is available.
 	 * @return true if the ExplorationManager is active, false if not. 
 	 */
-	bool isActive();
+	bool isActive() const;
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -215,7 +219,7 @@ public:
 	//void setExpansionSite(BWAPI::TilePosition pos);
 
 	/** Shows all spotted objects as squares on the SC map. Use for debug purpose. */
-	void printInfo();
+	void printInfo() const;
 
 	/** Notify the ExplorationManager that an enemy unit has been spotted.
 	 * @param pUnit the unit that has been spotted.
@@ -244,23 +248,33 @@ public:
 	 * @return the closest building that was spotted. If no building was found it will
 	 * return BWAPI::TilePositions::Invalid.
 	 */
-	BWAPI::TilePosition getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition);
+	BWAPI::TilePosition getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const;
 
 	/** Calculates the number of spotted enemy structure within the specified range (in tiles).
-	 * @param position the position to check if there are any enemy buildings in range.
+	 * @param position the position to check if there are any enemy structures in range.
 	 * @param range the radius to check from the position
 	 * @return number of enemy structures in range.
 	 */
-	int spottedBuildingsWithinRange(const BWAPI::TilePosition& position, int range);
+	int countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, double range) const;
+
+	/**
+	 * Calculates whether there exist a spotted enemy structure within the specified range
+	 * from the specified position.
+	 * @param position the position to check if there are any enemy structures in range.
+	 * @param range the radius to check from the position.
+	 * @return true if an enemy structure exists within the air range of the position.
+	 * @todo Implement functionality use ground range and not always air range.
+	 */
+	bool hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, double range) const;
 
 	/**
 	 * Returns true if any enemy structures have been spotted.
 	 * @return true if any enemy structures have been spotted.
 	 */
-	bool buildingsSpotted();
+	bool hasSpottedBuilding() const;
 
 	/** Shows some data about the enemy on screen. */
-	void showIntellData();
+	void showIntellData() const;
 
 	/** Returns true if a ground unit can reach position 'destination' from position 'source'.
 	 * Uses BWTA.
@@ -296,12 +310,12 @@ public:
 	 * @param position the position we want to see if a detector is covering
 	 * @return true if a visible enemy detector is covering the position.
 	 */
-	bool isEnemyDetectorCovering(BWAPI::TilePosition position);
+	bool isEnemyDetectorCovering(const BWAPI::TilePosition& position) const;
 
 	/**
 	 * \copydoc isEnemyDetectorCovering()
 	 */
-	bool isEnemyDetectorCovering(BWAPI::Position position);
+	bool isEnemyDetectorCovering(const BWAPI::Position& position) const;
 
 	/**
 	 * Find expansions that haven't been scouted for X seconds. X is specified by

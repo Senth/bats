@@ -62,6 +62,12 @@ public:
 	bool isDisbandable() const;
 
 	/**
+	 * Returns true if the squad is currently regrouping
+	 * @return true if the squad is regrouping
+	 */
+	bool isRegrouping() const;
+
+	/**
 	 * Returns true if the squad is empty
 	 * @return true if the squad is empty
 	 */
@@ -99,6 +105,20 @@ public:
 	 * Because it will then use the median of all units.
 	 */
 	BWAPI::TilePosition getCenter() const;
+
+	/**
+	 * Calculates the distance to the unit furthest away from the center of the squad.
+	 * Because this function is calculation heavy it will cache the distance for 
+	 * CALC_FURTHEST_AWAY_TIME (calc_furthest_away_time in config file). You can override
+	 * this setting by setting the parameter forceRecalculate to true, then it will always 
+	 * recalculate the distance.
+	 * @param forceRecalculate set this to true if you want to force recalculation, thus
+	 * being sure you get the right answer, defaults to false.
+	 * @return the distance to the unit furthest aways from the center of the squad. If no
+	 * units exist it will return 0.0.
+	 */
+	double getFurthestUnitAwayDistance(bool forceRecalculate = false) const;
+
 
 	/**
 	 * Returns true if the squad is full, only applicable on squads with a unit composition
@@ -161,6 +181,13 @@ public:
 	* @see addWaitGoal() for a more detailed description.
 	*/
 	void addWaitGoals(const std::vector<std::tr1::shared_ptr<WaitGoal>>& waitGoals);
+
+	/**
+	 * Checks whether the squad has wait goals or not. Can mean no wait goals were added
+	 * or all wait goals were are done, either successfully or failed by some means.
+	 * @return true if the squad has no wait goals. 
+	 */
+	bool hasWaitGoals() const;
 
 	/**
 	 * Returns the squad's id.
@@ -240,13 +267,70 @@ public:
 	 * @return current state of the Squad
 	 */
 	States getState() const;
+
+	/**
+	 * Returns true if the squad is close to the specified position. Will always
+	 * return false if the squad is regrouping, because when regrouping the center might
+	 * not be valid at all, if 4 units are at the top left of the map and 4 units are
+	 * at bottom right of the map the center will be in the center of the map, but no units
+	 * are really close to the center. Uses the default range set in
+	 * config::squad::CLOSE_DISTANCE_RANGE (close_distance_range in config file).
+	 * @note Takes the type of squad into account, if the squad travelsByAir() it will use
+	 * the direct distance, else it will use ground distance.
+	 * @param position the position to test if the squad is close to.
+	 * @return true if the center position of the squad is close to that position. Returns
+	 * false if the center position isn't in range or if the squad is regrouping.
+	 * @see isCloseTo(const BWAPI::TilePosition&,double) for you own radius.
+	 */
+	bool isCloseTo(const BWAPI::TilePosition& position) const;
+
+	/**
+	 * Returns true if the squad is close to the specified position. Will always
+	 * return false if the squad is regrouping, because when regrouping the center might
+	 * not be valid at all, if 4 units are at the top left of the map and 4 units are
+	 * at bottom right of the map the center will be in the center of the map, but no units
+	 * are really close to the center.
+	 * @note Takes the type of squad into account, if the squad travelsByAir() it will use
+	 * the direct distance, else it will use ground distance.
+	 * @param position the position to test if the squad is close to.
+	 * @param range the distance between position and the center
+	 * of the squad needs to be less or equal to the this range.
+	 * @return true if the center position of the squad is close to that position. Returns
+	 * false if the center position isn't in range or if the squad is regrouping.
+	 * @see isCloseTo(const BWAPI::TilePosition&) for using the default radius.
+	 */
+	bool isCloseTo(const BWAPI::TilePosition& position, double range) const;
 	
 protected:
+	/**
+	 * Different goal states.
+	 */
+	enum GoalStates {
+		GoalState_First = 0,
+		GoalState_Succeeded = GoalState_First,
+		GoalState_Failed,
+		GoalState_NotCompleted,
+		GoalState_Lim
+	};
+
 	/**
 	 * Virtual compute actions function. This function is called by computeActions().
 	 * Implement this function to create specific squad behavior.
 	 */
 	virtual void computeSquadSpecificActions();
+
+	/**
+	 * Check whether the goal is completed or not. Shall return whether
+	 * the current goal state of the squad.
+	 * @return current goal state of the squad.
+	 */
+	virtual GoalStates checkGoalState() const = 0;
+
+	/**
+	 * Called when a new goal shall be created.
+	 * @returns true a goal was successfully created.
+	 */
+	virtual bool createGoal() = 0;
 
 	/**
 	 * Sets whether the squad shall mainly be used for air transportation.
@@ -319,31 +403,13 @@ protected:
 	 */ 
 	bool hasTemporaryGoalPosition() const;
 
-	/**
-	 * Different goal states.
-	 */
-	enum GoalStates {
-		GoalState_First = 0,
-		GoalState_Success = GoalState_First,
-		GoalState_Failed,
-		GoalState_NotCompleted,
-		GoalState_Lim
-	};
-
-	GoalStates mGoalState;
-
-private:
-	/**
-	 * Called when a new goal shall be created.
-	 * @returns true a goal was successfully created.
-	 */
-	virtual bool createGoal() = 0;
-	
+private:	
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mGoalPositions;
 	UnitComposition mUnitComposition;
 	BWAPI::TilePosition mTempGoalPosition;
+	BWAPI::TilePosition mRegroupPosition;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
@@ -351,8 +417,12 @@ private:
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
 	States mState;
 	SquadId mId;
-
 	std::tr1::weak_ptr<Squad> mThis;
+	GoalStates mGoalState;
+
+	// Calculating furthest unit away distance
+	mutable double mFurthestUnitAwayDistance;
+	mutable double mFurthestUnitAwayLastTime;
 
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
 	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
