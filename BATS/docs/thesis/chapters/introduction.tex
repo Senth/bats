@@ -24,16 +24,26 @@ The AI is implemented in an RTS game: StarCraft, more specifically StarCraft : B
 StarCraft has three races—Terran, Protoss, and Zerg—which the player can choose from. Each of these races have their own unique type of units and their play styles are very different to each other.
 
 \paragraph{Commonalities between races}
-All races have worker units that collect minerals and gas—minerals and gas are the games resources used to build structures, units and upgrades. Minerals and gas are usually located in clusters of several mineral fields and maybe one gas. The player always starts at a base with both mineral fields and a gas depot. To mine minerals and gas workers go to the fields and then return to the base building—you can have multiple base buildings. Because of the travel distance you usually want to place your base close to the resource clusters.
+All races have worker units that collect minerals and gas—minerals and gas are the games resources used to build structures, units and upgrades. Minerals and gas are usually located in clusters of several mineral fields and sometimes a Vespene geyser which you mine gas from. The player always starts at a base with both mineral fields and a gas depot. To mine minerals and gas workers go to the fields and then return to the closest main structure of the player. Because of the travel distance you usually want to build a new main structure near resource clusters.
 
-Minerals fields have a fixed number of resources they can yield, when all those have been depleted the mineral field disappears. A Vespene gas geyser on the other hand does not disappear after depletion, instead each worker now brings back 2 units of gas each turn, instead of 8. To mine gas an additional structure needs to be placed on the Vespene gas geyser. 
+Mineral fields have a fixed number of resources they can yield; when all have been depleted the mineral field disappears. A Vespene geyser on the other hand does not disappear after depletion, instead each worker now brings back 2 units of gas each turn, instead of 8. To be able to mine gas in the first place an additional structure needs to be placed on a Vespene geyser. Only one worker can simultaneously collect minerals from a mineral field, or gas from a gas depot, other workers are automatically queued to start mining when the first worker brings back the resources.
 
-This makes the distance short from the resources to the base which all resources has to be carried to. Only one worker can simultaneously collect minerals from a mineral field, or gas from a gas depot. Minerals have a fixed number of resources to them that can be mined before they disappear; gas on the other hand too have a number of resources, but after that limit is reached gas can still be mined, but now the worker only harvest 2 gas instead of 7. To harvest gas a structure needs to be built on top of the gas depot.
+StarCraft limits the number of units one can have to 200 supply\footnote{It’s called Psi for Protoss, and Control for Zerg which makes more sense on those unit. Supply is, however, more commonly used jargon for all races.}. Each unit occupies an amount of supply, ranging from a half supply (Zerglings) to 6 supplies (Carriers), armed nuclear silos take up 8 supplies. In general, the better the unit the more supply it takes. The player does, however, only start with 9 to 10 max supply depending on the race. To increase the max supply a special structure (unit for Zerg) can be built; main bases also generate supply, 10 for Terran Command Center, 9 for Protoss Nexus, and 1 for Zerg Hatchery.
 
-Each unit occupies an amount of supply, ranging from a half supply (Zerglings) to 8 supplies (Carriers). Zerg's Overlord is the only unit that doesn't take any supplies, in fact it gives supplies, this is described in the following text. The maximum supply of units is 200 for all races. To get more supplies than the starting amount, the races have to either build a new base structure or a special supply structure, or unit in the Zerg's case.
+\paragraph{Constructing Structures}
+Terran's worker unit, SCV,  When an SCV constructs a structure it becomes occupied and cannot do anything else; it can still be targeted, and can stop building and let another SCV take over—this can be the case when an enemy attacks the SCV.
 
-\paragraph{Terran}
-Terran's worker unit 'SVC' can repair structures, and vehicle units. When they construct a structure they becomes occupied with that task and cannot do anything else. The SVC can however abort the building and let another SVC continue with the construction.
+Zerg’s worker unit, Drone, will instead morph itself into a structure. The drone will disappear once the morphing stage begins, but if the player cancels the building progress the drone will reappear. Once the morph completes the drone is forever lost. Zerg structures need to be placed on creep which Hatcheries and colonies help to spread. The only exception to this is Hatcheries and Excractors (for Vespene geyser).
+
+Protoss’s worker unit, Probe, need to construct structures in a psionic power grid that is generated by pylons structures. If a structure becomes unpowered it will not function again until a nearby pylon is reconstructed to create a new psionic power grid.
+
+\paragraph{Unit Health}
+
+%: Notes below
+
+can repair structures, and vehicles (both ground and flying).
+to target the 
+The SVC can however abort the building and let another SVC continue with the construction.
 
 While Protoss's supply structure and Zerg's supply unit has special abilities the Terran's supply unit does nothing more than take up place and give 8 supply to the player.
 
