@@ -70,7 +70,7 @@ void AgentManager::requestOverlord(TilePosition pos)
 	{
 		if (agents.at(i)->isOfType(UnitTypes::Zerg_Overlord) && agents.at(i)->isAlive())
 		{
-			if (agents.at(i)->getGoal().x() == -1)
+			if (agents.at(i)->getGoal()== TilePositions::Invalid)
 			{
 				agents.at(i)->setGoal(pos);
 				return;
@@ -437,7 +437,7 @@ bool AgentManager::unitsInArea(TilePosition pos, int tileWidth, int tileHeight, 
 
 TilePosition AgentManager::getClosestDetector(TilePosition startPos)
 {
-	TilePosition pos = TilePosition(-1, -1);
+	TilePosition pos = TilePositions::Invalid;
 	double bestDist = 10000;
 
 	for (int i = 0; i < (int)agents.size(); i++)

@@ -13,7 +13,7 @@ SiegeTankAgent::SiegeTankAgent(Unit* mUnit)
 	agentType = "SiegeTankAgent";
 	//Broodwar->printf("SiegeTankAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void SiegeTankAgent::computeActions()

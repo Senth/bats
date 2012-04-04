@@ -30,7 +30,7 @@ ExplorationManager::ExplorationManager()
 
 	lastCallFrame = Broodwar->getFrameCount();
 
-	expansionSite = TilePosition(-1, -1);
+	expansionSite = TilePositions::Invalid;
 }
 
 ExplorationManager::~ExplorationManager()
@@ -91,7 +91,7 @@ TilePosition ExplorationManager::searchExpansionSite()
 {
 	getExpansionSite();
 
-	if (expansionSite.x() == -1)
+	if (expansionSite== TilePositions::Invalid)
 	{
 		expansionSite = CoverMap::getInstance()->findExpansionSite();
 		siteSetFrame = Broodwar->getFrameCount();
@@ -107,7 +107,7 @@ TilePosition ExplorationManager::getExpansionSite()
 	{
 		if (Broodwar->getFrameCount() - siteSetFrame > 500)
 		{
-			expansionSite = TilePosition(-1, -1);
+			expansionSite = TilePositions::Invalid;
 		}
 	}
 
@@ -129,7 +129,7 @@ TilePosition ExplorationManager::getNextToExplore(Squad* squad)
 	TilePosition goal = squad->getGoal();
 
 	//Special case: No goal set
-	if (goal.x() == -1 || goal.y() == -1)
+	if (goal== TilePositions::Invalid || goal.y() == -1)
 	{
 		BWTA::Region* startRegion = getRegion(curPos); 
 		goal = TilePosition(startRegion->getCenter());
@@ -203,7 +203,7 @@ TilePosition ExplorationManager::getNextToExplore(Squad* squad)
 		}
 	}
 
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 void ExplorationManager::setExplored(TilePosition goal)
@@ -490,7 +490,7 @@ TilePosition ExplorationManager::getClosestSpottedBuilding(TilePosition start)
 {
 	cleanup();
 
-	TilePosition pos = TilePosition(-1, -1);
+	TilePosition pos = TilePositions::Invalid;
 	double bestDist = 100000;
 
 	for (int i = 0; i < (int)spottedBuildings.size(); i++)
@@ -604,7 +604,7 @@ bool ExplorationManager::enemyIsUnknown()
 
 TilePosition ExplorationManager::scanForVulnerableBase()
 {
-	TilePosition spot = TilePosition(-1, -1);
+	TilePosition spot = TilePositions::Invalid;
 	for (int i = 0; i < (int)spottedBuildings.size(); i++)
 	{
 		if (spottedBuildings.at(i)->isActive())

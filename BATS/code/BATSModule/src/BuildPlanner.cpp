@@ -397,7 +397,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 	if (type.isResourceDepot())
 	{
 		TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-		if (pos.x() == -1)
+		if (pos== TilePositions::Invalid)
 		{
 			//No expansion site found.
 			if ((int)buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
@@ -630,7 +630,7 @@ void BuildPlanner::expand(UnitType commandCenterUnit){
 	}
 
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-	if (pos.x() == -1)
+	if (pos== TilePositions::Invalid)
 	{
 		//No expansion site found.
 		return;

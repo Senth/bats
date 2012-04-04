@@ -13,7 +13,7 @@ UltraliskAgent::UltraliskAgent(Unit* mUnit)
 	agentType = "UltraliskAgent";
 	//Broodwar->printf("UltraliskAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void UltraliskAgent::computeActions()

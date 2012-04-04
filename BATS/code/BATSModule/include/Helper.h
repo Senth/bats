@@ -13,7 +13,8 @@ namespace bats {
 #define OUR(what) (what->getPlayer()->getID() == Broodwar->self()->getID())
 
 /**
- * Returns the squared distance between two points
+ * Returns the squared distance between two points. This function is faster
+ * than using a regular getDistance() since getDistance() uses square root.
  * @pre type T needs to have a function x() and y()
  * @pre neither a or b shall be a pointer.
  * @param a the first point

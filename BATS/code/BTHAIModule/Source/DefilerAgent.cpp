@@ -14,7 +14,7 @@ DefilerAgent::DefilerAgent(Unit* mUnit)
 	agentType = "DefilerAgent";
 	//Broodwar->printf("DefilerAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void DefilerAgent::computeActions()

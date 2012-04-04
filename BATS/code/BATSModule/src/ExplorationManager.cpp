@@ -101,7 +101,7 @@ void bats::ExplorationManager::computeActions() {
 //{
 //	getExpansionSite();
 //
-//	if (mExpansionSite.x() == -1)
+//	if (mExpansionSite== TilePositions::Invalid)
 //	{
 //		mExpansionSite = CoverMap::getInstance()->findExpansionSite();
 //		mSiteSetFrame = Broodwar->getFrameCount();
@@ -117,7 +117,7 @@ void bats::ExplorationManager::computeActions() {
 //	{
 //		if (Broodwar->getFrameCount() - mSiteSetFrame > 500)
 //		{
-//			mExpansionSite = TilePosition(-1, -1);
+//			mExpansionSite = TilePositions::Invalid;
 //		}
 //	}
 //
@@ -495,7 +495,7 @@ bool bats::ExplorationManager::canReach(UnitAgent* pAgent, BWAPI::TilePosition d
 
 //TilePosition bats::ExplorationManager::scanForVulnerableBase()
 //{
-//	TilePosition spot = TilePosition(-1, -1);
+//	TilePosition spot = TilePositions::Invalid;
 //	for (int i = 0; i < (int)mSpottedStructures.size(); i++)
 //	{
 //		if (mSpottedStructures[i]->isActive())

@@ -47,6 +47,12 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
 {
 	Unit* unit = agent->getUnit();
 
+	// Stop if goal is invalid
+	if (goal == TilePositions::Invalid) {
+		unit->stop();
+		return;
+	}
+
 	if (!defensive || !forceMove)
 	{
 		//if (agent->getUnit()->isStartingAttack()) return;
@@ -100,25 +106,32 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
     }
 	//EndPF
 
-	TilePosition checkpoint = goal;
-	if (agent->_deprecated_getSquadID() >= 0)
-	{
-		Squad* sq = Commander::getInstance()->getSquad(agent->_deprecated_getSquadID());
-		if (sq != NULL)
-		{
-			checkpoint = sq->nextMovePosition();
-		}
-	}
+	// Not needed for BATS
+	//TilePosition checkpoint = goal;
+	//if (agent->_deprecated_getSquadID() >= 0)
+	//{
+	//	Squad* sq = Commander::getInstance()->getSquad(agent->_deprecated_getSquadID());
+	//	if (sq != NULL)
+	//	{
+	//		checkpoint = sq->nextMovePosition();
+	//	}
+	//}
 	
-	if (goal.x() != -1)
+	//if (goal != TilePositions::Invalid)
+	//{
+	//	moveToGoal(agent, checkpoint, goal);
+	//}
+	
+	// Using this instead for bats
+	if (goal != TilePositions::Invalid)
 	{
-		moveToGoal(agent, checkpoint, goal);
+		moveToGoal(agent, goal, goal);
 	}
 }
 
 bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosition goal)
 {
-	if (checkpoint.x() == -1 || goal.x() == -1) return false;
+	if (checkpoint == TilePositions::Invalid || goal == TilePositions::Invalid) return false;
 	Unit* unit = agent->getUnit();
 
 	if (unit->isStartingAttack() || unit->isAttacking())
@@ -146,8 +159,9 @@ bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosit
 	}
 	
 	//Move
-	if (!unit->isMoving()) return unit->attack(toReach);
-	else return true;
+	//if (!unit->isMoving()) return unit->attack(toReach);
+	//else return true;
+	return unit->attack(toReach);
 }
 
 float PFManager::getAttackingUnitP(BaseAgent* agent, int cX, int cY, bool defensive)

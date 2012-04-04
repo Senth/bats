@@ -13,7 +13,7 @@ GoliathAgent::GoliathAgent(Unit* mUnit)
 	agentType = "GoliathAgent";
 	//Broodwar->printf("GoliathAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void GoliathAgent::computeActions()

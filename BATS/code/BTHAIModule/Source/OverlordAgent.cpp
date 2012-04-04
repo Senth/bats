@@ -15,7 +15,7 @@ OverlordAgent::OverlordAgent(Unit* mUnit)
 	//Broodwar->printf("OverlordAgent created (%s)", unit->getType().getName().c_str());
 	
 	lastUpdateFrame = Broodwar->getFrameCount();
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	updateGoal();
 }
 

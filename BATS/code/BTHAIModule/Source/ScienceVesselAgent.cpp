@@ -14,7 +14,7 @@ ScienceVesselAgent::ScienceVesselAgent(Unit* mUnit)
 	//Broodwar->printf("ScienceVesselAgent created (%s)", unit->getType().getName().c_str());
 	lastIrradiateFrame = 0;
 
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ScienceVesselAgent::computeActions()

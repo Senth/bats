@@ -14,7 +14,7 @@ ScoutAgent::ScoutAgent(Unit* mUnit)
 	agentType = "ScoutAgent";
 	//Broodwar->printf("ScoutAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ScoutAgent::computeActions()

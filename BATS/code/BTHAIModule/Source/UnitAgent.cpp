@@ -21,7 +21,7 @@ UnitAgent::UnitAgent(Unit* mUnit) : squadId(bats::SquadId::INVALID_KEY)
 	dropped = 0;
 	agentType = "UnitAgent";
 
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void UnitAgent::setSquadId(bats::SquadId squadId) {
@@ -604,7 +604,7 @@ void UnitAgent::setGoal(TilePosition goal)
 
 void UnitAgent::clearGoal()
 {
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 bool UnitAgent::isAir() const

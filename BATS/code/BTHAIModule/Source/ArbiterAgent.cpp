@@ -13,7 +13,7 @@ ArbiterAgent::ArbiterAgent(Unit* mUnit)
 	agentType = "ArbiterAgent";
 	//Broodwar->printf("ArbiterAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ArbiterAgent::computeActions()

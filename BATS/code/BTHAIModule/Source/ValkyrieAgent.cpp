@@ -14,7 +14,7 @@ ValkyrieAgent::ValkyrieAgent(Unit* mUnit)
 	agentType = "ValkyrieAgent";
 	//Broodwar->printf("ValkyrieAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ValkyrieAgent::computeActions()

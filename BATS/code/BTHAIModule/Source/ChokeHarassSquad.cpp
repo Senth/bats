@@ -62,7 +62,7 @@ void ChokeHarassSquad::computeActions()
 		if (analyzed)
 		{
 			TilePosition defSpot = Commander::getInstance()->findChokePoint();
-			if (defSpot.x() != -1)
+			if (defSpot!= TilePositions::Invalid)
 			{
 				goal = defSpot;
 			}
@@ -88,7 +88,7 @@ void ChokeHarassSquad::computeActions()
 		}
 
 		TilePosition ePos = ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
-		if (ePos.x() == -1)
+		if (ePos== TilePositions::Invalid)
 		{
 			//No enemy building found, check start locations
 			TilePosition nGoal = getNextStartLocation();
@@ -135,7 +135,7 @@ void ChokeHarassSquad::printInfo()
 
 void ChokeHarassSquad::clearGoal()
 {
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 TilePosition ChokeHarassSquad::getGoal()

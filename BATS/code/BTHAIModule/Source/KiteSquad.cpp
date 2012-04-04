@@ -62,7 +62,7 @@ void KiteSquad::computeActions()
 		if (analyzed)
 		{
 			TilePosition defSpot = Commander::getInstance()->findChokePoint();
-			if (defSpot.x() != -1)
+			if (defSpot!= TilePositions::Invalid)
 			{
 				goal = defSpot;
 			}
@@ -95,7 +95,7 @@ void KiteSquad::computeActions()
 		}
 
 		TilePosition ePos = ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
-		if (ePos.x() == -1)
+		if (ePos== TilePositions::Invalid)
 		{
 			TilePosition nGoal = getNextStartLocation();
 			if (nGoal.x() >= 0)
@@ -129,14 +129,14 @@ TilePosition KiteSquad::getNextStartLocation()
 				int eCnt = uagent->enemyUnitsWithinRange(10 * 32);
 				if (eCnt > 0)
 				{
-					return TilePosition(-1, -1);
+					return TilePositions::Invalid;
 				}
 			}
 
 			hasVisited.push_back(basePos);
 		}
 	}
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 bool KiteSquad::isVisible(TilePosition pos)

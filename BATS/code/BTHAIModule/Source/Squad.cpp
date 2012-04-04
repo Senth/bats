@@ -27,7 +27,7 @@ Squad::Squad(int mId, int mType, string mName, int mPriority)
 	activePriority = priority;
 	active = false;
 	required = false;
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	goalSetFrame = 0;
 	arrivedFrame = -1;
 	currentState = STATE_DEFEND;
@@ -528,7 +528,7 @@ bool Squad::isGathered()
 
 void Squad::defend(TilePosition mGoal)
 {
-	if (mGoal.x() == -1 || mGoal.y() == -1) return;
+	if (mGoal== TilePositions::Invalid || mGoal.y() == -1) return;
 
 	if (currentState != STATE_DEFEND)
 	{
@@ -542,7 +542,7 @@ void Squad::defend(TilePosition mGoal)
 
 void Squad::attack(TilePosition mGoal)
 {
-	if (mGoal.x() == -1 || mGoal.y() == -1) return;
+	if (mGoal== TilePositions::Invalid || mGoal.y() == -1) return;
 	
 	if (currentState != STATE_ATTACK)
 	{
@@ -563,7 +563,7 @@ void Squad::attack(TilePosition mGoal)
 
 void Squad::assist(TilePosition mGoal)
 {
-	if (mGoal.x() == -1 || mGoal.y() == -1) return;
+	if (mGoal== TilePositions::Invalid || mGoal.y() == -1) return;
 
 	if (currentState != STATE_ASSIST)
 	{
@@ -575,7 +575,7 @@ void Squad::assist(TilePosition mGoal)
 	}
 	else
 	{
-		if (goal.x() == -1)
+		if (goal== TilePositions::Invalid)
 		{
 			setGoal(mGoal);
 		}
@@ -586,7 +586,7 @@ void Squad::setGoal(TilePosition mGoal)
 {
 	if (isAttacking())
 	{
-		if (goal.x() != -1)
+		if (goal!= TilePositions::Invalid)
 		{
 			return;
 		}
@@ -673,7 +673,7 @@ TilePosition Squad::nextMovePosition()
 
 void Squad::clearGoal()
 {
-	this->goal = TilePosition(-1, -1);
+	this->goal = TilePositions::Invalid;
 	setMemberGoals(goal);
 }
 
@@ -700,7 +700,7 @@ bool Squad::hasGoal()
 	{
 		if (!isAttacking())
 		{
-			goal = TilePosition(-1, -1);
+			goal = TilePositions::Invalid;
 		}
 	}
 	
@@ -1063,14 +1063,14 @@ TilePosition Squad::getNextStartLocation()
 				int eCnt = uagent->enemyUnitsWithinRange(10 * 32);
 				if (eCnt > 0)
 				{
-					return TilePosition(-1, -1);
+					return TilePositions::Invalid;
 				}
 			}
 
 			hasVisited.push_back(basePos);
 		}
 	}
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 bool Squad::isVisible(TilePosition pos)

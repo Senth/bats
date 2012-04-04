@@ -13,7 +13,7 @@ BattlecruiserAgent::BattlecruiserAgent(Unit* mUnit)
 	agentType = "BattlecruiserAgent";
 	//Broodwar->printf("BattlecruiserAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	lastUseFrame = Broodwar->getFrameCount();
 }
 

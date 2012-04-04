@@ -95,10 +95,10 @@ public:
 	BWAPI::TilePosition findRefineryBuildSpot(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
 	/** Finds and returns the position of the closest free vespene gas around the specified start position.
-	 * If no gas vein is found, a BWAPI::TilePosition(-1, -1) is returned. */
+	 * If no gas vein is found, a BWAPI::TilePositions::Invalid is returned. */
 	BWAPI::TilePosition findClosestGasWithoutRefinery(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
-	/** Searches for a spot to build a refinery at. Returns BWAPI::TilePosition(-1, -1) if no spot was found.*/
+	/** Searches for a spot to build a refinery at. Returns BWAPI::TilePositions::Invalid if no spot was found.*/
 	BWAPI::TilePosition searchRefinerySpot();
 
 	/** Returns a position of a suitable site for expansion, i.e. new bases. */

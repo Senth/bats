@@ -403,7 +403,45 @@ protected:
 	 */ 
 	bool hasTemporaryGoalPosition() const;
 
-private:	
+private:
+	/**
+	 * Handles the regrouping. It will check whether the squad shall regroup (if it's not
+	 * regrouping) or continue with the last active goal once the regrouping is finished.
+	 */
+	void handleRegroup();
+
+	/**
+	 * Checks if a unit is out of the config::squad::REGROUP_DISTANCE_BEGIN range.
+	 * @return true if squad needs regrouping
+	 */
+	bool needsRegrouping() const;
+
+	/**
+	 * Checks if all units are within config::squad::REGROUP_DISTANCE_BEGIN range.
+	 * @return true if squad finished regrouping.
+	 */
+	bool finishedRegrouping() const;
+
+	/**
+	 * Sets a regrouping position and makes the units move to that point instead
+	 * @param regroupPosition the position to regroup to, usually this would be
+	 * getCenter().
+	 */
+	void setRegroupPosition(const BWAPI::TilePosition& regorupPosition);
+
+	/**
+	 * Clears the regrouping position and resumes moving to the last goal we had.
+	 * It will first try the temporary position, then via position, and last the goal
+	 * position if none of the previous exists.
+	 */
+	void clearRegroupPosition();
+
+	/**
+	 * Returns true if a unit is standing still and not attacking.
+	 * @return true if a unit stands still and not attacks 
+	 */
+	bool isAUnitStill() const;
+
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mGoalPositions;

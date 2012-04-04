@@ -15,7 +15,7 @@ VultureAgent::VultureAgent(BWAPI::Unit* mUnit)
 	//Broodwar->printf("VultureAgent created (%s)", unit->getType().getName().c_str());
 	mineDropFrame = 0;
 
-	goal = BWAPI::TilePosition(-1, -1);
+	goal = BWAPI::TilePositions::Invalid;
 }
 
 void VultureAgent::computeActions()

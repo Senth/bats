@@ -22,7 +22,7 @@ WorkerAgent::WorkerAgent(Unit* mUnit)
 	//Broodwar->printf("WorkerAgent created (%s)", unit->getType().getName().c_str());
 	setState(GATHER_MINERALS);
 	startBuildFrame = 0;
-	startSpot = TilePosition(-1, -1);
+	startSpot = TilePositions::Invalid;
 	agentType = "WorkerAgent";
 }
 
@@ -320,7 +320,7 @@ void WorkerAgent::computeActions()
 		{
 			//Broodwar->printf("[%d] is building at (%d,%d)", unitID, buildSpot.x(), buildSpot.y());
 			setState(CONSTRUCT);
-			startSpot = TilePosition(-1, -1);
+			startSpot = TilePositions::Invalid;
 		}
 	}
 
@@ -399,8 +399,8 @@ void WorkerAgent::setState(int state)
 	
 	if (state == GATHER_MINERALS)
 	{
-		startSpot = TilePosition(-1, -1);
-		buildSpot = TilePosition(-1, -1);
+		startSpot = TilePositions::Invalid;
+		buildSpot = TilePositions::Invalid;
 	}
 }
 
@@ -458,7 +458,7 @@ bool WorkerAgent::assignToBuild(UnitType type)
 	else
 	{
 		//Broodwar->printf("No buildspot found for %s", type.getName().c_str());
-		startSpot = TilePosition(-1, -1);
+		startSpot = TilePositions::Invalid;
 		return false;
 	}
 }

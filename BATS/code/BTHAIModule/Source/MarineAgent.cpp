@@ -14,8 +14,6 @@ MarineAgent::MarineAgent(Unit* mUnit)
 	unitID = unit->getID();
 	agentType = "MarineAgent";
 	//Broodwar->printf("MarineAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePosition(-1, -1);
 }
 
 void MarineAgent::computeActions()

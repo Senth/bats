@@ -14,7 +14,7 @@ DevourerAgent::DevourerAgent(Unit* mUnit)
 	agentType = "DevourerAgent";
 	//Broodwar->printf("DevourerAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void DevourerAgent::computeActions()

@@ -133,7 +133,7 @@ public:
 	virtual void printInfo();
 
 	/** Searches for a chokepoint that is unfortified, i.e. does not contain for example a Bunker or defensive
-	 * turret. Returns BWAPI::TilePosition(-1, -1) if no position was found. */
+	 * turret. Returns BWAPI::TilePositions::Invalid if no position was found. */
 	virtual BWAPI::TilePosition findUnfortifiedChokePoint();
 	
 	/** Searches for and returns a good chokepoint position to defend the territory. */

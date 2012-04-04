@@ -155,7 +155,7 @@ void Squad::computeActions() {
 			break;
 		}
 
-		/// @todo implement regroup functionality to the squads.
+		handleRegroup();
 
 	default:
 		// Do nothing
@@ -431,4 +431,99 @@ const TilePosition& Squad::getTemporaryGoalPosition() const {
 
 bool Squad::hasTemporaryGoalPosition() const {
 	return mTempGoalPosition != TilePositions::Invalid;
+}
+
+void Squad::handleRegroup() {
+	/// @todo improve regrouping position for ground units. Regroup position shall be between
+	/// the two units that are furthest away from each other (ground distance), and not
+	/// the center, which sometimes are inaccessible.
+
+	// Not regrouping, but needs regrouping
+	if (mRegroupPosition == TilePositions::Invalid) {
+		if (needsRegrouping()) {
+			setRegroupPosition(getCenter());
+		}
+	}
+	// Stop regrouping if we're done
+	else {
+		if (finishedRegrouping()) {
+			clearRegroupPosition();
+		} else {
+			// If a unit is standing still we need to update the regroup position
+			if (isAUnitStill()) {
+				setRegroupPosition(getCenter());
+			}
+		}
+	}
+}
+
+bool Squad::needsRegrouping() const {
+
+	// Use same calculation both for air and ground
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		double squaredDistance = getSquaredDistance(getCenter(), mUnits[i]->getUnit()->getTilePosition());
+
+		if (squaredDistance > config::squad::REGROUP_DISTANCE_BEGIN_SQUARED) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Squad::finishedRegrouping() const {
+	// Use same calculation both for air and ground
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		double squaredDistance = getSquaredDistance(getCenter(), mUnits[i]->getUnit()->getTilePosition());
+
+		if (squaredDistance > config::squad::REGROUP_DISTANCE_END_SQUARED) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void Squad::setRegroupPosition(const BWAPI::TilePosition& regorupPosition) {
+	mRegroupPosition = regorupPosition;
+
+	// Update units
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		mUnits[i]->setGoal(mRegroupPosition);
+	}
+}
+
+void Squad::clearRegroupPosition() {
+	mRegroupPosition = TilePositions::Invalid;
+
+	TilePosition nextGoal = TilePositions::Invalid;
+
+	// Temporary position?
+	nextGoal = mTempGoalPosition;
+
+	/// @todo add via position
+	if (nextGoal == TilePositions::Invalid) {
+
+	}
+
+	// Goal
+	if (nextGoal == TilePositions::Invalid && !mGoalPositions.empty()) {
+		nextGoal = mGoalPositions.front();
+	}
+
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		mUnits[i]->setGoal(nextGoal);
+	}
+}
+
+bool Squad::isAUnitStill() const {
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		Unit* pUnit = mUnits[i]->getUnit();
+
+		if (!pUnit->isMoving() && !pUnit->isAttacking()) {
+			return true;
+		}
+	}
+
+	return false;
 }

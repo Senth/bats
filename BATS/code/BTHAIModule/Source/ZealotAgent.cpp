@@ -18,7 +18,7 @@ ZealotAgent::ZealotAgent(Unit* mUnit)
 	agentType = "ZealotAgent";
 	//Broodwar->printf("ZealotAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ZealotAgent::computeActions()

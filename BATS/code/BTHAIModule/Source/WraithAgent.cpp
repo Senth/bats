@@ -14,7 +14,7 @@ WraithAgent::WraithAgent(Unit* mUnit)
 	agentType = "WraithAgent";
 	//Broodwar->printf("WraithAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void WraithAgent::computeActions()

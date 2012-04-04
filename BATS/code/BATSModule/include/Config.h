@@ -94,11 +94,17 @@ namespace bats {
 			 * should not have the same value since this can cause threshold errors.
 			 */
 			extern double REGROUP_DISTANCE_BEGIN;
+			/** See REGROUP_DISTANCE_BEGIN, the squared version. Cannot be set
+			 * through the config file, will set automatically, used for faster calculation. */
+			extern double REGROUP_DISTANCE_BEGIN_SQUARED;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
 			extern double REGROUP_DISTANCE_END;
+			/** See REGROUP_DISTANCE_END, the squared version. Cannot be set through
+			 * the config file, will set automatically, used for faster calculation. */
+			extern double REGROUP_DISTANCE_END_SQUARED;
 			/** How long time before recalculating the distance to the unit furthest away
 			 * from the squad. This is the minimum time and the distance will not be
 			 * recalculated until the function is called again. */

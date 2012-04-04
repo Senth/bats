@@ -14,7 +14,7 @@ CorsairAgent::CorsairAgent(Unit* mUnit)
 	agentType = "CorsairAgent";
 	//Broodwar->printf("CorsairAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	lastUseFrame = Broodwar->getFrameCount();
 }
 

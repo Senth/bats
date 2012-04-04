@@ -16,7 +16,7 @@ TransportAgent::TransportAgent(Unit* mUnit)
 	unitID = unit->getID();
 	agentType = "TransportAgent";
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 int TransportAgent::getCurrentLoad()

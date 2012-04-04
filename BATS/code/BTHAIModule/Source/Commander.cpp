@@ -50,7 +50,7 @@ Commander* Commander::getInstance()
 bool Commander::shallEngage()
 {
 	TilePosition closeEnemy = getClosestEnemyBuilding(Broodwar->self()->getStartLocation());
-	if (closeEnemy.x() == -1)
+	if (closeEnemy== TilePositions::Invalid)
 	{
 		//No enemy sighted. Dont launch attack.
 		return false;
@@ -70,7 +70,7 @@ void Commander::updateGoals()
 {
 	TilePosition defSpot = findChokePoint();
 	
-	if (defSpot.x() != -1)
+	if (defSpot!= TilePositions::Invalid)
 	{
 		for (int i = 0; i < (int)squads.size(); i++)
 		{
@@ -126,7 +126,7 @@ void Commander::computeActions()
 		{
 			if (!squads.at(i)->hasGoal())
 			{
-				if (defSpot.x() != -1)
+				if (defSpot!= TilePositions::Invalid)
 				{
 					squads.at(i)->defend(defSpot);
 				}
@@ -152,7 +152,7 @@ void Commander::computeActions()
 			else
 			{
 				TilePosition defSpot = findChokePoint();
-				if (defSpot.x() != -1)
+				if (defSpot!= TilePositions::Invalid)
 				{
 					squads.at(i)->defend(defSpot);
 				}
@@ -542,7 +542,7 @@ TilePosition Commander::findUnfortifiedChokePoint()
 		}
 	}
 
-	TilePosition buildPos = TilePosition(-1, -1);
+	TilePosition buildPos = TilePositions::Invalid;
 	if (bestChoke != NULL)
 	{
 		buildPos = TilePosition(bestChoke->getCenter());
@@ -838,12 +838,12 @@ bool Commander::needUnit(UnitType type)
 
 TilePosition Commander::findOffensiveSquadPosition(TilePosition closeEnemy)
 {
-	TilePosition pos = TilePosition(-1, -1);
+	TilePosition pos = TilePositions::Invalid;
 
 	for (int i = 0; i < (int)squads.size(); i++)
 	{
 		Squad* sq = squads.at(i);
-		if (pos.x() == -1)
+		if (pos== TilePositions::Invalid)
 		{
 			if (sq->isActive() && sq->isOffensive() && sq->isGround() && currentState == ATTACK && sq->size() >= 2)
 			{
@@ -856,7 +856,7 @@ TilePosition Commander::findOffensiveSquadPosition(TilePosition closeEnemy)
 		}
 	}
 
-	if (pos.x() == -1)
+	if (pos== TilePositions::Invalid)
 	{
 		//No position found, wait at home base
 		pos = Broodwar->self()->getStartLocation();
@@ -957,7 +957,7 @@ void Commander::forceAttack()
 	
 	Broodwar->printf("Force attack at (%d,%d)", cGoal.x(), cGoal.y());
 
-	if (cGoal.x() == -1)
+	if (cGoal== TilePositions::Invalid)
 	{
 		return;
 	}

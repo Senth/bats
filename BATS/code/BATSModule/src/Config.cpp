@@ -55,7 +55,9 @@ namespace squad {
 	double PING_WAIT_TIME_FIRST = 0.0;
 	double PING_WAIT_TIME_AFTER_FIRST = 0.0;
 	double REGROUP_DISTANCE_BEGIN = 0.0;
+	double REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 	double REGROUP_DISTANCE_END = 0.0;
+	double REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 	double CALC_FURTHEST_AWAY_TIME = 1.0;
 	double CLOSE_DISTANCE = 0.0;
 
@@ -202,8 +204,10 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 			PING_WAIT_TIME_AFTER_FIRST = variableInfo;
 		} else if (variableInfo.name == "regroup_distance_begin") {
 			REGROUP_DISTANCE_BEGIN = variableInfo;
+			REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 		} else if (variableInfo.name == "regroup_distance_end") {
 			REGROUP_DISTANCE_END = variableInfo;
+			REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 		} else if (variableInfo.name == "calc_furthest_away_time") {
 			CALC_FURTHEST_AWAY_TIME = variableInfo;
 		} else if (variableInfo.name == "close_distance") {

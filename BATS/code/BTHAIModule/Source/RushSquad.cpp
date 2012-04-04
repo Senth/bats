@@ -62,7 +62,7 @@ void RushSquad::computeActions()
 		if (analyzed)
 		{
 			TilePosition defSpot = Commander::getInstance()->findChokePoint();
-			if (defSpot.x() != -1)
+			if (defSpot!= TilePositions::Invalid)
 			{
 				goal = defSpot;
 			}
@@ -101,7 +101,7 @@ void RushSquad::computeActions()
 		}
 
 		TilePosition ePos = ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
-		if (ePos.x() == -1)
+		if (ePos== TilePositions::Invalid)
 		{
 			TilePosition nGoal = getNextStartLocation();
 			if (nGoal.x() >= 0)
@@ -171,7 +171,7 @@ void RushSquad::printInfo()
 
 void RushSquad::clearGoal()
 {
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 TilePosition RushSquad::getGoal()

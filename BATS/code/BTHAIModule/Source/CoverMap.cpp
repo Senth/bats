@@ -147,7 +147,7 @@ bool CoverMap::positionFree(TilePosition pos)
 
 void CoverMap::blockPosition(TilePosition buildSpot)
 {
-	if (buildSpot.x() == -1)
+	if (buildSpot != TilePositions::Invalid)
 	{
 		//Error check
 		return;
@@ -279,7 +279,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Pylon) > 0)
 		{
 			TilePosition cp = Commander::getInstance()->findChokePoint();
-			if (cp.x() != -1)
+			if (cp!= TilePositions::Invalid)
 			{
 				if (!Broodwar->hasPower(cp, UnitTypes::Protoss_Cybernetics_Core))
 				{
@@ -297,7 +297,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	if (BaseAgent::isOfType(toBuild, UnitTypes::Terran_Bunker) || BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Photon_Cannon) || BaseAgent::isOfType(toBuild, UnitTypes::Zerg_Creep_Colony))
 	{
 		TilePosition cp = Commander::getInstance()->findChokePoint();
-		if (cp.x() != -1)
+		if (cp!= TilePositions::Invalid)
 		{
 			TilePosition spot = findBuildSpot(toBuild, cp);
 			return spot;
@@ -308,7 +308,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	if (toBuild.isResourceDepot())
 	{
 		TilePosition start = ExplorationManager::getInstance()->searchExpansionSite();
-		if (start.x() != -1)
+		if (start!= TilePositions::Invalid)
 		{
 			TilePosition spot = findBuildSpot(toBuild, start);
 			return spot;
@@ -316,7 +316,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 		else
 		{
 			//No expansion site found.
-			return TilePosition(-1, -1);
+			return TilePositions::Invalid;
 		}
 	}
 
@@ -329,7 +329,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 		{
 			TilePosition start = agent->getUnit()->getTilePosition();
 			TilePosition bSpot = findBuildSpot(toBuild, start);
-			if (bSpot.x() != -1)
+			if (bSpot!= TilePositions::Invalid)
 			{
 				//Spot found, return it.
 				return bSpot;
@@ -337,7 +337,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 		}
 	}
 
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 bool CoverMap::baseUnderConstruction(BaseAgent* base)
@@ -378,7 +378,7 @@ TilePosition CoverMap::findSpotAtSide(UnitType toBuild, TilePosition start, Tile
 		if (cPos.x() == end.x() && cPos.y() == end.y()) done = true;
 	}
 
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 bool CoverMap::canBuildAt(UnitType toBuild, TilePosition pos)
@@ -405,14 +405,14 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild, TilePosition start)
 	//Search outwards
 	bool found = false;
 	int cDiff = 1;
-	TilePosition spot = TilePosition(-1, -1);
+	TilePosition spot = TilePositions::Invalid;
 	while (!found) 
 	{
 		//Top
 		TilePosition s = TilePosition(start.x() - cDiff, start.y() - cDiff);
 		TilePosition e = TilePosition(start.x() + cDiff, start.y() - cDiff);
 		spot = findSpotAtSide(toBuild, s, e);
-		if (spot.x() != -1 && spot.y() != -1)
+		if (spot!= TilePositions::Invalid && spot.y() != -1)
 		{
 			found = true;
 			break;
@@ -422,7 +422,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild, TilePosition start)
 		s = TilePosition(start.x() - cDiff, start.y() + cDiff);
 		e = TilePosition(start.x() + cDiff, start.y() + cDiff);
 		spot = findSpotAtSide(toBuild, s, e);
-		if (spot.x() != -1 && spot.y() != -1)
+		if (spot!= TilePositions::Invalid && spot.y() != -1)
 		{
 			found = true;
 			break;
@@ -432,7 +432,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild, TilePosition start)
 		s = TilePosition(start.x() - cDiff, start.y() - cDiff);
 		e = TilePosition(start.x() - cDiff, start.y() + cDiff);
 		spot = findSpotAtSide(toBuild, s, e);
-		if (spot.x() != -1 && spot.y() != -1)
+		if (spot!= TilePositions::Invalid && spot.y() != -1)
 		{
 			found = true;
 			break;
@@ -442,7 +442,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild, TilePosition start)
 		s = TilePosition(start.x() + cDiff, start.y() - cDiff);
 		e = TilePosition(start.x() + cDiff, start.y() + cDiff);
 		spot = findSpotAtSide(toBuild, s, e);
-		if (spot.x() != -1 && spot.y() != -1)
+		if (spot!= TilePositions::Invalid && spot.y() != -1)
 		{
 			found = true;
 			break;
@@ -542,7 +542,7 @@ void CoverMap::clear(Corners c)
 
 void CoverMap::clearTemp(UnitType toBuild, TilePosition buildSpot)
 {
-	if (buildSpot.x() == -1)
+	if (buildSpot== TilePositions::Invalid)
 	{
 		return;
 	}
@@ -733,14 +733,14 @@ TilePosition CoverMap::searchRefinerySpot()
 		}
 	}
 
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }
 
 TilePosition CoverMap::findExpansionSite()
 {
 	UnitType baseType = Broodwar->self()->getRace().getCenter();
 	double bestDist = 100000;
-	TilePosition bestPos = TilePosition(-1, -1);
+	TilePosition bestPos = TilePositions::Invalid;
 	
 	//Iterate through all base locations
 	for(set<BWTA::BaseLocation*>::const_iterator i=BWTA::getBaseLocations().begin(); i!= BWTA::getBaseLocations().end(); i++)

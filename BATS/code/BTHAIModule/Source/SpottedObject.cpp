@@ -6,7 +6,7 @@ using namespace std;
 SpottedObject::SpottedObject()
 {
 	position = Position(-1, -1);
-	tilePosition = TilePosition(-1, -1);
+	tilePosition = TilePositions::Invalid;
 	unitID = -1;
 	active = true;
 }

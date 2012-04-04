@@ -161,7 +161,7 @@ void StructureAgent::computeActions()
 			if (isOfType(UnitTypes::Terran_Comsat_Station))
 			{
 				TilePosition p = getNextScanLocation();
-				if (p.x() != -1)
+				if (p!= TilePositions::Invalid)
 				{
 					if (unit->getEnergy() >= 50)
 				{
@@ -317,7 +317,7 @@ TilePosition StructureAgent::getNextScanLocation()
 	if (ePos.x() > -1)
 	{
 		//Already found enemy base
-		return TilePosition(-1, -1);
+		return TilePositions::Invalid;
 	}
 
 	for(set<BaseLocation*>::const_iterator i=getStartLocations().begin();i!=getStartLocations().end();i++)
@@ -369,5 +369,5 @@ TilePosition StructureAgent::getNextScanLocation()
 			return basePos;
 		}
 	}
-	return TilePosition(-1, -1);
+	return TilePositions::Invalid;
 }

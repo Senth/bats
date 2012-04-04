@@ -13,7 +13,7 @@ BaseAgent::BaseAgent()
 	squadID = -1;
 	type = UnitTypes::Unknown;
 	lastActionFrame = 0;
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 BaseAgent::BaseAgent(Unit* mUnit)
@@ -24,7 +24,7 @@ BaseAgent::BaseAgent(Unit* mUnit)
 	alive = true;
 	squadID = -1;
 	lastActionFrame = 0;
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	agentType = "BaseAgent";
 }
 
@@ -336,7 +336,7 @@ void BaseAgent::setGoal(TilePosition goal)
 
 void BaseAgent::clearGoal()
 {
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 TilePosition BaseAgent::getGoal()

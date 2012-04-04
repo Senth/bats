@@ -14,7 +14,7 @@ ReaverAgent::ReaverAgent(Unit* mUnit)
 	agentType = "ReaverAgent";
 	//Broodwar->printf("ReaverAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ReaverAgent::computeActions()

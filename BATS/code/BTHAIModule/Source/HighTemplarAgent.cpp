@@ -14,7 +14,7 @@ HighTemplarAgent::HighTemplarAgent(Unit* mUnit)
 	agentType = "HighTemplarAgent";
 	//Broodwar->printf("HighTemplarAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 	hasCastTransform = false;
 }
 

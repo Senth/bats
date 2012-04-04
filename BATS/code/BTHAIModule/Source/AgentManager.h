@@ -110,7 +110,7 @@ public:
 	BaseAgent* getClosestBase(BWAPI::TilePosition pos);
 
 	/** Returns the position of the closest detector unit relative to startPos. Returns
-	 * BWAPI::TilePosition(-1, -1) if none was found. */
+	 * BWAPI::TilePositions::Invalid if none was found. */
 	BWAPI::TilePosition getClosestDetector(BWAPI::TilePosition startPos);
 
 	/** Checks if there are any units in an area. The unit with id unitID is allowed. */

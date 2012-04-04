@@ -13,7 +13,7 @@ ObserverAgent::ObserverAgent(Unit* mUnit)
 	agentType = "ObserverAgent";
 	//Broodwar->printf("ObserverAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void ObserverAgent::computeActions()

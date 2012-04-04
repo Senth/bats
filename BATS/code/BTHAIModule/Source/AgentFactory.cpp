@@ -225,7 +225,8 @@ BaseAgent* AgentFactory::createTerranAgent(Unit* unit)
 		}
 		else if (isOfType(unit, UnitTypes::Terran_Bunker))
 		{
-			Commander::getInstance()->addBunkerSquad();
+			/// @todo how to use bunkers?
+			//Commander::getInstance()->addBunkerSquad();
 			return new StructureAgent(unit);
 		}
 		/**

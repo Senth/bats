@@ -15,7 +15,7 @@ LurkerAgent::LurkerAgent(Unit* mUnit)
 	agentType = "LurkerAgent";
 	//Broodwar->printf("LurkerAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void LurkerAgent::computeActions()

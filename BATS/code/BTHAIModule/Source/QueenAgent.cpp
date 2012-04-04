@@ -13,7 +13,7 @@ QueenAgent::QueenAgent(Unit* mUnit)
 	agentType = "QueenAgent";
 	//Broodwar->printf("QueenAgent created (%s)", unit->getType().getName().c_str());
 	
-	goal = TilePosition(-1, -1);
+	goal = TilePositions::Invalid;
 }
 
 void QueenAgent::computeActions()
