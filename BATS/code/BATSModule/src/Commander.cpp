@@ -62,7 +62,7 @@ bool Commander::issueCommand(const std::string& command) {
 
 	if (command == "attack") {
 		// Get free units
-		std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_NoSquad);
+		std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
 
 		// Only add if we have free units
 		if (!freeUnits.empty()) {

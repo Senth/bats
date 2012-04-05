@@ -1,7 +1,7 @@
 #ifndef __WORKERAGENT_H__
 #define __WORKERAGENT_H__
 
-#include "BaseAgent.h"
+#include "UnitAgent.h"
 
 /** The WorkerAgent class handles all tasks that a worker, for example a Terran SCV, can perform. The tasks
  * involves gathering minerals and gas, move to a selected buildspot and construct the specified building,
@@ -9,7 +9,7 @@
  *
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
  */
-class WorkerAgent : public BaseAgent {
+class WorkerAgent : public UnitAgent {
 
 private:
 	int currentState;

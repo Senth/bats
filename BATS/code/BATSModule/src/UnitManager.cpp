@@ -45,16 +45,35 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 		if (NULL != pUnitAgent) {
 			bool addUnit = false;
 
-			if (filter & UnitFilter_NoSquad) {
-				if (pUnitAgent->getSquadId().isInvalid()) {
+			// Worker units
+			if (pUnitAgent->getUnitType().isWorker()) {
+				if (filter & UnitFilter_WorkersAll) {
 					addUnit = true;
 				}
+
+				if (filter & UnitFilter_WorkersNoSquad) {
+					if (pUnitAgent->getSquadId().isInvalid()) {
+						addUnit = true;
+					}
+				}
 			}
+			// Non-worker units
+			else {
+				if (filter & UnitFilter_HasNoSquad) {
+					if (pUnitAgent->getSquadId().isInvalid()) {
+						addUnit = true;
+					}
+				}
 
-			if (filter & UnitFilter_DisbandableSquad) {
-				SquadId squadId = pUnitAgent->getSquadId();
+				if (filter & UnitFilter_InDisbandableSquad) {
+					SquadId squadId = pUnitAgent->getSquadId();
 
-				if (mpSquadManager->getSquad(squadId)->isDisbandable()) {
+					if (mpSquadManager->getSquad(squadId)->isDisbandable()) {
+						addUnit = true;
+					}
+				}
+
+				if (filter & UnitFilter_UnitsAll) {
 					addUnit = true;
 				}
 			}
