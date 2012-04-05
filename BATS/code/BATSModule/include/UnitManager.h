@@ -54,7 +54,7 @@ public:
 	 * @see UnitFilters for all available filters.
 	 * @todo Maybe optimize the function, it's very inefficient at the moment.
 	 * 
-	 * <b>Examples:</b> \n
+	 * @section Examples
 	 * Returns all units (excluding workers) that is either in no squad or in a squad
 	 * that is disbandable.
 	 * \code

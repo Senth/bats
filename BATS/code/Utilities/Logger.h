@@ -71,11 +71,18 @@ enum LogLevels {
 	LogLevel_None
 };
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(USE_DEBUG_MESSAGE)
 /**
-* Prints a debug message. Only active if _DEBUG is defined.
-* Does not process the message if verbosity level is too low.
-* @section Examples
+* Prints a debug message. Does not process the message if verbosity level is too low.
+* @param verbosity tho verbosity level to use
+* @param message the message to display, using streams are possible
+* @note Only active in debug if _DEBUG is defined, or can be set active when USE_DEBUG_MESSAGE
+* is defined. When inactive the macro is replaced by empty space, meaning no extra processing
+* is done.
+* @see utilities::LogLevels for guidelines what levels to use when
+* @see ERROR_MESSAGE() if you want to print an error message.
+* 
+*  @section Examples
 * \code
 * // Prints a regular message
 * DEBUG_MESSAGE(LogLevel_Info, "This is a message");
@@ -83,9 +90,6 @@ enum LogLevels {
 * // You can also use "cout" syntax to create more complex messages.
 * DEBUG_MESSAGE(LogLevel_Warning, "Value of " << strMessage << " is: " << intValue);
 * \endcode
-* @param verbosity tho verbosity level to use
-* @param message the message to display, using streams are possible
-* @see utilities::LogLevels for guidelines what levels to use when
 */
 #define DEBUG_MESSAGE(verbosity, message) { \
 	if (verbosity >= utilities::gVerbosityLevelConsole || \
@@ -103,8 +107,13 @@ enum LogLevels {
 * Only active if _DEBUG is defined, and only stops for console verbosity.
 * @param verbosity the verbosity level to use
 * @param message the message to display, using streams are possible
+* @note Only active in debug if _DEBUG is defined, or can be set active when USE_DEBUG_MESSAGE
+* is defined. When inactive the macro is replaced by empty space, meaning no extra processing
+* is done.
 * @see utilities::LogLevels for guidelines what levels to use when
 * @see DEBUG_MESSAGE() for examples how to this function.
+* @see DEBUG_MESSAGE_CONDITION() which only prints a debug message when a condition is true.
+* @see ERROR_MESSAGE() if you want to print an error message.
 */
 #define DEBUG_MESSAGE_STOP(verbosity, message) {  \
 	if (verbosity >= utilities::gVerbosityLevelConsole || \
@@ -119,16 +128,20 @@ enum LogLevels {
 
 /**
  * Prints a debug message if the conditional is true.
- * 
- * Example:
- * \code
- * DEBUG_MESSAGE_CONDITION(result != SUCCESS, LogLevel_Warning, "Your message :D");
- * \endcode
- * 
  * @param condition the condition that needs to be true for the message to appear.
  * @param verbosity the verbosity level to use
  * @param message the message to display, using streams are possible
+ * @note Only active in debug if _DEBUG is defined, or can be set active when USE_DEBUG_MESSAGE
+ * is defined. When inactive the macro is replaced by empty space, meaning no extra processing
+ * is done.
  * @see utilities::LogLevels for guidelines what levels to use when
+ * @see ERROR_MESSAGE() if you want to print an error message.
+ * 
+ * @section Examples
+ * Only prints the debug message when the result wasn't equal to SUCCESS.
+ * \code
+ * DEBUG_MESSAGE_CONDITION(result != SUCCESS, LogLevel_Warning, "Your message :D");
+ * \endcode
  */
 #define DEBUG_MESSAGE_CONDITION(condition, verbosity, message) { \
 	if (condition) { \
@@ -143,44 +156,8 @@ enum LogLevels {
 	} \
 }
 #else
-/**
-* Prints a debug message. Only active if _DEBUG is defined.
-* Does not process the message if verbosity level is too low.
-* @section Examples
-* \code
-* // Prints a regular message
-* DEBUG_MESSAGE(LogLevel_Info, "This is a message");
-* 
-* // You can also use "cout" syntax to create more complex messages.
-* DEBUG_MESSAGE(LogLevel_Warning, "Value of " << strMessage << " is: " << intValue);
-* \endcode
-* @param verbosity tho verbosity level to use
-* @param message the message to display, using streams are possible
-* @see utilities::LogLevels for guidelines what levels to use when
-*/
 #define DEBUG_MESSAGE(verbosity, message)
-/**
-* Prints a debug message and waits for input after the message has been displayed.
-* Only active if _DEBUG is defined, and only stops for console verbosity.
-* @param verbosity the verbosity level to use
-* @param message the message to display, using streams are possible
-* @see utilities::LogLevels for guidelines what levels to use when
-* @see DEBUG_MESSAGE() for examples how to this function.
-*/
 #define DEBUG_MESSAGE_STOP(verbosity, message)
-
-/**
- * Prints a debug message if the conditional is true.
- * 
- * Example:
- * \code
- * DEBUG_MESSAGE_CONDITION(result != SUCCESS, LogLevel_Warning, "Your message :D");
- * \endcode
- * 
- * @param condition the condition that needs to be true for the message to appear.
- * @param verbosity the verbosity level to use
- * @param message the message to display, using streams are possible
- */
 #define DEBUG_MESSAGE_CONDITION(condition, verbosity, message)
 #endif
 
