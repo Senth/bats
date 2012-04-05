@@ -51,6 +51,7 @@ public:
 	 * which will return all units including workers.
 	 * @return all attacking, supporting movable units (i.e. non-building and non-worker) that match
 	 * the specified filter.
+	 * @see UnitFilters for all available filters.
 	 * @todo Maybe optimize the function, it's very inefficient at the moment.
 	 * 
 	 * <b>Examples:</b> \n
