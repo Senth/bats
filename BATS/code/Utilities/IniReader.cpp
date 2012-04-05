@@ -144,7 +144,7 @@ void IniReader::readNext() {
 		getline(mFile, line);
 
 		// Failed to read line
-		if (!mFile.good()) {
+		if (!mFile.good() && line.empty()) {
 			mGood = false;
 			break;
 		}

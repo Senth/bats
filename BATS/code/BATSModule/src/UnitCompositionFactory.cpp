@@ -73,6 +73,7 @@ void UnitCompositionFactory::reloadConfigs() {
 				);
 				unitSets.clear();
 			}
+			nameCurrent = variableInfo.section;
 		}
 
 		
