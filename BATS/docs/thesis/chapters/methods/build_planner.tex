@@ -1,2 +1,38 @@
 % !TEX root = ../../main.tex
 \section{Build planner}
+Build planner is the core for planning Structure (Building) and Army creations. Here Building or Structure includes production, upgrade, add-on and resource gathering buildings and Army refers to all combat and non-combat (Medic) type units.
+The production process during the whole game is divided into three phases namely early, mid and late. BATS follows specific build order provided in the configuration file (/BATS-data/buildorder/) by the user. User can configure and keep more than one build order for a phase. The exact transition graph is configured using "transition" config file and the individual phase build order is configured using files in early, mid and late folders.
+The phase transition during the game is done by the command "transition" or "transition FILE_NAME". The configuration in the "transition" file is overriden by the command "transition FILE_NAME". BATS asks user for the permission to make transition in case if the user forget to do so.
+The priority of the production is the order in which the units are placed in the configuration file. The Army is classified into "Must Have" and "Percentage" units for each phase. The priority of army production is done based on maintenance of percentage and higher priority is given to the "Must Have" units over "Percentage" units.
+E.g. format
+<name>
+early-x
+<available-transitions>
+mid-x
+mid-Y
+<build-order>
+Terran_Supply_Depot
+Terran_Barracks
+Terran_Refinery
+Terran_Bunker
+Terran_Academy
+Terran_Factory
+<units>
+80% Terran_Marine
+20% Terran_Medic
+<must-have>
+2 Terran_Medic
+1 Terran_Vulture
+
+Above is the default configuration followed by the BATS for phase "early-x" which can be edited by the user. Separate configuration is available for separate phase namely "early", "mid" and "late". The configuration file has three parts name, available-transition, build-order, units and must-have. <name> has the phase name to which the configuration file applies to. <available-transition> has the possible phases to which the current phase can transit to. <build-order> has the list of structure or building names to be built for that phase. The structures are built in the order they are listed. <units> defines the Army that the current phase should have and is mentioned in percentage. 
+It will always prioritize the unit that is furthest away from its goal.
+E.g. 60% marines are at (56%), 20% tanks are at (18%) will choose to prioritize a tank, why?
+Marines: 56/60 = 0.933... meaning roughly 7% from its goal.
+Tanks: 18/20 = 0.9 meaning 10% from its goal.
+Tanks are then furthest away from its goal.
+<must-have> lists the units that are compulsory to be available during a phase. Units are listed in decimal numbers. If the highest priority unit cannot be built because of: 
+- Low minerals -> Wait for minerals, do not build another unit
+- No buildings are free (or does not exist) -> Build next unit in the priority list instead.
+BATS maintains the production by considering the unit destruction and building availability to produce that unit. i.e. when a must have unit is destroyed, it is rebuilt again and when a percentage unit is destroyed, it is added again into the production queue.
+BATS has pre-defined or default set of configuration for each phase and the transition. Following is the example or format how the transition config file should be.
+E.g. early-x>mid-y>late-z
