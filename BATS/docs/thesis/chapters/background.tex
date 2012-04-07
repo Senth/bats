@@ -4,12 +4,21 @@ While RTS games has been along since the 80s\cite{adams06, rtsHistory}, only a h
 %: cite!
 or to create the best bot to compete in RTS bot tournaments, such as  AIIDE's StarCraft AI Competinion\cite{scaiide} and CIG's StarCraft AI Competition\cite{sccig}.
 
-First related research topics will be covered, beginning with teammate bots across all genres and asking what guidelines can apply to RTS games; continuing with RTS enemy bots and asking, what implementation strategies exists, how shall a good bot play; and ending with communication between AI and humans to minimize misinterpretation by the player, this includes design choices. After plowing through all research you will be updated with the current games using teammate bots and what has been used in other genres that RTS is lacking.
-
-What has been done instead is a lot of research about enemy bots for RTS games. 
-
+%: change the paragraph later
+In the next section related research topics will be covered, beginning with teammate bots across all genres and asking what guidelines applies to RTS games; continuing with RTS enemy bots and asking, what implementation strategies exists, how a good bot shall play; and ending with communication between AI and humans including design choices to avoid player misinterpretation of the bot. After plowing through all research you will be updated with the current games across all genres using teammate bots and what current RTS games lacks.
 
 
+\section{Research}
+As mentioned, not a lot have been done in the area of teammate bots, this is especially true for RTS games. McGee and Abraham did a survey in 2010 where they first present their definition of real-time teammate bots which they limit themselves to\cite{mcgee10}. Their definition of a real-time teammate bot includes a bot that
+\begin{inparaenum}[a\upshape)]
+	\item works together with team players while taking into account the state, needs, behavior, goals, plans and intentions of these players;
+	\item uses coordinated behaviors or decision-making
+	\item that aligns with the team goals;
+	\item where these coordinated behaviors or decision-making includes player-related uncertainty requiring inference, reasoning, classification, calculation, or another method; and
+	\item whenever possible, prioritizing the player experience.
+\end{inparaenum}
+
+In their analysis\cite{mcgee10} McGee and Abraham they noticed that, although human player participation and engagement are one key functionality of a game\cite{reynolds03}, often the player's preferences are neglected and the bots behave in the way they think is best. When the bot prioritizes the player, some challenges arise; how to create priority rules that do their job correctly\cite{mcgee10}, i.e. the bot has to know, or use a qualified guess, what the player wants. This is not an easy task, probably impossible in the near future; humans have a hard time understanding each others intentions, why think AIs that humans have created understands us better\cite{norman07}?.
 
 \section{Implementation in games}
 
