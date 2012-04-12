@@ -38,7 +38,7 @@ public:
 	 * all units needs to be added directly in this constructor. Defaults to
 	 * INVALID_UNIT_COMPOSITON.
 	 */
-	Squad(std::vector<UnitAgent*> units,
+	Squad(const std::vector<UnitAgent*>& units,
 		bool avoidEnemyUnits = false,
 		bool disbandable = true,
 		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
@@ -148,12 +148,16 @@ public:
 	/**
 	 * Adds a unit to the squad.
 	 * @param pUnit the unit to add.
+	 * @note if the squad has a unit composition, the unit will only be added if the unit
+	 * composition has a free spot for it.
 	 */
 	void addUnit(UnitAgent* pUnit);
 
 	/**
 	 * Adds many units to the squad.
 	 * @param units vector with units to add
+	 * @note if the squad has a unit composition, units will only be added if the unit
+	 * composition has a free spot for them, all other units will be skipped.
 	 */
 	void addUnits(const std::vector<UnitAgent*>& units);
 
@@ -243,7 +247,7 @@ public:
 	 * Returns all the squad's units
 	 * @return all squad's units
 	 */
-	const std::vector<UnitAgent*> getUnits() const;
+	const std::vector<UnitAgent*>& getUnits() const;
 
 	/**
 	 * Returns this pointer to the squad as an shared_ptr instead of just this
@@ -312,6 +316,12 @@ protected:
 		GoalState_NotCompleted,
 		GoalState_Lim
 	};
+
+	/**
+	 * Returns all the squad's units
+	 * @return all squad's units
+	 */
+	std::vector<UnitAgent*>& getUnits();
 
 	/**
 	 * Virtual compute actions function. This function is called by computeActions().

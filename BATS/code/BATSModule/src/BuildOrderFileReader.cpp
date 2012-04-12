@@ -2,12 +2,16 @@
 #include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildPlanner.h"
 #include "Utilities/Logger.h"
+#include "Utilities/String.h"
+#include "Config.h"
 #include <fstream>
 #include <sstream>
 
 using namespace BWAPI;
 using namespace std;
 using namespace bats;
+
+const string BUILD_ORDER_EXT = ".txt";
 
 BuildOrderFileReader::BuildOrderFileReader(){
 	//TODO: read the transition config file
@@ -18,11 +22,7 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 	//Read transition file
 	ifstream inFile;
 	TransitionGraph graph;
-	stringstream ss;
-	ss << "bwapi-data\\AI\\BATS-data\\";
-	ss << "buildorder\\";
-	ss << fileName;
-	string filePath = ss.str();
+	string filePath = config::build_order::DIR + fileName;
 	Tokens token;
 	inFile.open(filePath.c_str());
 
@@ -43,10 +43,10 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 				ss << buffer;
 				line = ss.str();
 				token = split(line, ">");
-				graph.early = token.key;			
+				graph.early = utilities::string::trim(token.key);
 				token = split(token.value, ">");
-				graph.mid = token.key;
-				graph.late = token.value;
+				graph.mid = utilities::string::trim(token.key);
+				graph.late = utilities::string::trim(token.value);
 			}
 		}
 		inFile.close();
@@ -67,17 +67,13 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 	//Read buildorder file
 	ifstream inFile;
 
-	stringstream ss;
-	ss << getScriptPath();
-	ss << "buildorder\\" + phase + "\\";	
-	ss << fileName + ".txt";	
-	string filePath = ss.str();
+	string filePath = config::build_order::DIR + phase + "\\" + fileName + BUILD_ORDER_EXT;
 
 	inFile.open(filePath.c_str());
 	string type = "none";
 	if (!inFile)
 	{
-		Broodwar->printf("Unable to open file %s", filePath.c_str());
+		ERROR_MESSAGE(false, "Unable to open file " << filePath);
 	}
 	else
 	{
@@ -128,21 +124,19 @@ void BuildOrderFileReader::addUnitType(string line, vector<bats::CoreUnit> &core
 	replace(line);
 
 	CoreUnit unit;
-	for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
-	{
-		if ((*i).getName() == line){
-			//Compose the unit
-			unit.mustHave = mustHave;
-			unit.quantity = toInt(quantity);
-			unit.unit = (*i);
-			//Add unit to list | vector
-			coreUnits.push_back(unit);
-			return;
-		}
-	}
-
+	UnitType unitType = UnitTypes::getUnitType(line);
+	if (unitType != UnitTypes::Unknown) {
+		//Compose the unit
+		unit.mustHave = mustHave;
+		unit.quantity = toInt(quantity);
+		unit.unit = unitType;
+		//Add unit to list | vector
+		coreUnits.push_back(unit);
+	} 
 	//No UnitType match found
-	ERROR_MESSAGE(false, "No matching UnitType found for " << line);
+	else {
+		ERROR_MESSAGE(false, "No matching UnitType found for " << line);
+	}
 }
 
 void BuildOrderFileReader::addBuildingType(string line, vector<UnitType> &buildOrder){
@@ -150,14 +144,11 @@ void BuildOrderFileReader::addBuildingType(string line, vector<UnitType> &buildO
 
 	//Replace all _ with whitespaces, or they wont match
 	replace(line);
-	
-	for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++){
-		if ((*i).getName() == line){
-			buildOrder.push_back((*i));
-			return;
-		}
-	}
 
-	//No Building match found
-	Broodwar->printf("Error: No matching Building found for %s", line.c_str());
+	UnitType unitType = BWAPI::UnitTypes::getUnitType(line);
+	if (unitType != UnitTypes::Unknown) {
+		buildOrder.push_back(unitType);
+	} else {
+		ERROR_MESSAGE(false, "No matching buliding found for " << line);
+	}
 }

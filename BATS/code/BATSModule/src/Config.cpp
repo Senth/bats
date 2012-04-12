@@ -32,6 +32,10 @@ namespace attack_coordinator {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
+namespace build_order {
+	const std::string DIR = CONFIG_DIR + "buildorder\\";
+}
+
 namespace frame_distribution {
 	int EXPLORATION_MANAGER = 61;
 	int RESOURCE_COUNTER = 23;

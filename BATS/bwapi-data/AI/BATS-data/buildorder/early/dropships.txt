@@ -1,0 +1,16 @@
+<name>
+Early Dropships
+<description>
+Only for testing purposes
+<available-transitions>
+mid-x
+<build-order>
+Terran_Supply_Depot
+Terran_Barracks
+Terran_Refinery
+Terran_Factory
+Terran_Starport
+<units>
+100% Terran_Marine
+<must-have>
+1 Terran_Dropship

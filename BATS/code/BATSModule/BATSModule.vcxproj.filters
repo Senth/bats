@@ -108,6 +108,9 @@
     <ClInclude Include="include\WaitGoalManager.h">
       <Filter>WaitGoal</Filter>
     </ClInclude>
+    <ClInclude Include="include\DropSquad.h">
+      <Filter>Squads\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="src\WaitGoalManager.cpp">
       <Filter>WaitGoal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DropSquad.cpp">
+      <Filter>Squads\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

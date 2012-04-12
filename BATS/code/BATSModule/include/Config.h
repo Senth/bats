@@ -56,6 +56,14 @@ namespace bats {
 		}
 
 		/**
+		 * Build order configuration variables
+		 */
+		namespace build_order {
+			/** Directory of the build orders */
+			extern const std::string DIR;
+		}
+
+		/**
 		 * How often classes shall be called.
 		 */
 		namespace frame_distribution {

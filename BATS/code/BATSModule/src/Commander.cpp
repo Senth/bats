@@ -9,6 +9,7 @@
 #include <memory.h>
 
 #include "AttackSquad.h"
+#include "DropSquad.h"
 
 using namespace bats;
 using namespace std::tr1;
@@ -61,27 +62,9 @@ bool Commander::issueCommand(const std::string& command) {
 	//}
 
 	if (command == "attack") {
-		// Get free units
-		std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
-
-		// Only add if we have free units
-		if (!freeUnits.empty()) {
-			// Add the units to the old attack squad if it exists
-			shared_ptr<AttackSquad> oldSquad;
-			std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mpSquadManager->begin();
-			while (oldSquad == NULL && squadIt != mpSquadManager->end()) {
-				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
-			}
-
-			if (oldSquad != NULL) {
-				oldSquad->addUnits(freeUnits);
-			} else {
-				AttackSquad* attackSquad = new AttackSquad(freeUnits);
-				mSquadWaiting = attackSquad->getThis();
-			}
-		}
+		createAttack();
 	} else if (command == "drop") {
-		/// @todo drop command
+		createDrop();
 	} else if (command == "harass") {
 		/// @todo harass command
 	} else if (command == "counter-attack") {
@@ -121,4 +104,61 @@ void Commander::finishWaitingSquad() {
 
 	mSquadWaiting->activate();
 	mSquadWaiting.reset();
+}
+
+void Commander::createAttack() {
+	///@ todo handle already existing waiting squad.
+	if (NULL != mSquadWaiting) {
+		finishWaitingSquad();
+	}
+
+	// Get free units
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
+
+	// Only add if we have free units
+	if (!freeUnits.empty()) {
+		// Add the units to the old attack squad if it exists
+		shared_ptr<AttackSquad> oldSquad;
+		std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mpSquadManager->begin();
+		while (oldSquad == NULL && squadIt != mpSquadManager->end()) {
+			oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+		}
+
+		if (oldSquad != NULL) {
+			oldSquad->addUnits(freeUnits);
+		} else {
+			AttackSquad* attackSquad = new AttackSquad(freeUnits);
+			mSquadWaiting = attackSquad->getThis();
+		}
+	}
+}
+
+void Commander::createDrop() {
+	/// @todo handle already existing waiting squad
+	if (NULL != mSquadWaiting) {
+		finishWaitingSquad();
+	}
+
+	// Get available unit compositions
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
+	std::vector<UnitComposition> availableUnitCompositions;
+	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
+
+	// Create drop
+	if (!availableUnitCompositions.empty()) {
+		// Choose a random unit composition
+		unsigned int randomId = rand() % availableUnitCompositions.size();
+		const UnitComposition& chosenComposition = availableUnitCompositions[randomId];
+
+		DropSquad* pDropSquad = new DropSquad(freeUnits, chosenComposition);
+		mSquadWaiting = pDropSquad->getThis();
+	}
+	// No drops available
+	else {
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Commander::createDrop() | No drops available");
+
+		/// @todo print a message to the other player that no drops are available
+		/// But only if the player issued the command. Probably if the commander issued
+		/// the command a drop shall always be available?
+	}
 }

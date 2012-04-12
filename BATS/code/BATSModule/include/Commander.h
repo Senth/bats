@@ -76,6 +76,16 @@ private:
 	 */
 	void finishWaitingSquad();
 
+	/**
+	 * Initiates an attack
+	 */
+	void createAttack();
+
+	/**
+	 * Initiates a drop
+	 */
+	void createDrop();
+
 	std::tr1::shared_ptr<Squad> mSquadWaiting;
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;

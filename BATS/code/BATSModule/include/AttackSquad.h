@@ -20,8 +20,13 @@ public:
 	 * Constructor that takes units to be used with the squad.
 	 * @param units all units to be added to the squad.
 	 * @param distracting if the attack squad is distracting or not. Defaults to false
+	 * @param unitComposition the unit composition the attack squad uses.
 	 */
-	AttackSquad(const std::vector<UnitAgent*> units, bool distracting = false);
+	AttackSquad(
+		const std::vector<UnitAgent*>& units,
+		bool distracting = false,
+		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION
+	);
 
 	/**
 	 * Destructor

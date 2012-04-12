@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AttackCoordinator.cpp" />
+    <ClCompile Include="src\DropSquad.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\Resource.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="include\BuildPlanner.h" />
     <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
+    <ClInclude Include="include\DropSquad.h" />
     <ClInclude Include="include\ExplorationManager.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />

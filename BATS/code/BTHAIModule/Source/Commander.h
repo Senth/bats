@@ -170,6 +170,7 @@ public:
 
 	/** Adds a bunker squad when a Terran Bunker has been created. */
 	virtual void addBunkerSquad();
+
 };
 
 #endif

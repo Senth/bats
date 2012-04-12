@@ -22,7 +22,7 @@ SquadManager* bats::Squad::mpsSquadManager = NULL;
 const int MAX_KEYS = 100;
 
 Squad::Squad(
-	std::vector<UnitAgent*> units,
+	const std::vector<UnitAgent*>& units,
 	bool avoidEnemyUnits,
 	bool disbandable,
 	const UnitComposition& unitComposition) 
@@ -56,6 +56,11 @@ Squad::Squad(
 	// Add all units
 	addUnits(units);
 
+	if (mUnitComposition.isValid() && !mUnitComposition.isFull()) {
+		DEBUG_MESSAGE(utilities::LogLevel_Warning, "Squad::Squad() | Created a Squad with a " <<
+			"UnitComposition, but not enough units were supplied for the squad");
+	}
+
 	// Add to squad manager
 	shared_ptr<Squad> strongPtr = shared_ptr<Squad>(this);
 	mThis = weak_ptr<Squad>(strongPtr);
@@ -63,8 +68,6 @@ Squad::Squad(
 }
 
 Squad::~Squad() {
-	forceDisband();
-
 	mcsInstance--;
 
 	// Free key
@@ -247,12 +250,45 @@ bool Squad::travelsByAir() const {
 void Squad::addUnit(UnitAgent* pUnit) {
 	// Check so that the unit agent doesn't have a squad already.
 	assert(pUnit->getSquadId() == SquadId::INVALID_KEY);
-	mUnits.push_back(pUnit);
-	pUnit->setSquadId(mId);
+
+	bool bAddUnit = false;
+
+	// Only add units if we have place for them in the unit composition
+	if (mUnitComposition.isValid()) {
+		bAddUnit = mUnitComposition.addUnit(pUnit);
+	}
+	// No unit composition, all units can be added
+	else {
+		bAddUnit = true;
+	}
+
+	if (bAddUnit) {	
+		mUnits.push_back(pUnit);
+		pUnit->setSquadId(mId);
 	
-	// Update goal position if we have one
-	if (!mGoalPositions.empty()) {
-		pUnit->setGoal(mGoalPositions.front());
+		// Set the correct active goal. Priority goes like this
+		// REGROUP -> TEMPORARY -> VIA -> GOAL
+
+		TilePosition movePosition = TilePositions::Invalid;
+
+		// Regroup
+		if (mRegroupPosition != TilePositions::Invalid) {
+			movePosition = mRegroupPosition;
+		}
+
+		// Temp
+		if (movePosition != TilePositions::Invalid && mTempGoalPosition != TilePositions::Invalid) {
+			movePosition = mTempGoalPosition;
+		}
+
+		/// @todo via position when adding unit
+
+		// Goal
+		if (movePosition != TilePositions::Invalid && !mGoalPositions.empty()) {
+			movePosition = mGoalPositions.front();
+		}
+
+		pUnit->setGoal(movePosition);
 	}
 }
 
@@ -264,8 +300,14 @@ void Squad::addUnits(const vector<UnitAgent*>& units) {
 }
 
 void Squad::removeUnit(UnitAgent* pUnit) {
+
 	vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), pUnit);
 	if (foundUnit != mUnits.end()) {
+		// Remove from unit composition
+		if (mUnitComposition.isValid()) {
+			mUnitComposition.removeUnit(*foundUnit);
+		}
+
 		mUnits.erase(foundUnit);
 	} else {
 		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
@@ -362,11 +404,15 @@ void Squad::onWaitGoalFinished(const shared_ptr<WaitGoal>& finishedWaitGoal) {
 
 void Squad::forceDisband() {
 	if (!mDisbanded) {
+		const TilePosition& ourBase = Broodwar->self()->getStartLocation();
+
 		// Free all the units from a squad id.
 		for (size_t i = 0; i < mUnits.size(); ++i) {
 			mUnits[i]->setSquadId(SquadId::INVALID_KEY);
 
-			///@todo maybe make the units retreat to a point?
+			/// @todo retreat to a better point than our start location.
+			/// Maybe add to a defensive squad?			
+			mUnits[i]->setGoal(ourBase);
 		}
 
 		mDisbanded = true;
@@ -412,7 +458,11 @@ Squad::States Squad::getState() const {
 	return mState;
 }
 
-const vector<UnitAgent*> Squad::getUnits() const {
+const vector<UnitAgent*>& Squad::getUnits() const {
+	return mUnits;
+}
+
+vector<UnitAgent*>& Squad::getUnits() {
 	return mUnits;
 }
 

@@ -9,6 +9,9 @@ In the next section related research topics will be covered, beginning with team
 
 
 \section{Research}
+%: Write some text
+
+\subsection{Teammate bots}
 As mentioned, not a lot have been done in the area of teammate bots, this is especially true for RTS games. McGee and Abraham did a survey in 2010 where they first present their definition of real-time teammate bots which they limit themselves to\cite{mcgee10}. Their definition of a real-time teammate bot includes a bot that
 \begin{inparaenum}[a\upshape)]
 	\item works together with team players while taking into account the state, needs, behavior, goals, plans and intentions of these players;
@@ -18,16 +21,25 @@ As mentioned, not a lot have been done in the area of teammate bots, this is esp
 	\item whenever possible, prioritizing the player experience.
 \end{inparaenum}
 
-In their analysis\cite{mcgee10} McGee and Abraham they noticed that, although human player participation and engagement are one key functionality of a game\cite{reynolds03}, often the player's preferences are neglected and the bots behave in the way they think is best. When the bot prioritizes the player, some challenges arise; how to create priority rules that do their job correctly\cite{mcgee10}, i.e. the bot has to know, or use a qualified guess, what the player wants. This is not an easy task, probably impossible in the near future; humans have a hard time understanding each others intentions, why think AIs that humans have created understands us better\cite{norman07}?.
+In their survey\cite{mcgee10} McGee and Abraham noticed that, although human player participation and engagement are one key functionality of a game\cite{reynolds03}, often the player's preferences are neglected and the bot(s) behave what it thinks is the best for either just itself or both the player and itself; this might sound as if it prioritizes the player, but what it does is steer the player into how to play rather than the player steering the bot. When the bot prioritizes the player, some challenges arise; how to create priority rules that do their job correctly\cite{mcgee10}, i.e. the bot has to know, or use a qualified guess, what the player wants. This is not an easy task, probably impossible in the near future; humans have a hard time understanding each others intentions, why think AIs that humans have created understands us better\cite{norman07} without even asking?.
+
+A more important discovery was the lack of research of communication between human players and bots, “This survey suggests that there are also some aspects of real-time team-mate AI where there seems to be little or no work: ..., and communication.”\cite{mcgee10} Meaning “little or no work” spans through multiple topics and multiple genres; while gathering background information for this thesis, no research was found on teammate communication between human players and bots for any genre, let alone for RTS games; there does however exist games in other genres that has implemented communication between human player and bot, this is covered below in section \ref{sec:teammate_bots}
+
+\paragraph{Teammate bots across all genres}
+Abraham and McGee created a teammate bot for a simple game: Capture the gunner\cite{abraham10}. The goal of this game is to capture the gunner by touching him from both sides while not being shot. The game required cooperation with their bot because selfish players never passed the first level. They also found that because the player had so much responsibility over the teammate players never felt unfair when the bot died by the gunner. In fact, some players felt that it was partly their fault if the bot died.
+
+
+
+\paragraph{Player modeling}
 
 \section{Implementation in games}
-
 
 Today, no RTS games, that we know of, allows communication with a teammate bot; players can, however, play with a bot, but instead of trying to collaborate with player it acts more or less (depending on the game) on its own, it can try to complement the player's behavior but does not ask if this is the preferred choice for the player.
 %: cite a game that tries this
 
 
 \subsection{Teammate bots}
+\label{sec:teammate_bots}
 Teammate bots have become more and more a commonplace in todays game, 
 
 \subsection{RTS Games}

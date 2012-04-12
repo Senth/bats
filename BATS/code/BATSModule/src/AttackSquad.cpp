@@ -11,7 +11,13 @@ using namespace std::tr1;
 AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
 ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
 
-AttackSquad::AttackSquad(const std::vector<UnitAgent*> units, bool distracting) : Squad(units) {
+AttackSquad::AttackSquad(
+	const std::vector<UnitAgent*>& units,
+	bool distracting,
+	const UnitComposition& unitComposition)
+	:
+	Squad(units, distracting, true, unitComposition)
+{
 	mDistraction = distracting;
 	mWaitInPosition = false;
 
