@@ -22,12 +22,16 @@ private:
 	bool running;
 	bool lock;
 	bool end;
+	
 
 	std::vector<PathObj*> pathObj;
 
 	PathObj* getPathObj(BWAPI::TilePosition start, BWAPI::TilePosition end);
 
 	bool isRunning();
+
+	void setThreadEnded();
+	bool isThreadDead();
 
 public:
 	/** Destructor */

@@ -43,6 +43,13 @@ BatsModule::BatsModule() : BTHAIModule() {
 	utilities::loadLogSettings(config::log::SETTINGS_FILE);
 	config::loadConfig();
 
+	// Set default debug level
+#ifdef _DEBUG
+	mDebugLevel = config::game::DEBUG_VALUE_IN_DEBUG;
+#else
+	mDebugLevel = config::game::DEBUG_VALUE_IN_RELEASE;
+#endif
+
 	// Initialize singletons that stays throughout multiple games
 	mpProfiler = Profiler::getInstance();
 }
@@ -143,7 +150,7 @@ void BatsModule::onSendText(std::string text) {
 	} else if (text == "/d3" || text == "/debug high") {
 		mDebugLevel = 3;
 	} else if (text == "/d0" || text == "/debug off") {
-		mDebugLevel = 4;
+		mDebugLevel = 0;
 	} else if (text == "/transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
 	} else if (startsWith(text,"/transition")) {				

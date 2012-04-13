@@ -75,7 +75,12 @@ namespace bats {
 		 * General configuration for the game
 		 */
 		namespace game {
+			/** The default speeed of the game */
 			extern int SPEED;
+			/** Default debug value in debugging mode */
+			extern int DEBUG_VALUE_IN_DEBUG;
+			/** Default debug value in release mode */
+			extern int DEBUG_VALUE_IN_RELEASE;
 		}
 
 		/**

@@ -1,0 +1,35 @@
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#include "HumanModule.h"
+
+namespace BWAPI { Game* Broodwar = NULL; }
+
+#pragma warning (push)
+#pragma warning (disable:4100)
+BOOL APIENTRY DllMain( HANDLE hModule, 
+	DWORD  reasonForCall, 
+	LPVOID pReserved
+	)
+{
+	switch (reasonForCall)
+	{
+	case DLL_PROCESS_ATTACH:
+		BWAPI::BWAPI_init();
+		break;
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+
+
+	return TRUE;
+}
+
+extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
+{
+	BWAPI::Broodwar = game;
+	return new human::HumanModule();
+}
+#pragma warning (pop)

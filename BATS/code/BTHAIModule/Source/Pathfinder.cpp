@@ -22,7 +22,7 @@ Pathfinder::Pathfinder()
 Pathfinder::~Pathfinder()
 {
 	running = false;
-	while (!end);
+	while (!isThreadDead());
 
 	for (int i = 0; i < (int)pathObj.size(); i++)
 	{	
@@ -140,8 +140,17 @@ unsigned long Pathfinder::Process (void* parameter)
 		Sleep(5);
 	}
 
-	end = true;
+	setThreadEnded();
 
 	return 0;
 }
 
+void Pathfinder::setThreadEnded() {
+	end = true;
+}
+
+#pragma optimize("", off)
+bool Pathfinder::isThreadDead() {
+	return end;
+}
+#pragma optimize("", on)

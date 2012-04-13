@@ -45,6 +45,8 @@ namespace frame_distribution {
 
 namespace game {
 	int SPEED = 8;
+	int DEBUG_VALUE_IN_DEBUG = 0;
+	int DEBUG_VALUE_IN_RELEASE = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -191,6 +193,10 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 bool game::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "speed") {
 		SPEED = variableInfo;
+	} else if (variableInfo.name == "debug_value_in_debug") {
+		DEBUG_VALUE_IN_DEBUG = variableInfo;
+	} else if (variableInfo.name == "debug_value_in_release") {
+		DEBUG_VALUE_IN_RELEASE = variableInfo;
 	} else {
 		return false;
 	}
