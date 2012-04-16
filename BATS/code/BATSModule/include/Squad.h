@@ -207,7 +207,7 @@ public:
 	 */
 	const BWAPI::TilePosition& getGoal() const;
 
-		/**
+	/**
 	 * Sets the position to move to as a goal. This will reset all current goal positions.
 	 * @param position the new goal position to move to.
 	 * @see setGoalPositions() to set a list of positions, and reset current positions.
@@ -217,31 +217,32 @@ public:
 	void setGoalPosition(const BWAPI::TilePosition& position);
 
 	/**
-	 * Sets the positions to move to as goals. This will reset all current goal positions.
-	 * @param positions the new goal positions to move to.
-	 * @see setGoalPosition() to set one position, and reset current positions.
-	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
-	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
+	 * Sets a new via path to the current goal. The bot will always go via the 'via' positions.
+	 * @param positions the new via path that will be used. An empty list will remove the current
+	 * via path and set them to 0.
+	 * @see setGoalPosition() to set one goal position, and reset current positions.
+	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back of the queue.
 	 */
-	void setGoalPositions(const std::list<BWAPI::TilePosition>& positions);
+	void setViaPath(const std::list<BWAPI::TilePosition>& positions);
 
 	/**
-	 * Adds the position at the back of the queue.
+	 * Adds the position to the via path at the back of the queue
 	 * @param position the goal position to add at the back of the queue.
 	 * @see setGoalPosition() to set one position, and reset current positions.
-	 * @see setGoalPositions() to set a list of positions, and reset current positions.
-	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
+	 * @see setViaPath() to set a new via path removing the old.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back of the queue.
 	 */
-	void addGoalPosition(const BWAPI::TilePosition& position);
+	void addViaPath(const BWAPI::TilePosition& position);
 
 	/**
 	 * Adds the positions at the back of the queue.
 	 * @param positions the goal positions to add at the back of the queue.
 	 * @see setGoalPosition() to set one position, and reset current positions.
-	 * @see setGoalPositions() to set a list of positions, and reset current positions.
-	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
+	 * @see setViaPath() to set a new via path removing the old.
+	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
 	 */
-	void addGoalPositions(const std::list<BWAPI::TilePosition>& positions);
+	void addViaPath(const std::list<BWAPI::TilePosition>& positions);
 
 	/**
 	 * Returns all the squad's units
@@ -387,12 +388,6 @@ protected:
 	void forceDisband();
 
 	/**
-	 * Update the current goal on all the squad's units to the current goal in the list.
-	 * If no goal exists, set an invalid goal. This also removes any temporary goal positions.
-	 */
-	void updateUnitGoals();
-
-	/**
 	 * Overrides the squad's units' goal with a temporary goal position. Can be used to wait in a
 	 * certain position before attacking. To go back to the main goal, call updateUnitGoals().
 	 * @param temporaryPosition the new temporary goal position of the units. Nothing happens
@@ -447,6 +442,40 @@ private:
 	void clearRegroupPosition();
 
 	/**
+	 * Updates the unit's movement to the current active position to move to.
+	 * Call this once a type of goal has been added removed. Or when a unit is added.
+	 * @pre squad state is active
+	 * @param pUnit the unit to update the goal position of
+	 * @see updateUnitMovement() to update the position of all units in the squad.
+	 * @see getPriorityMoveToPosition() for the move to position with the highest priority
+	 */
+	void updateUnitMovement(UnitAgent* pUnit);
+
+	/**
+	 * Updates all unit movements to the current active position. This function is equivalent
+	 * to calling updateUnitMovement(UnitAgent*) for all units in the squad.
+	 * @pre squad state is active
+	 * @see updateUnitMovement(UnitAgent*) to update the position of one unit.
+	 * @see getPriorityMoveToPosition() for the move to position with the highest priority
+	 */
+	void updateUnitMovement();
+
+	/**
+	 * Returns the current "goal" with the highest priority. \n
+	 * <b>Priority:</b>
+	 * <ol>
+	 * <li>RegroupPosition</li>
+	 * <li>TemporaryPosition</li>
+	 * <li>ViaPath</li>
+	 * <li>GoalPosition</li>
+	 * </ol>
+	 * @return position with the highest priority to move to.
+	 * @see updateUnitMovement(UnitAgent*) to update the position of one unit.
+	 * @see updateUnitMovement() to update the position of all units in the squad. 
+	 */
+	BWAPI::TilePosition getPriorityMoveToPosition() const;
+
+	/**
 	 * Returns true if a unit is standing still and not attacking.
 	 * @return true if a unit stands still and not attacks 
 	 */
@@ -454,7 +483,8 @@ private:
 
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
-	std::list<BWAPI::TilePosition> mGoalPositions;
+	std::list<BWAPI::TilePosition> mViaPath;
+	BWAPI::TilePosition mGoalPosition;
 	UnitComposition mUnitComposition;
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;

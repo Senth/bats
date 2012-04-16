@@ -38,7 +38,7 @@ void AttackSquad::computeSquadSpecificActions() {
 			// All wait goals done, continue to goal
 			if (!hasWaitGoals()) {
 				mWaitInPosition = false;
-				updateUnitGoals();
+				setTemporaryGoalPosition(BWAPI::TilePositions::Invalid);
 			}
 		} else {
 			setTemporaryGoalPosition(getCenter());

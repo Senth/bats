@@ -34,6 +34,7 @@ Squad::Squad(
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mTempGoalPosition(TilePositions::Invalid),
+	mGoalPosition(TilePositions::Invalid),
 	mRegroupPosition(TilePositions::Invalid),
 	mFurthestUnitAwayDistance(0.0),
 	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
@@ -117,31 +118,50 @@ void Squad::computeActions() {
 
 	}
 
-	// Remove finished WaitGoals and call onWaitGoalFinished for finished events.
-	vector<shared_ptr<WaitGoal>>::iterator waitGoalIt;
-	waitGoalIt = mWaitGoals.begin();
-	while (mWaitGoals.end() != waitGoalIt) {
-		if ((*waitGoalIt)->getWaitState() != WaitState_Waiting) {
-			shared_ptr<WaitGoal> finishedWaitGoal = *waitGoalIt;
-			waitGoalIt = mWaitGoals.erase(waitGoalIt);
-			onWaitGoalFinished(finishedWaitGoal);
-		} else {
-			++waitGoalIt;
-		}
-	}
-
-
 	switch (mState) {
 	case State_Initializing:
-		if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
+		// Only try to create a goal if the player hasn't specified one
+		if (mGoalPosition == TilePositions::Invalid &&
+			(!mUnitComposition.isValid() ||
+			mUnitComposition.isFull()))
+		{
 			bool goalCreated = createGoal();
 			if (goalCreated) {
 				mState = State_Active;
 			}
+		} else {
+			mState = State_Active;
+		}
+
+		// Update unit movement if we changed to active state
+		if (State_Active == mState) {
+			updateUnitMovement();
 		}
 		break;
 
-	case State_Active:
+	case State_Active: {
+		// Remove finished WaitGoals and call onWaitGoalFinished for finished events.
+		vector<shared_ptr<WaitGoal>>::iterator waitGoalIt;
+		waitGoalIt = mWaitGoals.begin();
+		while (mWaitGoals.end() != waitGoalIt) {
+			if ((*waitGoalIt)->getWaitState() != WaitState_Waiting) {
+				shared_ptr<WaitGoal> finishedWaitGoal = *waitGoalIt;
+				waitGoalIt = mWaitGoals.erase(waitGoalIt);
+				onWaitGoalFinished(finishedWaitGoal);
+			} else {
+				++waitGoalIt;
+			}
+		}
+
+
+		// Use next via path if close to
+		if (!mViaPath.empty() && isCloseTo(mViaPath.front())) {
+			mViaPath.pop_front();
+			updateUnitMovement();
+		}
+
+
+		// Squad specific and goals
 		computeSquadSpecificActions();
 		mGoalState = checkGoalState();
 
@@ -159,7 +179,8 @@ void Squad::computeActions() {
 		}
 
 		handleRegroup();
-
+	}
+	
 	default:
 		// Do nothing
 		break;
@@ -266,29 +287,7 @@ void Squad::addUnit(UnitAgent* pUnit) {
 		mUnits.push_back(pUnit);
 		pUnit->setSquadId(mId);
 	
-		// Set the correct active goal. Priority goes like this
-		// REGROUP -> TEMPORARY -> VIA -> GOAL
-
-		TilePosition movePosition = TilePositions::Invalid;
-
-		// Regroup
-		if (mRegroupPosition != TilePositions::Invalid) {
-			movePosition = mRegroupPosition;
-		}
-
-		// Temp
-		if (movePosition != TilePositions::Invalid && mTempGoalPosition != TilePositions::Invalid) {
-			movePosition = mTempGoalPosition;
-		}
-
-		/// @todo via position when adding unit
-
-		// Goal
-		if (movePosition != TilePositions::Invalid && !mGoalPositions.empty()) {
-			movePosition = mGoalPositions.front();
-		}
-
-		pUnit->setGoal(movePosition);
+		updateUnitMovement(pUnit);
 	}
 }
 
@@ -337,11 +336,7 @@ const SquadId & Squad::getSquadId() const {
 }
 
 const BWAPI::TilePosition& Squad::getGoal() const {
-	if (!mGoalPositions.empty()) {
-		return mGoalPositions.front();
-	} else {
-		return BWAPI::TilePositions::Invalid;
-	}
+	return mGoalPosition;
 }
 
 shared_ptr<Squad> Squad::getThis() const {
@@ -420,38 +415,23 @@ void Squad::forceDisband() {
 }
 
 void Squad::setGoalPosition(const TilePosition& position) {
-	mGoalPositions.clear();
-	mGoalPositions.push_back(position);
-	updateUnitGoals();
+	mGoalPosition = position;
+	updateUnitMovement();
 }
 
-void Squad::setGoalPositions(const std::list<TilePosition>& positions) {
-	mGoalPositions = positions;
-	updateUnitGoals();
+void Squad::setViaPath(const std::list<TilePosition>& positions) {
+	mViaPath = positions;
+	updateUnitMovement();
 }
 
-void Squad::addGoalPosition(const TilePosition& position) {
-	mGoalPositions.push_back(position);
-	updateUnitGoals();
+void Squad::addViaPath(const TilePosition& position) {
+	mViaPath.push_back(position);
+	updateUnitMovement();
 }
 
-void Squad::addGoalPositions(const std::list<TilePosition>& positions) {
-	mGoalPositions.insert(mGoalPositions.end(), positions.begin(), positions.end());
-	updateUnitGoals();
-}
-
-void Squad::updateUnitGoals() {
-	BWAPI::TilePosition newGoal = TilePositions::Invalid;
-	
-	if (!mGoalPositions.empty()) {
-		newGoal = mGoalPositions.front();
-	}
-
-	for (size_t i = 0; i < mUnits.size(); ++i) {
-		mUnits[i]->setGoal(newGoal);
-	}
-
-	mTempGoalPosition = TilePositions::Invalid;
+void Squad::addViaPath(const std::list<TilePosition>& positions) {
+	mViaPath.insert(mViaPath.end(), positions.begin(), positions.end());
+	updateUnitMovement();
 }
 
 Squad::States Squad::getState() const {
@@ -467,12 +447,8 @@ vector<UnitAgent*>& Squad::getUnits() {
 }
 
 void Squad::setTemporaryGoalPosition(const TilePosition& temporaryPosition) {
-	if (mTempGoalPosition != TilePositions::Invalid) {
-		mTempGoalPosition = temporaryPosition;
-		for (size_t i = 0; i < mUnits.size(); ++i) {
-			mUnits[i]->setGoal(mTempGoalPosition);
-		}
-	}	
+	mTempGoalPosition = temporaryPosition;
+	updateUnitMovement();
 }
 
 const TilePosition& Squad::getTemporaryGoalPosition() const {
@@ -537,33 +513,55 @@ bool Squad::finishedRegrouping() const {
 void Squad::setRegroupPosition(const BWAPI::TilePosition& regorupPosition) {
 	mRegroupPosition = regorupPosition;
 
-	// Update units
-	for (size_t i = 0; i < mUnits.size(); ++i) {
-		mUnits[i]->setGoal(mRegroupPosition);
-	}
+	updateUnitMovement();
 }
 
 void Squad::clearRegroupPosition() {
 	mRegroupPosition = TilePositions::Invalid;
 
-	TilePosition nextGoal = TilePositions::Invalid;
+	updateUnitMovement();
+}
 
-	// Temporary position?
-	nextGoal = mTempGoalPosition;
+void Squad::updateUnitMovement(UnitAgent* pUnit) {
+	if (State_Active == mState) {
+		pUnit->setGoal(getPriorityMoveToPosition());
+	}
+}
 
-	/// @todo add via position
-	if (nextGoal == TilePositions::Invalid) {
+void Squad::updateUnitMovement() {
+	if (State_Active == mState) {
+		TilePosition movePosition = getPriorityMoveToPosition();
 
+		for (size_t i = 0; i < mUnits.size(); ++i) {
+			mUnits[i]->setGoal(movePosition);
+		}
+	}
+}
+
+TilePosition Squad::getPriorityMoveToPosition() const {
+	TilePosition movePosition = TilePositions::Invalid;
+
+	// Regroup
+	if (movePosition == TilePositions::Invalid) {
+		movePosition = mRegroupPosition;
+	}
+
+	// Temp
+	if (movePosition == TilePositions::Invalid) {
+		movePosition = mTempGoalPosition;
+	}
+
+	/// @todo via position when adding unit
+	if (movePosition == TilePositions::Invalid && !mViaPath.empty()) {
+		movePosition = mViaPath.front();
 	}
 
 	// Goal
-	if (nextGoal == TilePositions::Invalid && !mGoalPositions.empty()) {
-		nextGoal = mGoalPositions.front();
+	if (movePosition == TilePositions::Invalid) {
+		movePosition = mGoalPosition;
 	}
 
-	for (size_t i = 0; i < mUnits.size(); ++i) {
-		mUnits[i]->setGoal(nextGoal);
-	}
+	return movePosition;
 }
 
 bool Squad::isAUnitStill() const {
