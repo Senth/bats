@@ -99,7 +99,7 @@ void BuildPlanner::buildingDestroyed(Unit* building){
 void BuildPlanner::computeActions(){
 	//Dont call too often
 	int cFrame = Broodwar->getFrameCount();
-	if (cFrame - lastCallFrame < 40)
+	if (cFrame - lastCallFrame < 30)
 	{
 		return;
 	}

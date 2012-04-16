@@ -332,7 +332,8 @@ void BatsModule::releaseGameClasses() {
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (mDebugLevel > 0) {
-		UnitCreator::getInstance()->printInfo();
+		if(mDebugLevel == 1)
+			UnitCreator::getInstance()->printInfo();
 		std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++) {
 			if (agents.at(i)->isBuilding()) agents.at(i)->debug_showGoal();

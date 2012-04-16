@@ -32,7 +32,14 @@ private:
 	ResourceManager();
 
 	bool hasProductionBuilding();
+	/*
+	* @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+	*/
+
+	bool isProductionBuildingsIdle();
 	
+	/* End
+	*/
 	std::vector<ResourceLock> locks;
 
 	int calcLockedMinerals();

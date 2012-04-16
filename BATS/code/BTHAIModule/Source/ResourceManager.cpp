@@ -29,6 +29,23 @@ ResourceManager* ResourceManager::getInstance()
 	return instance;
 }
 
+bool ResourceManager::isProductionBuildingsIdle(){	
+	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+	for (int i = 0; i < (int)agents.size(); i++){
+		BaseAgent* agent = agents.at(i);
+		Unit* unit = agent->getUnit();
+		BWAPI::UnitType type = agent->getUnitType();
+		if (agent != NULL && agent->isAlive() && !unit->isBeingConstructed()){
+			if (agent->isBuilding() && (type == UnitTypes::Terran_Barracks 
+				|| type == UnitTypes::Terran_Starport 
+				|| type == UnitTypes::Terran_Factory))
+				if(unit->isIdle())
+					return true;
+		}
+	}	
+	return false;
+}
+
 bool ResourceManager::hasProductionBuilding()
 {
 	if (bats::BuildPlanner::isTerran())
@@ -80,14 +97,18 @@ bool ResourceManager::hasResources(UnitType type)
 
 	if (type.isBuilding())
 	{
-		if (hasProductionBuilding())
+		/*if (hasProductionBuilding())
 		{
 			nMinerals += 150;
 			if (nGas > 0)
 			{
 				nGas += 100;
 			}
-		}
+		}*/
+		//if (hasProductionBuilding())
+			//nMinerals += 100;
+		if(isProductionBuildingsIdle())
+			return false;
 	}
 
 	return hasResources(nMinerals, nGas);
