@@ -45,9 +45,9 @@ BatsModule::BatsModule() : BTHAIModule() {
 
 	// Set default debug level
 #ifdef _DEBUG
-	mDebugLevel = config::game::DEBUG_VALUE_IN_DEBUG;
+	mDebugLevel = config::debug::GRAPHICS_TEXT_VERBOSITY_IN_DEBUG;
 #else
-	mDebugLevel = config::game::DEBUG_VALUE_IN_RELEASE;
+	mDebugLevel = config::debug::GRAPHICS_TEXT_VERBOSITY_IN_RELEASE;
 #endif
 
 	// Initialize singletons that stays throughout multiple games

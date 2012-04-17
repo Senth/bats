@@ -18,6 +18,7 @@ class UnitAgent;
 namespace bats {
 
 class SquadManager;
+class GameTime;
 
 /**
  * Base class for all BATS squads. Represents a squad of units with a shared goal.
@@ -305,6 +306,12 @@ public:
 	 * @see isCloseTo(const BWAPI::TilePosition&) for using the default radius.
 	 */
 	bool isCloseTo(const BWAPI::TilePosition& position, double range) const;
+
+	/**
+	 * Returns the name of the squad. Almost purely for debugging purposes
+	 * @return name of the derived squad.
+	 */
+	virtual std::string getName() const = 0;
 	
 protected:
 	/**
@@ -488,6 +495,7 @@ private:
 	UnitComposition mUnitComposition;
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;
+	double mRegroupStartTime;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
@@ -505,5 +513,6 @@ private:
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
 	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
 	static SquadManager* mpsSquadManager;
+	static GameTime* mpsGameTime;
 };
 }

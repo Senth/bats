@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BTHAIModule/Source/UnitAgent.h"
-#include "GameTime.h"
+#include "ExploreData.h"
 #include <memory.h>
 
 class SpottedObject;
@@ -94,77 +94,7 @@ struct ForceData {
 	}
 };
 
-/**
- * A region we have viseted, and when we visited it.
- * @author Johan Hagelback (johan.hagelback@gmail.com)
- */
-struct ExploreData {
-	BWAPI::TilePosition center;
-	int lastVisitFrame;
-	
-	ExploreData(const BWAPI::Position& tCenter)
-	{
-		center = BWAPI::TilePosition(tCenter);
-		lastVisitFrame = 0;
-	}
 
-	ExploreData(const BWAPI::TilePosition& tCenter) {
-		center = tCenter;
-	}
-
-	int getX() const
-	{
-		return center.x();
-	}
-
-	int getY() const
-	{
-		return center.y();
-	}
-
-	bool matches(BWTA::Region* region) const
-	{
-		if (region == NULL)
-		{
-			return false;
-		}
-		BWAPI::TilePosition tCenter = BWAPI::TilePosition(region->getCenter());
-		return matches(tCenter);
-	}
-
-	bool matches(const BWAPI::TilePosition& tCenter) const
-	{
-		double dist = tCenter.getDistance(center);
-		if (dist <= 2)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Checks whether the specified TilePosition is within this exploration region
-	 * @param position the position we want to check whether it's within this region.
-	 * @return true if the position is within this region.
-	 */
-	bool isWithin(const BWAPI::TilePosition& position) const {
-		BWTA::Region* pPositionRegion = BWTA::getRegion(position);
-		if (pPositionRegion != NULL) {
-			BWAPI::TilePosition regionCenter = BWAPI::TilePosition(pPositionRegion->getCenter());
-			return regionCenter == center;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Returns how many seconds (in fastest speed) since the location was checked.
-	 * @return number of seconds since last visit.
-	 */
-	double secondsSinceLastVisit() const {
-		return GameTime::getInstance()->getElapsedTime(lastVisitFrame);
-	}
-};
 
 /** The ExplorationManager handles all tasks involving exploration of the game world.
  ** It issue orders to a number of units that is used as explorers, keep track of
@@ -292,13 +222,6 @@ public:
 	 */
 	static bool canReach(UnitAgent* pUnit, BWAPI::TilePosition destination);
 
-	/** Sets that a region is explored.
-	 * @pre The position must be the BWAPI::TilePosition for the center of the
-	 * region.
-	 * @param exploredPos the explored position
-	 */
-	void setExplored(const BWAPI::TilePosition& exploredPos);
-
 	///**
 	// * Scans for vulnerable enemy bases, i.e. bases without protection from detectors.
 	// */
@@ -340,6 +263,11 @@ private:
 	 * Private constructor to enforce singleton usage.
 	 */
 	ExplorationManager();
+
+	/**
+	 * Update the explored position depending on where our units are.
+	 */
+	void updateExploredRegions();
 
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedStructures;
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedUnits;

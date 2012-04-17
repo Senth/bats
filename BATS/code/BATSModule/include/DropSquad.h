@@ -35,6 +35,8 @@ public:
 	 */
 	virtual ~DropSquad();
 
+	std::string getName() const;
+
 protected:
 	virtual void computeSquadSpecificActions();
 	virtual GoalStates checkGoalState() const;

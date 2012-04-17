@@ -36,3 +36,7 @@ double GameTime::getElapsedTime(int sinceFrame) const {
 	int frameDiff = BWAPI::Broodwar->getFrameCount() - sinceFrame;
 	return static_cast<double>(frameDiff) * SECONDS_PER_FRAME_FASTEST;
 }
+
+int GameTime::getFrameCount() const {
+	return BWAPI::Broodwar->getFrameCount();
+}

@@ -72,6 +72,8 @@ public:
 	 */
 	std::tr1::shared_ptr<AttackSquad> getThis() const;
 
+	std::string getName() const;
+
 protected:
 	virtual void computeSquadSpecificActions();
 	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);

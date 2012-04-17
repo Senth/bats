@@ -4,6 +4,8 @@
 using namespace bats;
 using namespace std;
 
+const std::string DROP_SQUAD_NAME = "DropSquad";
+
 DropSquad::DropSquad(const std::vector<UnitAgent*>& units, const UnitComposition& unitComposition) :
 	AttackSquad(units, true, unitComposition)
 {
@@ -94,4 +96,8 @@ void DropSquad::loadUnits() {
 	DEBUG_MESSAGE_CONDITION(!allAdded, utilities::LogLevel_Info, "DropSquad::loadUnits() | " <<
 		"Not enough transportations to load all units!"
 	);
+}
+
+std::string DropSquad::getName() const {
+	return DROP_SQUAD_NAME;
 }

@@ -303,4 +303,11 @@ void printDebugMessage(LogLevels verbosity, const std::string& debugMessage, boo
 */
 std::string getTimeStamp(bool filenameProof = false);
 
+/**
+ * Returns the string with the current date in the format: YYYY-MM-DD
+ * @return current date as string
+ */
+std::string getDateStamp();
+
 }
+

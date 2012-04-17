@@ -43,13 +43,23 @@ int utilities::gOutputTargetError = OUTPUT_CONSOLE;
 int utilities::gOutputTargetDebugMessage = OUTPUT_CONSOLE;
 int utilities::gcError = 0;
 
-const std::string ERROR_FILE_NAME = "error_log_";
-const std::string DEBUG_FILE_NAME = "debug_message_log_";
+const std::string ERROR_FILE_NAME = "error_log__";
+const std::string DEBUG_FILE_NAME = "debug_message_log__";
 const std::string ERROR_DEBUG_EXTENSION = ".txt";
 
 std::string gErrorPath;
 std::ofstream gErrorFile;
 std::ofstream gDebugMessageFile;
+
+std::string VERBOSITY_NAMES[] = {
+	"[FINEST]",
+	"[FINER]",
+	"[FINE]",
+	"[INFO]",
+	"[WARNING]",
+	"[SEVERE]",
+	"[NONE]"
+};
 
 #include <BWAPI/Game.h>
 namespace BWAPI{
@@ -59,7 +69,7 @@ namespace BWAPI{
 void utilities::setOutputDirectory(const std::string& dirPath) {
 	// Get date and time
 	std::string timeStamp = getTimeStamp(true);
-
+	std::string dateStamp = getDateStamp();
 
 	gErrorPath;
 	std::string debugPath;
@@ -83,12 +93,10 @@ void utilities::setOutputDirectory(const std::string& dirPath) {
 		}
 	}
 
-	gErrorPath += ERROR_FILE_NAME;
-	gErrorPath += timeStamp;
-	gErrorPath += ERROR_DEBUG_EXTENSION;
-	debugPath += DEBUG_FILE_NAME;
-	debugPath += timeStamp;
-	debugPath += ERROR_DEBUG_EXTENSION;
+	std::string endName = dateStamp + "__" + timeStamp + ERROR_DEBUG_EXTENSION;
+
+	gErrorPath += ERROR_FILE_NAME + endName;
+	debugPath += DEBUG_FILE_NAME + endName;
 
 	// Create the directory if it doesn't exist
 #ifdef WINDOWS
@@ -304,10 +312,14 @@ void utilities::printDebugMessage(LogLevels verbosity, const std::string& debugM
 {
 	std::string timeStamp = getTimeStamp();
 
+	std::stringstream messageFormat;
+	messageFormat << std::left << timeStamp << std::setw(12) << VERBOSITY_NAMES[verbosity] <<
+		debugMessage;
+
 	// File output
 	if (verbosity >= gVerbosityLevelFile && gOutputTargetDebugMessage & OUTPUT_FILE)
 	{
-		gDebugMessageFile << std::left << std::setw(14) << timeStamp << debugMessage << std::endl;
+		gDebugMessageFile << messageFormat.str() << std::endl;
 	}
 
 	// console output
@@ -315,7 +327,7 @@ void utilities::printDebugMessage(LogLevels verbosity, const std::string& debugM
 	{
 		if (gOutputTargetDebugMessage & OUTPUT_CONSOLE)
 		{
-			std::cout << std::left << std::setw(15) << timeStamp << debugMessage << std::endl;
+			std::cout << messageFormat.str() << std::endl;
 		}
 
 		if (stop)
@@ -326,9 +338,7 @@ void utilities::printDebugMessage(LogLevels verbosity, const std::string& debugM
 	// StarCraft
 	if (verbosity >= gVerbosityLevelStarCraft)
 	{
-		std::stringstream ss;
-		ss << std::left << std::setw(15) << timeStamp << debugMessage;
-		BWAPI::Broodwar->printf("%s", ss.str().c_str());
+		BWAPI::Broodwar->printf("%s", messageFormat.str().c_str());
 	}
 }
 
@@ -366,4 +376,20 @@ std::string utilities::getTimeStamp(bool filenameProof) {
 #endif
 
 	return timeStamp.str();
+}
+
+std::string utilities::getDateStamp() {
+	std::stringstream dateStamp;
+
+	/// @todo add linux code for getting current date
+#if defined(WINDOWS)
+	SYSTEMTIME curTime;
+	GetSystemTime(&curTime);
+	dateStamp << std::setfill('0') << std::right << curTime.wYear << "-" <<
+		std::setw(2) << curTime.wMonth << "-" << std::setw(2) << curTime.wDay;
+#elif defined(__linux__) || defined(__APPLE__)
+	
+#endif
+
+	return dateStamp.str();
 }

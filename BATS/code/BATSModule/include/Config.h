@@ -56,6 +56,16 @@ namespace bats {
 		}
 
 		/**
+		 * Debugging configuration
+		 */
+		namespace debug {
+			/** Default debug value in debugging mode */
+			extern int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG;
+			/** Default debug value in release mode */
+			extern int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE;
+		}
+
+		/**
 		 * Build order configuration variables
 		 */
 		namespace build_order {
@@ -75,12 +85,8 @@ namespace bats {
 		 * General configuration for the game
 		 */
 		namespace game {
-			/** The default speeed of the game */
+			/** The default speed of the game */
 			extern int SPEED;
-			/** Default debug value in debugging mode */
-			extern int DEBUG_VALUE_IN_DEBUG;
-			/** Default debug value in release mode */
-			extern int DEBUG_VALUE_IN_RELEASE;
 		}
 
 		/**
@@ -118,6 +124,8 @@ namespace bats {
 			/** See REGROUP_DISTANCE_END, the squared version. Cannot be set through
 			 * the config file, will set automatically, used for faster calculation. */
 			extern double REGROUP_DISTANCE_END_SQUARED;
+			/** Time before trying with a new regroup position when a unit is still */
+			extern double REGROUP_NEW_POSITION_TIME;
 			/** How long time before recalculating the distance to the unit furthest away
 			 * from the squad. This is the minimum time and the distance will not be
 			 * recalculated until the function is called again. */

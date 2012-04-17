@@ -28,13 +28,18 @@ bats::ExplorationManager::ExplorationManager() {
 	mForceEnemy.reset();
 	mCalcTurnCurrent = CalcTurn_First;
 
-	//Add the regions for this map
+	// Add the regions for this map
 	for(set<BWTA::Region*>::const_iterator it=getRegions().begin(); it != getRegions().end(); ++it) {
-		mExploreData.push_back(ExploreData((*it)->getCenter()));
+		mExploreData.push_back(ExploreData(TilePosition((*it)->getCenter())));
 	}
 
-	//mSiteSetFrame = 0;
-	//mExpansionSite = TilePositions::Invalid;
+	// Add all expansions
+	const set<BWTA::BaseLocation*>& baseLocations = BWTA::getBaseLocations();
+	set<BWTA::BaseLocation*>::const_iterator baseLocationIt;
+	for (baseLocationIt = baseLocations.begin(); baseLocationIt != baseLocations.end(); ++baseLocationIt) {
+		TilePosition basePosition = (*baseLocationIt)->getTilePosition();
+		mExploreData.push_back(ExploreData(basePosition, true));
+	}
 
 	mFrameLastCall = Broodwar->getFrameCount();
 }
@@ -87,6 +92,14 @@ void bats::ExplorationManager::computeActions() {
 	mCalcTurnCurrent = static_cast<CalcTurns>(static_cast<int>(mCalcTurnCurrent) + 1);
 	if (mCalcTurnCurrent == CalcTurn_Lim) {
 		mCalcTurnCurrent = CalcTurn_First;
+	}
+
+
+	// Check if an exploration point is visible, if it is, update visited time
+	for (size_t i = 0; i < mExploreData.size(); ++i) {
+		if (Broodwar->isVisible(mExploreData[i].getCenterPosition())) {
+			mExploreData[i].updateVisited();
+		}
 	}
 
 
@@ -156,7 +169,7 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 		//Squad is close to goal
 
 		//1. Set region to explored
-		setExplored(goal);
+		//setExplored(goal);
 
 		//2. Find new region to explore
 		BWTA::Region* startRegion = getRegion(goal);
@@ -206,14 +219,8 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 	return TilePositions::Invalid;
 }
 
-void bats::ExplorationManager::setExplored(const BWAPI::TilePosition& goal) {
-	bool found = false;
-	for (size_t i = 0; i < mExploreData.size(); i++) {
-		if (mExploreData[i].matches(goal)) {
-			mExploreData[i].lastVisitFrame = Broodwar->getFrameCount();
-			found = true;
-		}
-	}
+void bats::ExplorationManager::updateExploredRegions() {
+	vector<ExploreData> exploreCopy = mExploreData;
 }
 
 int bats::ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
@@ -221,11 +228,11 @@ int bats::ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
 		if (mExploreData[i].matches(region)) {
 
 			//Check if region is visible. If so, set lastVisitFrame to now
-			if (Broodwar->isVisible(mExploreData[i].center)) {
-				mExploreData[i].lastVisitFrame = Broodwar->getFrameCount();
+			if (Broodwar->isVisible(mExploreData[i].getCenterPosition())) {
+				mExploreData[i].updateVisited();
 			}
 
-			return mExploreData[i].lastVisitFrame;
+			return mExploreData[i].getLastVisitFrame();
 		}
 	}
 	
@@ -543,32 +550,17 @@ bool bats::ExplorationManager::isEnemyDetectorCovering(const BWAPI::Position& po
 vector<TilePosition> bats::ExplorationManager::findNotCheckedExpansions() const {
 	vector<TilePosition> foundPositions;
 
-	// Iterate through all expansions sites
-	const set<BWTA::BaseLocation*>& baseLocations = BWTA::getBaseLocations();
-	set<BWTA::BaseLocation*>::const_iterator baseLocationIt;
-	for (baseLocationIt = baseLocations.begin(); baseLocationIt != baseLocations.end(); ++baseLocationIt) {
-		TilePosition basePosition = (*baseLocationIt)->getTilePosition();
+	for (size_t i = 0; i < mExploreData.size(); ++i) {
+		if (mExploreData[i].isExpansion()) {
+			double lastVisit = mExploreData[i].secondsSinceLastVisit();
 
-		// Search all regions for the base position
-		ExploreData foundRegion(TilePositions::Invalid);
-		vector<ExploreData>::const_iterator exploreRegionIt = mExploreData.begin();
-		while (foundRegion.center == TilePositions::Invalid && exploreRegionIt != mExploreData.end()) {
-			if (exploreRegionIt->isWithin(basePosition)) {
-				foundRegion = *exploreRegionIt;
+			DEBUG_MESSAGE(utilities::LogLevel_Finest, "ExplorationManager::findNotCheckedExpansions() | " <<
+				"Position: " << mExploreData[i].getCenterPosition() << ", LastVisit: " << lastVisit
+			);
+
+			if (lastVisit >= config::attack_coordinator::EXPANSION_NOT_CHECKED_TIME) {
+				foundPositions.push_back(mExploreData[i].getCenterPosition());
 			}
-			++exploreRegionIt;
-		}
-
-		DEBUG_MESSAGE_CONDITION(foundRegion.center == TilePositions::Invalid,
-			utilities::LogLevel_Severe,
-			"ExplorationManager::findNotCheckdExpansions() | Did not find any region for " <<
-			"expansion located at (" << basePosition.x() << ", " << basePosition.y() << ")!");
-
-		// Add the region if it hasn't been visited for a "long" time
-		if (foundRegion.center != TilePositions::Invalid && 
-			foundRegion.secondsSinceLastVisit() >= config::attack_coordinator::EXPANSION_NOT_CHECKED_TIME)
-		{
-			foundPositions.push_back(basePosition);	
 		}
 	}
 

@@ -32,6 +32,14 @@ namespace attack_coordinator {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
+namespace debug {
+	int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = 0;
+	int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = 0;
+	int DEBUG_MESSAGE_VERBOSITY = 0;
+
+	bool set(const utilities::VariableInfo& variableInfo);
+}
+
 namespace build_order {
 	const std::string DIR = CONFIG_DIR + "buildorder\\";
 }
@@ -45,8 +53,6 @@ namespace frame_distribution {
 
 namespace game {
 	int SPEED = 8;
-	int DEBUG_VALUE_IN_DEBUG = 0;
-	int DEBUG_VALUE_IN_RELEASE = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -64,6 +70,7 @@ namespace squad {
 	double REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 	double REGROUP_DISTANCE_END = 0.0;
 	double REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
+	double REGROUP_NEW_POSITION_TIME = 0.0;
 	double CALC_FURTHEST_AWAY_TIME = 1.0;
 	double CLOSE_DISTANCE = 0.0;
 
@@ -116,6 +123,8 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 	bool noErrors = true;
 	if (variableInfo.section == "attack_coordinator") {
 		noErrors = attack_coordinator::set(variableInfo);
+	} else if (variableInfo.section == "debug") {
+		noErrors = debug::set(variableInfo);
 	} else if (variableInfo.section == "frame_distribution") {
 		noErrors = frame_distribution::set(variableInfo);
 	} else if (variableInfo.section == "game") {
@@ -178,6 +187,18 @@ bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInf
 	return true;
 }
 
+bool debug::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "graphics_text_verbosity_in_debug") {
+		GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = variableInfo;
+	} else if (variableInfo.name == "graphics_text_verbosity_in_release") {
+		GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = variableInfo;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
 bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "exploration_manager") {
 		EXPLORATION_MANAGER = variableInfo;
@@ -193,10 +214,6 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 bool game::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "speed") {
 		SPEED = variableInfo;
-	} else if (variableInfo.name == "debug_value_in_debug") {
-		DEBUG_VALUE_IN_DEBUG = variableInfo;
-	} else if (variableInfo.name == "debug_value_in_release") {
-		DEBUG_VALUE_IN_RELEASE = variableInfo;
 	} else {
 		return false;
 	}
@@ -218,6 +235,8 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 		} else if (variableInfo.name == "regroup_distance_end") {
 			REGROUP_DISTANCE_END = variableInfo;
 			REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
+		} else if (variableInfo.name == "regroup_new_position_time") {
+			REGROUP_NEW_POSITION_TIME = variableInfo;
 		} else if (variableInfo.name == "calc_furthest_away_time") {
 			CALC_FURTHEST_AWAY_TIME = variableInfo;
 		} else if (variableInfo.name == "close_distance") {

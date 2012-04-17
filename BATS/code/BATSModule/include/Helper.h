@@ -1,5 +1,9 @@
 #pragma once
 
+#include <ostream>
+#include <BWAPI/Position.h>
+#include <BWAPI/TilePosition.h>
+
 namespace bats {
 
 /**
@@ -29,4 +33,16 @@ inline double getSquaredDistance(const T& a, const T& b) {
 	return diffDistance.x() * diffDistance.x() + diffDistance.y() * diffDistance.y();
 }
 
+/**
+ * Prints out the x and y value to an outstream
+ * @param out ostream object to print to
+ * @param position the position to print
+ * @return a reference to the ostream object
+ */
+std::ostream& operator<<(std::ostream& out, const BWAPI::TilePosition& position);
+
+/**
+ * \copydoc operator<<(std::ostream&,BWPAI::Tileposition&)
+ */
+std::ostream& operator<<(std::ostream& out, const BWAPI::Position& position);
 }

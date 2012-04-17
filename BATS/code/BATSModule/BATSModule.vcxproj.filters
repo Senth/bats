@@ -111,6 +111,9 @@
     <ClInclude Include="include\DropSquad.h">
       <Filter>Squads\Types</Filter>
     </ClInclude>
+    <ClInclude Include="include\ExploreData.h">
+      <Filter>ExplorationAndMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -187,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="src\DropSquad.cpp">
       <Filter>Squads\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExploreData.cpp">
+      <Filter>ExplorationAndMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper.cpp">
+      <Filter>Helpers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

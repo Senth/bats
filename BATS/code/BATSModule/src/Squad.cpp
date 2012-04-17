@@ -18,6 +18,7 @@ using namespace BWAPI;
 int bats::Squad::mcsInstance = 0;
 utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
 SquadManager* bats::Squad::mpsSquadManager = NULL;
+GameTime* bats::Squad::mpsGameTime = NULL;
 
 const int MAX_KEYS = 100;
 
@@ -50,6 +51,7 @@ Squad::Squad(
 
 	if (NULL == mpsSquadManager) {
 		mpsSquadManager = SquadManager::getInstance();
+		mpsGameTime = GameTime::getInstance();
 	}
 
 	mId = mpsKeyHandler->allocateKey();
@@ -76,6 +78,8 @@ Squad::~Squad() {
 
 	if (mcsInstance == 0) {
 		SAFE_DELETE(mpsKeyHandler);
+		mpsGameTime = NULL;
+		mpsSquadManager = NULL;
 	}
 }
 
@@ -167,10 +171,12 @@ void Squad::computeActions() {
 
 		switch (mGoalState) {
 		case GoalState_Succeeded:
+			DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << " successful with goal");
 			onGoalSucceeded();
 			break;
 
 		case GoalState_Failed:
+			DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << " failed current goal");
 			onGoalFailed();
 			break;
 
@@ -401,7 +407,7 @@ void Squad::forceDisband() {
 	if (!mDisbanded) {
 		const TilePosition& ourBase = Broodwar->self()->getStartLocation();
 
-		// Free all the units from a squad id.
+		// Free all the units from a squad.
 		for (size_t i = 0; i < mUnits.size(); ++i) {
 			mUnits[i]->setSquadId(SquadId::INVALID_KEY);
 
@@ -409,6 +415,8 @@ void Squad::forceDisband() {
 			/// Maybe add to a defensive squad?			
 			mUnits[i]->setGoal(ourBase);
 		}
+
+		mUnits.clear();
 
 		mDisbanded = true;
 	}
@@ -474,10 +482,14 @@ void Squad::handleRegroup() {
 	else {
 		if (finishedRegrouping()) {
 			clearRegroupPosition();
-		} else {
-			// If a unit is standing still we need to update the regroup position
-			if (isAUnitStill()) {
-				setRegroupPosition(getCenter());
+		} else if (mpsGameTime->getElapsedTime() >= mRegroupStartTime + config::squad::REGROUP_NEW_POSITION_TIME &&
+			isAUnitStill())
+		{
+			TilePosition newRegroupPosition = getCenter();
+
+			// Only add if the new position is different
+			if (newRegroupPosition != mRegroupPosition) {
+				setRegroupPosition(newRegroupPosition);
 			}
 		}
 	}
@@ -512,12 +524,13 @@ bool Squad::finishedRegrouping() const {
 
 void Squad::setRegroupPosition(const BWAPI::TilePosition& regorupPosition) {
 	mRegroupPosition = regorupPosition;
-
+	mRegroupStartTime;
 	updateUnitMovement();
 }
 
 void Squad::clearRegroupPosition() {
 	mRegroupPosition = TilePositions::Invalid;
+	mRegroupStartTime = mpsGameTime->getElapsedTime();
 
 	updateUnitMovement();
 }
@@ -544,21 +557,45 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 	// Regroup
 	if (movePosition == TilePositions::Invalid) {
 		movePosition = mRegroupPosition;
+		
+		DEBUG_MESSAGE_CONDITION(
+			movePosition != TilePositions::Invalid,
+			utilities::LogLevel_Fine,
+			getName() << ": New regroup position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+		);
 	}
 
 	// Temp
 	if (movePosition == TilePositions::Invalid) {
 		movePosition = mTempGoalPosition;
+		
+		DEBUG_MESSAGE_CONDITION(
+			movePosition != TilePositions::Invalid,
+			utilities::LogLevel_Fine,
+			getName() << ": New temp position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+		);
 	}
 
-	/// @todo via position when adding unit
+	/// Via
 	if (movePosition == TilePositions::Invalid && !mViaPath.empty()) {
 		movePosition = mViaPath.front();
+		
+		DEBUG_MESSAGE_CONDITION(
+			movePosition != TilePositions::Invalid,
+			utilities::LogLevel_Fine,
+			getName() << ": New via position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+		);
 	}
 
 	// Goal
 	if (movePosition == TilePositions::Invalid) {
 		movePosition = mGoalPosition;
+		
+		DEBUG_MESSAGE_CONDITION(
+			movePosition != TilePositions::Invalid,
+			utilities::LogLevel_Fine,
+			getName() << ": New goal position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+		);
 	}
 
 	return movePosition;

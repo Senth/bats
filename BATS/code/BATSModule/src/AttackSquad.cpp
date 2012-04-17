@@ -11,6 +11,8 @@ using namespace std::tr1;
 AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
 ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
 
+const std::string ATTACK_SQUAD_NAME = "AttackSquad";
+
 AttackSquad::AttackSquad(
 	const std::vector<UnitAgent*>& units,
 	bool distracting,
@@ -57,8 +59,8 @@ Squad::GoalStates AttackSquad::checkGoalState() const {
 
 	// Check if all enemy structures are dead nearby
 	if (Broodwar->isVisible(getGoal()) &&
-		mpsExplorationManager->hasSpottedBuilding() &&
-		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoal(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE)) {
+		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoal(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
+	{
 		goalState = Squad::GoalState_Succeeded;
 	}
 
@@ -92,6 +94,10 @@ bool AttackSquad::isReadyToAttack() const {
 
 bool AttackSquad::isDistracting() const {
 	return mDistraction;
+}
+
+std::string AttackSquad::getName() const {
+	return ATTACK_SQUAD_NAME;
 }
 
 shared_ptr<AttackSquad> AttackSquad::getThis() const {
