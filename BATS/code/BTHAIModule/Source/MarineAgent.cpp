@@ -3,6 +3,8 @@
 #include "Commander.h"
 #include "TargetingAgent.h"
 #include "AgentManager.h"
+#include "BATSModule/include/SquadManager.h"
+#include "BATSModule/include/Squad.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -20,25 +22,26 @@ void MarineAgent::computeActions()
 {
 	if (!unit->isLoaded())
 	{
-		Squad* sq = Commander::getInstance()->getSquad(squadID);
-		if (sq != NULL)
-		{
-			if (sq->isBunkerDefend())
-			{
-				vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-				for (int i = 0; i < (int)agents.size(); i++)
-				{
-					if (agents.at(i)->isAlive() && agents.at(i)->isOfType(UnitTypes::Terran_Bunker))
-				{
-						if (agents.at(i)->getUnit()->getLoadedUnits().size() < 4)
-				{
-							unit->rightClick(agents.at(i)->getUnit());
-							return;
-						}
-					}
-				}
-			}
-		}
+		/// @todo check for nearby bunkers to enter
+		//Squad* sq = Commander::getInstance()->getSquad(squadID);
+		//if (sq != NULL)
+		//{
+		//	if (sq->isBunkerDefend())
+		//	{
+		//		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+		//		for (int i = 0; i < (int)agents.size(); i++)
+		//		{
+		//			if (agents.at(i)->isAlive() && agents.at(i)->isOfType(UnitTypes::Terran_Bunker))
+		//			{
+		//				if (agents.at(i)->getUnit()->getLoadedUnits().size() < 4)
+		//				{
+		//					unit->rightClick(agents.at(i)->getUnit());
+		//					return;
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 	}
 
 	if (Broodwar->self()->hasResearched(TechTypes::Stim_Packs))

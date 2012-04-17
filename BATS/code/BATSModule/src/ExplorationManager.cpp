@@ -110,42 +110,6 @@ void bats::ExplorationManager::computeActions() {
 	/// @todo update position on visible buildings that have moved.
 }
 
-//TilePosition bats::ExplorationManager::searchExpansionSite()
-//{
-//	getExpansionSite();
-//
-//	if (mExpansionSite== TilePositions::Invalid)
-//	{
-//		mExpansionSite = CoverMap::getInstance()->findExpansionSite();
-//		mSiteSetFrame = Broodwar->getFrameCount();
-//		//Broodwar->printf("Found expansion site around (%d,%d)", expansionSite.x(), expansionSite.y());
-//	}
-//
-//	return mExpansionSite;
-//}
-//
-//TilePosition bats::ExplorationManager::getExpansionSite()
-//{
-//	if (mExpansionSite.x() >= 0)
-//	{
-//		if (Broodwar->getFrameCount() - mSiteSetFrame > 500)
-//		{
-//			mExpansionSite = TilePositions::Invalid;
-//		}
-//	}
-//
-//	return mExpansionSite;
-//}
-
-//void bats::ExplorationManager::setExpansionSite(TilePosition pos)
-//{
-//	if (pos.x() >= 0)
-//	{
-//		mSiteSetFrame = Broodwar->getFrameCount();
-//		mExpansionSite = pos;
-//	}
-//}
-
 TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_ptr<Squad>& squad) {
 	TilePosition currentPos = squad->getCenter();
 	TilePosition goal = squad->getGoal();

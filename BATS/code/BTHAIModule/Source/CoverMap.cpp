@@ -1,9 +1,8 @@
 #include "CoverMap.h"
 #include "AgentManager.h"
-#include "ExplorationManager.h"
 #include "BaseAgent.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "Commander.h"
+#include "BatsModule/include/ExplorationManager.h"
 #include "Profiler.h"
 
 using namespace BWAPI;
@@ -13,9 +12,12 @@ using namespace std;
 
 bool CoverMap::instanceFlag = false;
 CoverMap* CoverMap::instance = NULL;
+bats::ExplorationManager* CoverMap::mpsExplorationManager = NULL;
 
 CoverMap::CoverMap()
 {
+	mpsExplorationManager = bats::ExplorationManager::getInstance();
+
 	w = Broodwar->mapWidth();
 	h = Broodwar->mapHeight();
 	range = 30;
@@ -113,6 +115,7 @@ CoverMap::~CoverMap()
 
 	instanceFlag = false;
 	instance = NULL;
+	mpsExplorationManager = NULL;
 }
 
 CoverMap* CoverMap::getInstance()
@@ -181,7 +184,7 @@ bool CoverMap::canBuild(UnitType toBuild, TilePosition buildSpot)
 	}
 
 	//Step 2: Check if path is available
-	if (!ExplorationManager::canReach(Broodwar->self()->getStartLocation(), buildSpot))
+	if (!mpsExplorationManager->canReach(Broodwar->self()->getStartLocation(), buildSpot))
 	{
 		return false;
 	}
@@ -278,8 +281,8 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	{
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Pylon) > 0)
 		{
-			TilePosition cp = Commander::getInstance()->findChokePoint();
-			if (cp!= TilePositions::Invalid)
+			TilePosition cp = findChokepoint();
+			if (cp != TilePositions::Invalid)
 			{
 				if (!Broodwar->hasPower(cp, UnitTypes::Protoss_Cybernetics_Core))
 				{
@@ -294,10 +297,12 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	}
 
 	//Build near chokepoints: Bunker, Photon Cannon, Creep Colony
-	if (BaseAgent::isOfType(toBuild, UnitTypes::Terran_Bunker) || BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Photon_Cannon) || BaseAgent::isOfType(toBuild, UnitTypes::Zerg_Creep_Colony))
+	if (BaseAgent::isOfType(toBuild, UnitTypes::Terran_Bunker) ||
+		BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Photon_Cannon) ||
+		BaseAgent::isOfType(toBuild, UnitTypes::Zerg_Creep_Colony))
 	{
-		TilePosition cp = Commander::getInstance()->findChokePoint();
-		if (cp!= TilePositions::Invalid)
+		TilePosition cp = findChokepoint();
+		if (cp != TilePositions::Invalid)
 		{
 			TilePosition spot = findBuildSpot(toBuild, cp);
 			return spot;
@@ -307,8 +312,8 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	//Base buildings.
 	if (toBuild.isResourceDepot())
 	{
-		TilePosition start = ExplorationManager::getInstance()->searchExpansionSite();
-		if (start!= TilePositions::Invalid)
+		TilePosition start = findExpansionSite();
+		if (start != TilePositions::Invalid)
 		{
 			TilePosition spot = findBuildSpot(toBuild, start);
 			return spot;
@@ -379,6 +384,157 @@ TilePosition CoverMap::findSpotAtSide(UnitType toBuild, TilePosition start, Tile
 	}
 
 	return TilePositions::Invalid;
+}
+
+bool CoverMap::isOccupied(BWTA::Region* region) const
+{
+	BWTA::Polygon p = region->getPolygon();
+	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+	for (int i = 0; i < (int)agents.size(); i++)
+	{
+		BaseAgent* agent = agents.at(i);
+		if (agent->isAlive() && (agent->isBuilding() && !agent->isOfType(UnitTypes::Protoss_Pylon)))
+		{
+			BWTA::Region* aRegion = getRegion(agents.at(i)->getUnit()->getTilePosition());
+			Position c1 = region->getCenter();
+			Position c2 = aRegion->getCenter();
+			if (c2.x() == c1.x() && c2.y() == c1.y())
+			{
+				return true;
+			}
+		}
+	}
+
+	/// @todo Check for the next expansion site to see if has expanded. This information shall
+	/// be available in the commander later, not the Exploration manager. Maybe creating
+	/// an ExpansionManager?
+
+
+	return false;
+}
+
+double CoverMap::getChokepointPrio(const TilePosition& center) const
+{
+	TilePosition ePos = mpsExplorationManager->getClosestSpottedBuilding(center);
+
+	if (ePos != TilePositions::Invalid) {
+		double dist = ePos.getDistance(center);
+		return 1000 - dist;
+	}
+	else
+	{
+		double dist = Broodwar->self()->getStartLocation().getDistance(center);
+		return dist;
+	}
+}
+
+TilePosition CoverMap::findChokepoint() const {
+	double bestPrio = -1;
+	Chokepoint* bestChoke = NULL;
+
+	set<BWTA::Region*>::const_iterator regionIt;
+	for(regionIt = getRegions().begin(); regionIt != getRegions().end(); ++regionIt)
+	{
+		if (isOccupied((*regionIt)))
+		{
+			set<Chokepoint*>::const_iterator chokeIt;
+			for(chokeIt = (*regionIt)->getChokepoints().begin(); chokeIt != (*regionIt)->getChokepoints().end(); ++chokeIt)
+			{
+				if (isEdgeChokepoint(*chokeIt))
+				{
+					double cPrio = getChokepointPrio(TilePosition((*chokeIt)->getCenter()));
+					if (cPrio > bestPrio)
+					{
+						bestPrio = cPrio;
+						bestChoke = *chokeIt;
+					}
+				}
+			}
+		}
+	}
+
+	TilePosition guardPos = Broodwar->self()->getStartLocation();
+	if (bestChoke != NULL)
+	{
+		guardPos = findDefensePos(bestChoke);
+	}
+
+	return guardPos;
+}
+
+bool CoverMap::isEdgeChokepoint(Chokepoint* choke) const
+{
+	pair<BWTA::Region*,BWTA::Region*> regions = choke->getRegions();
+	//If both is occupied it is not an edge chokepoint
+	if (isOccupied(regions.first) && isOccupied(regions.second))
+	{
+		return false;
+	}
+	//...but one of them must be occupied
+	if (isOccupied(regions.first) || isOccupied(regions.second))
+	{
+		return true;
+	}
+	return false;
+}
+
+TilePosition CoverMap::findDefensePos(Chokepoint* choke) const
+{
+	TilePosition defPos = TilePosition(choke->getCenter());
+	TilePosition chokePos = defPos;
+
+	double size = choke->getWidth();
+	if (size <= 32 * 3)
+	{
+		//Very narrow chokepoint, dont crowd it
+		double bestDist = 1000;
+		TilePosition basePos = Broodwar->self()->getStartLocation();
+
+		int maxD = 8;
+		int minD = 5;
+
+		// Find a good place to defend the chokepoint
+		for (int cX = chokePos.x() - maxD; cX <= chokePos.x() + maxD; cX++)
+		{
+			for (int cY = chokePos.y() - maxD; cY <= chokePos.y() + maxD; cY++)
+			{
+				TilePosition cPos = TilePosition(cX, cY);
+				if (mpsExplorationManager->canReach(basePos, cPos))
+				{
+					double chokeDist = chokePos.getDistance(cPos);
+					double baseDist = basePos.getDistance(cPos);
+
+					if (chokeDist >= minD && chokeDist <= maxD)
+					{
+						if (baseDist < bestDist)
+						{
+							bestDist = baseDist;
+							defPos = cPos;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//Uncomment to make defenders crowd around defensive structures.
+	/*UnitType defType;
+	if (BuildPlanner::isZerg()) defType = UnitTypes::Zerg_Sunken_Colony;
+	if (BuildPlanner::isProtoss()) defType = UnitTypes::Protoss_Photon_Cannon;
+	if (BuildPlanner::isTerran()) defType = UnitTypes::Terran_Bunker;
+
+	BaseAgent* turret = AgentManager::getInstance()->getClosestAgent(defPos, defType);
+	if (turret != NULL)
+	{
+		TilePosition tPos = turret->getUnit()->getTilePosition();
+		double dist = tPos.getDistance(defPos);
+		if (dist <= 12)
+		{
+			defPos = tPos;
+		}
+	}*/
+
+	return defPos;
 }
 
 bool CoverMap::canBuildAt(UnitType toBuild, TilePosition pos)
@@ -668,7 +824,7 @@ TilePosition CoverMap::findClosestGasWithoutRefinery(UnitType toBuild, TilePosit
 				}
 				if (ok)
 				{
-					if (ExplorationManager::canReach(home, cPos))
+					if (mpsExplorationManager->canReach(home, cPos))
 					{
 						BaseAgent* agent = AgentManager::getInstance()->getClosestBase(cPos);
 						double dist = agent->getUnit()->getTilePosition().getDistance(cPos);
@@ -722,7 +878,7 @@ TilePosition CoverMap::searchRefinerySpot()
 
 						if (dist < 15)
 						{
-							if (ExplorationManager::canReach(bPos, cPos))
+							if (mpsExplorationManager->canReach(bPos, cPos))
 							{
 								return cPos;
 							}			
@@ -773,7 +929,7 @@ TilePosition CoverMap::findExpansionSite()
 		}
 
 		//Check if enemy buildings are close
-		int eCnt = ExplorationManager::getInstance()->spottedBuildingsWithinRange(pos, 20);
+		int eCnt = mpsExplorationManager->countSpottedBuildingsWithinRange(pos, 20);
 		if (eCnt > 0)
 		{
 			taken = true;
@@ -782,7 +938,7 @@ TilePosition CoverMap::findExpansionSite()
 		//Not taken, calculate ground distance
 		if (!taken)
 		{
-			if (ExplorationManager::canReach(Broodwar->self()->getStartLocation(), pos))
+			if (mpsExplorationManager->canReach(Broodwar->self()->getStartLocation(), pos))
 			{
 				double dist = mapData.getDistance(Broodwar->self()->getStartLocation(), pos);
 				if (dist <= bestDist)

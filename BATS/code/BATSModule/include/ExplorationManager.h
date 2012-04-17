@@ -139,15 +139,6 @@ public:
 	 */
 	BWAPI::TilePosition getNextToExplore(const std::tr1::shared_ptr<Squad>& squad);
 
-	///** Searches for the next position to expand the base to. */
-	//BWAPI::TilePosition searchExpansionSite();
-
-	///** Returns the next position to expand the base to. */
-	//BWAPI::TilePosition getExpansionSite();
-
-	///** Sets the next position to expand the base to. */
-	//void setExpansionSite(BWAPI::TilePosition pos);
-
 	/** Shows all spotted objects as squares on the SC map. Use for debug purpose. */
 	void printInfo() const;
 

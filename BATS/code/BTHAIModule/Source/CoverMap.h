@@ -11,6 +11,11 @@ struct Corners {
 	int y2;
 };
 
+// Forward declaration
+namespace bats {
+	class ExplorationManager;
+}
+
 /** The CoverMap class is used to keep track of the own base and which Tiles that are occupied by buildings,
  * and which Tiles are free and possibly can be used to construct new buildings on. 
  *
@@ -30,6 +35,7 @@ private:
 	CoverMap();
 	static CoverMap* instance;
 	static bool instanceFlag;
+	static bats::ExplorationManager* mpsExplorationManager;
 
 	int range;
 	int w;
@@ -55,6 +61,12 @@ private:
 	BWAPI::TilePosition findBuildSpot(BWAPI::UnitType toBuild, BWAPI::TilePosition start);
 
 	BWAPI::Unit* hasMineralNear(BWAPI::TilePosition pos);
+
+	BWAPI::TilePosition findChokepoint() const;
+	BWAPI::TilePosition findDefensePos(BWTA::Chokepoint* choke) const;
+	bool isOccupied(BWTA::Region* region) const;
+	bool isEdgeChokepoint(BWTA::Chokepoint* choke) const;
+	double getChokepointPrio(const BWAPI::TilePosition& center) const;
 
 public:
 	/** Destructor */
