@@ -103,6 +103,7 @@
     <ClCompile Include="src\Resource.cpp" />
     <ClCompile Include="src\ResourceCounter.cpp" />
     <ClCompile Include="src\ResourceGroup.cpp" />
+    <ClCompile Include="src\ScoutSquad.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceCounter.h" />
     <ClInclude Include="include\ResourceGroup.h" />
+    <ClInclude Include="include\ScoutSquad.h" />
     <ClInclude Include="include\Squad.h" />
     <ClInclude Include="include\SquadManager.h" />
     <ClInclude Include="include\TerranProductionBuilding.h" />

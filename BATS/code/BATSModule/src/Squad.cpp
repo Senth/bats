@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "BTHAIModule/Source/WorkerAgent.h"
+
 using namespace bats;
 using namespace std;
 using std::tr1::shared_ptr;
@@ -544,6 +546,10 @@ void Squad::updateUnitMovement() {
 		TilePosition movePosition = getPriorityMoveToPosition();
 
 		for (size_t i = 0; i < mUnits.size(); ++i) {
+			/*if(mUnits[i]->isWorker()){
+				WorkerAgent * w = new WorkerAgent(mUnits[i]->getUnit());
+				w->setState(WorkerAgent::MOVE_TO_SPOT);
+			}*/
 			mUnits[i]->setGoal(movePosition);
 		}
 	}

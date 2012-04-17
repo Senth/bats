@@ -86,6 +86,11 @@ private:
 	 */
 	void createDrop();
 
+	/**
+	 * Initiates a scout
+	 */
+	void createScout();
+
 	std::tr1::shared_ptr<Squad> mSquadWaiting;
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;

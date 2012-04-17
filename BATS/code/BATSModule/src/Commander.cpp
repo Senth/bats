@@ -10,6 +10,7 @@
 
 #include "AttackSquad.h"
 #include "DropSquad.h"
+#include "ScoutSquad.h"
 
 using namespace bats;
 using namespace std::tr1;
@@ -74,7 +75,7 @@ bool Commander::issueCommand(const std::string& command) {
 	} else if (command == "move") {
 		/// @todo move command
 	} else if (command == "scout") {
-		/// @todo scout command
+		createScout();
 	}
 	/// @todo abort
 
@@ -161,4 +162,40 @@ void Commander::createDrop() {
 		/// But only if the player issued the command. Probably if the commander issued
 		/// the command a drop shall always be available?
 	}
+}
+
+void Commander::createScout() {
+	/// @todo handle already existing waiting squad
+	if (NULL != mSquadWaiting) {
+		finishWaitingSquad();
+	}
+
+	// Get available unit compositions
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
+	if(freeUnits.size() <= 0)
+		freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_WorkersAll);
+	UnitAgent* unit = freeUnits.at(0);
+	freeUnits.clear();
+	freeUnits.push_back(unit);
+	ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
+	mSquadWaiting = pScoutSuad->getThis();
+
+	/*std::vector<UnitComposition> availableUnitCompositions;
+	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Scout);
+
+	// Create scout
+	if (!availableUnitCompositions.empty()) {
+		// Choose a random unit composition
+		unsigned int randomId = rand() % availableUnitCompositions.size();
+		const UnitComposition& chosenComposition = availableUnitCompositions[randomId];
+
+		ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits, true, chosenComposition);
+		mSquadWaiting = pScoutSuad->getThis();
+	}
+	// No scouts available
+	else {
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Commander::createScout() | No scouts available");
+
+		/// @todo print a message to the other player that no scouts are available
+	}*/
 }

@@ -47,7 +47,12 @@ void UnitAgent::debug_showGoal()
 
 		Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Move (%d,%d)", goal.x(), goal.y());
 	}
-
+	if(unit->isIdle()){
+		Position a = Position(unit->getPosition());
+		Position b = Position(goal);		
+		Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
+		Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Idle (%d,%d)", goal.x(), goal.y());
+	}
 	if (!unit->isIdle())
 	{
 		Unit* targ = unit->getOrderTarget();

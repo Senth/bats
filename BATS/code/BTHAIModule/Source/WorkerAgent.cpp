@@ -119,6 +119,9 @@ void WorkerAgent::debug_showGoal()
 {
 	if (!isAlive()) return;
 	if (!unit->isCompleted()) return;
+	Position a = Position(unit->getPosition());
+	Position b = Position(goal);
+	//Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "(%d %d %d)", getSquadId(), b.x(), b.y());
 	
 	if (currentState == GATHER_MINERALS || currentState == GATHER_GAS)
 	{
@@ -175,11 +178,13 @@ void WorkerAgent::debug_showGoal()
 
 void WorkerAgent::computeActions()
 {
-	if (squadID != -1)
+	// if(SquadID != -1)
+	// @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+	if (getSquadId() != -1)
 	{
 		//Worker is in a squad
 
-		Squad* sq = Commander::getInstance()->getSquad(squadID);
+		Squad* sq = Commander::getInstance()->getSquad(getSquadId());
 		if (sq != NULL)
 		{
 			if (sq->isRush())

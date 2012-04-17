@@ -114,6 +114,9 @@
     <ClInclude Include="include\ExploreData.h">
       <Filter>ExplorationAndMap</Filter>
     </ClInclude>
+    <ClInclude Include="include\ScoutSquad.h">
+      <Filter>Squads\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -196,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="src\Helper.cpp">
       <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScoutSquad.cpp">
+      <Filter>Squads\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
