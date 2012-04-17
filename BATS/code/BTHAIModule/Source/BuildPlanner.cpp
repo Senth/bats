@@ -8,6 +8,7 @@
 #include "ExplorationManager.h"
 #include "BuildOrderFileReader.h"
 #include "ResourceManager.h"
+#include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -28,7 +29,7 @@ BuildPlanner::~BuildPlanner()
 
 BuildPlanner* BuildPlanner::getInstance()
 {
-	Broodwar->printf("~~Error~~");
+	ERROR_MESSAGE(false, "Called BTHAI's BuildPlanner::getInstance() instead of BATS!");
 	if (instance == NULL)
 	{
 		instance = new BuildPlanner();

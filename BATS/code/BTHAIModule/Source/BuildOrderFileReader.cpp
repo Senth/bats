@@ -1,6 +1,7 @@
 #include "BuildOrderFileReader.h"
 #include "ExplorationManager.h"
 #include "BatsModule/include/BuildPlanner.h"
+#include "Utilities/Logger.h"
 #include <fstream>
 #include <sstream>
 
@@ -14,7 +15,7 @@ BuildOrderFileReader::BuildOrderFileReader()
 
 vector<UnitType> BuildOrderFileReader::readBuildOrder()
 {
-	Broodwar->printf("~~Error~~");
+	ERROR_MESSAGE(false, "Called BTHAI's BuildOrderFileReader instead of BATS!");
 	string filename = getFilename("buildorder");
 	vector<UnitType> buildOrder;
 

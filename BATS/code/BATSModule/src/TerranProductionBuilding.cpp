@@ -13,8 +13,7 @@ TerranProductionBuilding::TerranProductionBuilding(BWAPI::Unit* pUnit){
 	type = unit->getType();
 	unitID = unit->getID();
 	agentType = "TerranProductionBuilding";
-	Broodwar->printf("TerranProductionBuilding Created");
-	utilities::printDebugMessage(utilities::LogLevel_Info, "TerranProductionBuilding Created");
+	DEBUG_MESSAGE(utilities::LogLevel_Fine, "TerranProductionBuilding Created");
 }
 
 TerranProductionBuilding::~TerranProductionBuilding(){
@@ -33,7 +32,8 @@ void TerranProductionBuilding::computeActions(){
 				UnitType toBuild = UnitCreator::getInstance()->getNextProducableUnit(unit);
 				if(toBuild != UnitTypes::None){
 					//Build it!
-					Broodwar->printf("%s",toBuild.getName());
+					DEBUG_MESSAGE(utilities::LogLevel_Fine, "TerranPrudoctionBuilding | Building " <<
+						toBuild.getName());
 					unit->train(toBuild);
 				}
 			}

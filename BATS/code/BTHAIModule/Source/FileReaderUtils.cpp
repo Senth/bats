@@ -1,6 +1,7 @@
 #include "FileReaderUtils.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "ExplorationManager.h"
+#include "Utilities/Logger.h"
 #include "Config.h"
 #include <fstream>
 #include <sstream>
@@ -123,7 +124,7 @@ UnitType FileReaderUtils::getUnitType(string line)
 	}
 
 	//No UnitType match found
-	Broodwar->printf("Error: No matching UnitType found for %s", line.c_str());
+	ERROR_MESSAGE(false, "No matching UnitType found for " << line);
 	return UnitTypes::Unknown;
 }
 
@@ -162,7 +163,7 @@ TechType FileReaderUtils::getTechType(string line)
 	}
 
 	//No UnitType match found
-	Broodwar->printf("Error: No matching TechType found for %s", line.c_str());
+	ERROR_MESSAGE(false, "No matching TechType found for " << line);
 	return TechTypes::Unknown;
 }
 

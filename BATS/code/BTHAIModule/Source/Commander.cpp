@@ -6,6 +6,7 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "WorkerAgent.h"
 #include "Profiler.h"
+#include "Utilities/Logger.h"
 #include <algorithm>
 
 using namespace BWAPI;
@@ -40,6 +41,7 @@ Commander::~Commander()
 
 Commander* Commander::getInstance()
 {
+	ERROR_MESSAGE(false, "Called BTHAI's Commander instead of BATS!");
 	if (instance == NULL)
 	{
 		instance = new Commander();

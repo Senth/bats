@@ -51,8 +51,7 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 		}
 		inFile.close();
 	}
-	//Broodwar->drawTextScreen(15,50,"Build order file %s loaded", filePath.c_str());
-	Broodwar->printf("Transition config file %s loaded", filePath.c_str());
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "BuildOrder: Transition config file " << filePath << " loaded");
 	return graph;
 }
 
@@ -63,7 +62,7 @@ vector<bats::CoreUnit> BuildOrderFileReader::getUnitList(){
 vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileName, vector<UnitType> &buildOrder){
 	//string filename = getFilename("buildorder\\" + phase + "\\");
 	//vector<UnitType> buildOrder;
-	Broodwar->printf("~~~Build Order changed to phase %s", phase);
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "BuildOrder: changed to phase " << phase);
 	//Read buildorder file
 	ifstream inFile;
 
@@ -104,8 +103,8 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 		}
 		inFile.close();
 	}
-	//Broodwar->drawTextScreen(15,50,"Build order file %s loaded", filePath.c_str());
-	Broodwar->printf("Build order file %s loaded", filePath.c_str());
+
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "Build order file " << filePath << " loaded");
 	return buildOrder;
 }
 

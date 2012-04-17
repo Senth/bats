@@ -2,6 +2,7 @@
 #include "FileReaderUtils.h"
 #include "ExplorationManager.h"
 #include "BatsModule/include/BuildPlanner.h"
+#include "Utilities/Logger.h"
 #include <fstream>
 #include <sstream>
 
@@ -79,7 +80,7 @@ void UpgradesFileReader::readUpgrades()
 		inFile.close();
 	}
 
-	Broodwar->printf("Upgrades file %s loaded", filePath.c_str());
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "Upgrades file " << filePath << "loaded");
 }
 
 void UpgradesFileReader::addUpgrade(string line)

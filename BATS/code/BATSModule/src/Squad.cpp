@@ -133,8 +133,6 @@ void Squad::computeActions() {
 			if (goalCreated) {
 				mState = State_Active;
 			}
-		} else {
-			mState = State_Active;
 		}
 
 		// Update unit movement if we changed to active state

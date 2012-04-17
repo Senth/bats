@@ -5,6 +5,7 @@
 #include "Commander.h"
 #include "Squad.h"
 #include "CoverMap.h"
+#include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace BWTA;
@@ -57,6 +58,7 @@ bool ExplorationManager::isActive()
 
 ExplorationManager* ExplorationManager::getInstance()
 {
+	ERROR_MESSAGE(false, "Called BTHAI's ExplorationManager instead of BATS!");
 	if (!instanceFlag)
 	{
 		instance = new ExplorationManager();

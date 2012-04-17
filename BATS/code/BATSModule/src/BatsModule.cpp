@@ -102,7 +102,7 @@ void BatsModule::onStart() {
 		}
 	}
 
-	//Broodwar->printf("BTHAI %s (%s)", VERSION.c_str(), Broodwar->self()->getRace().getName().c_str());
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "BATS bot running!");
 
 	running = true;
 
@@ -281,7 +281,7 @@ bool BatsModule::areWePlaying() const {
 void BatsModule::updateGame() {
 	// Quit the game if the game is lost
 	if (isGameLost()) {
-		Broodwar->printf("No workers left; bailing out.");
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "No workers left; bailing out.");
 		Broodwar->sendText("gg");
 		Broodwar->leaveGame();
 		return;

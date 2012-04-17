@@ -75,7 +75,7 @@ void BuildPlanner::switchToPhase(std::string fileName){
 				ERROR_MESSAGE(false, "Error loading file %s" << fileName);
 		}
 		else{
-			Broodwar->printf("All transition used");
+			DEBUG_MESSAGE(utilities::LogLevel_Fine, "All transition used");
 		}
 	}
 }
