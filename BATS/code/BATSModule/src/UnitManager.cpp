@@ -1,6 +1,7 @@
 #include "UnitManager.h"
 #include "SquadManager.h"
 #include "Squad.h"
+#include "BTHAIModule/Source/WorkerAgent.h"
 #include <cassert>
 #include <memory.h>
 
@@ -47,12 +48,18 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 
 			// Worker units
 			if (pUnitAgent->getUnitType().isWorker()) {
+				// All workers including those that are building
 				if (filter & UnitFilter_WorkersAll) {
 					addUnit = true;
 				}
 
+				// Only add free workers (in no squad and not building)
 				if (filter & UnitFilter_WorkersNoSquad) {
-					if (pUnitAgent->getSquadId().isInvalid()) {
+					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(pUnitAgent);
+					if (NULL != pWorkerAgent &&
+						!pWorkerAgent->isBuilding() &&
+						pWorkerAgent->getSquadId().isInvalid())
+					{
 						addUnit = true;
 					}
 				}
