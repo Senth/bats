@@ -211,7 +211,7 @@ public:
 	 * @param destination the location pUnit wants to check
 	 * @return true if the unit can reach position 'destination'. Else false
 	 */
-	static bool canReach(UnitAgent* pUnit, BWAPI::TilePosition destination);
+	static bool canReach(BaseAgent* pUnit, BWAPI::TilePosition destination);
 
 	///**
 	// * Scans for vulnerable enemy bases, i.e. bases without protection from detectors.

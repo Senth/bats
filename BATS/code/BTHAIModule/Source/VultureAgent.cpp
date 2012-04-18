@@ -20,15 +20,16 @@ VultureAgent::VultureAgent(BWAPI::Unit* mUnit)
 
 void VultureAgent::computeActions()
 {
-	Squad* sq = Commander::getInstance()->getSquad(squadID);
-	if (sq != NULL)
-	{
-		if (sq->isKite())
-		{
-			computeKitingActions();
-			return;
-		}
-	}
+	/// @todo kite
+	//Squad* sq = Commander::getInstance()->getSquad(squadID);
+	//if (sq != NULL)
+	//{
+	//	if (sq->isKite())
+	//	{
+	//		computeKitingActions();
+	//		return;
+	//	}
+	//}
 
 	int eCnt = enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), 320);
 	if (eCnt > 0)

@@ -76,7 +76,7 @@ void ExplorationSquad::computeActions()
 		}
 
 		TilePosition nGoal = ExplorationManager::getInstance()->getNextToExplore(this);
-		if (nGoal.x() >= 0)
+		if (nGoal != TilePositions::Invalid)
 		{
 			this->goal = nGoal;
 			setMemberGoals(goal);

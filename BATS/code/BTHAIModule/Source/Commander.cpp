@@ -145,7 +145,7 @@ void Commander::computeActions()
 				if (!squads.at(i)->hasGoal())
 				{
 					TilePosition closeEnemy = getClosestEnemyBuilding(TilePosition(squads.at(i)->getCenter()));
-					if (closeEnemy.x() >= 0)
+					if (closeEnemy != TilePositions::Invalid)
 					{
 						squads.at(i)->attack(closeEnemy);
 					}
@@ -239,7 +239,7 @@ void Commander::checkNoSquadUnits()
 		if (agent->isOfType(UnitTypes::Zerg_Overlord)) notAssigned = false;
 		if (agent->getUnitType().isBuilding()) notAssigned = false;
 		if (agent->getUnitType().isAddon()) notAssigned = false;
-		if (agent->_deprecated_getSquadID() != -1) notAssigned = false;
+		//if (agent->_deprecated_getSquadID() != -1) notAssigned = false;
 
 		if (notAssigned)
 		{
@@ -371,15 +371,15 @@ int Commander::noOffensiveSquadsWithin(TilePosition center, int maxRange)
 
 void Commander::unitDestroyed(BaseAgent* agent)
 {
-	int squadID = agent->_deprecated_getSquadID();
-	if (squadID != -1)
-	{
-		Squad* squad = getSquad(squadID);
-		if (squad != NULL)
-		{
-			squad->removeMember(agent);
-		}
-	}
+	//int squadID = agent->_deprecated_getSquadID();
+	//if (squadID != -1)
+	//{
+	//	Squad* squad = getSquad(squadID);
+	//	if (squad != NULL)
+	//	{
+	//		squad->removeMember(agent);
+	//	}
+	//}
 }
 
 void Commander::sortSquadList()
@@ -576,7 +576,7 @@ double Commander::getChokepointPrio(TilePosition center)
 {
 	TilePosition ePos = ExplorationManager::getInstance()->getClosestSpottedBuilding(center);
 
-	if (ePos.x() >= 0)
+	if (ePos != TilePositions::Invalid)
 	{
 		double dist = ePos.getDistance(center);
 		return 1000 - dist;
@@ -740,7 +740,7 @@ bool Commander::isOccupied(BWTA::Region* region)
 	//Check expansion site
 	TilePosition expansionSite = ExplorationManager::getInstance()->getExpansionSite();
 	TilePosition center = TilePosition(region->getCenter());
-	if (expansionSite.x() >= 0)
+	if (expansionSite != TilePositions::Invalid)
 	{
 		double dist = expansionSite.getDistance(center);
 		if (dist <= 15)
@@ -909,11 +909,11 @@ void Commander::assistBuilding(BaseAgent* building)
 
 void Commander::assistWorker(BaseAgent* worker)
 {
-	if (worker->_deprecated_getSquadID() != -1)
-	{
-		//Worker is in a squad. Do nothing.
-		return;
-	}
+	//if (worker->_deprecated_getSquadID() != -1)
+	//{
+	//	//Worker is in a squad. Do nothing.
+	//	return;
+	//}
 
 	//Find out who targets the worker
 	TilePosition defPos = worker->getUnit()->getTilePosition();
@@ -968,7 +968,7 @@ void Commander::forceAttack()
 	{
 		if (squads.at(i)->isOffensive() || squads.at(i)->isSupport())
 		{
-			if (cGoal.x() >= 0)
+			if (cGoal != TilePositions::Invalid)
 			{
 				squads.at(i)->forceActive();
 				squads.at(i)->attack(cGoal);

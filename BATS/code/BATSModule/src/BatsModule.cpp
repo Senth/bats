@@ -238,7 +238,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 	}
 }
 
-void BatsModule::onMorphUnit(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 		if (OUR(pUnit)) {
 			if (BuildPlanner::isZerg()) {

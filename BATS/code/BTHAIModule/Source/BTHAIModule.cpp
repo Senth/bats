@@ -7,7 +7,7 @@
 #include "Pathfinder.h"
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
-#include "AIloop.h"
+//#include "AIloop.h"
 #include "Statistics.h"
 #include "Profiler.h"
 #include "Config.h"
@@ -22,7 +22,7 @@ bool leader = false;
 
 BTHAIModule::BTHAIModule() : BWAPI::AIModule() {
 	statistics = NULL;
-	loop = NULL;
+	//loop = NULL;
 
 	running = false;
 	profile = false;
@@ -31,7 +31,7 @@ BTHAIModule::BTHAIModule() : BWAPI::AIModule() {
 
 BTHAIModule::~BTHAIModule() {
 	delete statistics;
-	delete loop;
+	//delete loop;
 }
 
 void BTHAIModule::onStart() 
@@ -64,8 +64,8 @@ void BTHAIModule::onStart()
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
-	loop = new AIloop();
-	loop->setDebugMode(1);
+	//loop = new AIloop();
+	//loop->setDebugMode(1);
 
 	if (Broodwar->isReplay()) 
 	{
@@ -127,8 +127,8 @@ void BTHAIModule::onFrame()
 		return;
 	}
 	
-	loop->computeActions();
-	loop->show_debug();
+	//loop->computeActions();
+	//loop->show_debug();
 
 	Config::getInstance()->displayBotName();
 
@@ -141,41 +141,41 @@ void BTHAIModule::onSendText(std::string text)
 {
 	if (text=="/a") 
 	{
-		Commander::getInstance()->forceAttack();
+		//Commander::getInstance()->forceAttack();
 	}
 	else if(text=="/p") 
 	{
 		profile = !profile;
 	}
-	else if(text=="/d1") 
-	{
-		loop->setDebugMode(1);
-	}
-	else if(text=="/d2") 
-	{
-		loop->setDebugMode(2);
-	}
-	else if(text=="/d3") 
-	{
-		loop->setDebugMode(3);
-	}
-	else if(text=="/off") 
-	{
-		loop->setDebugMode(0);
-	}
-	else if(text=="/d0") 
-	{
-		loop->setDebugMode(0);
-	}
-	else if (text.substr(0, 2)=="sq") 
-	{
-		int id = atoi(&text[2]);
-		Squad* squad = Commander::getInstance()->getSquad(id);
-		if (squad != NULL) 
-		{
-			squad->printFullInfo();
-		}
-	}
+	//else if(text=="/d1") 
+	//{
+	//	loop->setDebugMode(1);
+	//}
+	//else if(text=="/d2") 
+	//{
+	//	loop->setDebugMode(2);
+	//}
+	//else if(text=="/d3") 
+	//{
+	//	loop->setDebugMode(3);
+	//}
+	//else if(text=="/off") 
+	//{
+	//	loop->setDebugMode(0);
+	//}
+	//else if(text=="/d0") 
+	//{
+	//	loop->setDebugMode(0);
+	//}
+	//else if (text.substr(0, 2)=="sq") 
+	//{
+	//	int id = atoi(&text[2]);
+	//	Squad* squad = Commander::getInstance()->getSquad(id);
+	//	if (squad != NULL) 
+	//	{
+	//		squad->printFullInfo();
+	//	}
+	//}
 	else if (text=="+") 
 	{
 		speed -= 4;
@@ -275,15 +275,15 @@ void BTHAIModule::onUnitEvade(BWAPI::Unit* unit)
 
 void BTHAIModule::onUnitShow(BWAPI::Unit* unit) 
 {
-	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
+	//if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
 
-	if (unit->getPlayer()->getID() != Broodwar->self()->getID()) 
-	{
-		if (!unit->getPlayer()->isNeutral() && !unit->getPlayer()->isAlly(Broodwar->self()))
-		{
-			ExplorationManager::getInstance()->addSpottedUnit(unit);
-		}
-	}
+	//if (unit->getPlayer()->getID() != Broodwar->self()->getID()) 
+	//{
+	//	if (!unit->getPlayer()->isNeutral() && !unit->getPlayer()->isAlly(Broodwar->self()))
+	//	{
+	//		ExplorationManager::getInstance()->addSpottedUnit(unit);
+	//	}
+	//}
 }
 
 void BTHAIModule::onUnitHide(BWAPI::Unit* unit) 
@@ -295,31 +295,31 @@ void BTHAIModule::onUnitCreate(BWAPI::Unit* unit)
 {
 	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
 
-	loop->addUnit(unit);
+	//loop->addUnit(unit);
 }
 
 void BTHAIModule::onUnitDestroy(BWAPI::Unit* unit) 
 {
 	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
 
-	loop->unitDestroyed(unit);
+	//loop->unitDestroyed(unit);
 }
 
 void BTHAIModule::onUnitMorph(BWAPI::Unit* unit) 
 {
-	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
+	//if (Broodwar->isReplay() || Broodwar->getFrameCount() <= 1) return;
 
-	if (unit->getPlayer()->getID() == Broodwar->self()->getID()) 
-	{
-		if (bats::BuildPlanner::isZerg())
-		{
-			loop->morphUnit(unit);
-		}
-		else
-		{
-			loop->addUnit(unit);
-		}
-	}
+	//if (unit->getPlayer()->getID() == Broodwar->self()->getID()) 
+	//{
+	//	if (bats::BuildPlanner::isZerg())
+	//	{
+	//		loop->morphUnit(unit);
+	//	}
+	//	else
+	//	{
+	//		loop->addUnit(unit);
+	//	}
+	//}
 }
 
 void BTHAIModule::onUnitRenegade(BWAPI::Unit* unit) 

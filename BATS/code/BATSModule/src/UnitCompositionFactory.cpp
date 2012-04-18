@@ -4,6 +4,7 @@
 #include "Config.h"
 #include <BWAPI/Race.h>
 #include <BWAPI/UnitType.h>
+#include <algorithm>
 
 using namespace bats;
 
@@ -56,8 +57,7 @@ void UnitCompositionFactory::reloadConfigs() {
 
 	std::string typeNameCurrent;
 	UnitCompositions typeCurrent = UnitComposition_Lim;
-	std::string nameCurrent;
-	std::vector<UnitSet> unitSets;
+	UnitComposition compositionCurrent;
 
 	while (unitCompositionReader.isGood()) {
 		utilities::VariableInfo variableInfo;
@@ -66,14 +66,12 @@ void UnitCompositionFactory::reloadConfigs() {
 		// New Squad, maybe add unit sets
 		// The reason we test for new file too is that maybe an equal section in the next file
 		// exists
-		if (variableInfo.section != nameCurrent || variableInfo.file != typeNameCurrent) {
-			if (typeCurrent != UnitComposition_Lim && !unitSets.empty()) {
-				mUnitCompositions[typeCurrent].push_back(
-					UnitComposition(typeNameCurrent, nameCurrent, unitSets)
-				);
-				unitSets.clear();
+		if (variableInfo.section != compositionCurrent.getName() || variableInfo.file != typeNameCurrent) {
+			if (typeCurrent != UnitComposition_Lim && compositionCurrent.isValid()) {
+				mUnitCompositions[typeCurrent].push_back(compositionCurrent);
+				compositionCurrent.clear();
 			}
-			nameCurrent = variableInfo.section;
+			compositionCurrent.setTypeAndName(variableInfo.file, variableInfo.section);
 		}
 
 		
@@ -89,32 +87,47 @@ void UnitCompositionFactory::reloadConfigs() {
 			}
 		}
 
-		
-		// New UnitSet
-		BWAPI::UnitType unitType = BWAPI::UnitTypes::getUnitType(variableInfo.name);
+		// UnitComposition configuration variables
+		if (variableInfo.subsection.empty()) {
+			if (variableInfo.name == "Priority") {
+				compositionCurrent.setPriority(variableInfo);
+			} else {
+				ERROR_MESSAGE(false, "UnitComposition: Invalid configuration variable '" <<
+					variableInfo.name << "' in " << variableInfo.file << ".ini-" <<
+					variableInfo.section << "!\nValid variable names are: \nPriority"
+				);
+			}
+		}
+		// All units
+		else if (variableInfo.subsection == "units") {
+			// New UnitSet
+			BWAPI::UnitType unitType = BWAPI::UnitTypes::getUnitType(variableInfo.name);
 
-		if (unitType != BWAPI::UnitTypes::Unknown) {
-			int cUnits = variableInfo;
-			if (cUnits > 0) {
+			if (unitType != BWAPI::UnitTypes::Unknown) {
+				int cUnits = variableInfo;
+				if (cUnits > 0) {
 
-				// Check for special morph units, like siege tank.
-				bool treatMorphAsSame = false;
-				if (unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
-					unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
-				{
-					treatMorphAsSame = true;
+					// Check for special morph units, like siege tank.
+					bool treatMorphAsSame = false;
+					if (unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode ||
+						unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+					{
+						treatMorphAsSame = true;
+					}
+
+					compositionCurrent.addUnitSet(UnitSet(unitType, cUnits, treatMorphAsSame));
 				}
-
-				unitSets.push_back(UnitSet(unitType, cUnits, treatMorphAsSame));
+			} else {
+				ERROR_MESSAGE(false, "UnitComposition: Unknown unit type '" << variableInfo.name <<
+					"' in " << variableInfo.file << ".ini-" << variableInfo.section << "!"
+				);
 			}
 		}
 	}
 
 	// Create the last UnitComposition
 	if (typeCurrent != UnitComposition_Lim) {
-		mUnitCompositions[typeCurrent].push_back(
-			UnitComposition(typeNameCurrent, nameCurrent, unitSets)
-		);
+		mUnitCompositions[typeCurrent].push_back(compositionCurrent);
 	}
 }
 
@@ -134,10 +147,13 @@ std::vector<UnitComposition> UnitCompositionFactory::getUnitCompositionsByType(
 		unitCompositions[i].addUnits(availableUnits);
 
 		if (unitCompositions[i].isFull()) {
-			unitCompositions[i].clear();
+			unitCompositions[i].resetUnitCountToZero();
 			availableCompositions.push_back(unitCompositions[i]);
 		}
 	}
+
+	// Sort the compositions by priority. Use reverse sorting since we want highest priority first
+	std::sort(availableCompositions.rbegin(), availableCompositions.rend());
 
 	return availableCompositions;
 }

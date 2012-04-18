@@ -5,22 +5,28 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "BWTAExtern.h"
+#include "Utilities/KeyType.h"
+#include "BATSModule/include/IdTypes.h"
 
 /** The BaseAgent is the base agent class all agent classes directly or indirectly must extend. It contains some
  * common logic that is needed for several other agent implementations.
+ * @todo move protected variables to private
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * 
  */
 class BaseAgent {
 
 private:
+	bats::SquadId mSquadId;
 
 protected:
+	
 	BWAPI::Unit* unit;
 	BWAPI::UnitType type;
 	BWAPI::TilePosition goal;
 	int unitID;
-	int squadID;
+	//int squadID;
 	bool alive;
 	int lastActionFrame;
 	bool bBlock;
@@ -33,6 +39,18 @@ public:
 	BaseAgent(BWAPI::Unit* mUnit);
 	/** Destructor. */
 	~BaseAgent();
+
+	/**
+	 * Set the squad id
+	 * @param squadId the squad id to set
+	 */ 
+	void setSquadId(bats::SquadId squadId);
+
+	/**
+	 * Get Squad id
+	 * @return the squad id
+	 */
+	const bats::SquadId& getSquadId() const;
 
 	/** Called each update to issue orders. */
 	virtual void computeActions()
@@ -188,12 +206,12 @@ public:
 	/** Orders the Zerg Queen to do an Ensnare at the specified area. */
 	static bool doEnsnare(BWAPI::TilePosition pos);
 
-	/** Assigns this agent to the squad with the specified id. */
-	void _deprecated_setSquadID(int id);
+	///** Assigns this agent to the squad with the specified id. */
+	//void _deprecated_setSquadID(int id);
 
-	/** Returns the squad this agent belongs to, or -1 if it doesnt
-	 * belong to any squad. */
-	int _deprecated_getSquadID();
+	///** Returns the squad this agent belongs to, or -1 if it doesnt
+	// * belong to any squad. */
+	//int _deprecated_getSquadID();
 
 };
 

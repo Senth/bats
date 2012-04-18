@@ -1,21 +1,13 @@
 #include "UnitComposition.h"
+#include "Utilities/Logger.h"
 
 using namespace bats;
 
-UnitComposition::UnitComposition() : mValid(false) {
-	// Does nothing
-}
+const int PRIORITY_MIN = 0;
+const int PRIORITY_MAX = 100;
 
-UnitComposition::UnitComposition(
-	const std::string& type,
-	const std::string& name,
-	const std::vector<UnitSet>& unitSets) :
-		mType(type),
-		mName(name),
-		mUnitSets(unitSets),
-		mValid(true)
-{
-		// Does nothing
+UnitComposition::UnitComposition() {
+	clear();
 }
 
 UnitComposition::~UnitComposition() {
@@ -33,7 +25,8 @@ bool UnitComposition::isFull() const {
 }
 
 bool UnitComposition::isValid() const {
-	return mValid;
+	// Needs a type, name, and at least one unit set.
+	return !mUnitSets.empty() && mName != "" && mType != "" ;
 }
 
 std::vector<const UnitSet> UnitComposition::getUnitSets() const {
@@ -69,7 +62,7 @@ bool UnitComposition::removeUnit(UnitAgent* pUnit) {
 	size_t i = 0;
 
 	// Find the unit type and remove one unit, if it is
-	// found then return directyl with the remove result
+	// found then return directly with the remove result
 	while (i < mUnitSets.size()) {
 		if (mUnitSets[i] == pUnit->getUnitType()) {
 			bool removeOk = mUnitSets[i].removeUnits(1);
@@ -80,6 +73,18 @@ bool UnitComposition::removeUnit(UnitAgent* pUnit) {
 	}
 
 	return false;
+}
+
+int UnitComposition::getPriority() const {
+	return mPriority;
+}
+
+const std::string& UnitComposition::getName() const {
+	return mName;
+}
+
+const std::string& UnitComposition::getType() const {
+	return mType;
 }
 
 std::vector<UnitAgent*> UnitComposition::addUnits(const std::vector<UnitAgent*>& units) {
@@ -112,8 +117,40 @@ std::vector<UnitAgent*> UnitComposition::removeUnits(const std::vector<UnitAgent
 	return notRemovedUnits;
 }
 
-void UnitComposition::clear() {
+bool UnitComposition::operator<(const UnitComposition& rightComposition) const {
+	return mPriority < rightComposition.mPriority;
+}
+
+void UnitComposition::addUnitSet(const UnitSet& unitSet) {
+	mUnitSets.push_back(unitSet);
+}
+
+void UnitComposition::resetUnitCountToZero() {
 	for (size_t i = 0; i < mUnitSets.size(); ++i) {
-		mUnitSets[i].clear();
+		mUnitSets[i].resetUnitCountAsZero();
 	}
+}
+
+void UnitComposition::clear() {
+	mPriority = PRIORITY_MIN;
+	mName.clear();
+	mType.clear();
+	mUnitSets.clear();
+}
+
+void UnitComposition::setTypeAndName(const std::string& type, const std::string& name) {
+	mType = type;
+	mName = name;
+}
+
+void UnitComposition::setPriority(int priority) {
+	ERROR_MESSAGE_CONDITION(priority < PRIORITY_MIN, false, 
+		"Setting too low priority for UnitComposition. Type: " << mType << ", name: " << mName <<
+		", priority: " << priority << ". Minimimum priority allowed is " << PRIORITY_MIN);
+
+	ERROR_MESSAGE_CONDITION(priority > PRIORITY_MAX, false, 
+		"Setting too high priority for UnitComposition. Type: " << mType << ", name: " << mName <<
+		", priority: " << priority << ". Maximum priority allowed is " << PRIORITY_MAX);
+
+	mPriority = priority;
 }

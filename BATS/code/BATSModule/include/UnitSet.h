@@ -70,7 +70,7 @@ public:
 	/**
 	 * Clears all current units from this UnitSet.
 	 */
-	void clear();
+	void resetUnitCountAsZero();
 
 	/**
 	 * Checks whether the instance contains and keeps track of units of the

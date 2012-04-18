@@ -460,7 +460,7 @@ bool bats::ExplorationManager::canReach(BWAPI::TilePosition source, BWAPI::TileP
 	return pathOk;
 }
 
-bool bats::ExplorationManager::canReach(UnitAgent* pAgent, BWAPI::TilePosition destination) {
+bool bats::ExplorationManager::canReach(BaseAgent* pAgent, BWAPI::TilePosition destination) {
 	return pAgent->getUnit()->hasPath(Position(destination));
 }
 

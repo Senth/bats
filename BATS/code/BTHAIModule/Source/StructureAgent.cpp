@@ -1,6 +1,7 @@
 #include "StructureAgent.h"
 #include "AgentManager.h"
 #include "BatsModule/include/BuildPlanner.h"
+#include "BatsModule/include/ExplorationManager.h"
 #include "UpgradesPlanner.h"
 #include "Commander.h"
 #include "WorkerAgent.h"
@@ -290,10 +291,10 @@ bool StructureAgent::canMorphInto(UnitType type)
 bool StructureAgent::canEvolveUnit(UnitType type)
 {
 	//1. Check if we need the unit in a squad
-	if (!Commander::getInstance()->needUnit(type))
-	{
-		return false;
-	}
+	//if (!Commander::getInstance()->needUnit(type))
+	//{
+	//	return false;
+	//}
 
 	//2. Check canBuild
 	if (!Broodwar->canMake(unit, type))
@@ -313,8 +314,8 @@ bool StructureAgent::canEvolveUnit(UnitType type)
 
 TilePosition StructureAgent::getNextScanLocation()
 {
-	TilePosition ePos = ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
-	if (ePos.x() > -1)
+	TilePosition ePos = bats::ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
+	if (ePos != TilePositions::Invalid)
 	{
 		//Already found enemy base
 		return TilePositions::Invalid;

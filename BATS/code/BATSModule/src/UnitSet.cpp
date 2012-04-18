@@ -53,7 +53,7 @@ bool UnitSet::removeUnits(int cUnits) {
 	}
 }
 
-void UnitSet::clear() {
+void UnitSet::resetUnitCountAsZero() {
 	mcUnitsCurrent = 0;
 }
 

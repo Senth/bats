@@ -5,7 +5,6 @@
 #include "PFManager.h"
 #include "CoverMap.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "Commander.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
@@ -104,7 +103,7 @@ void WorkerAgent::handleKitingWorker()
 	if (sq != NULL)
 	{
 		TilePosition nGoal = ExplorationManager::getInstance()->getNextToExplore(sq);
-		if (nGoal.x() >= 0)
+		if (nGoal != TilePositions::Invalid)
 		{
 			unit->rightClick(Position(nGoal));
 			return;
@@ -180,31 +179,31 @@ void WorkerAgent::computeActions()
 {
 	// if(SquadID != -1)
 	// @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
-	if (getSquadId() != -1)
+	if (getSquadId() != bats::SquadId::INVALID_KEY)
 	{
 		//Worker is in a squad
 
-		Squad* sq = Commander::getInstance()->getSquad(getSquadId());
-		if (sq != NULL)
-		{
-			if (sq->isRush())
-			{
-				//Someone has been attacking us, kite it
-				if (unit->isUnderAttack())
-				{
-					handleKitingWorker();
-					return;
-				}
+		//Squad* sq = Commander::getInstance()->getSquad(getSquadId());
+		//if (sq != NULL)
+		//{
+		//	if (sq->isRush())
+		//	{
+		//		//Someone has been attacking us, kite it
+		//		if (unit->isUnderAttack())
+		//		{
+		//			handleKitingWorker();
+		//			return;
+		//		}
 
-				//Check for enemies to attack
-				Unit* target = getEnemyWorker();
-				if (target != NULL)
-				{
-					unit->attack(target);
-					return;
-				}
-			}
-		}
+		//		//Check for enemies to attack
+		//		Unit* target = getEnemyWorker();
+		//		if (target != NULL)
+		//		{
+		//			unit->attack(target);
+		//			return;
+		//		}
+		//	}
+		//}
 
 		PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
 		return;
@@ -279,14 +278,15 @@ void WorkerAgent::computeActions()
 	{
 		CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
 		buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
-		if (buildSpot.x() >= 0)
+		if (buildSpot != TilePositions::Invalid)
 		{
 			//Broodwar->printf("[%d] Build spot for %s found at (%d,%d)", Broodwar->getFrameCount(), toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
 			setState(MOVE_TO_SPOT);
 			startBuildFrame = Broodwar->getFrameCount();
 			if (toBuild.isResourceDepot())
 			{
-				Commander::getInstance()->updateGoals();
+				/// @todo worker building resource depot
+				//Commander::getInstance()->updateGoals();
 			}
 		}
 	}
@@ -455,7 +455,7 @@ bool WorkerAgent::assignToBuild(UnitType type)
 {
 	toBuild = type;
 	buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
-	if (buildSpot.x() >= 0)
+	if (buildSpot != TilePositions::Invalid)
 	{
 		ResourceManager::getInstance()->lockResources(toBuild);
 		setState(FIND_BUILDSPOT);

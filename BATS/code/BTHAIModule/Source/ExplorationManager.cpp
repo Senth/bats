@@ -105,7 +105,7 @@ TilePosition ExplorationManager::searchExpansionSite()
 
 TilePosition ExplorationManager::getExpansionSite()
 {
-	if (expansionSite.x() >= 0)
+	if (expansionSite != TilePositions::Invalid)
 	{
 		if (Broodwar->getFrameCount() - siteSetFrame > 500)
 		{
@@ -118,7 +118,7 @@ TilePosition ExplorationManager::getExpansionSite()
 
 void ExplorationManager::setExpansionSite(TilePosition pos)
 {
-	if (pos.x() >= 0)
+	if (pos != TilePositions::Invalid)
 	{
 		siteSetFrame = Broodwar->getFrameCount();
 		expansionSite = pos;

@@ -29,7 +29,7 @@ void RefineryAgent::computeActions()
 		}
 	}
 
-	if ((int)assignedWorkers.size() <= 3)
+	if (assignedWorkers.size() <= 3)
 	{
 		if (!unit->isBeingConstructed() && unit->getPlayer()->getID() == Broodwar->self()->getID())
 		{

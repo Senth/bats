@@ -543,7 +543,7 @@ bool CoverMap::canBuildAt(UnitType toBuild, TilePosition pos)
 	int maxH = h - toBuild.tileHeight() - 1;
 
 	//Out of bounds check
-	if (pos.x() >= 0 && pos.x() < maxW && pos.y() >= 0 && pos.y() < maxH)
+	if (pos != TilePositions::Invalid && pos.x() < maxW && pos.y() >= 0 && pos.y() < maxH)
 	{
 		if (canBuild(toBuild, pos))
 		{
@@ -771,7 +771,7 @@ Corners CoverMap::getCorners(UnitType type, TilePosition center)
 TilePosition CoverMap::findRefineryBuildSpot(UnitType toBuild, TilePosition start)
 {
 	TilePosition buildSpot = findClosestGasWithoutRefinery(toBuild, start);
-	if (buildSpot.x() >= 0)
+	if (buildSpot != TilePositions::Invalid)
 	{
 		BaseAgent* base = AgentManager::getInstance()->getClosestBase(buildSpot);
 		if (base == NULL)

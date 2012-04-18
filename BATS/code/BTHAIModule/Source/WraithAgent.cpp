@@ -24,15 +24,16 @@ void WraithAgent::computeActions()
 		return;
 	}
 
-	Squad* sq = Commander::getInstance()->getSquad(squadID);
-	if (sq != NULL)
-	{
-		if (sq->isKite())
-		{
-			computeKitingActions();
-			return;
-		}
-	}
+	/// @todo kite
+	//Squad* sq = Commander::getInstance()->getSquad(squadID);
+	//if (sq != NULL)
+	//{
+	//	if (sq->isKite())
+	//	{
+	//		computeKitingActions();
+	//		return;
+	//	}
+	//}
 
 	Unit* target = TargetingAgent::findTarget(this);
 	if (target != NULL)

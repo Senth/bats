@@ -81,7 +81,7 @@ public:
 	 * Called when a unit has morphed
 	 * @param pUnit the morphed unit
 	 */
-	virtual void onMorphUnit(BWAPI::Unit* pUnit);
+	virtual void onUnitMorph(BWAPI::Unit* pUnit);
 
 protected:
 	/**

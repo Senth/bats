@@ -18,64 +18,64 @@ string FileReaderUtils::getFilename(string subpath)
 {
 	string filename = "";
 
-	if (bats::BuildPlanner::isProtoss())
-	{
-		if (ExplorationManager::enemyIsProtoss())
-		{
-			filename = "PvP.txt";
-			if (!fileExists(subpath, filename)) filename = "PvX.txt";
-		}
-		else if (ExplorationManager::enemyIsTerran())
-		{
-			filename = "PvT.txt";
-			if (!fileExists(subpath, filename)) filename = "PvX.txt";
-		}
-		else if (ExplorationManager::enemyIsZerg())
-		{
-			filename = "PvZ.txt";
-			if (!fileExists(subpath, filename)) filename = "PvX.txt";
-		}
-	}
-	else if (bats::BuildPlanner::isTerran())
-	{
-		if (ExplorationManager::enemyIsProtoss())
-		{
-			filename = "TvP.txt";
-			if (!fileExists(subpath, filename)) filename = "TvX.txt";
-		}
-		else if (ExplorationManager::enemyIsTerran())
-		{
-			filename = "TvT.txt";
-			if (!fileExists(subpath, filename)) filename = "TvX.txt";
-		}
-		else if (ExplorationManager::enemyIsZerg())
-		{
-			filename = "TvZ.txt";
-			if (!fileExists(subpath, filename)) filename = "TvX.txt";
-		}
-	}
-	else if (bats::BuildPlanner::isZerg())
-	{
-		if (ExplorationManager::enemyIsProtoss())
-		{
-			filename = "ZvP.txt";
-			if (!fileExists(subpath, filename)) filename = "ZvX.txt";
-		}
-		else if (ExplorationManager::enemyIsTerran())
-		{
-			filename = "ZvT.txt";
-			if (!fileExists(subpath, filename)) filename = "ZvX.txt";
-		}
-		else if (ExplorationManager::enemyIsZerg())
-		{
-			filename = "ZvZ.txt";
-			if (!fileExists(subpath, filename)) filename = "ZvX.txt";
-		}
-	}
-	else
-	{
+	//if (bats::BuildPlanner::isProtoss())
+	//{
+	//	if (Broodwar->enemy()->getRace() == Races::Protoss)
+	//	{
+	//		filename = "PvP.txt";
+	//		if (!fileExists(subpath, filename)) filename = "PvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Terran)
+	//	{
+	//		filename = "PvT.txt";
+	//		if (!fileExists(subpath, filename)) filename = "PvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Zerg)
+	//	{
+	//		filename = "PvZ.txt";
+	//		if (!fileExists(subpath, filename)) filename = "PvX.txt";
+	//	}
+	//}
+	//else if (bats::BuildPlanner::isTerran())
+	//{
+	//	if (Broodwar->enemy()->getRace() == Races::Protoss)
+	//	{
+	//		filename = "TvP.txt";
+	//		if (!fileExists(subpath, filename)) filename = "TvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Terran)
+	//	{
+	//		filename = "TvT.txt";
+	//		if (!fileExists(subpath, filename)) filename = "TvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Zerg)
+	//	{
+	//		filename = "TvZ.txt";
+	//		if (!fileExists(subpath, filename)) filename = "TvX.txt";
+	//	}
+	//}
+	//else if (bats::BuildPlanner::isZerg())
+	//{
+	//	if (Broodwar->enemy()->getRace() == Races::Protoss)
+	//	{
+	//		filename = "ZvP.txt";
+	//		if (!fileExists(subpath, filename)) filename = "ZvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Terran)
+	//	{
+	//		filename = "ZvT.txt";
+	//		if (!fileExists(subpath, filename)) filename = "ZvX.txt";
+	//	}
+	//	else if (Broodwar->enemy()->getRace() == Races::Zerg)
+	//	{
+	//		filename = "ZvZ.txt";
+	//		if (!fileExists(subpath, filename)) filename = "ZvX.txt";
+	//	}
+	//}
+	//else
+	//{
 
-	}
+	//}
 	return filename;
 }
 

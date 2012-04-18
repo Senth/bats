@@ -104,7 +104,7 @@ void RushSquad::computeActions()
 		if (ePos== TilePositions::Invalid)
 		{
 			TilePosition nGoal = getNextStartLocation();
-			if (nGoal.x() >= 0)
+			if (nGoal != TilePositions::Invalid)
 			{
 				this->goal = nGoal;
 				setMemberGoals(goal);

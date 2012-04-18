@@ -1,5 +1,5 @@
 #include "MapDataReader.h"
-#include "ExplorationManager.h"
+#include "BATSModule/include/ExplorationManager.h"
 #include <fstream>
 #include <sstream>
 
@@ -50,7 +50,7 @@ void MapDataReader::readMap()
 		{
 			TilePosition pos = (*j)->getTilePosition();
 			int cDist = -1;
-			if (ExplorationManager::canReach(basePos, pos))
+			if (bats::ExplorationManager::canReach(basePos, pos))
 			{
 				cDist = (int)(getGroundDistance(basePos, pos));
 			}

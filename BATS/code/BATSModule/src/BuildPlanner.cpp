@@ -5,7 +5,6 @@
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/UnitSetup.h"
-#include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildOrderFileReader.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "Utilities/Logger.h"
@@ -397,7 +396,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 	if (type.isResourceDepot())
 	{
 		TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-		if (pos== TilePositions::Invalid)
+		if (pos == TilePositions::Invalid)
 		{
 			//No expansion site found.
 			if ((int)buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
@@ -407,7 +406,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 	if (type.isRefinery())
 	{
 		TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
-		if (rSpot.x() < 0)
+		if (rSpot == TilePositions::Invalid)
 		{
 			//No buildspot found
 			if ((int)buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());

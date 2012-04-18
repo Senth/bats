@@ -3,16 +3,19 @@
 #include "AgentManager.h"
 #include "ExplorationManager.h"
 #include "SpottedObject.h"
+#include "BATSModule/include/Helper.h"
+#include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace std;
+using bats::operator<<;
 
-UnitAgent::UnitAgent() : squadId(bats::SquadId::INVALID_KEY)
+UnitAgent::UnitAgent()
 {
 	
 }
 
-UnitAgent::UnitAgent(Unit* mUnit) : squadId(bats::SquadId::INVALID_KEY)
+UnitAgent::UnitAgent(Unit* mUnit)
 {
 	unit = mUnit;
 	type = unit->getType();
@@ -24,14 +27,6 @@ UnitAgent::UnitAgent(Unit* mUnit) : squadId(bats::SquadId::INVALID_KEY)
 	goal = TilePositions::Invalid;
 }
 
-void UnitAgent::setSquadId(bats::SquadId squadId) {
-	this->squadId = squadId;
-}
-
-const bats::SquadId& UnitAgent::getSquadId() const {
-	return squadId;
-}
-
 void UnitAgent::debug_showGoal()
 {
 	if (!isAlive()) return;
@@ -39,42 +34,44 @@ void UnitAgent::debug_showGoal()
 	if (unit->isBeingConstructed()) return;
 	if (!unit->isCompleted()) return;
 	
-	if (goal.x() >= 0 && unit->isMoving())
-	{
-		Position a = Position(unit->getPosition());
-		Position b = Position(goal);
-		Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
-
-		Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Move (%d,%d)", goal.x(), goal.y());
-	}
-	if(unit->isIdle()){
-		Position a = Position(unit->getPosition());
-		Position b = Position(goal);		
-		Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
-		Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Idle (%d,%d)", goal.x(), goal.y());
-	}
-	if (!unit->isIdle())
-	{
-		Unit* targ = unit->getOrderTarget();
-		if (targ != NULL)
+	if (goal != TilePositions::Invalid) {
+		if (unit->isMoving())
 		{
 			Position a = Position(unit->getPosition());
-			Position b = Position(targ->getPosition());
+			Position b = Position(goal);
+			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
 
-			if (targ->getPlayer()->isEnemy(Broodwar->self()))
+			Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Move (%d,%d)", goal.x(), goal.y());
+		}
+		if(unit->isIdle()){
+			Position a = Position(unit->getPosition());
+			Position b = Position(goal);		
+			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
+			Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Idle (%d,%d)", goal.x(), goal.y());
+		}
+		if (!unit->isIdle())
+		{
+			Unit* targ = unit->getOrderTarget();
+			if (targ != NULL)
 			{
-				if (targ->exists())
+				Position a = Position(unit->getPosition());
+				Position b = Position(targ->getPosition());
+
+				if (targ->getPlayer()->isEnemy(Broodwar->self()))
 				{
-					Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Red);
-					Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Attack %s", targ->getType().getName().c_str());
+					if (targ->exists())
+					{
+						Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Red);
+						Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Attack %s", targ->getType().getName().c_str());
+					}
 				}
-			}
-			else
-			{
-				if (targ->exists())
+				else
 				{
-					Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
-					Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "%s", targ->getType().getName().c_str());
+					if (targ->exists())
+					{
+						Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
+						Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "%s", targ->getType().getName().c_str());
+					}
 				}
 			}
 		}
@@ -590,28 +587,6 @@ bool UnitAgent::canAttack(UnitType attacker, UnitType target)
 	return false;
 }
 
-void UnitAgent::setGoal(TilePosition goal)
-{
-	if (unit->getType().isFlyer() || unit->getType().isFlyingBuilding())
-	{
-		//Flyers, can always move to goals.
-		this->goal = goal;
-	}
-	else
-	{
-		//Ground units, check if we can reach goal.
-		if (ExplorationManager::canReach(this, goal))
-		{
-			this->goal = goal;
-		}
-	}
-}
-
-void UnitAgent::clearGoal()
-{
-	goal = TilePositions::Invalid;
-}
-
 bool UnitAgent::isAir() const
 {
 	return unit->getType().isFlyer();
@@ -641,7 +616,8 @@ bool UnitAgent::isTransport() const
 
 void UnitAgent::printInfo()
 {
-	Broodwar->printf("[%s-%d] SquadID: %d (%d,%d) -> (%d,%d)", agentType.c_str(), unitID, squadID, unit->getTilePosition().x(), unit->getTilePosition().y(), goal.x(), goal.y());
+	DEBUG_MESSAGE(utilities::LogLevel_Finer, "[" << agentType << "-" << unitID <<
+		"SquadId" << getSquadId() << " " << unit->getTilePosition() << goal);
 }
 
 bool UnitAgent::chargeShields()

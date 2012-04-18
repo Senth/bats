@@ -2,27 +2,28 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
 #include "ResourceManager.h"
-#include "ExplorationManager.h"
+#include "BATSModule/include/ExplorationManager.h"
+#include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace std;
 
-BaseAgent::BaseAgent()
+BaseAgent::BaseAgent() : mSquadId(bats::SquadId::INVALID_KEY)
 {
 	alive = true;
-	squadID = -1;
+	//squadID = -1;
 	type = UnitTypes::Unknown;
 	lastActionFrame = 0;
 	goal = TilePositions::Invalid;
 }
 
-BaseAgent::BaseAgent(Unit* mUnit)
+BaseAgent::BaseAgent(Unit* mUnit) : mSquadId(bats::SquadId::INVALID_KEY)
 {
 	unit = mUnit;
 	unitID = unit->getID();
 	type = unit->getType();
 	alive = true;
-	squadID = -1;
+	//squadID = -1;
 	lastActionFrame = 0;
 	goal = TilePositions::Invalid;
 	agentType = "BaseAgent";
@@ -31,6 +32,14 @@ BaseAgent::BaseAgent(Unit* mUnit)
 BaseAgent::~BaseAgent()
 {
 	
+}
+
+void BaseAgent::setSquadId(bats::SquadId squadId) {
+	this->mSquadId = squadId;
+}
+
+const bats::SquadId& BaseAgent::getSquadId() const {
+	return mSquadId;
 }
 
 string BaseAgent::getTypeName()
@@ -145,7 +154,7 @@ bool BaseAgent::isFreeWorker()
 	{
 		if (unit->isIdle() || unit->isGatheringMinerals())
 		{
-			if (squadID == -1)
+			if (getSquadId() == bats::SquadId::INVALID_KEY)
 			{
 				return true;
 			}
@@ -264,15 +273,16 @@ bool BaseAgent::doEnsnare(TilePosition pos)
 	return false;
 }
 
-void BaseAgent::_deprecated_setSquadID(int id)
-{
-	squadID = id;
-}
-
-int BaseAgent::_deprecated_getSquadID()
-{
-	return squadID;
-}
+//void BaseAgent::_deprecated_setSquadID(int id)
+//{
+//	ERROR_MESSAGE(false, "Called _deprecated_setSquadID(). This function will be removed in the future");
+//}
+//
+//int BaseAgent::_deprecated_getSquadID()
+//{
+//	ERROR_MESSAGE(false, "Called _deprecated_getSquadID(). This function will be removed in the future");
+//	return -1;
+//}
 
 void BaseAgent::setActionFrame()
 {
@@ -327,7 +337,7 @@ void BaseAgent::setGoal(TilePosition goal)
 	else
 	{
 		//Ground units, check if we can reach goal.
-		if (ExplorationManager::canReach(this, goal))
+		if (bats::ExplorationManager::canReach(this, goal))
 		{
 			this->goal = goal;
 		}

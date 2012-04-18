@@ -3,8 +3,6 @@
 
 #include <BWAPI.h>
 #include "BaseAgent.h"
-#include "Utilities/KeyType.h"
-#include "BATSModule/include/IdTypes.h"
 
 #define DISABLE_UNIT_AI 0
 
@@ -16,8 +14,6 @@
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
  */
 class UnitAgent : public BaseAgent {
-private:
-	bats::SquadId squadId;
 
 protected:
 	
@@ -27,18 +23,6 @@ public:
 
 	int dropped;
 
-	/**
-	 * Set the squad id
-	 * @param squadId the squad id to set
-	 */ 
-	void setSquadId(bats::SquadId squadId);
-
-	/**
-	 * Get Squad id
-	 * @return the squad id
-	 */
-	const bats::SquadId& getSquadId() const;
-
 	/** Called each update to issue orders. */
 	void computeActions();
 
@@ -47,13 +31,6 @@ public:
 
 	/** Handles actions for kiting agents. */
 	void computeKitingActions();
-
-	/** Sets the goal for this unit. Goals are set from either the SquadCommander for attacking
-	 * or defending units, or from ExplorationManager for explore units. */
-	virtual void setGoal(BWAPI::TilePosition goal);
-
-	/** Clears the goal for this unit. */
-	virtual void clearGoal();
 
 	/**
 	 * Returns true if the unit is an air unit

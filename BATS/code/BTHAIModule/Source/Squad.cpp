@@ -134,7 +134,7 @@ vector<UnitSetup> Squad::getSetup()
 
 void Squad::debug_showGoal()
 {
-	if (size() > 0 && goal.x() >= 0)
+	if (size() > 0 && goal != TilePositions::Invalid)
 	{
 		Position a = Position(goal.x() * 32 - 3, goal.y() * 32 - 3);
 
@@ -341,10 +341,10 @@ bool Squad::addMember(BaseAgent* agent)
 			{
 				//Yes we have, add it to the squad
 				agents.push_back(agent);
-				agent->_deprecated_setSquadID(id);
+				//agent->_deprecated_setSquadID(id);
 				setup.at(i).current++;
 				
-				if (goal.x() >= 0)
+				if (goal != TilePositions::Invalid)
 				{
 					agent->setGoal(goal);
 				}
@@ -436,7 +436,7 @@ void Squad::removeMember(BaseAgent* agent)
 	{
 		if (agents.at(i)->getUnitID() == agent->getUnitID())
 		{
-			agents.at(i)->_deprecated_setSquadID(-1);
+			//agents.at(i)->_deprecated_setSquadID(-1);
 			agents.at(i)->assignToDefend();
 			agents.erase(agents.begin() + i);
 			break;
@@ -457,7 +457,7 @@ void Squad::removeMember(BaseAgent* agent)
 	if (isExplorer())
 	{
 		TilePosition goal = agent->getGoal();
-		if (goal.x() >= 0)
+		if (goal != TilePositions::Invalid)
 		{
 			ExplorationManager::getInstance()->setExplored(goal);
 		}

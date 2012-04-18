@@ -92,7 +92,7 @@ void ChokeHarassSquad::computeActions()
 		{
 			//No enemy building found, check start locations
 			TilePosition nGoal = getNextStartLocation();
-			if (nGoal.x() >= 0)
+			if (nGoal != TilePositions::Invalid)
 			{
 				this->goal = nGoal;
 				setMemberGoals(goal);
@@ -105,7 +105,7 @@ void ChokeHarassSquad::computeActions()
 			for(set<Chokepoint*>::const_iterator c=eRegion->getChokepoints().begin();c!=eRegion->getChokepoints().end();c++)
 			{
 				TilePosition nGoal = TilePosition((*c)->getCenter());
-				if (nGoal.x() >= 0)
+				if (nGoal != TilePositions::Invalid)
 				{
 					this->goal = nGoal;
 					setMemberGoals(goal);

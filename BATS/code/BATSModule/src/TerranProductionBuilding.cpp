@@ -32,7 +32,7 @@ void TerranProductionBuilding::computeActions(){
 				UnitType toBuild = UnitCreator::getInstance()->getNextProducableUnit(unit);
 				if(toBuild != UnitTypes::None){
 					//Build it!
-					DEBUG_MESSAGE(utilities::LogLevel_Fine, "TerranPrudoctionBuilding | Building " <<
+					DEBUG_MESSAGE(utilities::LogLevel_Finest, "TerranPrudoctionBuilding | Building " <<
 						toBuild.getName());
 					unit->train(toBuild);
 				}

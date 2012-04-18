@@ -73,6 +73,25 @@ public:
 	bool removeUnit(UnitAgent* pUnit);
 
 	/**
+	 * Returns the priority of the UnitComposition. If no priority has been set
+	 * this defaults to 0, higher value means higher priority.
+	 * @return priority of the UnitComposition.
+	 */
+	int getPriority() const;
+
+	/**
+	 * Returns the name of the composition
+	 * @return name of the composition
+	 */
+	const std::string& getName() const;
+
+	/**
+	 * Returns the type of the composition
+	 * @return type of the composition
+	 */
+	const std::string& getType() const;
+
+	/**
 	 * Tries to add all units to the unit composition.
 	 * @param units all the units we're trying to add.
 	 * @return an empty vector if all units were succussfully added; if some units failed
@@ -89,40 +108,63 @@ public:
 	 * returned in the vector.
 	 */
 	std::vector<UnitAgent*> removeUnits(const std::vector<UnitAgent*>& units);
+
+	/**
+	 * Operator that checks if this unit composition has lower priority then the one
+	 * on the right side.
+	 * @param rightComposition the composition on the right side of the less '<' sign.
+	 * @return true if this composition has less priority
+	 */
+	bool operator<(const UnitComposition& rightComposition) const;
 	
 private:
 	/**
-	 * Constructs a new UnitComposition with a type (drop), name (marine), and all
-	 * the UnitSets that are needed for this UnitComposition (1 dropship, 8 marines).
-	 * The constructor is private to ensure that only UnitCompositionFactory can create
-	 * new UnitCompositions.
-	 * @param type name of the unit composition type, e.g. (drop)
-	 * @param name the name of the unit composition. A more descriptive name what the type
-	 * contains, e.g. marines or marine-medics.
-	 * @param unitSets what unit types and how many the unit composition contains.
-	 */
-	UnitComposition(
-		const std::string& type,
-		const std::string& name,
-		const std::vector<UnitSet>& unitSets
-	);
-
-	/**
-	 * Constructs an invalid unit composition.
+	 * Constructs an invalid unit composition. To make the UnitComposition valid it needs
+	 * to have at least one UnitSet, a type, and a name. The priority will default to
+	 * 0 if none are set. To reset the state of the of the UnitComposition to the state directly
+	 * after this constructor have been called, i.e. invalid, call clear().
+	 * @see addUnitSet() to add a unit set, at least one needs to be added.
+	 * @see setTypeAndName() to set the type and name of the unit set.
+	 * @see setPriority() to set the priority of the unit composition (optional).
 	 */
 	UnitComposition();
 
 	/**
-	 * Clears all units from the UnitComposition, a helper function for
-	 * UnitCompositionFactory.
+	 * Set the unit sets this composition has. Used by UnitCompositionFactory
+	 * @param unitSet what unit type and how many of the unit the unit composition contains.
+	 */
+	void addUnitSet(const UnitSet& unitSets);
+
+	/**
+	 * Resets all the number of units to 0 for all unit sets. Helper function for
+	 * UnitCompositionFactory
+	 */
+	void resetUnitCountToZero();
+
+	/**
+	 * Clears the unit sets to 0, sets an invalid name and type, resets the priority to 0.
+	 * This will cause the unitComposition to be invalid.
 	 */
 	void clear();
+
+	/**
+	 * Sets the name and the type of the unit composition
+	 * @param type what type the unit set is of. E.g. drop.
+	 * @param name name of the unit set. E.g. marine.
+	 */
+	void setTypeAndName(const std::string& type, const std::string& name);
+
+	/**
+	 * Sets the priority of the unit composition. Higher value means higher priority.
+	 * @param priority the priority of the unit composition. Needs to be in the range [0,100].
+	 */
+	void setPriority(int priority);
 
 	friend class UnitCompositionFactory;
 
 	std::string mType;
 	std::string mName;
+	int mPriority;
 	std::vector<UnitSet> mUnitSets;
-	bool mValid;
 };
 }

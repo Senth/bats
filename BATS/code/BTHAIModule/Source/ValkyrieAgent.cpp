@@ -19,15 +19,16 @@ ValkyrieAgent::ValkyrieAgent(Unit* mUnit)
 
 void ValkyrieAgent::computeActions()
 {
-	Squad* sq = Commander::getInstance()->getSquad(squadID);
-	if (sq != NULL)
-	{
-		if (sq->isKite())
-		{
-			computeKitingActions();
-			return;
-		}
-	}
+	/// @todo kiting
+	//Squad* sq = Commander::getInstance()->getSquad(squadID);
+	//if (sq != NULL)
+	//{
+	//	if (sq->isKite())
+	//	{
+	//		computeKitingActions();
+	//		return;
+	//	}
+	//}
 
 	Unit* target = TargetingAgent::findTarget(this);
 	if (target != NULL)
