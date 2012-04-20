@@ -57,7 +57,7 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 				if (filter & UnitFilter_WorkersNoSquad) {
 					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(pUnitAgent);
 					if (NULL != pWorkerAgent &&
-						!pWorkerAgent->isBuilding() &&
+						!pWorkerAgent->isConstructing() &&
 						pWorkerAgent->getSquadId().isInvalid())
 					{
 						addUnit = true;

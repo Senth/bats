@@ -26,7 +26,7 @@ namespace bats {
  * @return squared distance between point a and b.
  */
 template<typename T>
-inline double getSquaredDistance(const T& a, const T& b) {
+inline int getSquaredDistance(const T& a, const T& b) {
 	T diffDistance;
 	diffDistance.x() = a.x() - b.x();
 	diffDistance.y() = a.y() - b.y();

@@ -312,6 +312,18 @@ public:
 	 * @return name of the derived squad.
 	 */
 	virtual std::string getName() const = 0;
+
+	/**
+	 * Checks whether this squad has air units
+	 * @return true if the squad has air units
+	 */
+	bool hasAir() const;
+
+	/**
+	 * Checks whether this squad has ground units
+	 * @return true if the squad has ground units
+	 */
+	bool hasGround() const;
 	
 protected:
 	/**
@@ -359,7 +371,7 @@ protected:
 	 * try to check if it can travel by air or not.
 	 * @see travelsByAir() for how it is calculated if it travelsy by air or not.
 	 */
-	void setAirTransportation(bool usesAir);
+	void setTravelsByAir(bool usesAir);
 
 	/**
 	 * Called when a goal fails. Disbands the squad, derive this function if you want to
@@ -414,6 +426,46 @@ protected:
 	 * @return true if the squad has a temporary goal position.
 	 */ 
 	bool hasTemporaryGoalPosition() const;
+
+	/**
+	 * Enable or disable the squad's ability to regroup. By default it is set to true
+	 * but for transportations this can be counter-productive while the transports are loading.
+	 * @param canRegroup true if the squad shall be able to regroup automatically, false otherwise
+	 */
+	void setCanRegroup(bool canRegroup);
+
+	/**
+	 * Checks whether there are enemy attacking units nearby. Uses the double vision range 
+	 * (of the squad unit with longest range) as radius from the center of the squad.
+	 * This function will not work if the squad is regrouping (and will then always
+	 * return false), because the squad's center might be far away from all squad units.
+	 * This takes into account ground structures that can attack as well (canons, sunken colony,
+	 * etc.) if the squad has air units it will take into account anti-air structures as well
+	 * (turrets, spore colony).
+	 * @return true if there are enemies are within sight_distance_multiplier vision range from the center of
+	 * the squad. Will always return false if the squad is regrouping.
+	 */
+	bool isEnemyAttackUnitsWithinSight() const;
+
+	/**
+	 * Returns all enemies within sight range from the center of the squad. This can
+	 * be a weird behavior if the squad is regrouping and the groups are far away
+	 * from each other. Or it could be exactly what we want (if we want to surround
+	 * the enemy), but it's generally better to use a customized function then.
+	 * Uses sight_distance_multiplier to get the radius out from the center. The radius
+	 * is the unit with longest sight range multiplied with the mentioned variable.
+	 * @param onlyAttackingUnits set to true if you only want enemy units that can attack
+	 * @return enemy units within sight range from the center of the squad.
+	 */
+	std::vector<BWAPI::Unit*> getEnemyUnitsWithinSight(bool onlyAttackingUnits) const;
+
+	/**
+	 * Returns the sight range of this squad. This is the unit in this squad with the
+	 * longest sight range multiplied; the multiplier can be set in the config file
+	 * under the squad section.
+	 * @return unit with longest sight multiplied with sight_distance_multiplier.
+	 */
+	double getSightDistance() const;
 
 private:
 	/**
@@ -496,10 +548,13 @@ private:
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;
 	double mRegroupStartTime;
+	bool mCanRegroup;
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
 	bool mTravelsByAir;
+	bool mHasAirUnits;
+	bool mHasGroundUnits;
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
 	States mState;
 	SquadId mId;

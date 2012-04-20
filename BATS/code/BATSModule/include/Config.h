@@ -133,9 +133,14 @@ namespace bats {
 			/** The default range when calculating distance between the center of the squad
 			 * and a position to test whether the squad is close to this position or not. */
 			extern double CLOSE_DISTANCE;
+			/** How much the sight distance shall be multiplied with, this is used to check
+			 * if enemy units are within sight distance. The sight circle center position is the
+			 * center of the squad and the radius is unit with longest sight distance multiplied
+			 * with this variable. */
+			extern double SIGHT_DISTANCE_MULTIPLIER;
 
 			/**
-			 * Variables for AttackSquad only
+			 * Variables for AttackSquad
 			 */
 			namespace attack {
 				/** The distance from the goal that the waiting position will be set. If
@@ -145,6 +150,14 @@ namespace bats {
 				/** The distance from the goal position to check if all buildings have
 				 * been destroyed to complete the goal. */
 				extern double STRUCTURES_DESTROYED_GOAL_DISTANCE;
+			}
+
+			/**
+			 * Variables for DropSquad
+			 */
+			namespace drop {
+				/** The time in seconds before a drop is treated as timed out. */
+				extern double TIMEOUT;
 			}
 		}
 

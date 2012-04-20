@@ -83,8 +83,12 @@ public:
 	void reset();
 
 	/** Returns true if this worker is in any of the build states, and is constructing
-	 * the specified building. */
-	bool isConstructing(BWAPI::UnitType type);
+	 * the specified building.
+	 * @param type the type the unit is constructing, when this is set to UnitType::None it
+	 * will check if it's constructing anything, defaults to UnitTypes::None
+	 * @return true if the worker is building the specified type, or building anything if
+	 * type was set to UnitTypes::None. */
+	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None);
 };
 
 #endif

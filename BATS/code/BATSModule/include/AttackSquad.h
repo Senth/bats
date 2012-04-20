@@ -75,6 +75,14 @@ public:
 	std::string getName() const;
 
 protected:
+	/**
+	 * Checks whether all enemy structures near the goal are dead. It will
+	 * only return true if the goal is visible. It uses structures_destroyed_goal_distance
+	 * for the radius. As of now it will not check the entire radius for buildings.
+	 * @return true if all enemy structures near the goal are dead.
+	 */
+	bool isEnemyStructuresNearGoalDead() const;
+
 	virtual void computeSquadSpecificActions();
 	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
 	virtual bool createGoal();

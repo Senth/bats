@@ -47,7 +47,28 @@ private:
 	 */
 	void loadUnits();
 
-	bool mLoaded;
+	/**
+	 * Unloads all units from the transportations
+	 */
+	void unloadUnits();
+
+	/**
+	 * Check if the specified units are faster than us
+	 * @param enemyUnits units to check if they are faster than our transportation
+	 * @return true if any enemy unit can travel faster than our transportation
+	 */
+	bool enemyIsFasterThanTransport(const std::vector<BWAPI::Unit*> enemyUnits) const;
+
+	/**
+	 * States of the Drop
+	 */
+	enum States {
+		State_Attack,	/**< When the squad attacks something */
+		State_Load,		/**< When the squad loads units into transports */
+		State_Transport	/**< When the squad transports all ground units */
+	};
+
+	States mState;
 	bool mInitialized;
 	double mStartTime;
 };

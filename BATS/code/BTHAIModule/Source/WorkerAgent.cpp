@@ -497,7 +497,11 @@ bool WorkerAgent::isConstructing(UnitType type)
 {
 	if (currentState == FIND_BUILDSPOT || currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
 	{
-		if (toBuild.getID() == type.getID())
+		if (type == UnitTypes::None)
+		{
+			return true;
+		}
+		else if (type == toBuild)
 		{
 			return true;
 		}

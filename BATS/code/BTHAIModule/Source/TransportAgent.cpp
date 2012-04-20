@@ -112,6 +112,6 @@ void TransportAgent::computeActions()
 	//	}
 	//}
 
-	//bool defensive = true;
-	//PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+	bool defensive = true;
+	PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
 }

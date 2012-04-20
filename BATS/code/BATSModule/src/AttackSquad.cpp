@@ -58,9 +58,7 @@ Squad::GoalStates AttackSquad::checkGoalState() const {
 	Squad::GoalStates goalState = Squad::GoalState_NotCompleted;
 
 	// Check if all enemy structures are dead nearby
-	if (Broodwar->isVisible(getGoal()) &&
-		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoal(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
-	{
+	if (isEnemyStructuresNearGoalDead()) {
 		goalState = Squad::GoalState_Succeeded;
 	}
 
@@ -69,6 +67,18 @@ Squad::GoalStates AttackSquad::checkGoalState() const {
 	/// @todo check for enemy units to kill them?
 
 	return goalState;
+}
+
+bool AttackSquad::isEnemyStructuresNearGoalDead() const {
+	/// @todo check the whole radius for buildings, some structures might be hidden from the view
+	/// all will therefore not be seen (and thus the goal is completed when it should not be).
+	if (Broodwar->isVisible(getGoal()) &&
+		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoal(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
+	{
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool AttackSquad::isInPosition() const {

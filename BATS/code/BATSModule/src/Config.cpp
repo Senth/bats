@@ -73,10 +73,17 @@ namespace squad {
 	double REGROUP_NEW_POSITION_TIME = 0.0;
 	double CALC_FURTHEST_AWAY_TIME = 1.0;
 	double CLOSE_DISTANCE = 0.0;
+	double SIGHT_DISTANCE_MULTIPLIER;
 
 	namespace attack {
 		double WAITING_POSITION_DISTANCE_FROM_GOAL = 0.0;
 		double STRUCTURES_DESTROYED_GOAL_DISTANCE = 0.0;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
+
+	namespace drop {
+		double TIMEOUT = 0.0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -132,13 +139,13 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 	} else if (variableInfo.section == "squad") {
 		noErrors = squad::set(variableInfo);
 	} else {
-		ERROR_MESSAGE(false, "Unknown section '" << variableInfo.section
-			<< "' in " << variableInfo.file << ".ini");
+		ERROR_MESSAGE(false, "Unknown section [" << variableInfo.section
+			<< "] in " << variableInfo.file << ".ini");
 	}
 
 	if (!noErrors) {
 		ERROR_MESSAGE(false, "Unkown variable name '" << variableInfo.name
-			<< "' in " << variableInfo.file << ".ini");
+			<< "' in " << variableInfo.file << ".ini, [" << variableInfo.section << "]!");
 	}
 }
 
@@ -224,6 +231,8 @@ bool game::set(const utilities::VariableInfo& variableInfo) {
 bool squad::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.subsection == "attack") {
 		return attack::set(variableInfo);
+	} else if (variableInfo.subsection == "drop") {
+		return drop::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "ping_wait_time_first") {
 			PING_WAIT_TIME_FIRST = variableInfo;
@@ -241,12 +250,14 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 			CALC_FURTHEST_AWAY_TIME = variableInfo;
 		} else if (variableInfo.name == "close_distance") {
 			CLOSE_DISTANCE = variableInfo;
+		} else if (variableInfo.name == "sight_distance_multiplier") {
+			SIGHT_DISTANCE_MULTIPLIER = variableInfo;
 		} else {
 			return false;
 		}
 	} else {
-		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
-			"' in " <<variableInfo.file << ".ini");
+		ERROR_MESSAGE(false, "Unknown subsection '" << variableInfo.section << "." <<
+			variableInfo.subsection << "' in " << variableInfo.file << ".ini");
 	}
 
 	return true;
@@ -261,6 +272,16 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 		return false;
 	}
 	
+	return true;
+}
+
+bool squad::drop::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "timeout") {
+		TIMEOUT = variableInfo;
+	} else {
+		return false;
+	}
+
 	return true;
 }
 

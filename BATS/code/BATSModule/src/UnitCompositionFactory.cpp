@@ -93,8 +93,8 @@ void UnitCompositionFactory::reloadConfigs() {
 				compositionCurrent.setPriority(variableInfo);
 			} else {
 				ERROR_MESSAGE(false, "UnitComposition: Invalid configuration variable '" <<
-					variableInfo.name << "' in " << variableInfo.file << ".ini-" <<
-					variableInfo.section << "!\nValid variable names are: \nPriority"
+					variableInfo.name << "' in " << variableInfo.file << ".ini, [" <<
+					variableInfo.section << "]!\nValid variable names are: \nPriority"
 				);
 			}
 		}
@@ -119,7 +119,7 @@ void UnitCompositionFactory::reloadConfigs() {
 				}
 			} else {
 				ERROR_MESSAGE(false, "UnitComposition: Unknown unit type '" << variableInfo.name <<
-					"' in " << variableInfo.file << ".ini-" << variableInfo.section << "!"
+					"' in " << variableInfo.file << ".ini, [" << variableInfo.section << "]!"
 				);
 			}
 		}

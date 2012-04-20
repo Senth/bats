@@ -42,7 +42,8 @@ Squad::Squad(
 	mFurthestUnitAwayDistance(0.0),
 	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
 	mGoalState(GoalState_Lim),
-	mState(State_Inactive)
+	mState(State_Inactive),
+	mCanRegroup(true)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
@@ -199,13 +200,28 @@ BWAPI::TilePosition Squad::getCenter() const {
 	}
 
 	BWAPI::TilePosition center(0,0);
+	int cUnits = 0;
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		center += mUnits[i]->getUnit()->getTilePosition();
+
+		// Only use center position of units that aren't loaded
+		if (!mUnits[i]->getUnit()->isLoaded()) {
+			++cUnits;
+			center += mUnits[i]->getUnit()->getTilePosition();
+		}
 	}
-	center.x() /= mUnits.size();
-	center.y() /= mUnits.size();
+
+	if (cUnits > 0) {
+		center.x() /= cUnits;
+		center.y() /= cUnits;
+	} else {
+		center = TilePositions::Invalid;
+	}
 
 	return center;
+}
+
+void Squad::setCanRegroup(bool canRegroup) {
+	mCanRegroup = canRegroup;
 }
 
 double Squad::getFurthestUnitAwayDistance(bool forceRecalculate) const {
@@ -294,6 +310,13 @@ void Squad::addUnit(UnitAgent* pUnit) {
 		pUnit->setSquadId(mId);
 	
 		updateUnitMovement(pUnit);
+
+		// Set has ground or has air
+		if (pUnit->isAir()) {
+			mHasAirUnits = true;
+		} else {
+			mHasGroundUnits = true;
+		}
 	}
 }
 
@@ -314,6 +337,32 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 		}
 
 		mUnits.erase(foundUnit);
+
+		// Update has air and has ground
+		if (pUnit->isAir()) {
+			mHasAirUnits = false;
+
+			// Look for air units
+			size_t i = 0;
+			while (i < mUnits.size() && !mHasAirUnits) {
+				if (mUnits[i]->isAir()) {
+					mHasAirUnits = true;
+				}
+				++i;
+			}
+		} else {
+			mHasGroundUnits = false;
+
+			// Look for air units
+			size_t i = 0;
+			while (i < mUnits.size() && !mHasGroundUnits) {
+				if (mUnits[i]->isGround()) {
+					mHasGroundUnits = true;
+				}
+				++i;
+			}
+		}
+
 	} else {
 		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
 	}
@@ -376,7 +425,7 @@ void Squad::computeSquadSpecificActions() {
 	// Does nothing
 }
 
-void Squad::setAirTransportation(bool usesAir) {
+void Squad::setTravelsByAir(bool usesAir) {
 	mTravelsByAir = usesAir;
 }
 
@@ -580,7 +629,7 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		);
 	}
 
-	/// Via
+	// Via
 	if (movePosition == TilePositions::Invalid && !mViaPath.empty()) {
 		movePosition = mViaPath.front();
 		
@@ -615,4 +664,104 @@ bool Squad::isAUnitStill() const {
 	}
 
 	return false;
+}
+
+bool Squad::hasAir() const {
+	return mHasAirUnits;
+}
+
+bool Squad::hasGround() const {
+	return mHasGroundUnits;
+}
+
+bool Squad::isEnemyAttackUnitsWithinSight() const {
+	// Skip if we're regrouping
+	if (isRegrouping()) {
+		return false;
+	}
+
+	// Use double squared distance (squared for faster calculation)
+	double sightDistanceSquared = getSightDistance();
+	sightDistanceSquared *= sightDistanceSquared;
+
+	TilePosition center = getCenter();
+
+	// Check for nearby enemies, RETURN early
+	const std::set<Unit*>& units = Broodwar->getAllUnits();	
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		// Only process enemy units that can attack
+		if (Broodwar->self()->isEnemy((*unitIt)->getPlayer()) && (*unitIt)->getType().canAttack()) {
+			
+			bool canAttackUs = false;
+
+			// If we only have ground units, skip units that cannot attack ground
+			if (hasGround() && !hasAir()) {
+				if ((*unitIt)->getType().groundWeapon() != WeaponTypes::None) {
+					canAttackUs = true;
+				}
+			}
+			// We only have air units, skip units that only cannot attack air
+			else if (hasAir() && !hasGround()) {
+				if ((*unitIt)->getType().airWeapon() != WeaponTypes::None) {
+					canAttackUs = true;
+				}
+			}
+			// Both ground and air, all attacking units count
+			else {
+				canAttackUs = true;
+			}
+
+			// Check if the unit is within range
+			if (canAttackUs) {
+				double diffDistance = static_cast<double>(getSquaredDistance(center, (*unitIt)->getTilePosition()));
+				if (diffDistance <= sightDistanceSquared) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
+
+	double sightDistanceSquared = getSightDistance();
+	sightDistanceSquared *= sightDistanceSquared;
+	TilePosition center = getCenter();
+
+	std::vector<Unit*> foundUnits;
+	const std::set<Unit*>& units = Broodwar->getAllUnits();	
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		// Only process enemy units
+		if (Broodwar->self()->isEnemy((*unitIt)->getPlayer())) {
+
+			// If we only want attacking units
+			if (!onlyAttackingUnits || (*unitIt)->getType().canAttack()) {
+
+				// Check if the unit is within range
+				double diffDistance = static_cast<double>(getSquaredDistance(center, (*unitIt)->getTilePosition()));
+				if (diffDistance <= sightDistanceSquared) {
+					foundUnits.push_back(*unitIt);
+				}
+			}
+		}
+	}
+
+	return foundUnits;
+}
+
+double Squad::getSightDistance() const {
+	int maxSight = 0;
+	const std::vector<UnitAgent*> squadUnits = getUnits();
+	for (size_t i = 0; i < squadUnits.size(); ++i) {
+		int unitSightCurrent = squadUnits[i]->getUnitType().sightRange();
+		if (unitSightCurrent > maxSight) {
+			maxSight = unitSightCurrent;
+		}
+	}
+
+	return maxSight * config::squad::SIGHT_DISTANCE_MULTIPLIER;
 }
