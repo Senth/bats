@@ -169,7 +169,7 @@ void Commander::createScout() {
 	if (NULL != mSquadWaiting) {
 		finishWaitingSquad();
 	}
-
+	/*
 	// Get available unit compositions
 	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
 	if(freeUnits.size() <= 0)
@@ -179,23 +179,21 @@ void Commander::createScout() {
 	freeUnits.push_back(unit);
 	ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
 	mSquadWaiting = pScoutSuad->getThis();
+	*/
+		// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
 
-	/*std::vector<UnitComposition> availableUnitCompositions;
+	// Get all unit compositions that can be created from the specified units.
+	// I.e. it will try to fill up all the slots in the unit compositions, those that can be fully filled will be returned
+	// in a prioritized order. E.g. if we have 10 free workers, 8 marines, and 2 medics. It can fill the scout composition with an SCV 
+	// it will only return it. If we instead have 10 free workers, 8 marines, 2 medics, 6 wraiths, and 2 Vultures it can fill all three
+	// compositions; these will then be returned sorted by the highest priority. Meaning if Wraith has priority 3, Vulture priority 2, and SCV priority 1, element [0] -> Wrait Unit composition, [1] -> Vulture, [2] -> SCV.
+	std::vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Scout);
 
-	// Create scout
+	// Create a squad with the highest composition.
 	if (!availableUnitCompositions.empty()) {
-		// Choose a random unit composition
-		unsigned int randomId = rand() % availableUnitCompositions.size();
-		const UnitComposition& chosenComposition = availableUnitCompositions[randomId];
-
-		ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits, true, chosenComposition);
-		mSquadWaiting = pScoutSuad->getThis();
+	ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
+	mSquadWaiting = pScoutSquad->getThis();
 	}
-	// No scouts available
-	else {
-		DEBUG_MESSAGE(utilities::LogLevel_Info, "Commander::createScout() | No scouts available");
-
-		/// @todo print a message to the other player that no scouts are available
-	}*/
 }
