@@ -2,6 +2,8 @@
 
 #include "AttackSquad.h"
 
+class TransportAgent;
+
 // Namespace for the project
 namespace bats {
 
@@ -40,8 +42,29 @@ public:
 protected:
 	virtual void computeSquadSpecificActions();
 	virtual GoalStates checkGoalState() const;
+	virtual void onUnitAdded(UnitAgent* pAddedUnit);
+	virtual void onUnitRemoved(UnitAgent* pRemovedUnit);
+	virtual void onGoalFailed();
+	virtual void onGoalSucceeded();
+	virtual void onRetreatCompleted();
+
+	/**
+	 * Uses mainly AttackSquad's createGoal to find where the goal shall be created
+	 * and then creates a via path to the goal. It will always try to go on the
+	 * outskirts of the map.
+	 */
+	virtual bool createGoal();
 
 private:
+	/**
+	 * States of the Drop
+	 */
+	enum States {
+		State_Attack,	/**< When the squad attacks something */
+		State_Load,		/**< When the squad loads units into transports */
+		State_Transport	/**< When the squad transports all ground units */
+	};
+
 	/**
 	 * Loads all units into the transportations
 	 */
@@ -53,23 +76,55 @@ private:
 	void unloadUnits();
 
 	/**
+	 * Checks if all enemy units within sight, that can attack, are faster than our transport
+	 * @return true if any enemy unit can travel faster than our transportation
+	 */
+	bool isEnemyFasterThanTransport() const;
+
+	/**
 	 * Check if the specified units are faster than us
 	 * @param enemyUnits units to check if they are faster than our transportation
 	 * @return true if any enemy unit can travel faster than our transportation
 	 */
-	bool enemyIsFasterThanTransport(const std::vector<BWAPI::Unit*> enemyUnits) const;
+	bool isEnemyFasterThanTransport(const std::vector<BWAPI::Unit*> enemyUnits) const;
 
 	/**
-	 * States of the Drop
+	 * Check if all transports are in the same region as the goal.
+	 * @return true if all transports are in the same region as the goal
 	 */
-	enum States {
-		State_Attack,	/**< When the squad attacks something */
-		State_Load,		/**< When the squad loads units into transports */
-		State_Transport	/**< When the squad transports all ground units */
-	};
+	bool isTransportsInGoalRegion() const;
+
+	/**
+	 * Sets the new state of the drop. This handles some extra functionality like
+	 * setting transportation to load/unload
+	 * @param newState the new state
+	 */
+	void setState(States newState);
+
+	/**
+	 * Checks whether the transports are done loading all units
+	 * @return true if all transports are done loading units
+	 */
+	bool isTransportsDoneLoading() const;
+
+	/**
+	 * Creates and replaces the via path. It will try to go along the map edges
+	 * until it comes to the border closest to the position, then it will continue to
+	 * go either to the retreat position or the goal.
+	 */
+	void createViaPath();
+
+	/**
+	 * Checks if the drop attack has timed out
+	 * @return true if the drop attack has timed out
+	 */
+	bool hasAttackTimedOut() const;
 
 	States mState;
 	bool mInitialized;
 	double mStartTime;
+	double mLoadStart;
+	bool mFailed;
+	std::set<TransportAgent*> mTransports;
 };
 }

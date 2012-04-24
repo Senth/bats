@@ -83,7 +83,8 @@ namespace squad {
 	}
 
 	namespace drop {
-		double TIMEOUT = 0.0;
+		double ATTACK_TIMEOUT = 0.0;
+		double LOAD_TIMEOUT = 0.0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -276,8 +277,10 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool squad::drop::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "timeout") {
-		TIMEOUT = variableInfo;
+	if (variableInfo.name == "attack_timeout") {
+		ATTACK_TIMEOUT = variableInfo;
+	} else if (variableInfo.name == "load_timeout") {
+		LOAD_TIMEOUT = variableInfo;
 	} else {
 		return false;
 	}

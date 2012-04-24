@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <memory.h>
+#include <BWAPI/TilePosition.h>
 
 // Namespace for the project
 namespace bats {
@@ -42,7 +43,7 @@ public:
 	 * Called every frame. Evaluates the situation if squads needs to be disbanded
 	 * merged etc.
 	 */
-	void computeActions();
+	virtual void computeActions();
 
 	/**
 	 * Tries to issue a specified command. This is essentially creating a new squad
@@ -56,14 +57,22 @@ public:
 	 * BATS-data\config.ini, if a ping has been assigned it will then wait for a second ping
 	 * for y seconds. If a new command is specified it will complete the current command.
 	 */
-	bool issueCommand(const std::string& command);
+	virtual bool issueCommand(const std::string& command);
 
 	/**
 	 * Checks whether the command is an available command that the Commander should handle.
 	 * @param command the command to check if it is an command for the Commander.
 	 * @return true if the command is available, else false.
 	 */
-	bool isCommandAvailable(const std::string& command) const;
+	virtual bool isCommandAvailable(const std::string& command) const;
+
+	/**
+	 * Returns a location where the specified squad shall retreat to
+	 * @param squad the squad that asks for a retreat
+	 * @return position the squad shall retreat to, TilePositions::Invalid if the squad
+	 * shall not retreat anywhere but stay and fight!
+	 */
+	virtual BWAPI::TilePosition getRetreatPosition(const std::tr1::shared_ptr<Squad>& squad) const;
 	
 private:
 	/**

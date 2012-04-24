@@ -12,8 +12,6 @@ namespace bats{
 class TerranProductionBuilding : public StructureAgent
 {
 public:
-	TerranProductionBuilding();
-
 	/**
 	*
 	*/

@@ -6,15 +6,9 @@
 using namespace BWAPI;
 using namespace std;
 
-ValkyrieAgent::ValkyrieAgent(Unit* mUnit)
+ValkyrieAgent::ValkyrieAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "ValkyrieAgent";
-	//Broodwar->printf("ValkyrieAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void ValkyrieAgent::computeActions()

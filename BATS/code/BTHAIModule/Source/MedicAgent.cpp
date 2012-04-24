@@ -5,15 +5,9 @@
 using namespace BWAPI;
 using namespace std;
 
-MedicAgent::MedicAgent(Unit* mUnit)
+MedicAgent::MedicAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "MedicAgent";
-	//Broodwar->printf("MedicAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void MedicAgent::computeActions()

@@ -10,40 +10,19 @@
  * Author: Johan Hagelback (johan.hagelback@gmail.com)
  */
 class WorkerAgent : public UnitAgent {
-
-private:
-	int currentState;
-
-	BWAPI::UnitType toBuild;
-	BWAPI::TilePosition buildSpot;
-	BWAPI::TilePosition startSpot;
-	bool buildSpotExplored();
-	bool areaFree();
-	bool isBuilt();
-	int startBuildFrame;
-
-	void handleKitingWorker();
-	BWAPI::Unit* getEnemyUnit();
-	BWAPI::Unit* getEnemyBuilding();
-	BWAPI::Unit* getEnemyWorker();
-
-	int lastFrame;
-
 public:
-	/** Worker is gathering minerals. */
-	static const int GATHER_MINERALS = 0;
-	/** Worker is gathering gas. */
-	static const int GATHER_GAS = 1;
-	/** Worker is trying to find a buildspot for a requested building. */
-	static const int FIND_BUILDSPOT = 2;
-	/** Worker is moving to a found buildspot. */
-	static const int MOVE_TO_SPOT = 3;
-	/** Worker is constructing a building. */
-	static const int CONSTRUCT = 4;
-	/** Worker is repairing a building (Terran only). */
-	static const int REPAIRING = 5;
-	/** Worker is needed to attack an enemy intruder in a base. */
-	static const int ATTACKING = 6;
+	/**
+	 * Different states of the worker
+	 */
+	enum States {
+		GATHER_MINERALS,
+		GATHER_GAS,
+		FIND_BUILDSPOT, /**< Trying to find a build spot for a requested building */
+		MOVE_TO_SPOT, /**< Moving to a found build spot */
+		CONSTRUCT, /**< Constructing a building */
+		REPAIRING, /**< Repairing (Terran only) */
+		ATTACKING /**< Attacking, either in squad or enemy intruder in base */
+	};
 
 	/** Constructor. */
 	WorkerAgent(BWAPI::Unit* mUnit);
@@ -56,13 +35,13 @@ public:
 
 	/** Set the state of the worker. I.e. what does it do right now. 
 	 * Should only be set if the worker is getting a task not through the functions in this class. Then it is automatic. */
-	void setState(int state);
+	void setState(States state);
 
 	/** Returns the current state of the worker. */
-	int getState();
+	States getState() const;
 
 	/** Returns true if the Worker agent can create units of the specified type. */
-	bool canBuild(BWAPI::UnitType type);
+	bool canBuild(BWAPI::UnitType type) const;
 
 	/** Assigns the agent to repair a building or tank. */
 	bool assignToRepair(BWAPI::Unit* building);
@@ -74,7 +53,7 @@ public:
 	bool assignToFinishBuild(BWAPI::Unit* building);
 
 	/** Returns the state of the agent as text. Good for printouts. */
-	std::string getStateAsText();
+	std::string getStateAsText() const;
 
 	/** Called when the unit assigned to this agent is destroyed. */
 	void destroyed();
@@ -88,7 +67,25 @@ public:
 	 * will check if it's constructing anything, defaults to UnitTypes::None
 	 * @return true if the worker is building the specified type, or building anything if
 	 * type was set to UnitTypes::None. */
-	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None);
+	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None) const;
+
+private:
+	States currentState;
+
+	BWAPI::UnitType toBuild;
+	BWAPI::TilePosition buildSpot;
+	BWAPI::TilePosition startSpot;
+	bool buildSpotExplored() const;
+	bool areaFree() const;
+	bool isBuilt() const;
+	int startBuildFrame;
+
+	void handleKitingWorker();
+	BWAPI::Unit* getEnemyUnit();
+	BWAPI::Unit* getEnemyBuilding();
+	BWAPI::Unit* getEnemyWorker();
+
+	int lastFrame;
 };
 
 #endif

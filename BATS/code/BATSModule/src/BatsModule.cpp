@@ -37,6 +37,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpExplorationManager = NULL;
 	mpWaitGoalManager = NULL;
 	mpSquadManager = NULL;
+	mpGameTime = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -151,12 +152,15 @@ void BatsModule::onSendText(std::string text) {
 		mDebugLevel = 3;
 	} else if (text == "/d0" || text == "/debug off") {
 		mDebugLevel = 0;
-	} else if (text == "/transition") {
+	} else if (text == "/transition" || text == "transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
 	} else if (startsWith(text,"/transition")) {				
 		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
 	} else if (mpCommander->isCommandAvailable(text)) {
 		mpCommander->issueCommand(text);
+	} else if (text == "/reload config") {
+		config::loadConfig();
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Configuration reloaded");
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);
@@ -287,6 +291,7 @@ void BatsModule::updateGame() {
 		return;
 	}
 
+	mpGameTime->update();
 	mpResourceCounter->update();
 	mpWaitGoalManager->update();
 
@@ -297,7 +302,7 @@ void BatsModule::updateGame() {
 }
 
 void BatsModule::initGameClasses() {
-	GameTime::getInstance();
+	mpGameTime = GameTime::getInstance();
 	mpWaitGoalManager = WaitGoalManager::getInstance();
 	mpSquadManager = SquadManager::getInstance();
 	AttackCoordinator::getInstance();
@@ -326,7 +331,7 @@ void BatsModule::releaseGameClasses() {
 	delete AttackCoordinator::getInstance();
 	SAFE_DELETE(mpSquadManager);
 	SAFE_DELETE(mpWaitGoalManager);
-	delete GameTime::getInstance();
+	SAFE_DELETE(mpGameTime);
 }
 
 void BatsModule::showDebug() const {

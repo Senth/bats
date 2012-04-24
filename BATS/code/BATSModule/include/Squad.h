@@ -75,6 +75,12 @@ public:
 	bool isEmpty() const;
 
 	/**
+	 * Returns true if the squad shall avoid enemies
+	 * @return true if the squad shall avoid enemies
+	 */
+	bool isAvoidingEnemies() const;
+
+	/**
 	 * Deactivates the squad. This will cause the squad to do nothing. Also
 	 * the initial state of the squad.
 	 */
@@ -386,6 +392,34 @@ protected:
 	virtual void onGoalSucceeded();
 
 	/**
+	 * Checks whether the squad is currently retreating or not. This is not the same as disband
+	 * @return true if the squad is retreating.
+	 */
+	bool isRetreating() const;
+
+	/**
+	 * Sets the current retreating goal, this will also disable any regrouping functionality
+	 * and temporary goals until the squad has arrived at the retreat position. Via path
+	 * can still be used. While retreating it will never check the state of the current
+	 * goal either.
+	 * @param retreatPosition where the squad shall retreat to
+	 */
+	void setRetreatPosition(const BWAPI::TilePosition& retreatPosition);
+
+	/**
+	 * Returns the retreat position of the squad.
+	 * @return the squad's retreat position. TilePositions::Invalid if it doesn't have
+	 * any retreat position.
+	 */
+	const BWAPI::TilePosition& getRetreatPosition() const;
+
+	/**
+	 * Called when the squad has arrived at the retreat position, use this in derived
+	 * classes if those use the retreat functionality.
+	 */
+	virtual void onRetreatCompleted() {}
+
+	/**
 	 * Called when a new WaitGoal has been added. Does nothing in the base class Squad.
 	 * @param newWaitGoal the new WaitGoal that has been added. This is the same goal as
 	 * the last goal in the wait goal vector.
@@ -467,7 +501,41 @@ protected:
 	 */
 	double getSightDistance() const;
 
+#pragma warning(push)
+#pragma warning(disable:4100)
+	/**
+	 * Called when a unit has been successfully added to the squad.
+	 * @param pAddedUnit the new unit that has been added
+	 */
+	virtual void onUnitAdded(UnitAgent* pAddedUnit) {}
+
+	/**
+	 * Called when a unit has been successfully removed from the squad.
+	 * @param pRemovedUnit the unit that has been removed
+	 */
+	virtual void onUnitRemoved(UnitAgent* pRemovedUnit) {}
+#pragma warning(pop)
+
+	static GameTime* mpsGameTime;
+
 private:
+	/**
+	 * Handle retreats, checks if we're the retreat is complete and then calls
+	 * onRetreatCompleted().
+	 */
+	void handleRetreat();
+	
+	/**
+	 * Handle goal states, checks whether the goal has succeeded or failed and calls
+	 * onGoalSucceeded() or onGoalFailed().
+	 */
+	void handleGoal();
+
+	/**
+	 * Handles wait goals, removes finished wait goals and calls onWaitGoalFinished
+	 */
+	void handleWaitGoals();
+
 	/**
 	 * Handles the regrouping. It will check whether the squad shall regroup (if it's not
 	 * regrouping) or continue with the last active goal once the regrouping is finished.
@@ -491,7 +559,7 @@ private:
 	 * @param regroupPosition the position to regroup to, usually this would be
 	 * getCenter().
 	 */
-	void setRegroupPosition(const BWAPI::TilePosition& regorupPosition);
+	void setRegroupPosition(const BWAPI::TilePosition& regroupPosition);
 
 	/**
 	 * Clears the regrouping position and resumes moving to the last goal we had.
@@ -547,6 +615,7 @@ private:
 	UnitComposition mUnitComposition;
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;
+	BWAPI::TilePosition mRetreatPosition;
 	double mRegroupStartTime;
 	bool mCanRegroup;
 
@@ -556,6 +625,7 @@ private:
 	bool mHasAirUnits;
 	bool mHasGroundUnits;
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
+	bool mInitialized;
 	States mState;
 	SquadId mId;
 	std::tr1::weak_ptr<Squad> mThis;
@@ -568,6 +638,5 @@ private:
 	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
 	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
 	static SquadManager* mpsSquadManager;
-	static GameTime* mpsGameTime;
 };
 }

@@ -6,6 +6,10 @@
 
 #define DISABLE_UNIT_AI 0
 
+namespace bats {
+	class SquadManager;
+}
+
 /** The UnitAgent is the base agent class for all agents handling mobile units. If a unit is created and no
  * specific agent for that type is found, the unit is assigned to a UnitAgents. UnitAgents can attack and
  * assist building under enemy fire, but cannot use any special abilities. To use abilities such as Terran Vultures
@@ -16,10 +20,10 @@
 class UnitAgent : public BaseAgent {
 
 protected:
+	static bats::SquadManager* mpsSquadManager;
 	
 public:
 	UnitAgent(BWAPI::Unit* mUnit);
-	UnitAgent();
 
 	int dropped;
 
@@ -51,50 +55,50 @@ public:
 	bool isTransport() const;
 
 	/** Returns the number of own units that are within 6 tiles range of the agent. */
-	int friendlyUnitsWithinRange();
+	int friendlyUnitsWithinRange() const;
 
 	/** Returns the number of own units that are within maxRange of the agent. */
-	int friendlyUnitsWithinRange(int maxRange);
+	int friendlyUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of own units that are within maxRange of the specified tile. */
-	int friendlyUnitsWithinRange(BWAPI::TilePosition tilePos, int maxRange);
+	int friendlyUnitsWithinRange(BWAPI::TilePosition tilePos, int maxRange) const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the agent. */
-	int enemyAttackingUnitsWithinRange();
+	int enemyAttackingUnitsWithinRange() const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within range of the center tile. */
-	int enemyAttackingUnitsWithinRange(int maxRange, BWAPI::TilePosition center);
+	int enemyAttackingUnitsWithinRange(int maxRange, BWAPI::TilePosition center) const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the specified unit type. */
-	int enemyAttackingUnitsWithinRange(BWAPI::UnitType type);
+	int enemyAttackingUnitsWithinRange(BWAPI::UnitType type) const;
 
 	/** Returns the number of enemy units and buildings that are within maxRange of the agent. */
-	int enemyUnitsWithinRange(int maxRange);
+	int enemyUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of enemy ground units and buildings that are within maxRange of the agent. */
-	int enemyGroundUnitsWithinRange(int maxRange);
+	int enemyGroundUnitsWithinRange(int maxRange) const;
 
 	/** Calculates the number of enemy sieged Siege Tanks within Siege Tank range. */
-	int enemySiegedTanksWithinRange(BWAPI::TilePosition center);
+	int enemySiegedTanksWithinRange(BWAPI::TilePosition center) const;
 
 	/** Returns the number of enemy ground units and buildings that are within maxRange of the center tile, and can attack the agent. */
-	int enemyGroundAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange);
+	int enemyGroundAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange) const;
 
 	/** Returns the number of flying units that are within maxRange of the agent. */
-	int enemyAirUnitsWithinRange(int maxRange);
+	int enemyAirUnitsWithinRange(int maxRange) const;
 
 	/** Checks if a unit can be in defensive mode. This happens if 1) the unit is in cooldown and 2) there are opponent
 	 * units that can attack it. */
-	bool useDefensiveMode();
+	bool useDefensiveMode() const;
 
 	/** Returns the number of flying units that can target ground and are within maxRange of the agent. */
-	int enemyAirToGroundUnitsWithinRange(int maxRange);
+	int enemyAirToGroundUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of flying unit that are within maxRange of the center tile, and can attack the agent. */
-	int enemyAirAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange);
+	int enemyAirAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange) const;
 
 	/** Returns the max firerange of the ground weapon this agent has, or -1 if it cannot attack ground. */
-	int getGroundRange();
+	int getGroundRange() const;
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack ground. */
 	static int getGroundRange(BWAPI::UnitType type);
@@ -103,7 +107,7 @@ public:
 	static bool canAttack(BWAPI::UnitType attacker, BWAPI::UnitType target);
 
 	/** Returns the max firerange of the air weapon this agent has, or -1 if it cannot attack air. */
-	int getAirRange();
+	int getAirRange() const;
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack air. */
 	static int getAirRange(BWAPI::UnitType type);
@@ -125,7 +129,7 @@ public:
 	bool chargeShields();
 
 	/** Used to print info about this agent to the screen. */
-	void printInfo();
+	void printInfo() const;
 };
 
 #endif

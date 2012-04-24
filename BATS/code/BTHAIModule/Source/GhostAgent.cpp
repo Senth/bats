@@ -5,15 +5,9 @@
 using namespace BWAPI;
 using namespace std;
 
-GhostAgent::GhostAgent(Unit* mUnit)
+GhostAgent::GhostAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "GhostAgent";
-	//Broodwar->printf("GhostAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void GhostAgent::computeActions()

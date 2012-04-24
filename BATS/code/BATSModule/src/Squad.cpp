@@ -23,6 +23,8 @@ SquadManager* bats::Squad::mpsSquadManager = NULL;
 GameTime* bats::Squad::mpsGameTime = NULL;
 
 const int MAX_KEYS = 100;
+const double FROM_TILE_TO_POSITION = 32.0;
+const double FROM_POSITION_TO_TILE = 1.0 / FROM_TILE_TO_POSITION;
 
 Squad::Squad(
 	const std::vector<UnitAgent*>& units,
@@ -39,6 +41,7 @@ Squad::Squad(
 	mTempGoalPosition(TilePositions::Invalid),
 	mGoalPosition(TilePositions::Invalid),
 	mRegroupPosition(TilePositions::Invalid),
+	mRetreatPosition(TilePositions::Invalid),
 	mFurthestUnitAwayDistance(0.0),
 	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
 	mGoalState(GoalState_Lim),
@@ -66,6 +69,8 @@ Squad::Squad(
 		DEBUG_MESSAGE(utilities::LogLevel_Warning, "Squad::Squad() | Created a Squad with a " <<
 			"UnitComposition, but not enough units were supplied for the squad");
 	}
+
+	mInitialized = false;
 
 	// Add to squad manager
 	shared_ptr<Squad> strongPtr = shared_ptr<Squad>(this);
@@ -125,6 +130,14 @@ void Squad::computeActions() {
 
 	}
 
+	// Check if this is the first time calling, then add all the initial units
+	if (!mInitialized) {
+		mInitialized = true;
+		for (size_t i = 0; i < mUnits.size(); ++i) {
+			onUnitAdded(mUnits[i]);
+		}
+	}
+
 	switch (mState) {
 	case State_Initializing:
 		// Only try to create a goal if the player hasn't specified one
@@ -145,19 +158,7 @@ void Squad::computeActions() {
 		break;
 
 	case State_Active: {
-		// Remove finished WaitGoals and call onWaitGoalFinished for finished events.
-		vector<shared_ptr<WaitGoal>>::iterator waitGoalIt;
-		waitGoalIt = mWaitGoals.begin();
-		while (mWaitGoals.end() != waitGoalIt) {
-			if ((*waitGoalIt)->getWaitState() != WaitState_Waiting) {
-				shared_ptr<WaitGoal> finishedWaitGoal = *waitGoalIt;
-				waitGoalIt = mWaitGoals.erase(waitGoalIt);
-				onWaitGoalFinished(finishedWaitGoal);
-			} else {
-				++waitGoalIt;
-			}
-		}
-
+		handleWaitGoals();
 
 		// Use next via path if close to
 		if (!mViaPath.empty() && isCloseTo(mViaPath.front())) {
@@ -168,29 +169,65 @@ void Squad::computeActions() {
 
 		// Squad specific and goals
 		computeSquadSpecificActions();
-		mGoalState = checkGoalState();
 
-		switch (mGoalState) {
-		case GoalState_Succeeded:
-			DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << " successful with goal");
-			onGoalSucceeded();
-			break;
 
-		case GoalState_Failed:
-			DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << " failed current goal");
-			onGoalFailed();
-			break;
-
-		default:
-			break;
+		// Handle goals and retreats if we're not retreating
+		if (!isRetreating()) {
+			handleGoal();
+			handleRegroup();
+		} else {
+			handleRetreat();
 		}
-
-		handleRegroup();
 	}
 	
 	default:
 		// Do nothing
 		break;
+	}
+}
+
+void Squad::handleRetreat() {
+	if (mRetreatPosition != TilePositions::Invalid) {
+		if (isCloseTo(mRetreatPosition)) {
+			mRetreatPosition = TilePositions::Invalid;
+			onRetreatCompleted();
+			// Shall update unit movement really be called?
+			updateUnitMovement();
+		}
+	}
+}
+
+void Squad::handleGoal() {
+	mGoalState = checkGoalState();
+
+	switch (mGoalState) {
+	case GoalState_Succeeded:
+		DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << ": Successfully completed goal");
+		onGoalSucceeded();
+		break;
+
+	case GoalState_Failed:
+		DEBUG_MESSAGE(utilities::LogLevel_Fine, getName() << ": Failed current goal");
+		onGoalFailed();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Squad::handleWaitGoals() {
+	// Remove finished WaitGoals and call onWaitGoalFinished for finished events.
+	vector<shared_ptr<WaitGoal>>::iterator waitGoalIt;
+	waitGoalIt = mWaitGoals.begin();
+	while (mWaitGoals.end() != waitGoalIt) {
+		if ((*waitGoalIt)->getWaitState() != WaitState_Waiting) {
+			shared_ptr<WaitGoal> finishedWaitGoal = *waitGoalIt;
+			waitGoalIt = mWaitGoals.erase(waitGoalIt);
+			onWaitGoalFinished(finishedWaitGoal);
+		} else {
+			++waitGoalIt;
+		}
 	}
 }
 
@@ -317,6 +354,8 @@ void Squad::addUnit(UnitAgent* pUnit) {
 		} else {
 			mHasGroundUnits = true;
 		}
+
+		onUnitAdded(pUnit);
 	}
 }
 
@@ -340,7 +379,7 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 
 		// Update has air and has ground
 		if (pUnit->isAir()) {
-			mHasAirUnits = false;
+			mHasAirUnits = false;	// testing
 
 			// Look for air units
 			size_t i = 0;
@@ -362,6 +401,9 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 				++i;
 			}
 		}
+		pUnit->setSquadId(bats::SquadId::INVALID_KEY);
+
+		onUnitRemoved(pUnit);
 
 	} else {
 		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
@@ -410,15 +452,21 @@ bool Squad::isCloseTo(const TilePosition& position, double range) const {
 
 	bool bClose = false;
 
-	if (travelsByGround()) {
-		double squaredDistance = getSquaredDistance(position, getCenter());
-		bClose = range * range <= squaredDistance;
-	} else {
-		double groundDistance = BWTA::getGroundDistance(getCenter(), position);
-		bClose = range <= groundDistance;
+	// To be more effective, use squared distance. If we're in range check for ground distance
+	// if the squad travels by ground. Ground distance is very computational heavy
+	double squaredDistance = getSquaredDistance(position, getCenter());
+	bClose = squaredDistance <= range * range;
+
+	if (bClose && travelsByGround()) {
+		double groundDistance = BWTA::getGroundDistance(getCenter(), position) * FROM_POSITION_TO_TILE;
+		bClose = groundDistance <= range;
 	}
 
 	return bClose;
+}
+
+bool Squad::isAvoidingEnemies() const {
+	return mAvoidEnemyUnits;
 }
 
 void Squad::computeSquadSpecificActions() {
@@ -430,15 +478,26 @@ void Squad::setTravelsByAir(bool usesAir) {
 }
 
 void Squad::onGoalFailed() {
-	/// @todo use the next goal, if no goals are available either disband or create new goal
-	/// which one should be the default?
+	/// @todo Disband or create new goal, which one should be the default?
 	forceDisband();
 }
 
 void Squad::onGoalSucceeded() {
-	/// @todo use the next goal, if no goals are available either disband or create new goal
-	/// which one should be the default?
+	/// @todo Disband or create new goal, which one should be the default?
 	forceDisband();
+}
+
+bool Squad::isRetreating() const {
+	return mRetreatPosition != TilePositions::Invalid;
+}
+
+void Squad::setRetreatPosition(const TilePosition& retreatPosition) {
+	mRetreatPosition = retreatPosition;
+	if (mRetreatPosition != TilePositions::Invalid) {
+		mRegroupPosition = TilePositions::Invalid;
+		mTempGoalPosition = TilePositions::Invalid;
+	}
+	updateUnitMovement();
 }
 
 #pragma warning(push)
@@ -454,15 +513,9 @@ void Squad::onWaitGoalFinished(const shared_ptr<WaitGoal>& finishedWaitGoal) {
 
 void Squad::forceDisband() {
 	if (!mDisbanded) {
-		const TilePosition& ourBase = Broodwar->self()->getStartLocation();
-
 		// Free all the units from a squad.
 		for (size_t i = 0; i < mUnits.size(); ++i) {
 			mUnits[i]->setSquadId(SquadId::INVALID_KEY);
-
-			/// @todo retreat to a better point than our start location.
-			/// Maybe add to a defensive squad?			
-			mUnits[i]->setGoal(ourBase);
 		}
 
 		mUnits.clear();
@@ -474,6 +527,10 @@ void Squad::forceDisband() {
 void Squad::setGoalPosition(const TilePosition& position) {
 	mGoalPosition = position;
 	updateUnitMovement();
+}
+
+const TilePosition& Squad::getRetreatPosition() const {
+	return mRetreatPosition;
 }
 
 void Squad::setViaPath(const std::list<TilePosition>& positions) {
@@ -520,7 +577,7 @@ void Squad::handleRegroup() {
 	/// @todo improve regrouping position for ground units. Regroup position shall be between
 	/// the two units that are furthest away from each other (ground distance), and not
 	/// the center, which sometimes are inaccessible.
-
+	
 	// Not regrouping, but needs regrouping
 	if (mRegroupPosition == TilePositions::Invalid) {
 		if (needsRegrouping()) {
@@ -545,6 +602,10 @@ void Squad::handleRegroup() {
 }
 
 bool Squad::needsRegrouping() const {
+	// We never need regrouping if the squad has set it to never regroup
+	if (!mCanRegroup) {
+		return false;
+	}
 
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
@@ -559,6 +620,11 @@ bool Squad::needsRegrouping() const {
 }
 
 bool Squad::finishedRegrouping() const {
+	// We have always finished regrouping if the squad can't regroup any more
+	if (!mCanRegroup) {
+		return true;
+	}
+
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
 		double squaredDistance = getSquaredDistance(getCenter(), mUnits[i]->getUnit()->getTilePosition());
@@ -571,16 +637,14 @@ bool Squad::finishedRegrouping() const {
 	return true;
 }
 
-void Squad::setRegroupPosition(const BWAPI::TilePosition& regorupPosition) {
-	mRegroupPosition = regorupPosition;
-	mRegroupStartTime;
+void Squad::setRegroupPosition(const BWAPI::TilePosition& regroupPosition) {
+	mRegroupPosition = regroupPosition;
+	mRegroupStartTime = mpsGameTime->getElapsedTime();
 	updateUnitMovement();
 }
 
 void Squad::clearRegroupPosition() {
 	mRegroupPosition = TilePositions::Invalid;
-	mRegroupStartTime = mpsGameTime->getElapsedTime();
-
 	updateUnitMovement();
 }
 
@@ -618,8 +682,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		);
 	}
 
-	// Temp
-	if (movePosition == TilePositions::Invalid) {
+	// Temp, don't use temp while retreating
+	if (movePosition == TilePositions::Invalid && !isRetreating()) {
 		movePosition = mTempGoalPosition;
 		
 		DEBUG_MESSAGE_CONDITION(
@@ -637,6 +701,17 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 			movePosition != TilePositions::Invalid,
 			utilities::LogLevel_Fine,
 			getName() << ": New via position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+		);
+	}
+
+	// Retreat
+	if (movePosition == TilePositions::Invalid && mRetreatPosition != TilePositions::Invalid) {
+		movePosition = mRetreatPosition;
+
+		DEBUG_MESSAGE_CONDITION(
+			movePosition != TilePositions::Invalid,
+			utilities::LogLevel_Fine,
+			getName() << ": New retreat position, (" << movePosition.x() << ", " << movePosition.y() << ")"
 		);
 	}
 

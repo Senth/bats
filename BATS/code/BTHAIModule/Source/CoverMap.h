@@ -62,7 +62,6 @@ private:
 
 	BWAPI::Unit* hasMineralNear(BWAPI::TilePosition pos);
 
-	BWAPI::TilePosition findChokepoint() const;
 	BWAPI::TilePosition findDefensePos(BWTA::Chokepoint* choke) const;
 	bool isOccupied(BWTA::Region* region) const;
 	bool isEdgeChokepoint(BWTA::Chokepoint* choke) const;
@@ -71,6 +70,9 @@ private:
 public:
 	/** Destructor */
 	~CoverMap();
+
+	/** Finds a good chokepoint to build at or place units at */
+	BWAPI::TilePosition findChokepoint() const;
 
 	/** Returns the instance of the class. */
 	static CoverMap* getInstance();

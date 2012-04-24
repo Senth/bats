@@ -5,15 +5,9 @@
 using namespace BWAPI;
 using namespace std;
 
-GoliathAgent::GoliathAgent(Unit* mUnit)
+GoliathAgent::GoliathAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "GoliathAgent";
-	//Broodwar->printf("GoliathAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void GoliathAgent::computeActions()

@@ -17,14 +17,13 @@ private:
 protected:
 	bool repairing;
 	
-	bool canBuildUnit(BWAPI::UnitType type);
-	bool canEvolveUnit(BWAPI::UnitType type);
+	bool canBuildUnit(BWAPI::UnitType type) const;
+	bool canEvolveUnit(BWAPI::UnitType type) const;
 
-	BWAPI::TilePosition getNextScanLocation();
+	BWAPI::TilePosition getNextScanLocation() const;
 	std::vector<BWAPI::TilePosition> hasScanned;
 
 public:
-	StructureAgent();
 	StructureAgent(BWAPI::Unit* mUnit);
 
 	/** Called each update to issue orders. */
@@ -34,13 +33,13 @@ public:
 	virtual void debug_showGoal();
 
 	/** Checks if the agent can morph into the specified type. Zerg only. */
-	bool canMorphInto(BWAPI::UnitType type);
+	bool canMorphInto(BWAPI::UnitType type) const;
 
 	/** Sends a number of workers to a newly constructed base. */
 	void sendWorkers();
 
 	/** Used to print info about this agent to the screen. */
-	void printInfo();
+	void printInfo() const;
 };
 
 #endif

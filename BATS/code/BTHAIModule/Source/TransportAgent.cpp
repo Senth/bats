@@ -1,117 +1,193 @@
 #include "TransportAgent.h"
 #include "PFManager.h"
-#include "AgentManager.h"
-#include "Commander.h"
-#include "Squad.h"
+#include "BatsModule\include\UnitManager.h"
+#include "BatsModule\include\SquadManager.h"
+#include "BatsModule\include\Squad.h"
 
 using namespace BWAPI;
 using namespace std;
 
-TransportAgent::TransportAgent(Unit* mUnit)
+TransportAgent::TransportAgent(Unit* pUnit) : UnitAgent(pUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	maxLoad = type.spaceProvided();
-	currentLoad = 0;
-	unitID = unit->getID();
 	agentType = "TransportAgent";
-	
-	goal = TilePositions::Invalid;
+
+	mLoadMax = type.spaceProvided();
+	mLoadQueueSpaces = 0;
 }
 
-int TransportAgent::getCurrentLoad()
-{
-	//Squad* sq = Commander::getInstance()->getSquad(squadID);
-	//if (sq != NULL)
-	//{
-	//	int load = 0;
-	//	vector<BaseAgent*> agents = sq->getMembers();
-	//	for (int i = 0; i < (int)agents.size(); i++)
-	//	{
-	//		BaseAgent* a = agents.at(i);
-	//		if (a->isAlive())
-	//		{
-	//			if (a->getUnit()->isLoaded())
-	//			{
-	//				if (a->getUnit()->getTransport()->getID() == unit->getID())
-	//				{
-	//					load += a->getUnitType().spaceRequired();
-	//				}
-	//			}
-	//		}
-	//	}
-	//	currentLoad = load;
-	//}
+int TransportAgent::getFreeLoadSpace(bool includeQueuedUnits) const {
+	// Don't calculate it every frame, use cached result then
+	static int sLoadCached = 0;
+	static int sLastFrameUpdate = 0;
+	if (sLastFrameUpdate != Broodwar->getFrameCount()) {
+		sLastFrameUpdate = Broodwar->getFrameCount();
+	} else {
+		int load = sLoadCached;
+		if (includeQueuedUnits) {
+			load -= mLoadQueueSpaces;
+		}
+		return mLoadMax - load;
+	}
 
-	return currentLoad;
+	int load = 0;
+	if (getSquadId() != bats::SquadId::INVALID_KEY) {
+		std::tr1::shared_ptr<const bats::Squad> squad = bats::SquadManager::getInstance()->getSquad(getSquadId());
+
+		if (NULL != squad) {	
+			const vector<UnitAgent*>& units = squad->getUnits();
+			for (size_t i = 0; i < units.size(); ++i) {
+				const UnitAgent* pUnitCurrent = units[i];
+
+				if (pUnitCurrent->getUnit()->isLoaded()) {
+					if (pUnitCurrent->getUnit()->getTransport()->getID() == getUnit()->getID()) {
+						load += pUnitCurrent->getUnitType().spaceRequired();
+					}
+				}
+			}
+		}
+
+		sLoadCached = load;
+	}
+	// Else check with all our units
+	else {
+		std::vector<UnitAgent*> units = bats::UnitManager::getInstance()->getUnitsByFilter();
+
+		for (size_t i = 0; i < units.size(); ++i) {
+			const UnitAgent* pUnitCurrent = units[i];
+
+			if (pUnitCurrent->getUnit()->isLoaded()) {
+				if (pUnitCurrent->getUnit()->getTransport()->getID() == getUnit()->getID()) {
+					load += pUnitCurrent->getUnitType().spaceRequired();
+				}
+			}
+		}
+	}
+
+	// If we want to include queued units we have to update the list, otherwise we might calculate
+	// a unit twice
+	if (includeQueuedUnits) {
+		TransportAgent* pThis = const_cast<TransportAgent*>(this);
+		pThis->updateQueue();
+		load += mLoadQueueSpaces;
+	}
+
+	return mLoadMax - load;
 }
 
-bool TransportAgent::isValidLoadUnit(BaseAgent* a)
+bool TransportAgent::isValidLoadUnit(UnitAgent* pUnit)
 {
-	if (a->getUnitType().isFlyer()) return false;
-	if (a->getUnit()->isLoaded()) return false;
-	if (a->getUnit()->isBeingConstructed()) return false;
-	if (a->getUnitID() == unit->getID()) return false;
+	if (pUnit->getUnitType().isFlyer()) return false;
+	if (pUnit->getUnit()->isLoaded()) return false;
+	if (pUnit->getUnit()->isBeingConstructed()) return false;
+	if (pUnit->isTransport()) return false;
 	return true;
-}
-
-BaseAgent* TransportAgent::findUnitToLoad(int spaceLimit)
-{
-	BaseAgent* agent = NULL;
-	//double bestDist = 100000;
-
-	//Squad* sq = Commander::getInstance()->getSquad(squadID);
-	//if (sq != NULL)
-	//{
-	//	vector<BaseAgent*> agents = sq->getMembers();
-	//	for (int i = 0; i < (int)agents.size(); i++)
-	//	{
-	//		BaseAgent* a = agents.at(i);
-	//		if (isValidLoadUnit(a))
-	//		{
-	//			double cDist = unit->getPosition().getDistance(a->getUnit()->getPosition());
-	//			if (cDist < bestDist)
-	//			{
-	//				bestDist = cDist;
-	//				agent = a;
-	//			}
-	//		}
-	//	}
-	//}
-
-	return agent;
 }
 
 void TransportAgent::computeActions()
 {
-	/// @todo create automatic load for the dropship
-	//if (unit->isBeingConstructed()) return;
+	if (unit->isBeingConstructed()) return;
 
-	//int currentLoad = getCurrentLoad();
-	//int eCnt = enemyUnitsWithinRange(unit->getType().sightRange());
+	// Sometimes a squad might be disbanded without ordering the unload command. When this happens
+	// the transportation will check, whenever it gets removed from a squad, if it has been loaded
+	// and will set mUnloading to true.
+	static bool firstNotSquadTime = true;
 
-	//if (eCnt == 0)
-	//{
-	//	if (currentLoad < maxLoad)
-	//	{
-	//		BaseAgent* toLoad = findUnitToLoad(maxLoad - currentLoad);
-	//		if (toLoad != NULL)
-	//		{
-	//			unit->load(toLoad->getUnit());
-	//			return;
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	if (currentLoad > 0)
-	//	{
-	//		TilePosition t = unit->getTilePosition();
-	//		unit->unloadAll();
-	//		return;
-	//	}
-	//}
+	// Only do something if we have a goal
+	if (getGoal() != TilePositions::Invalid) {
+		firstNotSquadTime = true;
 
-	bool defensive = true;
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+		// Only check loading etc if we are in a squad.
+		if (getSquadId() != bats::SquadId::INVALID_KEY) {
+			updateQueue();
+
+			// Loading units
+			if (!mLoadQueue.empty()) {
+				getUnit()->load(mLoadQueue.front()->getUnit());
+			} else {
+				// If we want to unload
+				if (mUnloading) {
+					if (getFreeLoadSpace() < mLoadMax) {
+						getUnit()->unloadAll();
+					} else {
+						mUnloading = false;
+					}
+				} else {
+					bool defensive = true;
+					PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+				}
+			}
+		} else {
+			// If we want to unload.
+			if (mUnloading || firstNotSquadTime) {
+				if (getFreeLoadSpace() < mLoadMax) {
+					mUnloading = true;
+					getUnit()->unloadAll();
+				} else {
+					mUnloading = false;
+				}
+
+				firstNotSquadTime = false;
+
+			} else {
+				bool defensive = true;
+				PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+			}
+		}
+	}
+}
+
+bool TransportAgent::loadUnit(UnitAgent* pUnit) {
+	mUnloading = false;
+
+	// Cannot load agent
+	if (!isValidLoadUnit(pUnit)) {
+		return false;
+	}
+
+	// Check if we have enough space for it
+	int freeSpace = getFreeLoadSpace(true);
+	int unitSpace = pUnit->getUnitType().spaceRequired();
+	if (freeSpace > unitSpace) {
+		mLoadQueue.push_back(pUnit);
+		mLoadQueueSpaces += unitSpace;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void TransportAgent::updateQueue() {
+	// Don't update several times every frame
+	static int sLastFrameUpdate = 0;
+
+	if (sLastFrameUpdate != Broodwar->getFrameCount()) {
+		sLastFrameUpdate = Broodwar->getFrameCount();
+	} else {
+		return;
+	}
+
+	vector<UnitAgent*>::iterator unitIt = mLoadQueue.begin();
+	while(unitIt != mLoadQueue.end()) {
+		UnitAgent* currentUnit = (*unitIt);
+		if (!currentUnit->isAlive() || currentUnit->getUnit()->isLoaded()) {
+			mLoadQueueSpaces -= currentUnit->getUnitType().spaceRequired();
+			unitIt = mLoadQueue.erase(unitIt);
+		} else {
+			++unitIt;
+		}
+	}
+}
+
+void TransportAgent::clearLoadQueue() {
+	mLoadQueueSpaces = 0;
+	mLoadQueue.clear();
+}
+
+void TransportAgent::unloadAll() {
+	clearLoadQueue();
+	mUnloading = true;
+}
+
+bool TransportAgent::isLoading() const {
+	return !mLoadQueue.empty();
 }

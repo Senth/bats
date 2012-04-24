@@ -5,15 +5,9 @@
 using namespace BWAPI;
 using namespace std;
 
-SiegeTankAgent::SiegeTankAgent(Unit* mUnit)
+SiegeTankAgent::SiegeTankAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "SiegeTankAgent";
-	//Broodwar->printf("SiegeTankAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void SiegeTankAgent::computeActions()

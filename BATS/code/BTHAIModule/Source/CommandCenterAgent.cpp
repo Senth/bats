@@ -9,13 +9,8 @@
 using namespace BWAPI;
 using namespace std;
 
-CommandCenterAgent::CommandCenterAgent(Unit* mUnit)
+CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
-	//Broodwar->printf("New base created at (%d,%d)", unit->getTilePosition().x(), unit->getTilePosition().y());
-
 	hasSentWorkers = false;
 	if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Command_Center) == 0)
 	{

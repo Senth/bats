@@ -44,12 +44,14 @@ Squad::GoalStates ScoutSquad::checkGoalState() const{
 	TilePosition goal = getGoal();
 	if (goal == BWAPI::TilePositions::Invalid)
 		return Squad::GoalState_Succeeded;
-	double dist = currentPos.getDistance(goal);
-	double acceptDist = 4;
-	if (travelsByGround()) 
-		acceptDist = 6;	
-	
-	if (dist <= acceptDist)
+	//double dist = currentPos.getDistance(goal);
+	//double acceptDist = 4;
+	//if (travelsByGround()) 
+	//	acceptDist = 6;	
+	//
+	//if (dist <= acceptDist)
+	//	return Squad::GoalState_Succeeded;
+	if (isCloseTo(goal))
 		return Squad::GoalState_Succeeded;
 
 	return Squad::GoalState_NotCompleted;

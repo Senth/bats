@@ -6,16 +6,10 @@
 using namespace BWAPI;
 using namespace std;
 
-VultureAgent::VultureAgent(BWAPI::Unit* mUnit)
+VultureAgent::VultureAgent(BWAPI::Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "VultureAgent";
-	//Broodwar->printf("VultureAgent created (%s)", unit->getType().getName().c_str());
 	mineDropFrame = 0;
-
-	goal = BWAPI::TilePositions::Invalid;
 }
 
 void VultureAgent::computeActions()

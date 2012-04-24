@@ -9,13 +9,9 @@
 using namespace BWAPI;
 using namespace std;
 
-MarineAgent::MarineAgent(Unit* mUnit)
+MarineAgent::MarineAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "MarineAgent";
-	//Broodwar->printf("MarineAgent created (%s)", unit->getType().getName().c_str());
 }
 
 void MarineAgent::computeActions()

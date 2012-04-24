@@ -8,14 +8,9 @@
 using namespace BWAPI;
 using namespace std;
 
-NexusAgent::NexusAgent(Unit* mUnit)
+NexusAgent::NexusAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "NexusAgent";
-	//Broodwar->printf("New base created at (%d,%d)", unit->getTilePosition().x(), unit->getTilePosition().y());
-
 	hasSentWorkers = false;
 	if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Nexus) == 0)
 	{

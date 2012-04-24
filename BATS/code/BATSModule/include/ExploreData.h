@@ -24,6 +24,14 @@ public:
 	virtual ~ExploreData();
 
 	/**
+	 * Returns true if the time since visiting this position is less than the specified
+	 * explorations data.
+	 * @param rightExploreData the right side of <
+	 * @return true if the time since visiting this position is less than the other.
+	 */
+	bool operator<(const ExploreData& rightExploreData) const;
+
+	/**
 	 * Returns the center position of the region
 	 * @return center position of the region
 	 */
@@ -74,7 +82,7 @@ public:
 	void updateVisited();
 
 private:
-	BWAPI::TilePosition mCenter;
+	BWAPI::TilePosition mPosition;
 	int mLastVisitFrame;
 	bool mbExpansion;
 };

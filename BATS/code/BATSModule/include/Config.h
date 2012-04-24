@@ -157,7 +157,10 @@ namespace bats {
 			 */
 			namespace drop {
 				/** The time in seconds before a drop is treated as timed out. */
-				extern double TIMEOUT;
+				extern double ATTACK_TIMEOUT;
+				/** Time before a load is treated as timed out. It will then try to 
+				 * load all units again */
+				extern double LOAD_TIMEOUT;
 			}
 		}
 

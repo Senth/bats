@@ -6,6 +6,7 @@
 #include "SquadManager.h"
 #include "UnitManager.h"
 #include "UnitCompositionFactory.h"
+#include "BTHAIModule/Source/CoverMap.h"
 #include <memory.h>
 
 #include "AttackSquad.h"
@@ -14,6 +15,8 @@
 
 using namespace bats;
 using namespace std::tr1;
+using namespace std;
+using namespace BWAPI;
 
 Commander* Commander::mpsInstance = NULL;
 
@@ -28,10 +31,10 @@ Commander::Commander() {
 
 	mAvailableCommands.insert("abort");
 	mAvailableCommands.insert("attack");
-	mAvailableCommands.insert("counter-attack");
+	//mAvailableCommands.insert("counter-attack");
 	mAvailableCommands.insert("drop");
 	mAvailableCommands.insert("expand");
-	mAvailableCommands.insert("move");
+	//mAvailableCommands.insert("move");
 	mAvailableCommands.insert("scout");
 }
 
@@ -122,7 +125,9 @@ void Commander::createAttack() {
 		shared_ptr<AttackSquad> oldSquad;
 		std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mpSquadManager->begin();
 		while (oldSquad == NULL && squadIt != mpSquadManager->end()) {
-			oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+			if (squadIt->second->getName() == "AttackSquad") {
+				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+			}
 		}
 
 		if (oldSquad != NULL) {
@@ -141,7 +146,7 @@ void Commander::createDrop() {
 	}
 
 	// Get available unit compositions
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
 	std::vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
 
@@ -181,19 +186,33 @@ void Commander::createScout() {
 	mSquadWaiting = pScoutSuad->getThis();
 	*/
 		// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
 
 	// Get all unit compositions that can be created from the specified units.
-	// I.e. it will try to fill up all the slots in the unit compositions, those that can be fully filled will be returned
-	// in a prioritized order. E.g. if we have 10 free workers, 8 marines, and 2 medics. It can fill the scout composition with an SCV 
-	// it will only return it. If we instead have 10 free workers, 8 marines, 2 medics, 6 wraiths, and 2 Vultures it can fill all three
-	// compositions; these will then be returned sorted by the highest priority. Meaning if Wraith has priority 3, Vulture priority 2, and SCV priority 1, element [0] -> Wrait Unit composition, [1] -> Vulture, [2] -> SCV.
+	// I.e. it will try to fill up all the slots in the unit compositions, those that can be fully
+	// filled will be returned in a prioritized order. E.g. if we have 10 free workers, 8 marines,
+	// and 2 medics. It can fill the scout composition with an SCV it will only return it. If we
+	// instead have 10 free workers, 8 marines, 2 medics, 6 wraiths, and 2 Vultures it can fill
+	// all three compositions; these will then be returned sorted by the highest priority.
+	// Meaning if Wraith has priority 3, Vulture priority 2, and SCV priority 1,
+	// element [0] -> Wrait Unit composition, [1] -> Vulture, [2] -> SCV.
 	std::vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Scout);
 
 	// Create a squad with the highest composition.
 	if (!availableUnitCompositions.empty()) {
-	ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
-	mSquadWaiting = pScoutSquad->getThis();
+		ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
+		mSquadWaiting = pScoutSquad->getThis();
 	}
 }
+
+#pragma warning(push)	// Disabled until the squad is actually used.
+#pragma warning(disable:4100)
+TilePosition Commander::getRetreatPosition(const shared_ptr<Squad>& squad) const {
+	/// @todo check if the squad shall stay and fight instead of retreating
+
+	/// @todo get a better retreat position than a good choke point
+
+	return CoverMap::getInstance()->findChokepoint();
+}
+#pragma warning(pop)

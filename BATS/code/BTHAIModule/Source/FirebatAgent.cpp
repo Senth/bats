@@ -8,15 +8,9 @@
 using namespace BWAPI;
 using namespace std;
 
-FirebatAgent::FirebatAgent(Unit* mUnit)
+FirebatAgent::FirebatAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "FirebatAgent";
-	//Broodwar->printf("FirebatAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void FirebatAgent::computeActions()

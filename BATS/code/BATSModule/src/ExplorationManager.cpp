@@ -9,6 +9,7 @@
 #include "Config.h"
 #include "Helper.h"
 #include <set>
+#include <algorithm>
 #include <cfloat>
 
 using namespace BWAPI;
@@ -116,71 +117,41 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 
 	//Special case: No goal set, give the squad a new goal directly
 	if (goal == TilePositions::Invalid) {
-		BWTA::Region* startRegion = getRegion(currentPos); 
-		goal = TilePosition(startRegion->getCenter());
+		BWTA::Region* pStartRegion = getRegion(currentPos);
+		if (NULL != pStartRegion) {
+			goal = TilePosition(pStartRegion->getCenter());
+		}
 		return goal;
 	}
 
-	double dist = currentPos.getDistance(goal);
 
-	/// @todo Move accept distance to config
-	double acceptDist = 4;
+	// Sort the exploration data, one that hasn't been explored for furthest time.
+	std::sort(mExploreData.rbegin(), mExploreData.rend());
+	
+	/// @todo check for close regions first when scouting
+
+	// Get the first in the queue that we can reach.
+	// GROUND
 	if (squad->travelsByGround()) {
-		acceptDist = 6;
-	}
+		vector<ExploreData>::iterator exploreIt = mExploreData.begin();
+		while (goal != TilePositions::Invalid && exploreIt != mExploreData.end()) {
 
-	if (dist <= acceptDist) {
-		//Squad is close to goal
 
-		//1. Set region to explored
-		//setExplored(goal);
-
-		//2. Find new region to explore
-		BWTA::Region* startRegion = getRegion(goal);
-		BWTA::Region* bestRegion = startRegion;
-
-		if (bestRegion != NULL) {
-			int bestLastVisitFrame = getLastVisitFrame(bestRegion);
-
-			if (squad->travelsByGround()) {
-				//Ground explorers
-				set<BWTA::Region*>::const_iterator regionIt;
-				for(regionIt = startRegion->getReachableRegions().begin(); regionIt != startRegion->getReachableRegions().end(); ++regionIt) {
-					int cLastVisitFrame = getLastVisitFrame((*regionIt));
-					TilePosition c = TilePosition((*regionIt)->getCenter());
-					if (cLastVisitFrame <= bestLastVisitFrame) {
-						bestLastVisitFrame = cLastVisitFrame;
-						bestRegion = (*regionIt);
-					}
-				}
-			} else {
-				//Air explorers
-				double bestDist = 100000;
-				set<BWTA::Region*>::const_iterator regionIt;
-				for(regionIt = getRegions().begin(); regionIt != getRegions().end(); ++regionIt) {
-					int cLastVisitFrame = getLastVisitFrame((*regionIt));
-					TilePosition c = TilePosition((*regionIt)->getCenter());
-					double dist = c.getDistance(currentPos);
-					if (cLastVisitFrame < bestLastVisitFrame) {
-						bestLastVisitFrame = cLastVisitFrame;
-						bestRegion = (*regionIt);
-						bestDist = dist;
-					}
-					if (cLastVisitFrame == bestLastVisitFrame && dist < bestDist) {
-						bestLastVisitFrame = cLastVisitFrame;
-						bestRegion = (*regionIt);
-						bestDist = dist;
-					}
-				}
+			if (BWTA::isConnected(currentPos, exploreIt->getCenterPosition())) {
+				goal = exploreIt->getCenterPosition();
 			}
 
-			TilePosition newGoal = TilePosition(bestRegion->getCenter());
-			return newGoal;
-			//Broodwar->printf("Explorer: new goal (%d,%d) I am at (%d,%d) agentGoal (%d,%d)", newGoal.x(), newGoal.y(), curPos.x(), curPos.y(), agent->getGoal().x(), agent->getGoal().y());
+			++exploreIt;
+		}
+	}
+	// AIR
+	else {
+		if (!mExploreData.empty()) {
+			goal = mExploreData.front().getCenterPosition();
 		}
 	}
 
-	return TilePositions::Invalid;
+	return goal;
 }
 
 void bats::ExplorationManager::updateExploredRegions() {

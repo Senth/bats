@@ -44,6 +44,11 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 	for (size_t i = 0; i < agents.size(); ++i) {
 		UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(agents[i]);
 		if (NULL != pUnitAgent) {
+			// Automatically skip constructing and dead units
+			if (pUnitAgent->isBeingBuilt() || !pUnitAgent->isAlive()) {
+				continue;
+			}
+
 			bool addUnit = false;
 
 			// Worker units
@@ -54,7 +59,7 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 				}
 
 				// Only add free workers (in no squad and not building)
-				if (filter & UnitFilter_WorkersNoSquad) {
+				if (filter & UnitFilter_WorkersFree) {
 					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(pUnitAgent);
 					if (NULL != pWorkerAgent &&
 						!pWorkerAgent->isConstructing() &&

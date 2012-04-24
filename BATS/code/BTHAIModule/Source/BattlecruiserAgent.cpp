@@ -5,15 +5,9 @@
 using namespace BWAPI;
 using namespace std;
 
-BattlecruiserAgent::BattlecruiserAgent(Unit* mUnit)
+BattlecruiserAgent::BattlecruiserAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "BattlecruiserAgent";
-	//Broodwar->printf("BattlecruiserAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 	lastUseFrame = Broodwar->getFrameCount();
 }
 

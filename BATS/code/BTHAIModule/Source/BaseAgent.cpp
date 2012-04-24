@@ -8,14 +8,14 @@
 using namespace BWAPI;
 using namespace std;
 
-BaseAgent::BaseAgent() : mSquadId(bats::SquadId::INVALID_KEY)
-{
-	alive = true;
-	//squadID = -1;
-	type = UnitTypes::Unknown;
-	lastActionFrame = 0;
-	goal = TilePositions::Invalid;
-}
+//BaseAgent::BaseAgent() : mSquadId(bats::SquadId::INVALID_KEY)
+//{
+//	alive = true;
+//	//squadID = -1;
+//	type = UnitTypes::Unknown;
+//	lastActionFrame = 0;
+//	goal = TilePositions::Invalid;
+//}
 
 BaseAgent::BaseAgent(Unit* mUnit) : mSquadId(bats::SquadId::INVALID_KEY)
 {
@@ -42,22 +42,26 @@ const bats::SquadId& BaseAgent::getSquadId() const {
 	return mSquadId;
 }
 
-string BaseAgent::getTypeName()
+const string& BaseAgent::getTypeName() const
 {
 	return agentType;
 }
 
-void BaseAgent::printInfo()
+bool BaseAgent::isBeingBuilt() const {
+	return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
+}
+
+void BaseAgent::printInfo() const
 {
 	Broodwar->printf("[%d] (%s)", unitID, getTypeName().c_str());
 }
 
-int BaseAgent::getUnitID()
+int BaseAgent::getUnitID() const
 {
 	return unitID;
 }
 
-UnitType BaseAgent::getUnitType()
+const UnitType& BaseAgent::getUnitType() const
 {
 	return type;
 }
@@ -67,7 +71,12 @@ Unit* BaseAgent::getUnit()
 	return unit;
 }
 
-bool BaseAgent::matches(Unit *mUnit)
+const Unit* BaseAgent::getUnit() const
+{
+	return unit;
+}
+
+bool BaseAgent::matches(Unit *mUnit) const
 {
 	if (isAlive())
 	{
@@ -79,7 +88,7 @@ bool BaseAgent::matches(Unit *mUnit)
 	return false;
 }
 
-bool BaseAgent::isOfType(UnitType type)
+bool BaseAgent::isOfType(UnitType type) const
 {
 	if (unit->getType().getID() == type.getID())
 	{
@@ -106,7 +115,7 @@ bool BaseAgent::isOfType(UnitType mType, UnitType toCheckType)
 	return false;
 }
 
-bool BaseAgent::canBuild(UnitType type)
+bool BaseAgent::canBuild(UnitType type) const
 {
 	//1. Check if building is being constructed
 	if (unit->isBeingConstructed())
@@ -130,7 +139,7 @@ bool BaseAgent::canBuild(UnitType type)
 	return true;
 }
 
-bool BaseAgent::isBuilding()
+bool BaseAgent::isBuilding() const
 {
 	if (unit->getType().isBuilding())
 	{
@@ -139,7 +148,7 @@ bool BaseAgent::isBuilding()
 	return false;
 }
 
-bool BaseAgent::isWorker()
+bool BaseAgent::isWorker() const
 {
 	if (unit->getType().isWorker())
 	{
@@ -148,7 +157,7 @@ bool BaseAgent::isWorker()
 	return false;
 }
 
-bool BaseAgent::isFreeWorker()
+bool BaseAgent::isFreeWorker() const
 {
 	if (unit->getType().isWorker())
 	{
@@ -163,7 +172,7 @@ bool BaseAgent::isFreeWorker()
 	return false;
 }
 
-bool BaseAgent::isUnit()
+bool BaseAgent::isUnit() const
 {
 	if (unit->getType().isBuilding() || unit->getType().isWorker() || unit->getType().isAddon())
 	{
@@ -172,7 +181,7 @@ bool BaseAgent::isUnit()
 	return true;
 }
 
-bool BaseAgent::isUnderAttack()
+bool BaseAgent::isUnderAttack() const
 {
 	bool attack = false;
 	
@@ -191,12 +200,12 @@ void BaseAgent::destroyed()
 	alive = false;
 }
 
-bool BaseAgent::isAlive()
+bool BaseAgent::isAlive() const
 {
 	return alive;
 }
 
-bool BaseAgent::isDamaged()
+bool BaseAgent::isDamaged() const
 {
 	if (unit->getHitPoints() < unit->getType().maxHitPoints())
 	{
@@ -205,7 +214,7 @@ bool BaseAgent::isDamaged()
 	return false;
 }
 
-bool BaseAgent::isDetectorWithinRange(TilePosition pos, int range)
+bool BaseAgent::isDetectorWithinRange(TilePosition pos, int range) const
 {
 	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
 	{
@@ -289,17 +298,17 @@ void BaseAgent::setActionFrame()
 	lastActionFrame = Broodwar->getFrameCount();
 }
 
-int BaseAgent::getLastActionFrame()
+int BaseAgent::getLastActionFrame() const
 {
 	return lastActionFrame;
 }
 
-bool BaseAgent::canAttack(Unit* target)
+bool BaseAgent::canAttack(Unit* target) const
 {
 	return canAttack(target->getType());
 }
 
-bool BaseAgent::canAttack(UnitType type)
+bool BaseAgent::canAttack(UnitType type) const
 {
 	if (!type.isFlyer())
 	{
@@ -314,7 +323,7 @@ bool BaseAgent::canAttack(UnitType type)
 	return false;
 }
 
-int BaseAgent::noUnitsInWeaponRange()
+int BaseAgent::noUnitsInWeaponRange() const
 {
 	int eCnt = 0;
 	for(set<Unit*>::const_iterator i=unit->getUnitsInWeaponRange(unit->getType().groundWeapon()).begin();i!=unit->getUnitsInWeaponRange(unit->getType().groundWeapon()).end();i++)
@@ -331,7 +340,7 @@ void BaseAgent::setGoal(TilePosition goal)
 {
 	if (unit->getType().isFlyer() || unit->getType().isFlyingBuilding())
 	{
-		//Flyers, can always move to goals.
+		//Fliers, can always move to goals.
 		this->goal = goal;
 	}
 	else
@@ -349,7 +358,7 @@ void BaseAgent::clearGoal()
 	goal = TilePositions::Invalid;
 }
 
-TilePosition BaseAgent::getGoal()
+const TilePosition& BaseAgent::getGoal() const
 {
 	return goal;
 }

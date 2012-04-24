@@ -20,7 +20,7 @@ enum UnitFilters {
 	UnitFilter_InDisbandableSquad	= 0x0002,	/**< Non-workers that are in a disbandable squad */
 	UnitFilter_UnitsAll				= 0x0004,	/**< All non-workers */
 	UnitFilter_WorkersAll			= 0x0010,	/**< All workers */
-	UnitFilter_WorkersNoSquad		= 0x0020	/**< Workers in no squads */
+	UnitFilter_WorkersFree		= 0x0020	/**< Workers in no squads */
 };
 
 /**

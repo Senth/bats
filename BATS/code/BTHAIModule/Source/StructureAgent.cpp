@@ -12,17 +12,10 @@ using namespace BWAPI;
 using namespace BWTA;
 using namespace std;
 
-StructureAgent::StructureAgent()
+
+StructureAgent::StructureAgent(Unit* mUnit) : BaseAgent(mUnit)
 {
-
-}
-
-StructureAgent::StructureAgent(Unit* mUnit){
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "StructureAgent";
-	//Broodwar->printf("StructureAgent created (%s)", unit->getType().getName().c_str());
 }
 
 void StructureAgent::debug_showGoal()
@@ -193,7 +186,7 @@ void StructureAgent::computeActions()
 	}
 }
 
-bool StructureAgent::canBuildUnit(UnitType type)
+bool StructureAgent::canBuildUnit(UnitType type) const
 {
 	//1. Check if race matches
 	if (type.getRace().getID() != Broodwar->self()->getRace().getID())
@@ -232,7 +225,7 @@ bool StructureAgent::canBuildUnit(UnitType type)
 	return true;
 }
 
-void StructureAgent::printInfo()
+void StructureAgent::printInfo() const
 {
 	Broodwar->printf("[%s-%d]", agentType.c_str(), unitID);
 }
@@ -264,7 +257,7 @@ void StructureAgent::sendWorkers()
 	}
 }
 
-bool StructureAgent::canMorphInto(UnitType type)
+bool StructureAgent::canMorphInto(UnitType type) const
 {
 	//1. Check canBuild
 	if (!Broodwar->canMake(unit, type))
@@ -288,7 +281,7 @@ bool StructureAgent::canMorphInto(UnitType type)
 	return true;
 }
 
-bool StructureAgent::canEvolveUnit(UnitType type)
+bool StructureAgent::canEvolveUnit(UnitType type) const
 {
 	//1. Check if we need the unit in a squad
 	//if (!Commander::getInstance()->needUnit(type))
@@ -312,7 +305,7 @@ bool StructureAgent::canEvolveUnit(UnitType type)
 	return true;
 }
 
-TilePosition StructureAgent::getNextScanLocation()
+TilePosition StructureAgent::getNextScanLocation() const
 {
 	TilePosition ePos = bats::ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
 	if (ePos != TilePositions::Invalid)

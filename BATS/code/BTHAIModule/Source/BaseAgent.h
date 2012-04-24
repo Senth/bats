@@ -33,8 +33,6 @@ protected:
 	std::string agentType;
 
 public:
-	/** Default constructor. Not used. */
-	BaseAgent();
 	/** Constructor. */
 	BaseAgent(BWAPI::Unit* mUnit);
 	/** Destructor. */
@@ -63,13 +61,13 @@ public:
 	}
 
 	/** Returns the number of enemy units within weapon range of the agent. */
-	int noUnitsInWeaponRange();
+	int noUnitsInWeaponRange() const;
 
 	/** Checks if this unit can attack the specified target unit. */
-	bool canAttack(BWAPI::Unit* target);
+	bool canAttack(BWAPI::Unit* target) const;
 
 	/** Checks if this unit can attack the specified unit type. */
-	bool canAttack(BWAPI::UnitType type);
+	bool canAttack(BWAPI::UnitType type) const;
 
 	/** Sets the goal for this unit. Goals are set from either the SquadCommander for attacking
 	 * or defending units, or from ExplorationManager for explore units. */
@@ -79,16 +77,16 @@ public:
 	virtual void clearGoal();
 
 	/** Returns the current goal for this unit. */
-	BWAPI::TilePosition getGoal();
+	const BWAPI::TilePosition& getGoal() const;
 
 	/** Sets the current frame when this agent is issued an order. */
 	void setActionFrame();
 
 	/** Returns the last frame this agent was issued an order. */
-	int getLastActionFrame();
+	int getLastActionFrame() const;
 
 	/** Returns the unique type name for the agent type. */
-	std::string getTypeName();
+	const std::string& getTypeName() const;
 
 #pragma warning (push)
 #pragma warning (disable:4100)
@@ -127,50 +125,58 @@ public:
 	}
 
 	/** Returns true if this agent is used to explore the game world. */
-	virtual bool isExploring()
+	virtual bool isExploring() const
 	{
 		return false;
 	}
 
 	/** Returns true if this agent is used to attack the enemy. */
-	virtual bool isAttacking()
+	virtual bool isAttacking() const
 	{
 		return false;
 	}
 
 	/** Returns true if this agent is defending the own base. */
-	virtual bool isDefending()
+	virtual bool isDefending() const
 	{
 		return false;
 	}
 
+	/** Returns true if the unit is currently being built */
+	bool isBeingBuilt() const;
+
 	/** Used to print info about this agent to the screen. */
-	virtual void printInfo();
+	virtual void printInfo() const;
 
 	/** Returns true if this agent can build units of the specified type. */
-	virtual bool canBuild(BWAPI::UnitType type);
+	virtual bool canBuild(BWAPI::UnitType type) const;
 
 	/** Returns the unique id for this agent. Agent id is the same as the id of the unit
 	 * assigned to the agent. */
-	int getUnitID();
+	int getUnitID() const;
 
 	/** Returns the type for the unit handled by this agent. */
-	BWAPI::UnitType getUnitType();
+	const BWAPI::UnitType& getUnitType() const;
 
 	/** Returns a reference to the unit assigned to this agent. */
 	BWAPI::Unit* getUnit();
+
+	/**
+	 * Returns a const pointer to the unit assigned to this agent.
+	 */
+	const BWAPI::Unit* getUnit() const;
 
 	/** Called when the unit assigned to this agent is destroyed. */
 	virtual void destroyed();
 
 	/** Returns true if this agent is active, i.e. the unit is not destroyed. */
-	bool isAlive();
+	bool isAlive() const;
 
 	/** Returns true if the specified unit is the same unit assigned to this agent. */
-	bool matches(BWAPI::Unit* mUnit);
+	bool matches(BWAPI::Unit* mUnit) const;
 
 	/** Returns true if the agent is of the specified type. */
-	bool isOfType(BWAPI::UnitType type);
+	bool isOfType(BWAPI::UnitType type) const;
 
 	/** Returns true if the unit is of the specified type. */
 	static bool isOfType(BWAPI::Unit* mUnit, BWAPI::UnitType type);
@@ -180,25 +186,25 @@ public:
 
 	/** Checks if there are any enemy detector units withing range of the
 	 * specified position. True if there is, false if not. */
-	bool isDetectorWithinRange(BWAPI::TilePosition pos, int range);
+	bool isDetectorWithinRange(BWAPI::TilePosition pos, int range) const;
 
 	/** Returns true if this agent is a building. */
-	bool isBuilding();
+	bool isBuilding() const;
 
 	/** Returns true if this agent is a worker. */
-	bool isWorker();
+	bool isWorker() const;
 
 	/** Returns true if this agent is a free worker, i.e. is idle or is gathering minerals. */
-	bool isFreeWorker();
+	bool isFreeWorker() const;
 
 	/** Returns true if this agent is a combat unit. */
-	bool isUnit();
+	bool isUnit() const;
 
 	/** Returns true if this agent is under attack, i.e. lost hitpoints since last check. */
-	bool isUnderAttack();
+	bool isUnderAttack() const;
 
 	/** Returns true if this agent is damaged. */
-	bool isDamaged();
+	bool isDamaged() const;
 
 	/** Orders the Terran Comsat Station to do a Scanner Sweep at the specified area. */
 	bool doScannerSweep(BWAPI::TilePosition pos);

@@ -268,7 +268,7 @@ void setVerbosityLevel(LogLevels verbosity, int target);
 		__pragma(warning(push)); \
 		__pragma(warning(disable:4127)); \
 		if (forceQuit) { \
-		exit(EXIT_FAILURE); \
+			exit(EXIT_FAILURE); \
 		} \
 		__pragma(warning(pop)); \
 	} \

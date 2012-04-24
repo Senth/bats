@@ -8,7 +8,7 @@ using BWAPI::TilePosition;
 using BWTA::Region;
 
 ExploreData::ExploreData(const TilePosition& position, bool bExpansion) {
-	mCenter = position;
+	mPosition = position;
 	mbExpansion = bExpansion;
 	mLastVisitFrame = 0;
 }
@@ -17,8 +17,12 @@ ExploreData::~ExploreData() {
 	// Does nothing
 }
 
+bool ExploreData::operator<(const ExploreData& rightExploreData) const {
+	return mLastVisitFrame < rightExploreData.mLastVisitFrame;
+}
+
 const TilePosition& ExploreData::getCenterPosition() const {
-	return mCenter;
+	return mPosition;
 }
 
 bool ExploreData::matches(BWTA::Region* region) const {
@@ -36,14 +40,14 @@ bool ExploreData::matches(const BWAPI::TilePosition& center) const {
 	//	return true;
 	//}
 	//return false;
-	return mCenter == center;
+	return mPosition == center;
 }
 
 bool ExploreData::isWithin(const BWAPI::TilePosition& position) const {
 	BWTA::Region* pPositionRegion = BWTA::getRegion(position);
 	if (pPositionRegion != NULL) {
 		BWAPI::TilePosition regionCenter = BWAPI::TilePosition(pPositionRegion->getCenter());
-		return regionCenter == mCenter;
+		return regionCenter == mPosition;
 	} else {
 		return false;
 	}

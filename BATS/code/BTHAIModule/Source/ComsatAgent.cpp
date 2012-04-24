@@ -5,11 +5,8 @@
 using namespace BWAPI;
 using namespace std;
 
-ComsatAgent::ComsatAgent(Unit* mUnit)
+ComsatAgent::ComsatAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "ComsatAgent";
 }
 

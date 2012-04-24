@@ -133,7 +133,7 @@ private:
 	 * Set the unit sets this composition has. Used by UnitCompositionFactory
 	 * @param unitSet what unit type and how many of the unit the unit composition contains.
 	 */
-	void addUnitSet(const UnitSet& unitSets);
+	void addUnitSet(const UnitSet& unitSet);
 
 	/**
 	 * Resets all the number of units to 0 for all unit sets. Helper function for

@@ -4,27 +4,23 @@
 #include "ExplorationManager.h"
 #include "SpottedObject.h"
 #include "BATSModule/include/Helper.h"
+#include "BATSModule/include/SquadManager.h"
 #include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace std;
 using bats::operator<<;
 
-UnitAgent::UnitAgent()
-{
-	
-}
+bats::SquadManager* UnitAgent::mpsSquadManager = NULL;
 
-UnitAgent::UnitAgent(Unit* mUnit)
+UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
-	//Broodwar->printf("UnitAgent created (%s)", unit->getType().getName().c_str());
 	dropped = 0;
 	agentType = "UnitAgent";
 
-	goal = TilePositions::Invalid;
+	if (mpsSquadManager == NULL) {
+		mpsSquadManager = bats::SquadManager::getInstance();
+	}
 }
 
 void UnitAgent::debug_showGoal()
@@ -129,7 +125,7 @@ void UnitAgent::computeKitingActions()
 	}
 }
 
-int UnitAgent::enemyUnitsWithinRange(int maxRange)
+int UnitAgent::enemyUnitsWithinRange(int maxRange) const
 {
 	int eCnt = 0;
 	int j = 0;
@@ -151,7 +147,7 @@ int UnitAgent::enemyUnitsWithinRange(int maxRange)
 	return eCnt;
 }
 
-int UnitAgent::enemyGroundUnitsWithinRange(int maxRange)
+int UnitAgent::enemyGroundUnitsWithinRange(int maxRange) const
 {
 	if (maxRange < 0)
 	{
@@ -179,7 +175,7 @@ int UnitAgent::enemyGroundUnitsWithinRange(int maxRange)
 	return eCnt;
 }
 
-int UnitAgent::enemySiegedTanksWithinRange(TilePosition center)
+int UnitAgent::enemySiegedTanksWithinRange(TilePosition center) const
 {
 	int maxRange = 12 * 32 + 16;
 	int eCnt = 0;
@@ -201,7 +197,7 @@ int UnitAgent::enemySiegedTanksWithinRange(TilePosition center)
 	return eCnt;
 }
 
-int UnitAgent::enemyGroundAttackingUnitsWithinRange(TilePosition center, int maxRange)
+int UnitAgent::enemyGroundAttackingUnitsWithinRange(TilePosition center, int maxRange) const
 {
 	if (maxRange < 0)
 	{
@@ -231,7 +227,7 @@ int UnitAgent::enemyGroundAttackingUnitsWithinRange(TilePosition center, int max
 	return eCnt;
 }
 
-int UnitAgent::enemyAirUnitsWithinRange(int maxRange)
+int UnitAgent::enemyAirUnitsWithinRange(int maxRange) const
 {
 	if (maxRange < 0)
 	{
@@ -258,7 +254,7 @@ int UnitAgent::enemyAirUnitsWithinRange(int maxRange)
 	return eCnt;
 }
 
-int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange)
+int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange) const
 {
 	if (maxRange < 0)
 	{
@@ -289,7 +285,7 @@ int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange)
 	return eCnt;
 }
 
-int UnitAgent::enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRange)
+int UnitAgent::enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRange) const
 {
 	if (maxRange < 0)
 	{
@@ -320,7 +316,7 @@ int UnitAgent::enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRan
 	return eCnt;
 }
 
-bool UnitAgent::useDefensiveMode()
+bool UnitAgent::useDefensiveMode() const
 {
 	if (unit->getGroundWeaponCooldown() > 0 || unit->getAirWeaponCooldown() > 0)
 	{
@@ -332,17 +328,17 @@ bool UnitAgent::useDefensiveMode()
 	return false;
 }
 
-int UnitAgent::enemyAttackingUnitsWithinRange()
+int UnitAgent::enemyAttackingUnitsWithinRange() const
 {
 	return enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), getGroundRange()) + enemyAirAttackingUnitsWithinRange(unit->getTilePosition(), getAirRange());
 }
 
-int UnitAgent::enemyAttackingUnitsWithinRange(int maxRange, TilePosition center)
+int UnitAgent::enemyAttackingUnitsWithinRange(int maxRange, TilePosition center) const
 {
 	return enemyGroundAttackingUnitsWithinRange(center, maxRange) + enemyAirAttackingUnitsWithinRange(center, maxRange);
 }
 
-int UnitAgent::enemyAttackingUnitsWithinRange(UnitType type)
+int UnitAgent::enemyAttackingUnitsWithinRange(UnitType type) const
 {
 	return enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), getGroundRange(type)) + enemyAirAttackingUnitsWithinRange(unit->getTilePosition(), getAirRange(type));
 }
@@ -460,12 +456,12 @@ Unit* UnitAgent::getClosestEnemyAirDefense(int maxRange)
 	}
 }
 
-int UnitAgent::friendlyUnitsWithinRange()
+int UnitAgent::friendlyUnitsWithinRange() const
 {
 	return friendlyUnitsWithinRange(192);
 }
 
-int UnitAgent::friendlyUnitsWithinRange(int maxRange)
+int UnitAgent::friendlyUnitsWithinRange(int maxRange) const
 {
 	int fCnt = 0;
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
@@ -484,7 +480,7 @@ int UnitAgent::friendlyUnitsWithinRange(int maxRange)
 	return fCnt;
 }
 
-int UnitAgent::friendlyUnitsWithinRange(TilePosition tilePos, int maxRange)
+int UnitAgent::friendlyUnitsWithinRange(TilePosition tilePos, int maxRange) const
 {
 	int fCnt = 0;
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
@@ -503,7 +499,7 @@ int UnitAgent::friendlyUnitsWithinRange(TilePosition tilePos, int maxRange)
 	return fCnt;
 }
 
-int UnitAgent::getGroundRange()
+int UnitAgent::getGroundRange() const
 {
 	return getGroundRange(unit->getType());
 }
@@ -529,7 +525,7 @@ int UnitAgent::getGroundRange(UnitType type)
 	return maxRange;
 }
 
-int UnitAgent::getAirRange()
+int UnitAgent::getAirRange() const
 {
 	return getAirRange(unit->getType());
 }
@@ -614,7 +610,7 @@ bool UnitAgent::isTransport() const
 	return isTransportType;
 }
 
-void UnitAgent::printInfo()
+void UnitAgent::printInfo() const
 {
 	DEBUG_MESSAGE(utilities::LogLevel_Finer, "[" << agentType << "-" << unitID <<
 		"SquadId" << getSquadId() << " " << unit->getTilePosition() << goal);

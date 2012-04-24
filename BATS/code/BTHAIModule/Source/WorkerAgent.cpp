@@ -5,6 +5,8 @@
 #include "PFManager.h"
 #include "CoverMap.h"
 #include "BatsModule/include/BuildPlanner.h"
+#include "BatsModule/include/SquadManager.h"
+#include "BatsModule/include/Squad.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
@@ -12,13 +14,10 @@
 
 using namespace BWAPI;
 using namespace std;
+using namespace std::tr1;
 
-WorkerAgent::WorkerAgent(Unit* mUnit)
+WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
-	//Broodwar->printf("WorkerAgent created (%s)", unit->getType().getName().c_str());
 	setState(GATHER_MINERALS);
 	startBuildFrame = 0;
 	startSpot = TilePositions::Invalid;
@@ -177,180 +176,169 @@ void WorkerAgent::debug_showGoal()
 
 void WorkerAgent::computeActions()
 {
-	// if(SquadID != -1)
 	// @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
 	if (getSquadId() != bats::SquadId::INVALID_KEY)
 	{
 		//Worker is in a squad
 
-		//Squad* sq = Commander::getInstance()->getSquad(getSquadId());
-		//if (sq != NULL)
-		//{
-		//	if (sq->isRush())
-		//	{
-		//		//Someone has been attacking us, kite it
-		//		if (unit->isUnderAttack())
-		//		{
-		//			handleKitingWorker();
-		//			return;
-		//		}
-
-		//		//Check for enemies to attack
-		//		Unit* target = getEnemyWorker();
-		//		if (target != NULL)
-		//		{
-		//			unit->attack(target);
-		//			return;
-		//		}
-		//	}
-		//}
-
-		PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
-		return;
-	}
-	//Check if workers are too far away from a base when attacking
-	if (currentState == ATTACKING)
-	{
-		if (unit->getTarget() != NULL)
+		shared_ptr<bats::Squad> squad = mpsSquadManager->getSquad(getSquadId());
+		if (NULL != squad) {
+			bool defensive = squad->isAvoidingEnemies();
+			PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+		} else {
+			ERROR_MESSAGE(false, "Squad is null for WorkerAgent, why is it this?");
+		}
+	} else {
+		//Check if workers are too far away from a base when attacking
+		if (currentState == ATTACKING)
 		{
-			BaseAgent* base = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
-			if (base != NULL)
+			if (unit->getTarget() != NULL)
 			{
-				double dist = base->getUnit()->getTilePosition().getDistance(unit->getTilePosition());
-				if (dist > 25)
+				BaseAgent* base = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
+				if (base != NULL)
 				{
-					//Stop attacking. Return home
-					unit->stop();
-					unit->rightClick(base->getUnit());
-					setState(GATHER_MINERALS);
-					return;
-				}
-			}
-		}
-		else
-		{
-			//No target, return to gather minerals
-			setState(GATHER_MINERALS);
-			return;
-		}
-	}
-
-	if (currentState == GATHER_GAS)
-	{
-		if (unit->isIdle())
-		{
-			//Not gathering gas. Reset.
-			setState(GATHER_MINERALS);
-		}
-	}
-	
-	if (currentState == REPAIRING)
-	{
-		if (!unit->isRepairing())
-		{
-			setState(GATHER_MINERALS);
-			BaseAgent* base = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
-			if (base != NULL)
-			{
-				unit->rightClick(base->getUnit());
-				return;
-			}
-		}
-		else
-		{
-			return;
-		}
-	}
-
-	if (currentState == GATHER_MINERALS)
-	{
-		if (unit->isIdle())
-		{
-			Unit* mineral = CoverMap::getInstance()->findClosestMineral(unit->getTilePosition());
-			if (mineral != NULL)
-			{
-				unit->rightClick(mineral);
-			}
-		}
-	}
-
-	if (currentState == FIND_BUILDSPOT)
-	{
-		CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
-		buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
-		if (buildSpot != TilePositions::Invalid)
-		{
-			//Broodwar->printf("[%d] Build spot for %s found at (%d,%d)", Broodwar->getFrameCount(), toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
-			setState(MOVE_TO_SPOT);
-			startBuildFrame = Broodwar->getFrameCount();
-			if (toBuild.isResourceDepot())
-			{
-				/// @todo worker building resource depot
-				//Commander::getInstance()->updateGoals();
-			}
-		}
-	}
-
-	if (currentState == MOVE_TO_SPOT)
-	{
-		CoverMap::getInstance()->fillTemp(toBuild, buildSpot);
-		if (!buildSpotExplored())
-		{
-			//Broodwar->printf("[%d] moving to spot (%d,%d) dist=%d", unitID, buildSpot.x(), buildSpot.y());
-			unit->rightClick(Position(buildSpot));
-
-			//Broodwar->printf("Move to build %s at (%d,%d)", toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
-		}
-
-		if (buildSpotExplored() && !unit->isConstructing())
-		{
-			if (areaFree())
-			{
-				bool ok = unit->build(buildSpot, toBuild);
-				if (!ok)
-				{
-					CoverMap::getInstance()->blockPosition(buildSpot);
-					//Cant build at selected spot, get a new one.
-					setState(FIND_BUILDSPOT);
+					double dist = base->getUnit()->getTilePosition().getDistance(unit->getTilePosition());
+					if (dist > 25)
+					{
+						//Stop attacking. Return home
+						unit->stop();
+						unit->rightClick(base->getUnit());
+						setState(GATHER_MINERALS);
+						return;
+					}
 				}
 			}
 			else
 			{
-				//Cant build at selected spot, get a new one.
-				setState(FIND_BUILDSPOT);
+				//No target, return to gather minerals
+				setState(GATHER_MINERALS);
+				return;
 			}
 		}
 
-		if (unit->isConstructing())
+		if (currentState == GATHER_GAS)
 		{
-			//Broodwar->printf("[%d] is building at (%d,%d)", unitID, buildSpot.x(), buildSpot.y());
-			setState(CONSTRUCT);
-			startSpot = TilePositions::Invalid;
-		}
-	}
-
-	if (currentState == CONSTRUCT)
-	{
-		if (isBuilt())
-		{
-			//Build finished.
-			BaseAgent* agent = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
-			if (agent != NULL)
+			if (unit->isIdle())
 			{
-				unit->rightClick(agent->getUnit()->getPosition());
+				//Not gathering gas. Reset.
+				setState(GATHER_MINERALS);
 			}
-			setState(GATHER_MINERALS);
+		}
+	
+		if (currentState == REPAIRING)
+		{
+			if (!unit->isRepairing())
+			{
+				setState(GATHER_MINERALS);
+				BaseAgent* base = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
+				if (base != NULL)
+				{
+					unit->rightClick(base->getUnit());
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
+
+		if (currentState == GATHER_MINERALS)
+		{
+			if (unit->isIdle())
+			{
+				Unit* mineral = CoverMap::getInstance()->findClosestMineral(unit->getTilePosition());
+				if (mineral != NULL)
+				{
+					unit->rightClick(mineral);
+				}
+			}
+		}
+
+		if (currentState == FIND_BUILDSPOT)
+		{
+			CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
+			buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
+			if (buildSpot != TilePositions::Invalid)
+			{
+				//Broodwar->printf("[%d] Build spot for %s found at (%d,%d)", Broodwar->getFrameCount(), toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
+				setState(MOVE_TO_SPOT);
+				startBuildFrame = Broodwar->getFrameCount();
+				if (toBuild.isResourceDepot())
+				{
+					/// @todo worker building resource depot
+					//Commander::getInstance()->updateGoals();
+				}
+			}
+		}
+
+		if (currentState == MOVE_TO_SPOT)
+		{
+			CoverMap::getInstance()->fillTemp(toBuild, buildSpot);
+			if (!buildSpotExplored())
+			{
+				//Broodwar->printf("[%d] moving to spot (%d,%d) dist=%d", unitID, buildSpot.x(), buildSpot.y());
+				unit->rightClick(Position(buildSpot));
+
+				//Broodwar->printf("Move to build %s at (%d,%d)", toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
+			}
+
+			if (buildSpotExplored() && !unit->isConstructing())
+			{
+				if (areaFree())
+				{
+					bool ok = unit->build(buildSpot, toBuild);
+					if (!ok)
+					{
+						CoverMap::getInstance()->blockPosition(buildSpot);
+						//Cant build at selected spot, get a new one.
+						setState(FIND_BUILDSPOT);
+					}
+				}
+				else
+				{
+					//Cant build at selected spot, get a new one.
+					setState(FIND_BUILDSPOT);
+				}
+			}
+
+			if (unit->isConstructing())
+			{
+				//Broodwar->printf("[%d] is building at (%d,%d)", unitID, buildSpot.x(), buildSpot.y());
+				setState(CONSTRUCT);
+				startSpot = TilePositions::Invalid;
+			}
+		}
+
+		if (currentState == CONSTRUCT)
+		{
+			if (isBuilt())
+			{
+				//Build finished.
+				BaseAgent* agent = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
+				if (agent != NULL)
+				{
+					unit->rightClick(agent->getUnit()->getPosition());
+				}
+				setState(GATHER_MINERALS);
+			}
 		}
 	}
 }
 
-bool WorkerAgent::isBuilt()
+bool WorkerAgent::isBuilt() const
 {
-	for(set<Unit*>::iterator m = Broodwar->getUnitsOnTile(buildSpot.x(), buildSpot.y()).begin(); m != Broodwar->getUnitsOnTile(buildSpot.x(), buildSpot.y()).end(); m++)
+	/// @author Matteus Magnusson (matteus.magnusson@gmail.com)
+	/// Changed logic a to test if the building is actually done, not begun
+	const set<Unit*> tileUnits = Broodwar->getUnitsOnTile(buildSpot.x(), buildSpot.y());
+	set<Unit*>::const_iterator tileUnitIt;
+	for (tileUnitIt = tileUnits.begin(); tileUnitIt != tileUnits.end(); ++tileUnitIt)
 	{
-		if ((*m)->exists() && (*m)->getPlayer()->getID() == Broodwar->self()->getID())
+		// Only our own units that exist
+		if ((*tileUnitIt)->exists() && (*tileUnitIt)->getPlayer()->getID() == Broodwar->self()->getID())
 		{
-			if ((*m)->getType().getID() == toBuild.getID())
+			// The building exist and is completed
+			if ((*tileUnitIt)->getType() == toBuild && !(*tileUnitIt)->isBeingConstructed())
 			{
 				return true;
 			}
@@ -359,7 +347,7 @@ bool WorkerAgent::isBuilt()
 	return false;
 }
 
-bool WorkerAgent::areaFree()
+bool WorkerAgent::areaFree() const
 {
 	if (toBuild.isRefinery())
 	{
@@ -374,7 +362,7 @@ bool WorkerAgent::areaFree()
 	return true;
 }
 
-bool WorkerAgent::buildSpotExplored()
+bool WorkerAgent::buildSpotExplored() const
 {
 	int sightDist = 64;
 	if (toBuild.isRefinery())
@@ -393,12 +381,12 @@ bool WorkerAgent::buildSpotExplored()
 	return true;
 }
 
-int WorkerAgent::getState()
+WorkerAgent::States WorkerAgent::getState() const
 {
 	return currentState;
 }
 
-void WorkerAgent::setState(int state)
+void WorkerAgent::setState(States state)
 {
 	currentState = state;
 	
@@ -431,7 +419,7 @@ bool WorkerAgent::assignToFinishBuild(Unit* building)
 	return false;
 }
 
-bool WorkerAgent::canBuild(UnitType type)
+bool WorkerAgent::canBuild(UnitType type) const
 {
 	//Make sure we have some spare resources so we dont drain
 	//required minerals for our units.
@@ -489,11 +477,9 @@ void WorkerAgent::reset()
 	{
 		unit->rightClick(base->getUnit()->getPosition());
 	}
-	
-	//Broodwar->printf("[%d] worker reset", unitID);
 }
 
-bool WorkerAgent::isConstructing(UnitType type)
+bool WorkerAgent::isConstructing(UnitType type) const
 {
 	if (currentState == FIND_BUILDSPOT || currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
 	{
@@ -510,7 +496,7 @@ bool WorkerAgent::isConstructing(UnitType type)
 }
 
 /** Returns the state of the agent as text. Good for printouts. */
-string WorkerAgent::getStateAsText()
+string WorkerAgent::getStateAsText() const
 {
 	string strReturn;
 	switch(currentState)

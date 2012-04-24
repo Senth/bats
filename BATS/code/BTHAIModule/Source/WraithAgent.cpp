@@ -6,15 +6,9 @@
 using namespace BWAPI;
 using namespace std;
 
-WraithAgent::WraithAgent(Unit* mUnit)
+WraithAgent::WraithAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "WraithAgent";
-	//Broodwar->printf("WraithAgent created (%s)", unit->getType().getName().c_str());
-	
-	goal = TilePositions::Invalid;
 }
 
 void WraithAgent::computeActions()

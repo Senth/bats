@@ -5,11 +5,8 @@
 using namespace BWAPI;
 using namespace std;
 
-RefineryAgent::RefineryAgent(Unit* mUnit)
+RefineryAgent::RefineryAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "RefineryAgent";
 }
 

@@ -5,16 +5,10 @@
 using namespace BWAPI;
 using namespace std;
 
-ScienceVesselAgent::ScienceVesselAgent(Unit* mUnit)
+ScienceVesselAgent::ScienceVesselAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
-	unit = mUnit;
-	type = unit->getType();
-	unitID = unit->getID();
 	agentType = "ScienceVesselAgent";
-	//Broodwar->printf("ScienceVesselAgent created (%s)", unit->getType().getName().c_str());
 	lastIrradiateFrame = 0;
-
-	goal = TilePositions::Invalid;
 }
 
 void ScienceVesselAgent::computeActions()
