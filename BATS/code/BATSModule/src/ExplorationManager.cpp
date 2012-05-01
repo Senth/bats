@@ -136,9 +136,11 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 		vector<ExploreData>::iterator exploreIt = mExploreData.begin();
 		while (goal != TilePositions::Invalid && exploreIt != mExploreData.end()) {
 
-
 			if (BWTA::isConnected(currentPos, exploreIt->getCenterPosition())) {
 				goal = exploreIt->getCenterPosition();
+
+				// Update visited so that we choose another one if we fail (because of enemy units)
+				exploreIt->updateVisited();
 			}
 
 			++exploreIt;
@@ -148,6 +150,9 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 	else {
 		if (!mExploreData.empty()) {
 			goal = mExploreData.front().getCenterPosition();
+
+			// Update visited so that we choose another one if we fail (because of enemy units)
+			mExploreData.front().updateVisited();
 		}
 	}
 

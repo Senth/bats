@@ -29,6 +29,7 @@ void ScoutSquad::computeSquadSpecificActions(){
 }
 
 void ScoutSquad::onGoalFailed(){
+	createGoal();
 }
 
 void ScoutSquad::onGoalSucceeded(){
@@ -42,17 +43,13 @@ std::string ScoutSquad::getName() const{
 Squad::GoalStates ScoutSquad::checkGoalState() const{
 	TilePosition currentPos = getCenter();
 	TilePosition goal = getGoal();
-	if (goal == BWAPI::TilePositions::Invalid)
+	if (goal == BWAPI::TilePositions::Invalid) {
 		return Squad::GoalState_Succeeded;
-	//double dist = currentPos.getDistance(goal);
-	//double acceptDist = 4;
-	//if (travelsByGround()) 
-	//	acceptDist = 6;	
-	//
-	//if (dist <= acceptDist)
-	//	return Squad::GoalState_Succeeded;
-	if (isCloseTo(goal))
+	} else if (isCloseTo(goal)) {
 		return Squad::GoalState_Succeeded;
+	}
+
+	/// @todo set scout as failed when it finds enemies in its way...
 
 	return Squad::GoalState_NotCompleted;
 }
