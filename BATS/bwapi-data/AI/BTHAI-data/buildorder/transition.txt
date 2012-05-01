@@ -2,4 +2,4 @@
 ; e.g early > mid > late
 ; 
 
-early-x>mid-y>late-z
+early-x > mid-y > late-z
