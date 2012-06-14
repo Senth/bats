@@ -36,6 +36,20 @@ VariableInfo::operator int() const {
 	return intValue;
 }
 
+VariableInfo::operator size_t() const {
+	stringstream ss(value);
+	size_t intValue = 0;
+	ss >> intValue;
+
+	if (!ss.good() && !ss.eof()) {
+		ERROR_MESSAGE(false, "VariableInfo::int() | Could not transform string value '" <<
+			value << "' to int!");
+		return 0;
+	}
+
+	return intValue;
+}
+
 VariableInfo::operator float() const {
 	stringstream ss(value);
 	float floatValue = 0.0f;
@@ -62,6 +76,10 @@ VariableInfo::operator double() const {
 	}
 
 	return doubleValue;
+}
+
+VariableInfo::operator const std::string &() const {
+	return value;
 }
 
 IniReader::IniReader() {

@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AlliedSquad.cpp" />
     <ClCompile Include="src\AttackCoordinator.cpp" />
     <ClCompile Include="src\DropSquad.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitGoalManager.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
+    <ClInclude Include="include\AlliedSquad.h" />
     <ClInclude Include="include\AttackCoordinator.h" />
     <ClInclude Include="include\AttackSquad.h" />
     <ClInclude Include="include\BatsModule.h" />

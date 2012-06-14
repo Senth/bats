@@ -35,32 +35,45 @@ struct VariableInfo {
 	std::string value; 
 
 	/**
-	 * Converts the value to a bool. Usage: bool yourBool = variableInfoStruct;
+	 * Converts the value to a bool. Usage: bool yourBool = variableInfo;
 	 * @returns a converted bool value from the string. If it fails to convert the value it will
 	 * return false and print an error using ERROR_MESSAGE().
 	 */
 	operator bool() const;
 
 	/**
-	 * Converts the value to an int. Usage: int yourInt = variableInfoStruct;
+	 * Converts the value to an int. Usage: int yourInt = variableInfoS;
 	 * @returns a converted int value from the string. If it fails to convert the value it
 	 * will return 0 and print an error using ERROR_MESSAGE().
 	 */
 	operator int() const;
 
 	/**
-	 * Converts the value to a float. Usage: float yourFloat = variableInfoStruct;
+	 * Converts the value to an unsigned int (size_t). Usage: size_t yourInt = variableInfo;
+	 * @returns a converted unsigned int value from the string. If it fails to convert the value it
+	 * will return 0 and print an error using ERROR_MESSAGE().
+	 */
+	operator size_t() const;
+
+	/**
+	 * Converts the value to a float. Usage: float yourFloat = variableInfo;
 	 * @returns a converted float value from the string. If it fails to convert the value it
 	 * will return 0.0f and print an error using ERROR_MESSAGE().
 	 */
 	operator float() const;
 
 	/**
-	 * Converts the value to a double. Usage: double yourDouble = variableInfoStruct;
+	 * Converts the value to a double. Usage: double yourDouble = variableInfo;
 	 * @returns a converted double value from the string. If it fails to convert the value it
 	 * will return 0.0 and print an erorr using ERROR_MESSAGE().
 	 */
 	operator double() const;
+
+	/**
+	 * Converts the value to a string. Usage: string yourString = variableInfo;
+	 * @returns a the value as string.
+	 */
+	operator const std::string&() const;
 };
 
 /**

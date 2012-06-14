@@ -31,6 +31,9 @@
     <Filter Include="BuildOrder">
       <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Allied">
+      <UniqueIdentifier>{0c5e75d3-5af0-4681-9e68-e498e1302ba7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -117,6 +120,9 @@
     <ClInclude Include="include\ScoutSquad.h">
       <Filter>Squads\Types</Filter>
     </ClInclude>
+    <ClInclude Include="include\AlliedSquad.h">
+      <Filter>Allied</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -202,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="src\ScoutSquad.cpp">
       <Filter>Squads\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AlliedSquad.cpp">
+      <Filter>Allied</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

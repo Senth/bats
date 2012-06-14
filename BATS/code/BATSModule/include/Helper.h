@@ -34,6 +34,19 @@ inline int getSquaredDistance(const T& a, const T& b) {
 }
 
 /**
+ * Returns the approximate distance between two positions. This function only uses one
+ * multiplication 
+ */
+template<typename T>
+inline double getApproxDistance(const T& a, const T& b) {
+	T diffDistance;
+	//@todo Implement this function.
+	diffDistance.x() = 0;
+	diffDistance.y() = 0;
+	return diffDistance;
+}
+
+/**
  * Returns the closest border position from the specified position
  * @param position the position we want to find the border from
  * @return closest border position.

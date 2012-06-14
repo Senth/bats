@@ -8,6 +8,49 @@ namespace bats {
 	 * the config files. config_default.ini and config_override.ini
 	 */
 	namespace config {
+		/**
+		 * Class for listening to constants that have been updated.
+		 * Classes shall be derived from this
+		 */
+		class OnConstantChangedListener {
+		public:
+			virtual void onConstantChanged(
+				const std::string& section,
+				const std::string& subSection,
+				const std::string& variable
+			) = 0;
+		};
+
+		/**
+		 * Add a listener for the specified variable
+		 * @param section section of the variable
+		 * @param subSection sub section of the variable, leave empty if it doesn't belong
+		 * to a sub section.
+		 * @param variable the name of the variable to listen to
+		 * @param pListener the instance that listens to the change
+		 */
+		void addOnConstantChangedListener(
+			const std::string& section,
+			const std::string& subsection,
+			const std::string& variable,
+			OnConstantChangedListener* pListener
+		);
+
+		/**
+		 * Removes an already existing listener
+		 * @param section section of the variable
+		 * @param subSection sub section of the variable, leave empty if it doesn't belong
+		 * to a sub section.
+		 * @param variable the name of the variable to listen to
+		 * @param pListener the instance that listens to the change
+		 */
+		void removeOnConstantChangedListener(
+			const std::string& section,
+			const std::string& subsection,
+			const std::string& variable,
+			OnConstantChangedListener* pListener
+		);
+
 		extern const std::string ROOT_DIR;
 		extern const std::string CONFIG_DIR;
 
@@ -52,6 +95,28 @@ namespace bats {
 				extern double UNIT_PRODUCING_STRUCTURE;
 				/** Other structures weight */
 				extern double OTHER_STRUCTURE;
+			}
+		}
+
+		/**
+		 * Classification rules for player and enemies
+		 */
+		namespace classification {
+			/**
+			 * Rules for how to group squads and what they are doing
+			 */
+			namespace squad {
+				/** Time to measure distance traveled and the direction of the squad */
+				extern size_t MEASURE_TIME;
+				/** Minimum distance a squad shall move until it is treated as attacking or
+				 * retreating */
+				extern double MOVED_TILES_MIN;
+				/** Minimum percentage distance from our structures to the enemy structures
+				 * until the squad can be treated as attacking, uses closest structures */
+				extern double ATTACK_PERCENT_AWAY_MIN;
+				/** Minimum percentage distance from our structures to the enemy structures
+				 * until the squad can be treated as retreating */
+				extern double RETREAT_PERCENT_AWAY_MIN;
 			}
 		}
 
