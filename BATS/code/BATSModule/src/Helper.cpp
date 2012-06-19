@@ -1,8 +1,47 @@
 #include "Helper.h"
 #include <ostream>
 #include <BWAPI/Game.h>
+#include <set>
+#include <cfloat>
 
 using namespace BWAPI;
+using namespace bats;
+
+std::pair<Unit*,int> bats::getClosestAlliedStructure(const TilePosition& position) {
+	Unit* pClosestUnit = NULL;
+	int closestDistance = INT_MAX;
+
+	// Get all our structures
+	const std::set<Unit*>& units = Broodwar->self()->getUnits();
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		if ((*unitIt)->getType().isBuilding()) {
+			int diffDistance = getSquaredDistance((*unitIt)->getTilePosition(), position);
+			if (diffDistance < closestDistance) {
+				closestDistance = diffDistance;
+				pClosestUnit = (*unitIt);
+			}
+		}
+	}
+
+	// Get all allied structures
+	const std::set<Player*>& allies = Broodwar->allies();
+	std::set<Player*>::const_iterator alliedIt;
+	for (alliedIt = allies.begin(); alliedIt != allies.end(); ++alliedIt) {
+		const std::set<Unit*>& units = (*alliedIt)->getUnits();
+		for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+			if ((*unitIt)->getType().isBuilding()) {
+				int diffDistance = getSquaredDistance((*unitIt)->getTilePosition(), position);
+				if (diffDistance < closestDistance) {
+					closestDistance = diffDistance;
+					pClosestUnit = (*unitIt);
+				}
+			}
+		}
+	}
+	
+	return std::make_pair(pClosestUnit, closestDistance);
+}
 
 TilePosition bats::getClosestBorder(const TilePosition& position) {
 	// Which horizontal border is closest, left or right?

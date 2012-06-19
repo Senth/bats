@@ -111,12 +111,16 @@ namespace bats {
 				/** Minimum distance a squad shall move until it is treated as attacking or
 				 * retreating */
 				extern double MOVED_TILES_MIN;
-				/** Minimum percentage distance from our structures to the enemy structures
+				/** Cannot be set through the config file, will set automatically,
+				 * used for faster calculation.
+				 * @see MOVED_TILES_MIN_SQUARED, the squared version. */
+				extern double MOVED_TILES_MIN_SQUARED;
+				/** Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as attacking, uses closest structures */
-				extern double ATTACK_PERCENT_AWAY_MIN;
-				/** Minimum percentage distance from our structures to the enemy structures
+				extern double ATTACK_FRACTION_AWAY_MIN;
+				/** Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as retreating */
-				extern double RETREAT_PERCENT_AWAY_MIN;
+				extern double RETREAT_FRACTION_AWAY_MIN;
 			}
 		}
 
@@ -178,16 +182,18 @@ namespace bats {
 			 * should not have the same value since this can cause threshold errors.
 			 */
 			extern double REGROUP_DISTANCE_BEGIN;
-			/** See REGROUP_DISTANCE_BEGIN, the squared version. Cannot be set
-			 * through the config file, will set automatically, used for faster calculation. */
+			/** Cannot be set through the config file, will set automatically,
+			 * used for faster calculation.
+			 * @see REGROUP_DISTANCE_BEGIN, the squared version. */
 			extern double REGROUP_DISTANCE_BEGIN_SQUARED;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
 			extern double REGROUP_DISTANCE_END;
-			/** See REGROUP_DISTANCE_END, the squared version. Cannot be set through
-			 * the config file, will set automatically, used for faster calculation. */
+			/** Cannot be set through the config file, will set automatically,
+			 * used for faster calculation.
+			 * @see REGROUP_DISTANCE_END, the squared version. */
 			extern double REGROUP_DISTANCE_END_SQUARED;
 			/** Time before trying with a new regroup position when a unit is still */
 			extern double REGROUP_NEW_POSITION_TIME;

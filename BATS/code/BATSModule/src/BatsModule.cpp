@@ -29,6 +29,11 @@ using namespace BWAPI;
 const int WORKER_MINERAL_PRICE = 50;
 const int GAME_STARTED_FRAME = 1;
 
+#define TEST_SELF() if (Broodwar->self() == NULL) {\
+	ERROR_MESSAGE(false, "self() is NULL!"); \
+	return; \
+}
+
 BatsModule::BatsModule() : BTHAIModule() {
 	mpProfiler = NULL;
 	mpUnitManager = NULL;
@@ -65,6 +70,8 @@ BatsModule::~BatsModule() {
 }
 
 void BatsModule::onStart() {
+	TEST_SELF();
+
 	mpProfiler->start("OnInit");
 
 	Broodwar->enableFlag(BWAPI::Flag::UserInput);
@@ -115,9 +122,13 @@ void BatsModule::onEnd() {
 	mpProfiler->dumpToFile();
 
 	releaseGameClasses();
+
+	TEST_SELF();
 }
 
 void BatsModule::onFrame() {
+	TEST_SELF();
+
 	mpProfiler->start("OnFrame");
 
 	// Some states to skip further processing
@@ -141,6 +152,8 @@ void BatsModule::onFrame() {
 }
 
 void BatsModule::onSendText(std::string text) {
+	TEST_SELF();
+
 	utilities::string::toLower(text);
 
 	// /d# needs to be overridden because base class calls a class we don't initialize
@@ -167,7 +180,7 @@ void BatsModule::onSendText(std::string text) {
 	}
 }
 
-bool BatsModule::startsWith(const std::string& text,const std::string& token){
+bool BatsModule::startsWith(const std::string& text,const std::string& token) {
 	
 	if(text.length() < token.length() || text.length() == 0)
 		return false;
@@ -183,6 +196,8 @@ bool BatsModule::startsWith(const std::string& text,const std::string& token){
 
 
 void BatsModule::onPlayerLeft(BWAPI::Player* player) {
+	TEST_SELF();
+
 	// Stop game if we left the game
 	if (player->getID() == Broodwar->self()->getID()) {
 		onEnd();
@@ -194,6 +209,8 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 }
 
 void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
+	TEST_SELF();
+
 	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= GAME_STARTED_FRAME) {
 		return;
 	}
@@ -208,6 +225,8 @@ void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
 }
 
 void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
+	TEST_SELF();
+
 	if (areWePlaying()) {
 		mpUnitManager->addAgent(pUnit);
 
@@ -219,6 +238,8 @@ void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 }
 
 void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
+	TEST_SELF();
+
 	if (areWePlaying()) {
 
 		if (OUR(pUnit)) {
@@ -243,6 +264,8 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 }
 
 void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
+	TEST_SELF();
+
 	if (areWePlaying()) {
 		if (OUR(pUnit)) {
 			if (BuildPlanner::isZerg()) {

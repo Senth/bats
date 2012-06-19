@@ -390,13 +390,13 @@ bool bats::ExplorationManager::hasSpottedBuildingWithinRange(const BWAPI::TilePo
 	return false;
 }
 
-TilePosition bats::ExplorationManager::getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const {
+std::pair<TilePosition,int> bats::ExplorationManager::getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const {
 	TilePosition pos = BWAPI::TilePositions::Invalid;
-	double bestDist = DBL_MAX;
+	int bestDist = INT_MAX;
 
 	for (size_t i = 0; i < mSpottedStructures.size(); i++) {
 		if (mSpottedStructures[i]->isActive()) {
-			double squaredDistance = getSquaredDistance(startPosition, mSpottedStructures[i]->getTilePosition());
+			int squaredDistance = getSquaredDistance(startPosition, mSpottedStructures[i]->getTilePosition());
 			if (squaredDistance < bestDist) {
 				bestDist = squaredDistance;
 				pos = mSpottedStructures[i]->getTilePosition();
@@ -404,7 +404,7 @@ TilePosition bats::ExplorationManager::getClosestSpottedBuilding(const BWAPI::Ti
 		}
 	}
 
-	return pos;
+	return std::make_pair(pos, bestDist);
 }
 
 vector<shared_ptr<SpottedObject>>& bats::ExplorationManager::getSpottedBuildings() {

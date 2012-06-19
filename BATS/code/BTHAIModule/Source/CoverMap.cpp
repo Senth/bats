@@ -415,7 +415,7 @@ bool CoverMap::isOccupied(BWTA::Region* region) const
 
 double CoverMap::getChokepointPrio(const TilePosition& center) const
 {
-	TilePosition ePos = mpsExplorationManager->getClosestSpottedBuilding(center);
+	TilePosition ePos = mpsExplorationManager->getClosestSpottedBuilding(center).first;
 
 	if (ePos != TilePositions::Invalid) {
 		double dist = ePos.getDistance(center);

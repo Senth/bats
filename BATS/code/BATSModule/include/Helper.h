@@ -3,6 +3,7 @@
 #include <ostream>
 #include <BWAPI/Position.h>
 #include <BWAPI/TilePosition.h>
+#include <BWAPI/Unit.h>
 
 namespace bats {
 
@@ -15,6 +16,13 @@ namespace bats {
  * @pre a global variable 'Broodwar' should be set.
  */
 #define OUR(what) (what->getPlayer()->getID() == Broodwar->self()->getID())
+
+/**
+* Returns the closest allied structure (including our structures).
+* @param[in] position where we measure from
+* @return closest allied structure including the <strong>squared</strong> distance.
+*/
+std::pair<BWAPI::Unit*,int> getClosestAlliedStructure(const BWAPI::TilePosition& position);
 
 /**
  * Returns the squared distance between two points. This function is faster

@@ -307,7 +307,7 @@ bool StructureAgent::canEvolveUnit(UnitType type) const
 
 TilePosition StructureAgent::getNextScanLocation() const
 {
-	TilePosition ePos = bats::ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation());
+	TilePosition ePos = bats::ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation()).first;
 	if (ePos != TilePositions::Invalid)
 	{
 		//Already found enemy base

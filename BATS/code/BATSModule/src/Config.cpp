@@ -99,8 +99,9 @@ namespace classification {
 	namespace squad {
 		size_t MEASURE_TIME = 5;
 		double MOVED_TILES_MIN = 0;
-		double ATTACK_PERCENT_AWAY_MIN = 0;
-		double RETREAT_PERCENT_AWAY_MIN = 0;
+		double MOVED_TILES_MIN_SQUARED = 0;
+		double ATTACK_FRACTION_AWAY_MIN = 0;
+		double RETREAT_FRACTION_AWAY_MIN = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -318,12 +319,13 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 	} else if (variableInfo.name == "moved_tiles_min") {
 		gPreviousVariableValue = toString(MOVED_TILES_MIN);
 		MOVED_TILES_MIN = variableInfo;
-	} else if (variableInfo.name == "attack_percent_away_min") {
-		gPreviousVariableValue = toString(ATTACK_PERCENT_AWAY_MIN);
-		ATTACK_PERCENT_AWAY_MIN = variableInfo;
-	} else if (variableInfo.name == "retreat_percent_away_min") {
-		gPreviousVariableValue = toString(RETREAT_PERCENT_AWAY_MIN);
-		RETREAT_PERCENT_AWAY_MIN = variableInfo;
+		MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
+	} else if (variableInfo.name == "attack_fraction_away_min") {
+		gPreviousVariableValue = toString(ATTACK_FRACTION_AWAY_MIN);
+		ATTACK_FRACTION_AWAY_MIN = variableInfo;
+	} else if (variableInfo.name == "retreat_fraction_away_min") {
+		gPreviousVariableValue = toString(RETREAT_FRACTION_AWAY_MIN);
+		RETREAT_FRACTION_AWAY_MIN = variableInfo;
 	} else  {
 		return false;
 	}

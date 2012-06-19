@@ -12,6 +12,10 @@
 // Namespace for the project
 namespace bats {
 
+// forward declarations
+class ExplorationManager;
+class GameTime;
+
 /**
  * Squad for allied units, such as the player playing with the bot.
  * This is a collection of units close to each other and where they are going.
@@ -154,15 +158,31 @@ private:
 	 * Checks whether the squad has stopped to move while moving to attack outside home
 	 * @return true if the squad is outside home and 'idle'
 	 */
-	bool hasHaltedAttack() const;
+	bool hasAttackHalted() const;
+
+	/**
+	 * Updates the center position
+	 */
+	void updateCenter();
+
+	/**
+	 * Updates the closest distances from allied and enemy structures
+	 */
+	void updateClosestDistances();
+
 
 	bool mBig;
 	std::vector<BWAPI::Unit*> mUnits;
 	std::list<BWAPI::TilePosition> mCenter;
+	std::list<int> mHomeDistances;
+	std::list<int> mEnemyDistances;
 	AlliedSquadId mId;
 	States mState;
+	double mLastUpdate;
 
 	static utilities::KeyHandler<_AlliedSquadType>* mpsKeyHandler;
 	static int mcsInstances;
+	static bats::ExplorationManager* mpsExplorationManager;
+	static GameTime* mpsGameTime;
 };
 }

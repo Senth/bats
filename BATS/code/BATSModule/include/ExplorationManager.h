@@ -166,10 +166,10 @@ public:
 	/** Returns the closest enemy spotted building from a start position, or BWAPI::TilePosition(-1,-1) if 
 	 * none was found.
 	 * @param startPosition the position we want to start searching from
-	 * @return the closest building that was spotted. If no building was found it will
-	 * return BWAPI::TilePositions::Invalid.
+	 * @return position of the closest building that has been spotted, including the squared distance.
+	 * If no building was found it will return BWAPI::TilePositions::Invalid (in .first).
 	 */
-	BWAPI::TilePosition getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const;
+	std::pair<BWAPI::TilePosition, int> getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const;
 
 	/** Calculates the number of spotted enemy structure within the specified range (in tiles).
 	 * @param position the position to check if there are any enemy structures in range.
