@@ -12,54 +12,51 @@ namespace config {
 //--------- Listeners ---------//
 using std::string;
 using std::map;
-// Doing this because of warnings -.-
-struct VariableListenerContainer {
-	map<string, std::set<OnConstantChangedListener*>> container;
-	
-	std::set<OnConstantChangedListener*>& operator[](string str) {
-		return container[str];
-	}
-};
-struct SubSectionListenerContainer {
-	map<string, VariableListenerContainer> container;
 
-	VariableListenerContainer& operator[](string str) {
-		return container[str];
-	}
-};
-struct SectionListenerContainer {
-	map<string, SubSectionListenerContainer> container;
-
-	SubSectionListenerContainer& operator[](string str) {
-		return container[str];
-	}
-};
-SectionListenerContainer gListeners;
-string gPreviousVariableValue;
+//// Doing this because of warnings -.-
+//struct VariableListenerContainer {
+//	map<string, std::set<OnConstantChangedListener*>> container;
+//	
+//	std::set<OnConstantChangedListener*>& operator[](string str) {
+//		return container[str];
+//	}
+//};
+//struct SubSectionListenerContainer {
+//	map<string, VariableListenerContainer> container;
+//
+//	VariableListenerContainer& operator[](string str) {
+//		return container[str];
+//	}
+//};
+//struct SectionListenerContainer {
+//	map<string, SubSectionListenerContainer> container;
+//
+//	SubSectionListenerContainer& operator[](string str) {
+//		return container[str];
+//	}
+//};
+//SectionListenerContainer gListeners;
+map<ConstantName, std::set<OnConstantChangedListener*>> gListeners;
 
 void addOnConstantChangedListener(
-	const std::string& section,
-	const std::string& subsection,
-	const std::string& variable,
+	ConstantName constantName,
 	OnConstantChangedListener* pListener)
 {
-	gListeners[section][subsection][variable].insert(pListener);
+	gListeners[constantName].insert(pListener);
 }
 
 void removeOnConstantChangedListener(
-	const std::string& section,
-	const std::string& subsection,
-	const std::string& variable,
+	ConstantName constantName,
 	OnConstantChangedListener* pListener)
 {
-	gListeners[section][subsection][variable].erase(pListener);
+	gListeners[constantName].erase(pListener);
 }
 
-void triggerOnConstantChanged(const utilities::VariableInfo& variableInfo) {
-	std::set<OnConstantChangedListener*>& listeners = gListeners[variableInfo.section][variableInfo.subsection][variableInfo.name];
+void triggerOnConstantChanged(ConstantName constantName) {
+	std::set<OnConstantChangedListener*>& listeners = gListeners[constantName];
 	std::set<OnConstantChangedListener*>::const_iterator it;
 	for (it = listeners.begin(); it != listeners.end(); ++it) {
-		(*it)->onConstantChanged(variableInfo.section, variableInfo.subsection, variableInfo.name);
+		(*it)->onConstantChanged(constantName);
 	}
 }
 
@@ -68,6 +65,12 @@ string toString(T value) {
 	std::stringstream ss;
 	ss << value;
 	return ss.str();
+}
+
+void checkForVariableChange(const std::string& oldValue, const std::string& newValue, const ConstantName constantName) {
+	if (oldValue != newValue) {
+		triggerOnConstantChanged(constantName);
+	}
 }
 
 //--------- Constants ---------//
@@ -98,10 +101,13 @@ namespace attack_coordinator {
 namespace classification {
 	namespace squad {
 		size_t MEASURE_TIME = 5;
-		double MOVED_TILES_MIN = 0;
-		double MOVED_TILES_MIN_SQUARED = 0;
+		int MOVED_TILES_MIN = 0;
+		int MOVED_TILES_MIN_SQUARED = 0;
 		double ATTACK_FRACTION_AWAY_MIN = 0;
 		double RETREAT_FRACTION_AWAY_MIN = 0;
+		int INCLUDE_DISTANCE = 0;
+		int EXCLUDE_DISTANCE = 0;
+		int GRID_SQUARE_DISTANCE = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -205,8 +211,6 @@ void readConfig(const std::string& configFile) {
 }
 
 void handleVariable(const utilities::VariableInfo& variableInfo) {
-	gPreviousVariableValue.clear();
-
 	bool success = true;
 	if (variableInfo.section == "attack_coordinator") {
 		success = attack_coordinator::set(variableInfo);
@@ -226,12 +230,7 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 	}
 
 	// If errors
-	if (success) {
-		// Check if the variable was changed
-		if (gPreviousVariableValue != static_cast<string>(variableInfo)) {
-			triggerOnConstantChanged(variableInfo);
-		}
-	} else {
+	if (!success) {
 		if (variableInfo.subsection.empty()) {
 			ERROR_MESSAGE(false, "Unkown variable name '" << variableInfo.name
 				<< "' in " << variableInfo.file << ".ini, [" << variableInfo.section << "]!");
@@ -248,10 +247,10 @@ bool attack_coordinator::set(const utilities::VariableInfo& variableInfo) {
 		return weights::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "expansion_not_checked_time") {
-			gPreviousVariableValue = toString(EXPANSION_NOT_CHECKED_TIME);
+			checkForVariableChange(toString(EXPANSION_NOT_CHECKED_TIME), variableInfo, TO_CONSTANT_NAME(EXPANSION_NOT_CHECKED_TIME));
 			EXPANSION_NOT_CHECKED_TIME = variableInfo;
 		} else if (variableInfo.name == "wait_goal_timeout") {
-			gPreviousVariableValue = toString(WAIT_GOAL_TIMEOUT);
+			checkForVariableChange(toString(WAIT_GOAL_TIMEOUT), variableInfo, TO_CONSTANT_NAME(WAIT_GOAL_TIMEOUT));
 			WAIT_GOAL_TIMEOUT = variableInfo;
 		} else {
 			return false;
@@ -266,31 +265,31 @@ bool attack_coordinator::set(const utilities::VariableInfo& variableInfo) {
 
 bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "expansion_not_checked") {
-		gPreviousVariableValue = toString(EXPANSION_NOT_CHECKED);
+		checkForVariableChange(toString(EXPANSION_NOT_CHECKED), variableInfo, TO_CONSTANT_NAME(EXPANSION_NOT_CHECKED));
 		EXPANSION_NOT_CHECKED = variableInfo;
 	} else if (variableInfo.name == "expansion_max") {
-		gPreviousVariableValue = toString(EXPANSION_MAX);
+		checkForVariableChange(toString(EXPANSION_MAX), variableInfo, TO_CONSTANT_NAME(EXPANSION_MAX));
 		EXPANSION_MAX = variableInfo;
 	} else if (variableInfo.name == "expansion_min") {
-		gPreviousVariableValue = toString(EXPANSION_MIN);
+		checkForVariableChange(toString(EXPANSION_MIN), variableInfo, TO_CONSTANT_NAME(EXPANSION_MIN));
 		EXPANSION_MIN = variableInfo;
 	} else if (variableInfo.name == "expansion_ceil") {
-		gPreviousVariableValue = toString(EXPANSION_CEIL);
+		checkForVariableChange(toString(EXPANSION_CEIL), variableInfo, TO_CONSTANT_NAME(EXPANSION_CEIL));
 		EXPANSION_CEIL = variableInfo;
 	} else if (variableInfo.name == "addon_structure") {
-		gPreviousVariableValue = toString(ADDON_STRUCTURE);
+		checkForVariableChange(toString(ADDON_STRUCTURE), variableInfo, TO_CONSTANT_NAME(ADDON_STRUCTURE));
 		ADDON_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "supply_structure") {
-		gPreviousVariableValue = toString(SUPPLY_STRUCTURE);
+		checkForVariableChange(toString(SUPPLY_STRUCTURE), variableInfo, TO_CONSTANT_NAME(SUPPLY_STRUCTURE));
 		SUPPLY_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "upgrade_structure") {
-		gPreviousVariableValue = toString(UPGRADE_STRUCTURE);
+		checkForVariableChange(toString(UPGRADE_STRUCTURE), variableInfo, TO_CONSTANT_NAME(UPGRADE_STRUCTURE));
 		UPGRADE_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "unit_producing_structure") {
-		gPreviousVariableValue = toString(UNIT_PRODUCING_STRUCTURE);
+		checkForVariableChange(toString(UNIT_PRODUCING_STRUCTURE), variableInfo, TO_CONSTANT_NAME(UNIT_PRODUCING_STRUCTURE));
 		UNIT_PRODUCING_STRUCTURE = variableInfo;
 	} else if (variableInfo.name == "other_structure") {
-		gPreviousVariableValue = toString(OTHER_STRUCTURE);
+		checkForVariableChange(toString(OTHER_STRUCTURE), variableInfo, TO_CONSTANT_NAME(OTHER_STRUCTURE));
 		OTHER_STRUCTURE = variableInfo;
 	} else {
 		return false;
@@ -314,18 +313,25 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 
 bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "measure_time") {
-		gPreviousVariableValue = toString(MEASURE_TIME);
+		checkForVariableChange(toString(MEASURE_TIME), variableInfo, TO_CONSTANT_NAME(MEASURE_TIME));
 		MEASURE_TIME = variableInfo;
 	} else if (variableInfo.name == "moved_tiles_min") {
-		gPreviousVariableValue = toString(MOVED_TILES_MIN);
+		checkForVariableChange(toString(MOVED_TILES_MIN), variableInfo, TO_CONSTANT_NAME(MOVED_TILES_MIN));
+		checkForVariableChange(toString(MOVED_TILES_MIN), variableInfo, TO_CONSTANT_NAME(MOVED_TILES_MIN_SQUARED));
 		MOVED_TILES_MIN = variableInfo;
 		MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
 	} else if (variableInfo.name == "attack_fraction_away_min") {
-		gPreviousVariableValue = toString(ATTACK_FRACTION_AWAY_MIN);
+		checkForVariableChange(toString(ATTACK_FRACTION_AWAY_MIN), variableInfo, TO_CONSTANT_NAME(ATTACK_FRACTION_AWAY_MIN));
 		ATTACK_FRACTION_AWAY_MIN = variableInfo;
 	} else if (variableInfo.name == "retreat_fraction_away_min") {
-		gPreviousVariableValue = toString(RETREAT_FRACTION_AWAY_MIN);
+		checkForVariableChange(toString(RETREAT_FRACTION_AWAY_MIN), variableInfo, TO_CONSTANT_NAME(RETREAT_FRACTION_AWAY_MIN));
 		RETREAT_FRACTION_AWAY_MIN = variableInfo;
+	} else if (variableInfo.name == "include_distance") {
+		checkForVariableChange(toString(INCLUDE_DISTANCE), variableInfo, TO_CONSTANT_NAME(INCLUDE_DISTANCE));
+		INCLUDE_DISTANCE = variableInfo;
+	} else if (variableInfo.name == "exclude_distance") {
+		checkForVariableChange(toString(EXCLUDE_DISTANCE), variableInfo, TO_CONSTANT_NAME(EXCLUDE_DISTANCE));
+		EXCLUDE_DISTANCE = variableInfo;
 	} else  {
 		return false;
 	}
@@ -335,10 +341,10 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 
 bool debug::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "graphics_text_verbosity_in_debug") {
-		gPreviousVariableValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG);
+		checkForVariableChange(toString(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG), variableInfo, TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG));
 		GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = variableInfo;
 	} else if (variableInfo.name == "graphics_text_verbosity_in_release") {
-		gPreviousVariableValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE);
+		checkForVariableChange(toString(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE), variableInfo, TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE));
 		GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = variableInfo;
 	} else {
 		return false;
@@ -349,10 +355,10 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 
 bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "exploration_manager") {
-		gPreviousVariableValue = toString(EXPLORATION_MANAGER);
+		checkForVariableChange(toString(EXPLORATION_MANAGER), variableInfo, TO_CONSTANT_NAME(EXPLORATION_MANAGER));
 		EXPLORATION_MANAGER = variableInfo;
 	} else if (variableInfo.name == "resource_counter") {
-		gPreviousVariableValue = toString(RESOURCE_COUNTER);
+		checkForVariableChange(toString(RESOURCE_COUNTER), variableInfo, TO_CONSTANT_NAME(RESOURCE_COUNTER));
 		RESOURCE_COUNTER = variableInfo;
 	} else {
 		return false;
@@ -363,7 +369,7 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 
 bool game::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "speed") {
-		gPreviousVariableValue = toString(SPEED);
+		checkForVariableChange(toString(SPEED), variableInfo, TO_CONSTANT_NAME(SPEED));
 		SPEED = variableInfo;
 	} else {
 		return false;
@@ -379,30 +385,32 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 		return drop::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "ping_wait_time_first") {
-			gPreviousVariableValue = toString(PING_WAIT_TIME_FIRST);
+			checkForVariableChange(toString(PING_WAIT_TIME_FIRST), variableInfo, TO_CONSTANT_NAME(PING_WAIT_TIME_FIRST));
 			PING_WAIT_TIME_FIRST = variableInfo;
 		} else if (variableInfo.name == "ping_wait_time_after_first") {
-			gPreviousVariableValue = toString(PING_WAIT_TIME_AFTER_FIRST);
+			checkForVariableChange(toString(PING_WAIT_TIME_AFTER_FIRST), variableInfo, TO_CONSTANT_NAME(PING_WAIT_TIME_AFTER_FIRST));
 			PING_WAIT_TIME_AFTER_FIRST = variableInfo;
 		} else if (variableInfo.name == "regroup_distance_begin") {
-			gPreviousVariableValue = toString(REGROUP_DISTANCE_BEGIN);
+			checkForVariableChange(toString(REGROUP_DISTANCE_BEGIN), variableInfo, TO_CONSTANT_NAME(REGROUP_DISTANCE_BEGIN));
+			checkForVariableChange(toString(REGROUP_DISTANCE_BEGIN), variableInfo, TO_CONSTANT_NAME(REGROUP_DISTANCE_BEGIN_SQUARED));
 			REGROUP_DISTANCE_BEGIN = variableInfo;
 			REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 		} else if (variableInfo.name == "regroup_distance_end") {
-			gPreviousVariableValue = toString(REGROUP_DISTANCE_END);
+			checkForVariableChange(toString(REGROUP_DISTANCE_END), variableInfo, TO_CONSTANT_NAME(REGROUP_DISTANCE_END));
+			checkForVariableChange(toString(REGROUP_DISTANCE_END), variableInfo, TO_CONSTANT_NAME(REGROUP_DISTANCE_END_SQUARED));
 			REGROUP_DISTANCE_END = variableInfo;
 			REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 		} else if (variableInfo.name == "regroup_new_position_time") {
-			gPreviousVariableValue = toString(REGROUP_NEW_POSITION_TIME);
+			checkForVariableChange(toString(REGROUP_NEW_POSITION_TIME), variableInfo, TO_CONSTANT_NAME(REGROUP_NEW_POSITION_TIME));
 			REGROUP_NEW_POSITION_TIME = variableInfo;
 		} else if (variableInfo.name == "calc_furthest_away_time") {
-			gPreviousVariableValue = toString(CALC_FURTHEST_AWAY_TIME);
+			checkForVariableChange(toString(CALC_FURTHEST_AWAY_TIME), variableInfo, TO_CONSTANT_NAME(CALC_FURTHEST_AWAY_TIME));
 			CALC_FURTHEST_AWAY_TIME = variableInfo;
 		} else if (variableInfo.name == "close_distance") {
-			gPreviousVariableValue = toString(CLOSE_DISTANCE);
+			checkForVariableChange(toString(CLOSE_DISTANCE), variableInfo, TO_CONSTANT_NAME(CLOSE_DISTANCE));
 			CLOSE_DISTANCE = variableInfo;
 		} else if (variableInfo.name == "sight_distance_multiplier") {
-			gPreviousVariableValue = toString(SIGHT_DISTANCE_MULTIPLIER);
+			checkForVariableChange(toString(SIGHT_DISTANCE_MULTIPLIER), variableInfo, TO_CONSTANT_NAME(SIGHT_DISTANCE_MULTIPLIER));
 			SIGHT_DISTANCE_MULTIPLIER = variableInfo;
 		} else {
 			return false;
@@ -417,10 +425,10 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 
 bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "waiting_position_distance_from_goal") {
-		gPreviousVariableValue = toString(WAITING_POSITION_DISTANCE_FROM_GOAL);
+		checkForVariableChange(toString(WAITING_POSITION_DISTANCE_FROM_GOAL), variableInfo, TO_CONSTANT_NAME(WAITING_POSITION_DISTANCE_FROM_GOAL));
 		WAITING_POSITION_DISTANCE_FROM_GOAL = variableInfo;
 	} else if (variableInfo.name == "structures_destroyed_goal_distance") {
-		gPreviousVariableValue = toString(STRUCTURES_DESTROYED_GOAL_DISTANCE);
+		checkForVariableChange(toString(STRUCTURES_DESTROYED_GOAL_DISTANCE), variableInfo, TO_CONSTANT_NAME(STRUCTURES_DESTROYED_GOAL_DISTANCE));
 		STRUCTURES_DESTROYED_GOAL_DISTANCE = variableInfo;
 	} else {
 		return false;
@@ -431,10 +439,10 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 
 bool squad::drop::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "attack_timeout") {
-		gPreviousVariableValue = toString(ATTACK_TIMEOUT);
+		checkForVariableChange(toString(ATTACK_TIMEOUT), variableInfo, TO_CONSTANT_NAME(ATTACK_TIMEOUT));
 		ATTACK_TIMEOUT = variableInfo;
 	} else if (variableInfo.name == "load_timeout") {
-		gPreviousVariableValue = toString(LOAD_TIMEOUT);
+		checkForVariableChange(toString(LOAD_TIMEOUT), variableInfo, TO_CONSTANT_NAME(LOAD_TIMEOUT));
 		LOAD_TIMEOUT = variableInfo;
 	} else {
 		return false;

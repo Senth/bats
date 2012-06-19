@@ -94,11 +94,7 @@ public:
 	 * measure_time
 	 * \endcode
 	 */
-	void onConstantChanged (
-		const std::string& section,
-		const std::string& subsection,
-		const std::string& variable
-	);
+	void onConstantChanged (config::ConstantName constantName);
 
 	/**
 	 * Returns the current state of the AlliedSquad.

@@ -123,6 +123,9 @@
     <ClInclude Include="include\AlliedSquad.h">
       <Filter>Allied</Filter>
     </ClInclude>
+    <ClInclude Include="include\AlliedArmyManager.h">
+      <Filter>Allied</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -210,6 +213,9 @@
       <Filter>Squads\Types</Filter>
     </ClCompile>
     <ClCompile Include="src\AlliedSquad.cpp">
+      <Filter>Allied</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AlliedArmyManager.cpp">
       <Filter>Allied</Filter>
     </ClCompile>
   </ItemGroup>

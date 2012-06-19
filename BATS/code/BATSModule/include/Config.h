@@ -8,46 +8,40 @@ namespace bats {
 	 * the config files. config_default.ini and config_override.ini
 	 */
 	namespace config {
+		typedef void const * const ConstantName;
 		/**
 		 * Class for listening to constants that have been updated.
 		 * Classes shall be derived from this
 		 */
 		class OnConstantChangedListener {
 		public:
-			virtual void onConstantChanged(
-				const std::string& section,
-				const std::string& subSection,
-				const std::string& variable
-			) = 0;
+			virtual void onConstantChanged(ConstantName constantName) = 0;
 		};
+
+/**
+ * Converts a constant to a "global" ConstantName
+ * @param constant the constant to convert
+ * @return name of the type ConstantName
+ */
+#define TO_CONSTANT_NAME(constant) const_cast<bats::config::ConstantName>(reinterpret_cast<void*>(&constant))
 
 		/**
 		 * Add a listener for the specified variable
-		 * @param section section of the variable
-		 * @param subSection sub section of the variable, leave empty if it doesn't belong
-		 * to a sub section.
-		 * @param variable the name of the variable to listen to
+		 * @param constantName name of the constant. Use macro TO_CONSTANT_NAME().
 		 * @param pListener the instance that listens to the change
 		 */
 		void addOnConstantChangedListener(
-			const std::string& section,
-			const std::string& subsection,
-			const std::string& variable,
+			ConstantName constantName,
 			OnConstantChangedListener* pListener
 		);
 
 		/**
 		 * Removes an already existing listener
-		 * @param section section of the variable
-		 * @param subSection sub section of the variable, leave empty if it doesn't belong
-		 * to a sub section.
-		 * @param variable the name of the variable to listen to
+		 * @param constantName name of the constant. Use macro TO_CONSTANT_NAME().
 		 * @param pListener the instance that listens to the change
 		 */
 		void removeOnConstantChangedListener(
-			const std::string& section,
-			const std::string& subsection,
-			const std::string& variable,
+			ConstantName constantName,
 			OnConstantChangedListener* pListener
 		);
 
@@ -110,17 +104,31 @@ namespace bats {
 				extern size_t MEASURE_TIME;
 				/** Minimum distance a squad shall move until it is treated as attacking or
 				 * retreating */
-				extern double MOVED_TILES_MIN;
+				extern int MOVED_TILES_MIN;
 				/** Cannot be set through the config file, will set automatically,
 				 * used for faster calculation.
 				 * @see MOVED_TILES_MIN_SQUARED, the squared version. */
-				extern double MOVED_TILES_MIN_SQUARED;
+				extern int MOVED_TILES_MIN_SQUARED;
 				/** Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as attacking, uses closest structures */
 				extern double ATTACK_FRACTION_AWAY_MIN;
 				/** Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as retreating */
 				extern double RETREAT_FRACTION_AWAY_MIN;
+				/** Distance a unit has to be to another unit in the squad until
+				 * it is treated as included in the squad. The distance is in TilePositions. */
+				extern int INCLUDE_DISTANCE;
+				/** If a unit is in a squad and the distance to the closest squad unit is
+				 * larger than this, it is no longer treated as part of the squad, i.e. 
+				 * excluded from the squad. The distance is in TilePositions. */
+				extern int EXCLUDE_DISTANCE;
+				/** Cannot be set through the config file, will set automatically when
+				 * exclude_distance is set. The distance each square in the grid has.
+				 * This is used for faster calculation which units are close etc. Current
+				 * equation is floor(exclude_distance/sqrt(8)). This gives all surrounding
+				 * squared (including diagonally) 100% certainty that units are withing
+				 * the exclude distance. */
+				extern int GRID_SQUARE_DISTANCE;
 			}
 		}
 

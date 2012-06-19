@@ -34,7 +34,7 @@ AlliedSquad::AlliedSquad(bool big) : mId(AlliedSquadId::INVALID_KEY) {
 	mId = mpsKeyHandler->allocateKey();
 
 	// Add listener
-	config::addOnConstantChangedListener("classification", "squad", "measure_time", this);
+	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_TIME), this);
 
 	mLastUpdate = mpsGameTime->getElapsedTime();
 	update();
@@ -42,7 +42,7 @@ AlliedSquad::AlliedSquad(bool big) : mId(AlliedSquadId::INVALID_KEY) {
 
 AlliedSquad::~AlliedSquad() {
 	// Remove listener
-	config::removeOnConstantChangedListener("classification", "squad", "measure_time", this);
+	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_TIME), this);
 	
 	mcsInstances--;
 
@@ -87,12 +87,9 @@ AlliedSquadId AlliedSquad::getId() const {
 	return mId;
 }
 
-void AlliedSquad::onConstantChanged(const std::string& section, const std::string& subsection, const std::string& variable) {
+void AlliedSquad::onConstantChanged(config::ConstantName constanName) {
 	// measure_time
-	if (section == "classification" &&
-		subsection == "squad" &&
-		variable == "measure_time")
-	{
+	if (constanName == TO_CONSTANT_NAME(config::classification::squad::MEASURE_TIME)) {
 		// If less then erase those at the back
 		if (config::classification::squad::MEASURE_TIME < mCenter.size()) {
 			mCenter.resize(config::classification::squad::MEASURE_TIME);
