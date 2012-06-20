@@ -15,6 +15,12 @@ class KeyType
 {
 public:
 	/**
+	* Default Constructor for Key Type with a key
+	* @param key the key value, default INVALID_KEY
+	*/
+	inline explicit KeyType() : mKey(INVALID_KEY) {}
+
+	/**
 	* Assignment operator
 	* @param key assigns a new key value to the key
 	*/
@@ -76,13 +82,13 @@ public:
 	inline operator int() const {return mKey;}
 
 	static const KeyType<T> INVALID_KEY;
-private:
 
+private:
 	/**
-	* Default Constructor for Key Type
+	* Constructor for Key Type with a key
 	* @param key the key value, default INVALID_KEY
 	*/
-	inline explicit KeyType(int key = INVALID_KEY.mKey) : mKey(key) {}
+	inline explicit KeyType(int key) : mKey(key) {}
 
 	friend class KeyHandler<T>;
 

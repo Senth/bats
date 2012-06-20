@@ -69,6 +69,12 @@ public:
 	const std::vector<BWAPI::Unit*> getUnits() const;
 
 	/**
+	 * Returns the number of units in the squad
+	 * @return number of units in the squad
+	 */
+	size_t getNrOfUnits() const;
+
+	/**
 	 * Adds a unit to the squad.
 	 * @param pUnit the unit that shall be added to the squad.
 	 */

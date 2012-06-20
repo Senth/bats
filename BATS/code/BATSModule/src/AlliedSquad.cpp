@@ -2,6 +2,7 @@
 #include "Helper.h"
 #include "ExplorationManager.h"
 #include "GameTime.h"
+#include "AlliedArmyManager.h"
 
 using namespace bats;
 using BWAPI::TilePosition;
@@ -36,8 +37,7 @@ AlliedSquad::AlliedSquad(bool big) : mId(AlliedSquadId::INVALID_KEY) {
 	// Add listener
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_TIME), this);
 
-	mLastUpdate = mpsGameTime->getElapsedTime();
-	update();
+	mLastUpdate = 0.0;
 }
 
 AlliedSquad::~AlliedSquad() {
@@ -64,6 +64,10 @@ void AlliedSquad::setBig(bool big) {
 
 const std::vector<BWAPI::Unit*> AlliedSquad::getUnits() const {
 	return mUnits;
+}
+
+size_t AlliedSquad::getNrOfUnits() const {
+	return mUnits.size();
 }
 
 void AlliedSquad::addUnit(BWAPI::Unit* pUnit) {
@@ -108,6 +112,11 @@ AlliedSquad::States AlliedSquad::getState() const {
 }
 
 void AlliedSquad::update() {
+	// Skip if no units in squad
+	if (mUnits.empty()) {
+		return;
+	}
+
 	// Check if it has passed one second
 	if (mpsGameTime->getElapsedTime() >= mLastUpdate + 1.0) {
 		return;
@@ -287,7 +296,7 @@ bool AlliedSquad::hasAttackHalted() const {
 }
 
 void AlliedSquad::updateCenter() {
-	TilePosition center;
+	TilePosition center(0,0);
 
 	for (size_t i = 0; i < mUnits.size(); ++i) {
 		center += mUnits[i]->getTilePosition();

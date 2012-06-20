@@ -120,14 +120,17 @@ namespace bats {
 				extern int INCLUDE_DISTANCE;
 				/** If a unit is in a squad and the distance to the closest squad unit is
 				 * larger than this, it is no longer treated as part of the squad, i.e. 
-				 * excluded from the squad. The distance is in TilePositions. */
+				 * excluded from the squad. The distance is in TilePositions.
+				 * @pre Only set this variable to an even number. because of the
+				 * GRID_SQUARE_DISTANCE calculation. */
 				extern int EXCLUDE_DISTANCE;
 				/** Cannot be set through the config file, will set automatically when
 				 * exclude_distance is set. The distance each square in the grid has.
 				 * This is used for faster calculation which units are close etc. Current
-				 * equation is floor(exclude_distance/sqrt(8)). This gives all surrounding
-				 * squared (including diagonally) 100% certainty that units are withing
-				 * the exclude distance. */
+				 * equation is exclude_distance/2. This means that units in squares to the
+				 * left/right/up/down is within the exclude_distance. If a unit
+				 * is more than 2 squares away it is absolutely further away than
+				 * exclude_distance. */
 				extern int GRID_SQUARE_DISTANCE;
 			}
 		}
