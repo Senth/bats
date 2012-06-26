@@ -66,8 +66,21 @@ const std::vector<BWAPI::Unit*> AlliedSquad::getUnits() const {
 	return mUnits;
 }
 
+int AlliedSquad::getSupplyCount() const {
+	int cSupply = 0;
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		cSupply += mUnits[i]->getType().supplyRequired();
+	}
+
+	return cSupply;
+}
+
 size_t AlliedSquad::getNrOfUnits() const {
 	return mUnits.size();
+}
+
+bool AlliedSquad::isEmpty() const {
+	return mUnits.size() == 0;
 }
 
 void AlliedSquad::addUnit(BWAPI::Unit* pUnit) {

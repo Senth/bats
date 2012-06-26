@@ -76,6 +76,22 @@ private:
 	AlliedArmyManager();
 
 	/**
+	 * Checks if the two units are within exclude_distance
+	 * @param pUnitA one of the units
+	 * @param pUnitB the other unit
+	 * @return true if distance between the two units are less or equal to exclude_distance
+	 */
+	bool withinExcludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const;
+
+	/**
+	 * Checks if the two units are within include_distance
+	 * @param pUnitA one of the units
+	 * @param pUnitB the other unit
+	 * @return true if distance between the two units are less or equal to include_distance
+	 */
+	bool withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const;
+
+	/**
 	 * Returns the grid position of the unit
 	 * @param pUnit unit that check the corresponding grid placement of
 	 * @pre pUnit is not NULL
@@ -84,10 +100,70 @@ private:
 	BWAPI::Position getGridPosition(BWAPI::Unit* pUnit) const;
 
 	/**
+	 * Returns true if the position is the same or a border grid position, not diagonally border.
+	 * Used for when checking if units is withing exclude_distance with 100% certainty.
+	 * @param centerPosition the origin of the unit to check
+	 * @param checkPosition the position to check if it's a border or same position as centerPosition.
+	 * @return true if checkPosition is same or border position as centerPosition (in grid units).
+	 */
+	bool isSameOrBorderGridPosition(const BWAPI::Position& centerPosition, const BWAPI::Position& checkPosition) const;
+
+	/**
+	 * Returns a valid range to iterate through the grid position, with a distance away from
+	 * the center position.
+	 * @note that the maximum range still is in bounds, so you have to use less than or equal to,
+	 * x <= second.x(), not just less than x < second.x().
+	 * @param centerPosition the center position
+	 * @param range how many coordinates away it shall at max use.
+	 * @pre centerPosition is a valid position
+	 * @return a valid interval of coordinates, where first is the minimum coordinates and second
+	 * is the maximum coordinates.
+	 * @section Example
+	 * If 2D array's size is 9x10 (max index x=8, y=9). And you enter center position
+	 * 7 and range with 2. It would have a range of 5–9 (both x and y), but x=9 is an invalid
+	 * index and will therefor return the range (5–8, 5–9).
+	 */
+	std::pair<BWAPI::Position, BWAPI::Position> getValidGridRange(const BWAPI::Position centerPosition, int range) const;
+
+	/**
+	 * Recursively add units, that are close to this unit, to the specified squad.
+	 * @param pUnit position to check close-by units.
+	 * @param squadId the squad of the original unit, i.e. the squad that units shall be added to
+	 * if the unit already belongs to this squad, nothing is changed, if the squad does not
+	 * belong to this squad, it is removed from the old squad and added to this.
+	 */
+	void addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId squadId);
+
+	/**
+	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
+	 * it as checked in mGridUnits.
+	 * @param pUnit the unit to be set as checked.
+	 */
+	void setUnitAsChecked(BWAPI::Unit* pUnit);
+
+	/**
+	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
+	 * it as checked in mGridUnits.
+	 * @param pUnit the unit to be set as checked.
+	 * @return iterator returned by mUnitsToBeChecked.erase(unitIt);
+	 */
+	std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator setUnitAsChecked(const std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator& unitIt);
+
+	/**
 	 * Recalculate the lookup table. Shall be called whenever grid_square_distance is
 	 * changed.
 	 */
 	void recalculateLookupTable();
+
+	/**
+	 * Disbands all empty squads
+	 */
+	void disbandEmptySquads();
+
+	/**
+	 * Updates the current "big" squad, to actually be the biggest one.
+	 */
+	void setBigSquad();
 
 	/**
 	 * Add a newly created AlliedSquad to the squad list.
@@ -101,11 +177,18 @@ private:
 	 */
 	void removeSquad(AlliedSquadId squadId);
 
+	int mLastFrameUpdate;
 	std::vector<std::tr1::shared_ptr<AlliedSquad>> mSquads;
-	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad;
+	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad; /**< A unit bound to an id */
 
-	// Look-up table for where the unit is located.
+	/** Look-up table for where the unit is located. */
 	std::vector<std::vector<BWAPI::Position>> mLookupTableGridPosition;
+
+	// Only temporary variables, placed here to avoid sending them as parameters
+	// over various functions
+	std::vector<std::vector<std::map<BWAPI::Unit*, bool>>> mGridUnits;
+	std::map<BWAPI::Unit*, AlliedSquadId> mUnitsToCheck;
+	
 
 	static AlliedArmyManager* mpsInstance;
 };

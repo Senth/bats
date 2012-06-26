@@ -107,7 +107,7 @@ namespace bats {
 				extern int MOVED_TILES_MIN;
 				/** Cannot be set through the config file, will set automatically,
 				 * used for faster calculation.
-				 * @see MOVED_TILES_MIN_SQUARED, the squared version. */
+				 * @see MOVED_TILES_MIN. */
 				extern int MOVED_TILES_MIN_SQUARED;
 				/** Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as attacking, uses closest structures */
@@ -118,12 +118,20 @@ namespace bats {
 				/** Distance a unit has to be to another unit in the squad until
 				 * it is treated as included in the squad. The distance is in TilePositions. */
 				extern int INCLUDE_DISTANCE;
+				/** Cannot be set through the config file, will set automatically,
+				 * used for faster calculation.
+				 * @see INCLUDE_DISTANCE */
+				extern int INCLUDE_DISTANCE_SQUARED;
 				/** If a unit is in a squad and the distance to the closest squad unit is
 				 * larger than this, it is no longer treated as part of the squad, i.e. 
 				 * excluded from the squad. The distance is in TilePositions.
 				 * @pre Only set this variable to an even number. because of the
 				 * GRID_SQUARE_DISTANCE calculation. */
 				extern int EXCLUDE_DISTANCE;
+				/** Cannot be set through the config file, will set automatically,
+				 * used for faster calculation.
+				 * @see EXCLUDE_DISTANCE */
+				extern int EXCLUDE_DISTANCE_SQUARED;
 				/** Cannot be set through the config file, will set automatically when
 				 * exclude_distance is set. The distance each square in the grid has.
 				 * This is used for faster calculation which units are close etc. Current
@@ -159,6 +167,7 @@ namespace bats {
 		namespace frame_distribution {
 			extern int EXPLORATION_MANAGER;
 			extern int RESOURCE_COUNTER;
+			extern int ALLIED_ARMY_REARRANGE_SQUADS;
 		}
 
 		/**

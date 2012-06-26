@@ -69,10 +69,25 @@ public:
 	const std::vector<BWAPI::Unit*> getUnits() const;
 
 	/**
+	 * Returns the amount of supply the squad occupies.
+	 * @note this is the double amount of supply since BWAPI uses this supply count
+	 * because Zerglings take up 0.5 supply.
+	 * @return amount of supply the squad occupies.
+	 */
+	int getSupplyCount() const;
+
+	/**
 	 * Returns the number of units in the squad
 	 * @return number of units in the squad
 	 */
 	size_t getNrOfUnits() const;
+
+	/**
+	 * Returns true if the squad is empty.
+	 * @see getNrOfUnits()
+	 * @return true if the squad is empty.
+	 */
+	bool isEmpty() const;
 
 	/**
 	 * Adds a unit to the squad.
