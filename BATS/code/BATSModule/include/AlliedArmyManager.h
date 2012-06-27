@@ -92,7 +92,8 @@ private:
 	bool withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const;
 
 	/**
-	 * Returns the grid position of the unit
+	 * Returns the grid position of the unit. If the unit is inside a transportation it will
+	 * use the transportation's position instead of the unit's.
 	 * @param pUnit unit that check the corresponding grid placement of
 	 * @pre pUnit is not NULL
 	 * @return grid position of the unit.
@@ -176,6 +177,13 @@ private:
 	 * @param squadId the squad id of the squad
 	 */
 	void removeSquad(AlliedSquadId squadId);
+
+	/**
+	 * Adds a unit to the grid with the correct position. I.e. if it's in a transportation
+	 * it will set the unit's position to where the transportation is.
+	 * @param pUnit the unit to add to the grid
+	 */
+	void addUnitToGrid(BWAPI::Unit* pUnit);
 
 	int mLastFrameUpdate;
 	std::vector<std::tr1::shared_ptr<AlliedSquad>> mSquads;

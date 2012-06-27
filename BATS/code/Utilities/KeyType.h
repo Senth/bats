@@ -70,9 +70,15 @@ public:
 
 	/**
 	 * Returns true if the key is invalid, equals to testing key == INVALID_KEY
-	 * @return true if the keys is invalid.
+	 * @return true if the key is invalid.
 	 */
 	inline bool isInvalid() const {return (*this) == INVALID_KEY;}
+
+	/**
+	 * Returns true if the key is valid, equals to testing key != INVALID_KEY
+	 * @return true if the key is valid
+	 */
+	inline bool isValid() const {return (*this) != INVALID_KEY;}
 
 	/**
 	 * Convert the key to an int. Although we don't want this feature in general,

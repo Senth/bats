@@ -13,12 +13,21 @@ using std::tr1::shared_ptr;
 
 AlliedArmyManager* AlliedArmyManager::mpsInstance = NULL;
 
+const int GRID_RANGE_EXCLUDE_MAX = 2;
+const int GRID_RANGE_EXCLUDE_CERTAIN = 1;
+
 AlliedArmyManager::AlliedArmyManager() {
 	recalculateLookupTable();
 
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::GRID_SQUARE_DISTANCE), this);
 
 	mLastFrameUpdate = 0;
+
+	// Initialize size of grid
+	mGridUnits.resize(mLookupTableGridPosition.size());
+	for (size_t x = 0; x < mGridUnits.size(); ++x) {
+		mGridUnits[x].resize(mLookupTableGridPosition[0].size());
+	}
 }
 
 AlliedArmyManager::~AlliedArmyManager() {
@@ -71,31 +80,7 @@ void AlliedArmyManager::rearrangeSquads() {
 	// Add all units to the grid
 	std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator unitIt;
 	for (unitIt = mUnitsToCheck.begin(); unitIt != mUnitsToCheck.end(); ++unitIt) {
-		TilePosition unitPos;
-
-		// Not loaded
-		if (!unitIt->first->isLoaded()) {
-			unitPos = unitIt->first->getTilePosition();
-		} else {
-			// Get position of the transport, this is needed because the position of the units
-			// are not updated while loaded.
-			Unit* pTransport = unitIt->first->getTransport();
-			assert(NULL != pTransport);
-			if (NULL != pTransport) {
-				unitPos = pTransport->getTilePosition();
-			} else {
-				ERROR_MESSAGE(false, "Unit is loaded, but doesn't have a transport!");
-				unitPos = unitIt->first->getTilePosition();
-			}
-		}
-
-		if (unitPos.x() >= 0 && unitPos.x() < static_cast<int>(mGridUnits.size()) &&
-			unitPos.y() >= 0 && unitPos.y() < static_cast<int>(mGridUnits[0].size()))
-		{
-			mGridUnits[unitPos.x()][unitPos.y()][unitIt->first] = false;
-		} else {
-			ERROR_MESSAGE(false, "Invalid unit position: " << unitPos);
-		}
+		addUnitToGrid(unitIt->first);
 	}
 
 
@@ -142,6 +127,7 @@ void AlliedArmyManager::rearrangeSquads() {
 		// Create new squad
 		AlliedSquad* pNewSquad = new AlliedSquad();
 		addSquad(pNewSquad);
+		// Note: addCloseUnitsToSquad, adds the unit to the squad automatically.
 
 		BWAPI::Unit* currentUnit = mUnitsToCheck.begin()->first;
 		setUnitAsChecked(mUnitsToCheck.begin());
@@ -156,11 +142,91 @@ void AlliedArmyManager::onConstantChanged(config::ConstantName constantName) {
 	}
 }
 
+void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
+	// Note, this function does not update the squads, it simply add the unit to this class,
+	// meaning in the next update phase the squads might be altered.
+	mUnitSquad[pUnit] = AlliedSquadId::INVALID_KEY;
+
+	//Position center = getGridPosition(pUnit);
+	//if (Positions::Invalid == center) {
+	//	ERROR_MESSAGE(false, "Invalid grid position for unit: " << pUnit->getType().getName());
+	//	return;
+	//}
+
+	//addUnitToGrid(pUnit);
+
+
+	//// Collect all squads withing include_distance range.
+	//std::set<AlliedSquadId> squads;
+	//std::pair<Position,Position> gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_MAX);
+	//for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
+	//	for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
+	//		
+	//		// Find all 
+	//		std::map<Unit*, bool>::iterator unitIt;
+	//		for (unitIt = mGridUnits[x][y].begin(); unitIt != mGridUnits[x][y].end(); ++unitIt) {
+	//			if (withinIncludeDistance(pUnit, unitIt->first)) {
+	//				squads.insert(mUnitSquad[unitIt->first]);
+	//			}
+	//		}
+	//	}
+	//}
+	//
+
+	//// Squads found
+	//if (!squads.empty()) {
+	//	
+	//	// All units within the same squad, add unit to squad
+	//	if (squads.size() == 1) {
+	//		if (NULL != mSquads[*squads.begin()]) {
+	//			mSquads[*squads.begin()]->addUnit(pUnit);
+	//		}
+	//	}
+	//	// Else Multiple squads, merge the squads
+	//	else  {
+	//		// Remove first 
+	//		AlliedSquadId nextToMerge = *squads.begin();
+	//		squads.erase(squads.begin());
+
+	//		std::set<AlliedSquadId>::const_iterator squadIt;
+	//		for (squadIt = squads.begin(); squadIt != squads.end(); ++squadIt) {
+	//			nextToMerge = mergeSquads(nextToMerge, *squadIt);
+	//		}
+
+	//		// Add the unit to the final merged squad
+	//		if (NULL != squads[nextToMerge]) {
+	//			mSquads[nextToMerge]->addUnit(pUnit);
+	//		}
+	//	}
+
+	//}
+	//// Else no units found -> Create new squad
+	//else  {
+	//	AlliedSquad* pNewSquad = new AlliedSquad();
+	//	addSquad(pNewSquad);
+
+	//	pNewSquad->addUnit(pUnit);
+	//}
+}
+
+void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
+	// Note, this function does not update the squads, it simply removes the unit from the squad
+	// and this class, meaning in the next update phase the squads might be altered.
+	std::map<Unit*, AlliedSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
+	if (unitIt != mUnitSquad.end() && unitIt->second.isValid()) {
+		mSquads[unitIt->second]->removeUnit(pUnit);
+	}
+
+	mUnitSquad.erase(unitIt);
+}
+
 void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId squadId) {
 	// Change squad if needed
 	AlliedSquadId oldSquadId = mUnitSquad[pUnit];
 	if (oldSquadId != squadId) {
-		mSquads[oldSquadId]->removeUnit(pUnit);
+		if (oldSquadId.isValid()) {
+			mSquads[oldSquadId]->removeUnit(pUnit);
+		}
 		mSquads[squadId]->addUnit(pUnit);
 	}
 
@@ -174,7 +240,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 
 	//const TilePosition& unitPos = pUnit->getTilePosition();
 	Position center = getGridPosition(pUnit);
-	std::pair<Position, Position> gridRange = getValidGridRange(center, 1);
+	std::pair<Position, Position> gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_CERTAIN);
 	for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
 		for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
 			if (isSameOrBorderGridPosition(center, Position(x,y))) {
@@ -208,7 +274,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 	// Check units out of 100% certain range of exclude range. Includes a grid of 5x5
 	// squares, excluding those already checked. Includes units with different squads than
 	// old squad and new squad.
-	gridRange = getValidGridRange(center, 2);
+	gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_MAX);
 	for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
 		for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
 			if (isSameOrBorderGridPosition(center, Position(x,y)) == false) {
@@ -265,7 +331,34 @@ bool AlliedArmyManager::withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* 
 }
 
 BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
-	return mLookupTableGridPosition[pUnit->getTilePosition().x()][pUnit->getTilePosition().y()];
+	TilePosition unitPos = BWAPI::TilePositions::Invalid;
+
+	// Not loaded
+	if (!pUnit->isLoaded()) {
+		unitPos = pUnit->getTilePosition();
+	} else {
+		// Get position of the transport, this is needed because the position of the units
+		// are not updated while loaded.
+		Unit* pTransport = pUnit->getTransport();
+		assert(NULL != pTransport);
+		if (NULL != pTransport) {
+			unitPos = pTransport->getTilePosition();
+		} else {
+			ERROR_MESSAGE(false, "Unit is loaded, but doesn't have a transport!");
+			unitPos = pUnit->getTilePosition();
+		}
+	}
+
+	Position gridPos = Positions::Invalid;
+	if (unitPos.x() >= 0 && unitPos.x() < static_cast<int>(mLookupTableGridPosition.size()) &&
+		unitPos.y() >= 0 && unitPos.y() < static_cast<int>(mLookupTableGridPosition[0].size()))
+	{
+		gridPos = mLookupTableGridPosition[unitPos.x()][unitPos.y()];
+	} else {
+		ERROR_MESSAGE(false, "Invalid unit position: " << unitPos);
+	}
+
+	return gridPos;
 }
 
 bool AlliedArmyManager::isSameOrBorderGridPosition(const BWAPI::Position& centerPosition, const BWAPI::Position& checkPosition) const {
@@ -349,4 +442,12 @@ void AlliedArmyManager::addSquad(AlliedSquad* pSquad) {
 
 void AlliedArmyManager::removeSquad(AlliedSquadId squadId) {
 	mSquads[squadId].reset();
+}
+
+void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
+	Position gridPos = getGridPosition(pUnit);
+
+	if (gridPos != Positions::Invalid) {
+		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = false;
+	}
 }

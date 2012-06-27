@@ -4,18 +4,37 @@
 #include <BWAPI/Position.h>
 #include <BWAPI/TilePosition.h>
 #include <BWAPI/Unit.h>
+#include <BWAPI/Game.h>
+#include <BWAPI/Player.h>
 
 namespace bats {
 
 /**
- * A macro to check if something (e.g. unit) belongs to us
- * @param what does this belong to us?
- * @return true if the what belongs to us, else false
- * @pre what needs to return a BWAPI::Player by the function getPlayer.
- * @pre what needs to be a pointer.
- * @pre a global variable 'Broodwar' should be set.
+ * A function to check if a unit belongs to us
+ * @param pUnit unit to check if it belongs to us
+ * @return true if the unit belongs to us, else false
  */
-#define OUR(what) (what->getPlayer()->getID() == Broodwar->self()->getID())
+inline bool isOurs(BWAPI::Unit* pUnit) {
+	return pUnit->getPlayer()->getID() == BWAPI::Broodwar->self()->getID();
+}
+
+/**
+ * Check if a unit belongs to an ally
+ * @param pUnit unit to check if it belongs to an ally
+ * @return true if the unit belongs to an ally.
+ */
+inline bool isAllied(BWAPI::Unit* pUnit) {
+	return BWAPI::Broodwar->self()->isAlly(pUnit->getPlayer());
+}
+
+/**
+ * Checks if a unit belongs to an enemy
+ * @param pUnit unit to check if it belongs to an enemy
+ * @return true if the unit belongs to an enemy.
+ */
+inline bool isEnemy(BWAPI::Unit* pUnit) {
+	return BWAPI::Broodwar->self()->isEnemy(pUnit->getPlayer());
+}
 
 /**
 * Returns the closest allied structure (including our structures).

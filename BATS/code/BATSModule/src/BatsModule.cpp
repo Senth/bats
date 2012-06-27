@@ -228,11 +228,18 @@ void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
-		mpUnitManager->addAgent(pUnit);
 
-		// Remove from build order if it's a building
-		if (pUnit->getType().isBuilding()) {
-			BuildPlanner::getInstance()->unlock(pUnit->getType());
+		if (isOurs(pUnit)) {
+			mpUnitManager->addAgent(pUnit);
+
+			// Remove from build order if it's a building
+			if (pUnit->getType().isBuilding()) {
+				BuildPlanner::getInstance()->unlock(pUnit->getType());
+			}
+		} else if (isAllied(pUnit)) {
+			/// @todo add allied unit to AlliedArmyManager
+			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit created: " << 
+				pUnit->getType().getName());
 		}
 	}
 }
@@ -242,7 +249,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 
 	if (areWePlaying()) {
 
-		if (OUR(pUnit)) {
+		if (isOurs(pUnit)) {
 			mpUnitManager->removeAgent(pUnit);			
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(pUnit);
@@ -257,8 +264,14 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 			mpUnitManager->cleanup();
 		}
 		// Enemies
-		else if (!pUnit->getType().isNeutral()) {
+		else if (isEnemy(pUnit)) {
 			mpExplorationManager->unitDestroyed(pUnit);
+		}
+		// Allied
+		else if (isAllied(pUnit)) {
+			/// @todo remove allied unit from ALliedArmyManager
+			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
+				pUnit->getType().getName());
 		}
 	}
 }
@@ -267,7 +280,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
-		if (OUR(pUnit)) {
+		if (isOurs(pUnit)) {
 			if (BuildPlanner::isZerg()) {
 				mpUnitManager->morphDrone(pUnit);
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
