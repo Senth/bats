@@ -146,67 +146,6 @@ void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply add the unit to this class,
 	// meaning in the next update phase the squads might be altered.
 	mUnitSquad[pUnit] = AlliedSquadId::INVALID_KEY;
-
-	//Position center = getGridPosition(pUnit);
-	//if (Positions::Invalid == center) {
-	//	ERROR_MESSAGE(false, "Invalid grid position for unit: " << pUnit->getType().getName());
-	//	return;
-	//}
-
-	//addUnitToGrid(pUnit);
-
-
-	//// Collect all squads withing include_distance range.
-	//std::set<AlliedSquadId> squads;
-	//std::pair<Position,Position> gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_MAX);
-	//for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
-	//	for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
-	//		
-	//		// Find all 
-	//		std::map<Unit*, bool>::iterator unitIt;
-	//		for (unitIt = mGridUnits[x][y].begin(); unitIt != mGridUnits[x][y].end(); ++unitIt) {
-	//			if (withinIncludeDistance(pUnit, unitIt->first)) {
-	//				squads.insert(mUnitSquad[unitIt->first]);
-	//			}
-	//		}
-	//	}
-	//}
-	//
-
-	//// Squads found
-	//if (!squads.empty()) {
-	//	
-	//	// All units within the same squad, add unit to squad
-	//	if (squads.size() == 1) {
-	//		if (NULL != mSquads[*squads.begin()]) {
-	//			mSquads[*squads.begin()]->addUnit(pUnit);
-	//		}
-	//	}
-	//	// Else Multiple squads, merge the squads
-	//	else  {
-	//		// Remove first 
-	//		AlliedSquadId nextToMerge = *squads.begin();
-	//		squads.erase(squads.begin());
-
-	//		std::set<AlliedSquadId>::const_iterator squadIt;
-	//		for (squadIt = squads.begin(); squadIt != squads.end(); ++squadIt) {
-	//			nextToMerge = mergeSquads(nextToMerge, *squadIt);
-	//		}
-
-	//		// Add the unit to the final merged squad
-	//		if (NULL != squads[nextToMerge]) {
-	//			mSquads[nextToMerge]->addUnit(pUnit);
-	//		}
-	//	}
-
-	//}
-	//// Else no units found -> Create new squad
-	//else  {
-	//	AlliedSquad* pNewSquad = new AlliedSquad();
-	//	addSquad(pNewSquad);
-
-	//	pNewSquad->addUnit(pUnit);
-	//}
 }
 
 void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {

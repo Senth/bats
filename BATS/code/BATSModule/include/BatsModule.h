@@ -155,7 +155,5 @@ private:
 	 * coding standards.
 	 */
 	virtual void drawTerrainData() const;
-
-	int mDebugLevel;
 };
 }

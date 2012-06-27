@@ -151,6 +151,19 @@ namespace bats {
 			extern int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG;
 			/** Default debug value in release mode */
 			extern int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE;
+			/** Current debug value, this get initially set by GRAPHICS_TEXT_VERBOSITY_IN_X
+			 * where X is the current mode running. Cannot be set in the config file. */
+			extern int GRAPHICS_TEXT_VERBOSITY;
+
+			/**
+			 * Enumerations for the graphics debugging levels
+			 */
+			enum GraphicsVerbosities {
+				GraphicsVerbosity_Off = 0,
+				GraphicsVerbosity_Low,
+				GraphicsVerbosity_Medium,
+				GraphicsVerbosity_High
+			};
 		}
 
 		/**

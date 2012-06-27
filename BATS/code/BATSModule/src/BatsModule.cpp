@@ -49,13 +49,6 @@ BatsModule::BatsModule() : BTHAIModule() {
 	utilities::loadLogSettings(config::log::SETTINGS_FILE);
 	config::loadConfig();
 
-	// Set default debug level
-#ifdef _DEBUG
-	mDebugLevel = config::debug::GRAPHICS_TEXT_VERBOSITY_IN_DEBUG;
-#else
-	mDebugLevel = config::debug::GRAPHICS_TEXT_VERBOSITY_IN_RELEASE;
-#endif
-
 	// Initialize singletons that stays throughout multiple games
 	mpProfiler = Profiler::getInstance();
 }
@@ -157,14 +150,18 @@ void BatsModule::onSendText(std::string text) {
 	utilities::string::toLower(text);
 
 	// /d# needs to be overridden because base class calls a class we don't initialize
-	if (text == "/d1" || text == "/debug low") {
-		mDebugLevel = 1;
-	} else if (text == "/d2" || text == "/debug medium") {
-		mDebugLevel = 2;
-	} else if (text == "/d3" || text == "/debug high") {
-		mDebugLevel = 3;
-	} else if (text == "/d0" || text == "/debug off") {
-		mDebugLevel = 0;
+	if (startsWith(text, "/d") || startsWith(text, "/debug ")) {
+
+		if (text == "/d1" || text == "/debug low") {
+			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Low;
+		} else if (text == "/d2" || text == "/debug medium") {
+			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Medium;
+		} else if (text == "/d3" || text == "/debug high") {
+			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_High;
+		} else if (text == "/d0" || text == "/debug off") {
+			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Off;
+		}
+
 	} else if (text == "/transition" || text == "transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
 	} else if (startsWith(text,"/transition")) {				
@@ -182,7 +179,7 @@ void BatsModule::onSendText(std::string text) {
 
 bool BatsModule::startsWith(const std::string& text,const std::string& token) {
 	
-	if(text.length() < token.length() || text.length() == 0)
+	if(text.length() < token.length() || text.length() == 0 || token.length() == 0)
 		return false;
 
 	for(unsigned int i=0; i<token.length(); ++i)
@@ -372,27 +369,48 @@ void BatsModule::releaseGameClasses() {
 
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
-	if (mDebugLevel > 0) {
-		if(mDebugLevel == 1)
+	if (config::debug::GRAPHICS_TEXT_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
+
+
+		// Low
+		/// @todo Commander::getInstance()->printInfo();
+		/// /// @todo Commander::getInstance()->debug_showGoal();
+		ExplorationManager::getInstance()->printInfo();
+		drawTerrainData();
+
+		// Only low
+		if(config::debug::GRAPHICS_TEXT_VERBOSITY == config::debug::GraphicsVerbosity_Low) {
 			UnitCreator::getInstance()->printInfo();
+		}
+
+
+		// Medium
+		if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
+			ResourceManager::getInstance()->printInfo();
+		}
+
 		std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
+
+		// Agents
 		for (int i = 0; i < (int)agents.size(); i++) {
-			if (agents.at(i)->isBuilding()) agents.at(i)->debug_showGoal();
-			if (!agents.at(i)->isBuilding() && mDebugLevel >= 2) agents.at(i)->debug_showGoal();
+			if (agents.at(i)->isBuilding()) {
+				agents.at(i)->debug_showGoal();
+			}
+			if (!agents.at(i)->isBuilding() &&
+				config::debug::GRAPHICS_TEXT_VERBOSITY_IN_DEBUG >= config::debug::GraphicsVerbosity_Medium)
+			{
+				agents.at(i)->debug_showGoal();
+			}
 		}
 
 		
-		ExplorationManager::getInstance()->printInfo();
-		/// @todo Commander::getInstance()->printInfo();
-
-		if (mDebugLevel >= 3) CoverMap::getInstance()->debug();
-		if (mDebugLevel >= 2) ResourceManager::getInstance()->printInfo();
-
-		/// @todo Commander::getInstance()->debug_showGoal();
-
-		if (mDebugLevel >= 1) {
-			drawTerrainData();
+		// High
+		if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
+			CoverMap::getInstance()->debug();
 		}
+
+
+		
 	}
 }
 
@@ -433,7 +451,9 @@ void BatsModule::drawTerrainData() const {
 		}
 	}
 
-	if (mDebugLevel >= 2)
+	
+	// Medium
+	if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_Medium)
 	{
 		//we will iterate through all the regions and draw the polygon outline of it in white.
 		std::set<BWTA::Region*>::const_iterator regionIt;

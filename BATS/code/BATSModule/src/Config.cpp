@@ -95,6 +95,7 @@ namespace classification {
 namespace debug {
 	int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = 0;
 	int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = 0;
+	int GRAPHICS_TEXT_VERBOSITY = 0;
 	int DEBUG_MESSAGE_VERBOSITY = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
@@ -356,9 +357,17 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG));
 		GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = variableInfo;
+#ifdef _DEBUG
+		GRAPHICS_TEXT_VERBOSITY = variableInfo;
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY));
+#endif
 	} else if (variableInfo.name == "graphics_text_verbosity_in_release") {
 		gOldValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE); gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE));
 		GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = variableInfo;
+#ifndef _DEBUG
+		GRAPHICS_TEXT_VERBOSITY = variableInfo;
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY));
+#endif
 	} else {
 		return false;
 	}
