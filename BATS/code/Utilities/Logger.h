@@ -68,7 +68,7 @@ enum LogLevels {
 	/**
 	 * Disables all messages, never use this for logging messages.
 	 */
-	LogLevel_None
+	LogLevel_Off
 };
 
 #if defined(_DEBUG) || defined(USE_DEBUG_MESSAGE)

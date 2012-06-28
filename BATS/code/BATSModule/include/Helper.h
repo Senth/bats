@@ -15,7 +15,7 @@ namespace bats {
  * @return true if the unit belongs to us, else false
  */
 inline bool isOurs(BWAPI::Unit* pUnit) {
-	return pUnit->getPlayer()->getID() == BWAPI::Broodwar->self()->getID();
+	return pUnit->getPlayer() == BWAPI::Broodwar->self();
 }
 
 /**
@@ -24,7 +24,8 @@ inline bool isOurs(BWAPI::Unit* pUnit) {
  * @return true if the unit belongs to an ally.
  */
 inline bool isAllied(BWAPI::Unit* pUnit) {
-	return BWAPI::Broodwar->self()->isAlly(pUnit->getPlayer());
+	return BWAPI::Broodwar->self()->isAlly(pUnit->getPlayer()) &&
+		BWAPI::Broodwar->self() != pUnit->getPlayer();
 }
 
 /**

@@ -69,6 +69,12 @@ public:
 	 */
 	void removeUnit(BWAPI::Unit* pUnit);
 
+	/**
+	 * Prints out various debug information depending on the current
+	 * GRAPHICS_VERBOSITY.
+	 */
+	void printInfo();
+
 private:
 	/**
 	 * Singleton constructor to enforce singleton usage.

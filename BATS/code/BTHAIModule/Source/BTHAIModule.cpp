@@ -147,35 +147,6 @@ void BTHAIModule::onSendText(std::string text)
 	{
 		profile = !profile;
 	}
-	//else if(text=="/d1") 
-	//{
-	//	loop->setDebugMode(1);
-	//}
-	//else if(text=="/d2") 
-	//{
-	//	loop->setDebugMode(2);
-	//}
-	//else if(text=="/d3") 
-	//{
-	//	loop->setDebugMode(3);
-	//}
-	//else if(text=="/off") 
-	//{
-	//	loop->setDebugMode(0);
-	//}
-	//else if(text=="/d0") 
-	//{
-	//	loop->setDebugMode(0);
-	//}
-	//else if (text.substr(0, 2)=="sq") 
-	//{
-	//	int id = atoi(&text[2]);
-	//	Squad* squad = Commander::getInstance()->getSquad(id);
-	//	if (squad != NULL) 
-	//	{
-	//		squad->printFullInfo();
-	//	}
-	//}
 	else if (text=="+") 
 	{
 		speed -= 4;

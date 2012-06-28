@@ -36,9 +36,9 @@
 
 using namespace utilities;
 
-int utilities::gVerbosityLevelConsole = LogLevel_None;
-int utilities::gVerbosityLevelFile = LogLevel_None;
-int utilities::gVerbosityLevelStarCraft = LogLevel_None;
+int utilities::gVerbosityLevelConsole = LogLevel_Off;
+int utilities::gVerbosityLevelFile = LogLevel_Off;
+int utilities::gVerbosityLevelStarCraft = LogLevel_Off;
 int utilities::gOutputTargetError = OUTPUT_CONSOLE;
 int utilities::gOutputTargetDebugMessage = OUTPUT_CONSOLE;
 int utilities::gcError = 0;
@@ -58,7 +58,7 @@ std::string VERBOSITY_NAMES[] = {
 	"[INFO]",
 	"[WARNING]",
 	"[SEVERE]",
-	"[NONE]"
+	"[OFF]"
 };
 
 #include <BWAPI/Game.h>
@@ -117,6 +117,10 @@ void utilities::loadLogSettings(const std::string& settingsFile) {
 		while (settings.good()) {
 			std::string token;
 			settings >> token;
+
+			if (token.empty()) {
+				continue;
+			}
 
 			std::transform(token.begin(), token.end(), token.begin(), ::toupper);
 
@@ -183,8 +187,8 @@ void utilities::loadLogSettings(const std::string& settingsFile) {
 								utilities::setVerbosityLevel(LogLevel_Warning, target);
 							} else if (tokens.front() == "SEVERE") {
 								utilities::setVerbosityLevel(LogLevel_Severe, target);
-							} else if (tokens.front() == "NONE") {
-								utilities::setVerbosityLevel(LogLevel_None, target);
+							} else if (tokens.front() == "OFF") {
+								utilities::setVerbosityLevel(LogLevel_Off, target);
 							}
 						}
 						tokens.clear();
@@ -206,8 +210,8 @@ void utilities::loadLogSettings(const std::string& settingsFile) {
 								utilities::setVerbosityLevel(LogLevel_Warning, target);
 							} else if (tokens.front() == "SEVERE") {
 								utilities::setVerbosityLevel(LogLevel_Severe, target);
-							} else if (tokens.front() == "NONE") {
-								utilities::setVerbosityLevel(LogLevel_None, target);
+							} else if (tokens.front() == "OFF") {
+								utilities::setVerbosityLevel(LogLevel_Off, target);
 							}
 						}
 						tokens.clear();
@@ -229,8 +233,8 @@ void utilities::loadLogSettings(const std::string& settingsFile) {
 								utilities::setVerbosityLevel(LogLevel_Warning, target);
 							} else if (tokens.front() == "SEVERE") {
 								utilities::setVerbosityLevel(LogLevel_Severe, target);
-							} else if (tokens.front() == "NONE") {
-								utilities::setVerbosityLevel(LogLevel_None, target);
+							} else if (tokens.front() == "OFF") {
+								utilities::setVerbosityLevel(LogLevel_Off, target);
 							}
 						}
 						tokens.clear();

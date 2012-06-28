@@ -93,10 +93,16 @@ namespace classification {
 }
 
 namespace debug {
-	int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = 0;
-	int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = 0;
-	int GRAPHICS_TEXT_VERBOSITY = 0;
-	int DEBUG_MESSAGE_VERBOSITY = 0;
+	int GRAPHICS_VERBOSITY_IN_DEBUG = 0;
+	int GRAPHICS_VERBOSITY_IN_RELEASE = 0;
+	int GRAPHICS_VERBOSITY = 0;
+
+	namespace classes {
+		bool ALLIED_ARMY_MANAGER = false;
+		bool ALLIED_SQUAD = false;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -353,21 +359,44 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool debug::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "graphics_text_verbosity_in_debug") {
-		gOldValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_DEBUG));
-		GRAPHICS_TEXT_VERBOSITY_IN_DEBUG = variableInfo;
-#ifdef _DEBUG
-		GRAPHICS_TEXT_VERBOSITY = variableInfo;
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY));
-#endif
-	} else if (variableInfo.name == "graphics_text_verbosity_in_release") {
-		gOldValue = toString(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE); gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY_IN_RELEASE));
-		GRAPHICS_TEXT_VERBOSITY_IN_RELEASE = variableInfo;
-#ifndef _DEBUG
-		GRAPHICS_TEXT_VERBOSITY = variableInfo;
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_TEXT_VERBOSITY));
-#endif
+	if (variableInfo.subsection == "classes") {
+		debug::classes::set(variableInfo);
+	} else if (variableInfo.subsection.empty()) {
+		if (variableInfo.name == "graphics_verbosity_in_debug") {
+			gOldValue = toString(GRAPHICS_VERBOSITY_IN_DEBUG);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY_IN_DEBUG));
+			GRAPHICS_VERBOSITY_IN_DEBUG = variableInfo;
+	#ifdef _DEBUG
+			GRAPHICS_VERBOSITY = variableInfo;
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY));
+	#endif
+		} else if (variableInfo.name == "graphics_verbosity_in_release") {
+			gOldValue = toString(GRAPHICS_VERBOSITY_IN_RELEASE); gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY_IN_RELEASE));
+			GRAPHICS_VERBOSITY_IN_RELEASE = variableInfo;
+	#ifndef _DEBUG
+			GRAPHICS_VERBOSITY = variableInfo;
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY));
+	#endif	
+		} else {
+			return false;
+		}
+	} else {
+		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
+			"' in " <<variableInfo.file << ".ini");
+	}
+
+	return true;
+}
+
+bool debug::classes::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "allied_squad") {
+		gOldValue = toString(ALLIED_SQUAD);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_SQUAD));
+		ALLIED_SQUAD = variableInfo;
+	} else if (variableInfo.name == "allied_army_manager") {
+		gOldValue = toString(ALLIED_ARMY_MANAGER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_ARMY_MANAGER));
+		ALLIED_ARMY_MANAGER = variableInfo;
 	} else {
 		return false;
 	}

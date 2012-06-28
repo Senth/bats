@@ -15,6 +15,7 @@ class ExplorationManager;
 class WaitGoalManager;
 class SquadManager;
 class GameTime;
+class AlliedArmyManager;
 
 /**
  * Main module for BATS
@@ -107,6 +108,7 @@ protected:
 	WaitGoalManager* mpWaitGoalManager;
 	SquadManager* mpSquadManager;
 	GameTime* mpGameTime;
+	AlliedArmyManager* mpAlliedArmyManager;
 
 private:
 	/**

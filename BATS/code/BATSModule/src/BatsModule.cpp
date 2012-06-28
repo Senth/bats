@@ -10,6 +10,7 @@
 #include "ResourceCounter.h"
 #include "AttackCoordinator.h"
 #include "WaitGoalManager.h"
+#include "AlliedArmyManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
@@ -43,6 +44,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpWaitGoalManager = NULL;
 	mpSquadManager = NULL;
 	mpGameTime = NULL;
+	mpAlliedArmyManager = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -152,14 +154,36 @@ void BatsModule::onSendText(std::string text) {
 	// /d# needs to be overridden because base class calls a class we don't initialize
 	if (startsWith(text, "/d") || startsWith(text, "/debug ")) {
 
-		if (text == "/d1" || text == "/debug low") {
-			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Low;
-		} else if (text == "/d2" || text == "/debug medium") {
-			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Medium;
-		} else if (text == "/d3" || text == "/debug high") {
-			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_High;
-		} else if (text == "/d0" || text == "/debug off") {
-			config::debug::GRAPHICS_TEXT_VERBOSITY = config::debug::GraphicsVerbosity_Off;
+		if (text == "/d1" || text == "/debug graphics low") {
+			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_Low;
+		} else if (text == "/d2" || text == "/debug graphics medium") {
+			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_Medium;
+		} else if (text == "/d3" || text == "/debug graphics high") {
+			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_High;
+		} else if (text == "/d0" || text == "/debug graphics off") {
+			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_Off;
+		} else if (startsWith(text, "/debug message")) {
+			if (text == "/debug message finest") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Finest, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message finer") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Finer, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message fine") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Fine, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message info") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Info, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message warning") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Warning, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message severe") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Severe, OUTPUT_STARCRAFT);
+			} else if (text == "/debug message off") {
+				utilities::setVerbosityLevel(utilities::LogLevel_Off, OUTPUT_STARCRAFT);
+			} else {
+				Broodwar->printf("Invalid message value. Valid message values are:\noff\nsevere\nwarning\ninfo\nfine\nfiner\nfinest");
+			}
+		} else if (startsWith(text, "/debug graphics")) {
+			Broodwar->printf("Invalid graphics value. Valid graphics values are:\noff\nhigh\nmedium\nlow");
+		} else {
+			Broodwar->printf("Invalid command, valid debug modes are\n/debug message|graphics value\nSee \"/debug message\" or \"/debug graphics\" for valid values.");
 		}
 
 	} else if (text == "/transition" || text == "transition") {
@@ -196,7 +220,7 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 	TEST_SELF();
 
 	// Stop game if we left the game
-	if (player->getID() == Broodwar->self()->getID()) {
+	if (player == Broodwar->self()) {
 		onEnd();
 	}
 	// Print out the player that left the game
@@ -208,16 +232,14 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
-	if (Broodwar->isReplay() || Broodwar->getFrameCount() <= GAME_STARTED_FRAME) {
-		return;
-	}
-
 	// Only add enemy units to exploration manager
-	if (pUnit->getPlayer()->getID() != Broodwar->self()->getID() &&
-		pUnit->getPlayer()->isNeutral() == false &&
-		pUnit->getPlayer()->isAlly(Broodwar->self()) == false)
-	{
+	if (isEnemy(pUnit)) {
 		mpExplorationManager->addSpottedUnit(pUnit);
+	} else if (isAllied(pUnit)) {
+		mpAlliedArmyManager->addUnit(pUnit);
+
+		DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
+			pUnit->getType().getName());
 	}
 }
 
@@ -233,10 +255,6 @@ void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			}
-		} else if (isAllied(pUnit)) {
-			/// @todo add allied unit to AlliedArmyManager
-			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit created: " << 
-				pUnit->getType().getName());
 		}
 	}
 }
@@ -266,7 +284,8 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 		}
 		// Allied
 		else if (isAllied(pUnit)) {
-			/// @todo remove allied unit from ALliedArmyManager
+			mpAlliedArmyManager->removeUnit(pUnit);
+
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
 				pUnit->getType().getName());
 		}
@@ -328,6 +347,8 @@ void BatsModule::updateGame() {
 	mpResourceCounter->update();
 	mpWaitGoalManager->update();
 
+	mpAlliedArmyManager->update();
+
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
@@ -349,9 +370,11 @@ void BatsModule::initGameClasses() {
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
 	mpExplorationManager = ExplorationManager::getInstance();
+	mpAlliedArmyManager = AlliedArmyManager::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
+	SAFE_DELETE(mpAlliedArmyManager);
 	SAFE_DELETE(mpExplorationManager);
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
@@ -369,8 +392,8 @@ void BatsModule::releaseGameClasses() {
 
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
-	if (config::debug::GRAPHICS_TEXT_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
-
+	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
+		mpAlliedArmyManager->printInfo();
 
 		// Low
 		/// @todo Commander::getInstance()->printInfo();
@@ -379,38 +402,37 @@ void BatsModule::showDebug() const {
 		drawTerrainData();
 
 		// Only low
-		if(config::debug::GRAPHICS_TEXT_VERBOSITY == config::debug::GraphicsVerbosity_Low) {
+		if(config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Low) {
 			UnitCreator::getInstance()->printInfo();
 		}
 
-
-		// Medium
-		if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
-			ResourceManager::getInstance()->printInfo();
-		}
-
-		std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
+				std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
 
 		// Agents
 		for (int i = 0; i < (int)agents.size(); i++) {
+			// Low while building
 			if (agents.at(i)->isBuilding()) {
 				agents.at(i)->debug_showGoal();
 			}
+			// Medium if not building
 			if (!agents.at(i)->isBuilding() &&
-				config::debug::GRAPHICS_TEXT_VERBOSITY_IN_DEBUG >= config::debug::GraphicsVerbosity_Medium)
+				config::debug::GRAPHICS_VERBOSITY_IN_DEBUG >= config::debug::GraphicsVerbosity_Medium)
 			{
 				agents.at(i)->debug_showGoal();
 			}
 		}
 
-		
-		// High
-		if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
-			CoverMap::getInstance()->debug();
+
+		// Medium
+		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
+			ResourceManager::getInstance()->printInfo();
 		}
 
-
 		
+		// High
+		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
+			CoverMap::getInstance()->debug();
+		}
 	}
 }
 
@@ -453,7 +475,7 @@ void BatsModule::drawTerrainData() const {
 
 	
 	// Medium
-	if (config::debug::GRAPHICS_TEXT_VERBOSITY >= config::debug::GraphicsVerbosity_Medium)
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium)
 	{
 		//we will iterate through all the regions and draw the polygon outline of it in white.
 		std::set<BWTA::Region*>::const_iterator regionIt;

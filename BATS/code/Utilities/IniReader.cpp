@@ -11,9 +11,9 @@ VariableInfo::operator bool() const {
 	std::string lowerValue = value;
 	std::transform(lowerValue.begin(), lowerValue.end(), lowerValue.begin(), ::tolower);
 
-	if (lowerValue == "true" || lowerValue == "1") {
+	if (lowerValue == "true" || lowerValue == "on" || lowerValue == "1") {
 		return true;
-	} else if (lowerValue == "false" || lowerValue == "0") {
+	} else if (lowerValue == "false" || lowerValue == "off" || lowerValue == "0") {
 		return false;
 	} else {
 		ERROR_MESSAGE(false, "VariableInfo::bool() | Could not transform string value '" <<

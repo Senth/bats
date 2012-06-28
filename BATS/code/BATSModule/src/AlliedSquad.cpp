@@ -75,7 +75,7 @@ int AlliedSquad::getSupplyCount() const {
 	return cSupply;
 }
 
-size_t AlliedSquad::getNrOfUnits() const {
+size_t AlliedSquad::getUnitCount() const {
 	return mUnits.size();
 }
 
@@ -131,7 +131,7 @@ void AlliedSquad::update() {
 	}
 
 	// Check if it has passed one second
-	if (mpsGameTime->getElapsedTime() >= mLastUpdate + 1.0) {
+	if (mpsGameTime->getElapsedTime() - mLastUpdate < 1.0) {
 		return;
 	}
 	mLastUpdate = mpsGameTime->getElapsedTime();
@@ -161,6 +161,10 @@ void AlliedSquad::update() {
 	else {
 		mState = State_Idle;
 	}
+}
+
+int AlliedSquad::getMaxKeys() {
+	return MAX_KEYS;
 }
 
 BWAPI::TilePosition AlliedSquad::getDirection() const {
@@ -261,6 +265,7 @@ bool AlliedSquad::isAttacking() const {
 		{
 			isAttacking = true;
 		}
+		++i;
 	}
 
 	if (!isAttacking) {
@@ -312,7 +317,10 @@ void AlliedSquad::updateCenter() {
 	TilePosition center(0,0);
 
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		center += mUnits[i]->getTilePosition();
+		TilePosition unitPos = mUnits[i]->getTilePosition();
+		if (unitPos.isValid()) {
+			center += unitPos;
+		}
 	}
 
 	if (mUnits.size() > 0) {
@@ -343,5 +351,57 @@ void AlliedSquad::updateClosestDistances() {
 	}
 	if (config::classification::squad::MEASURE_TIME < mEnemyDistances.size()) {
 		mEnemyDistances.pop_back();
+	}
+}
+
+void AlliedSquad::printInfo() {
+	// Skip if not turned on
+	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off ||
+		config::debug::classes::ALLIED_SQUAD == false) {
+		return;
+	}
+
+
+	// Low
+	// Print id, state, number of units and number of supplies.
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
+		if (!mCenter.empty()) {
+			BWAPI::Position squadCenterOnMap = BWAPI::Position(mCenter.front());
+			BWAPI::Broodwar->drawTextMap(
+					squadCenterOnMap.x(), squadCenterOnMap.y(),
+					"\x02Id: \x04%i\n\x02State: \x04%s\n\x02Units: \x04%i\n\x02Supplies: \x04%g",
+					mId, getStateString(), getUnitCount(),
+					static_cast<double>(getSupplyCount()) * 0.5
+				);
+		}
+	}
+
+
+	// Medium
+	// Draw line from the front and back center, display the length of this line
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
+		/// @todo medium draw line and length of line
+	}
+}
+
+std::string AlliedSquad::getStateString() const {
+	switch (mState) {
+		case State_AttackHalted:
+			return "Attack halted";
+
+		case State_Attacking:
+			return "Attacking";
+
+		case State_Idle:
+			return "Idle";
+
+		case State_MovingToAttack:
+			return "Moving to attack";
+
+		case State_Retreating:
+			return "Retreating";
+
+		default:
+			return "Unknown state";
 	}
 }

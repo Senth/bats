@@ -80,7 +80,7 @@ public:
 	 * Returns the number of units in the squad
 	 * @return number of units in the squad
 	 */
-	size_t getNrOfUnits() const;
+	size_t getUnitCount() const;
 
 	/**
 	 * Returns true if the squad is empty.
@@ -128,6 +128,18 @@ public:
 	 * Updates the center of the squad for isMoving() and isRetreaning() calculations
 	 */
 	void update();
+
+	/**
+	 * Prints debug information, id of squad, number of units and number of supply in
+	 * the center of the squad.
+	 */
+	void printInfo();
+
+	/**
+	 * Returns the maximum amount of AlliedSquads that are allowed to be created.
+	 * @return maximum amount of AlliedSquads that are allowed to be created.
+	 */
+	static int getMaxKeys();
 
 private:
 	/**
@@ -187,6 +199,11 @@ private:
 	 */
 	void updateClosestDistances();
 
+	/**
+	 * Returns the current state as a string
+	 * @return current state as string
+	 */
+	std::string getStateString() const;
 
 	bool mBig;
 	std::vector<BWAPI::Unit*> mUnits;

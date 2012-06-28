@@ -2,8 +2,10 @@
 #include "Utilities/Logger.h"
 #include "AlliedSquad.h"
 #include "Helper.h"
+#include "Utilities/KeyHandler.h"
 #include <cstdlib> // For NULL
 #include <BWAPI/Game.h>
+#include <BWAPI/Constants.h>
 #include <cassert>
 #include <cmath>
 
@@ -22,6 +24,8 @@ AlliedArmyManager::AlliedArmyManager() {
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::GRID_SQUARE_DISTANCE), this);
 
 	mLastFrameUpdate = 0;
+
+	mSquads.resize(AlliedSquad::getMaxKeys());
 
 	// Initialize size of grid
 	mGridUnits.resize(mLookupTableGridPosition.size());
@@ -46,13 +50,14 @@ void AlliedArmyManager::update() {
 	// Computational heavy, don't call every frame.
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - mLastFrameUpdate >= config::frame_distribution::ALLIED_ARMY_REARRANGE_SQUADS) {
+		mLastFrameUpdate = cFrame;
+
 		rearrangeSquads();
 
 		disbandEmptySquads();
 
 		setBigSquad();
 	}
-
 
 	// Update all squads "every frame". Squads limit their update themselves
 	for (size_t i = 0; i < mSquads.size(); ++i) {
@@ -119,7 +124,7 @@ void AlliedArmyManager::rearrangeSquads() {
 			addCloseUnitsToSquad(unitIt->first, unitIt->second);
 		}
 
-	} while (!foundUnit);
+	} while (foundUnit);
 
 
 	// Create squads for the rest of the units that went out of the squad's bounds
@@ -145,7 +150,14 @@ void AlliedArmyManager::onConstantChanged(config::ConstantName constantName) {
 void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply add the unit to this class,
 	// meaning in the next update phase the squads might be altered.
-	mUnitSquad[pUnit] = AlliedSquadId::INVALID_KEY;
+	
+	// Only add units and not buildings
+	if (!pUnit->getType().isBuilding()) {
+
+		// This will create the unit with an INVALID_KEY for squad if it doesn't exist in the map
+		// If it exist, it will do nothing.
+		mUnitSquad[pUnit];
+	}
 }
 
 void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
@@ -190,9 +202,9 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 					// Only parse not checked units
 					if (unitIt->second == false) {
 						// Only check same squads, these are 100% certain within exclude_distance
-						// now
-						AlliedSquadId currentSquadId = mUnitSquad[unitIt->first];
-						if (currentSquadId == oldSquadId || currentSquadId == squadId) {
+						// If the unit is part of the old (valid) squad, include those too
+						AlliedSquadId unitSquadId = mUnitSquad[unitIt->first];
+						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
 							queuedUnits.push_back(unitIt->first);
 							setUnitAsChecked(unitIt->first);
 						}
@@ -216,7 +228,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 	gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_MAX);
 	for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
 		for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
-			if (isSameOrBorderGridPosition(center, Position(x,y)) == false) {
+			if (!isSameOrBorderGridPosition(center, Position(x,y))) {
 
 				// Iterate through all units within this square
 				std::map<Unit*, bool>::iterator unitIt;
@@ -248,14 +260,18 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 }
 
 void AlliedArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
-	const TilePosition& unitPos = pUnit->getTilePosition();
-	mGridUnits[unitPos.x()][unitPos.y()][pUnit] = true;
+	const Position& gridPos = getGridPosition(pUnit);
+	if (gridPos != Positions::Invalid) {
+		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = true;
+	}
 	mUnitsToCheck.erase(pUnit);
 }
 
 std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator AlliedArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator& unitIt) {
-	const TilePosition& unitPos = unitIt->first->getTilePosition();
-	mGridUnits[unitPos.x()][unitPos.y()][unitIt->first] = true;
+	const Position& gridPos = getGridPosition(unitIt->first);
+	if (gridPos != Positions::Invalid) {
+		mGridUnits[gridPos.x()][gridPos.y()][unitIt->first] = true;
+	}
 	return mUnitsToCheck.erase(unitIt);
 }
 
@@ -289,12 +305,12 @@ BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
 	}
 
 	Position gridPos = Positions::Invalid;
-	if (unitPos.x() >= 0 && unitPos.x() < static_cast<int>(mLookupTableGridPosition.size()) &&
-		unitPos.y() >= 0 && unitPos.y() < static_cast<int>(mLookupTableGridPosition[0].size()))
+	if (unitPos.isValid())
 	{
 		gridPos = mLookupTableGridPosition[unitPos.x()][unitPos.y()];
-	} else {
-		ERROR_MESSAGE(false, "Invalid unit position: " << unitPos);
+	} else if (unitPos != TilePositions::Invalid && unitPos != TilePositions::None && unitPos != TilePositions::Unknown) {
+		ERROR_MESSAGE(false, "Invalid unit " << pUnit->getType().getName() <<
+			" (" << pUnit->getID() << ") position: " << unitPos);
 	}
 
 	return gridPos;
@@ -389,4 +405,60 @@ void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
 	if (gridPos != Positions::Invalid) {
 		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = false;
 	}
+}
+
+void AlliedArmyManager::printInfo() {
+	// Skip if not turned on
+	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off) {
+		return;
+	}
+
+
+	// Only draw if turned on
+	if (config::debug::classes::ALLIED_ARMY_MANAGER) {
+		// High 
+		// Draw two circles around each unit, orange for excluding, green for including
+		// Draw id on each unit
+		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
+			// Convert to map coordinates
+			int includeDistance = config::classification::squad::INCLUDE_DISTANCE * TILE_SIZE;
+			int excludeDistance = config::classification::squad::EXCLUDE_DISTANCE * TILE_SIZE;
+
+			std::map<Unit*, AlliedSquadId>::const_iterator unitIt;
+			for (unitIt = mUnitSquad.begin(); unitIt != mUnitSquad.end(); ++unitIt) {
+				// Include distance
+				Broodwar->drawCircleMap(
+					unitIt->first->getPosition().x(),
+					unitIt->first->getPosition().y(),
+					includeDistance,
+					Colors::Green
+				);
+
+				// Exclude distance
+				Broodwar->drawCircleMap(
+					unitIt->first->getPosition().x(),
+					unitIt->first->getPosition().y(),
+					excludeDistance,
+					Colors::Orange
+				);
+
+				// Id on unit
+				Broodwar->drawTextMap(
+					unitIt->first->getPosition().x(),
+					unitIt->first->getPosition().y(),
+					"\x04%i",
+					unitIt->first->getID()
+				);
+			}
+		}
+	}
+
+
+	// Print all squads
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i]) {
+			mSquads[i]->printInfo();
+		}
+	}
+	
 }

@@ -148,12 +148,12 @@ namespace bats {
 		 */
 		namespace debug {
 			/** Default debug value in debugging mode */
-			extern int GRAPHICS_TEXT_VERBOSITY_IN_DEBUG;
+			extern int GRAPHICS_VERBOSITY_IN_DEBUG;
 			/** Default debug value in release mode */
-			extern int GRAPHICS_TEXT_VERBOSITY_IN_RELEASE;
-			/** Current debug value, this get initially set by GRAPHICS_TEXT_VERBOSITY_IN_X
+			extern int GRAPHICS_VERBOSITY_IN_RELEASE;
+			/** Current debug value, this get initially set by GRAPHICS_VERBOSITY_IN_X
 			 * where X is the current mode running. Cannot be set in the config file. */
-			extern int GRAPHICS_TEXT_VERBOSITY;
+			extern int GRAPHICS_VERBOSITY;
 
 			/**
 			 * Enumerations for the graphics debugging levels
@@ -164,6 +164,17 @@ namespace bats {
 				GraphicsVerbosity_Medium,
 				GraphicsVerbosity_High
 			};
+
+			/**
+			 * Enabled classes, if these are enable they will show
+			 * debugging information, provided that GRAPHICS_VERBOSITY is set
+			 * to something other than Off.
+			 * @note Some classes only print out debugging information for medium or high.
+			 */
+			namespace classes {
+				extern bool ALLIED_SQUAD;
+				extern bool ALLIED_ARMY_MANAGER;
+			}
 		}
 
 		/**
