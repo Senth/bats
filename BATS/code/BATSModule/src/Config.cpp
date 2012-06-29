@@ -78,8 +78,10 @@ namespace classification {
 		size_t MEASURE_TIME = 5;
 		int MOVED_TILES_MIN = 0;
 		int MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
-		double ATTACK_FRACTION_AWAY_MIN = 0.0;
-		double RETREAT_FRACTION_AWAY_MIN = 0.0;
+		double ATTACK_FRACTION_AWAY_MIN = 0.0; // deprecated
+		double RETREAT_FRACTION_AWAY_MIN = 0.0; // deprecated
+		int AWAY_DISTANCE = 0;
+		int AWAY_DISTANCE_SQUARED = AWAY_DISTANCE * AWAY_DISTANCE;
 		int INCLUDE_DISTANCE = 0;
 		int INCLUDE_DISTANCE_SQUARED = INCLUDE_DISTANCE * INCLUDE_DISTANCE;
 		int EXCLUDE_DISTANCE = 0;
@@ -337,6 +339,12 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(RETREAT_FRACTION_AWAY_MIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(RETREAT_FRACTION_AWAY_MIN));
 		RETREAT_FRACTION_AWAY_MIN = variableInfo;
+	} else if (variableInfo.name == "away_distance") {
+		gOldValue = toString(AWAY_DISTANCE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AWAY_DISTANCE));
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AWAY_DISTANCE_SQUARED));
+		AWAY_DISTANCE = variableInfo;
+		AWAY_DISTANCE_SQUARED = AWAY_DISTANCE * AWAY_DISTANCE;
 	} else if (variableInfo.name == "include_distance") {
 		gOldValue = toString(INCLUDE_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(INCLUDE_DISTANCE));

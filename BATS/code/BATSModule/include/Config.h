@@ -109,12 +109,21 @@ namespace bats {
 				 * used for faster calculation.
 				 * @see MOVED_TILES_MIN. */
 				extern int MOVED_TILES_MIN_SQUARED;
-				/** Minimum fraction distance from our structures to the enemy structures
+				/** @deprecated
+				 * Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as attacking, uses closest structures */
 				extern double ATTACK_FRACTION_AWAY_MIN;
-				/** Minimum fraction distance from our structures to the enemy structures
+				/** @deprecated
+				 * Minimum fraction distance from our structures to the enemy structures
 				 * until the squad can be treated as retreating */
 				extern double RETREAT_FRACTION_AWAY_MIN;
+				/** How far away from our home (allied structures) the squad has to be until
+				 * it can be treated as either attacking or retreating. */
+				extern int AWAY_DISTANCE;
+				/** Cannot be set through the config file, will set automatically, used for
+				 * faster calculation.
+				 * @see AWAY_DISTANCE */
+				extern int AWAY_DISTANCE_SQUARED;
 				/** Distance a unit has to be to another unit in the squad until
 				 * it is treated as included in the squad. The distance is in TilePositions. */
 				extern int INCLUDE_DISTANCE;

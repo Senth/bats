@@ -416,10 +416,7 @@ const vector<shared_ptr<SpottedObject>>& bats::ExplorationManager::getSpottedBui
 }
 
 bool bats::ExplorationManager::hasSpottedBuilding() const {
-	if (mSpottedStructures.size() > 0) {
-		return true;
-	}
-	return false;
+	return !mSpottedStructures.empty();
 }
 
 bool bats::ExplorationManager::canReach(BWAPI::TilePosition source, BWAPI::TilePosition destination) {

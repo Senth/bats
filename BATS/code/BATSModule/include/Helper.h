@@ -9,6 +9,37 @@
 
 namespace bats {
 
+namespace TextColors {
+	extern std::string LIGHT_BLUE;
+	extern std::string DARK_YELLOW;
+	extern std::string WHITE;
+	extern std::string DARK_GREY;
+	extern std::string DARK_RED;
+	extern std::string GREEN;
+	extern std::string RED;
+	extern std::string BLUE;
+	extern std::string TEAL;
+	extern std::string PURPLE;
+	extern std::string ORANGE;
+	extern std::string BROWN;
+	extern std::string LIGHT_GREY;
+	extern std::string YELLOW;
+	extern std::string DARK_GREEN;
+	extern std::string LIGHT_YELLOW;
+	extern std::string PALE_PINK;
+	extern std::string ROYAL_BLUE;
+	extern std::string GREY_GREEN;
+	extern std::string GREY_BLUE;
+	extern std::string CYAN;
+}
+
+/**
+ * Checks if a unit is a gas building. This includes Resource_Vespene_Geyser, Terran_Refinery,
+ * Protoss_Assimilator, Zerg_Extractor
+ * @return true if the unit is a gas building.
+ */
+bool isGasStructure(BWAPI::Unit* pUnit);
+
 /**
  * A function to check if a unit belongs to us
  * @param pUnit unit to check if it belongs to us

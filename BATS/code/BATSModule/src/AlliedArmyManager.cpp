@@ -121,7 +121,7 @@ void AlliedArmyManager::rearrangeSquads() {
 			// Set squad as checked
 			checkedSquads.insert(currentUnit.second);
 
-			addCloseUnitsToSquad(unitIt->first, unitIt->second);
+			addCloseUnitsToSquad(currentUnit.first, currentUnit.second);
 		}
 
 	} while (foundUnit);
@@ -151,8 +151,8 @@ void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply add the unit to this class,
 	// meaning in the next update phase the squads might be altered.
 	
-	// Only add units and not buildings
-	if (!pUnit->getType().isBuilding()) {
+	// Don't add buildings and workers
+	if (!pUnit->getType().isBuilding() && !pUnit->getType().isWorker()) {
 
 		// This will create the unit with an INVALID_KEY for squad if it doesn't exist in the map
 		// If it exist, it will do nothing.
@@ -179,6 +179,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 			mSquads[oldSquadId]->removeUnit(pUnit);
 		}
 		mSquads[squadId]->addUnit(pUnit);
+		mUnitSquad[pUnit] = squadId;
 	}
 
 	
@@ -236,10 +237,10 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 					// Only parse not checked units
 					if (unitIt->second == false) {
 						
-						AlliedSquadId currentSquadId = mUnitSquad[unitIt->first];
+						AlliedSquadId unitSquadId = mUnitSquad[unitIt->first];
 
-						// Same squad, check exclude_distance
-						if (currentSquadId == oldSquadId || currentSquadId == squadId) {
+						// Same squad or old (if valid), check exclude_distance
+						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
 							if (withinExcludeDistance(pUnit, unitIt->first)) {
 								setUnitAsChecked(unitIt->first);
 								addCloseUnitsToSquad(unitIt->first, squadId);
@@ -288,10 +289,8 @@ bool AlliedArmyManager::withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* 
 BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
 	TilePosition unitPos = BWAPI::TilePositions::Invalid;
 
-	// Not loaded
-	if (!pUnit->isLoaded()) {
-		unitPos = pUnit->getTilePosition();
-	} else {
+	// Loaded
+	if (pUnit->isLoaded()) {
 		// Get position of the transport, this is needed because the position of the units
 		// are not updated while loaded.
 		Unit* pTransport = pUnit->getTransport();
@@ -303,10 +302,13 @@ BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
 			unitPos = pUnit->getTilePosition();
 		}
 	}
+	// Use regular position
+	else {
+		unitPos = pUnit->getTilePosition();
+	}
 
 	Position gridPos = Positions::Invalid;
-	if (unitPos.isValid())
-	{
+	if (unitPos.isValid()) {
 		gridPos = mLookupTableGridPosition[unitPos.x()][unitPos.y()];
 	} else if (unitPos != TilePositions::Invalid && unitPos != TilePositions::None && unitPos != TilePositions::Unknown) {
 		ERROR_MESSAGE(false, "Invalid unit " << pUnit->getType().getName() <<
@@ -421,8 +423,8 @@ void AlliedArmyManager::printInfo() {
 		// Draw id on each unit
 		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
 			// Convert to map coordinates
-			int includeDistance = config::classification::squad::INCLUDE_DISTANCE * TILE_SIZE;
-			int excludeDistance = config::classification::squad::EXCLUDE_DISTANCE * TILE_SIZE;
+			int includeDistance = config::classification::squad::INCLUDE_DISTANCE * TILE_SIZE >> 1;
+			int excludeDistance = config::classification::squad::EXCLUDE_DISTANCE * TILE_SIZE >> 1;
 
 			std::map<Unit*, AlliedSquadId>::const_iterator unitIt;
 			for (unitIt = mUnitSquad.begin(); unitIt != mUnitSquad.end(); ++unitIt) {

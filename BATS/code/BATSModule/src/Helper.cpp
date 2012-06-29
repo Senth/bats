@@ -7,6 +7,44 @@
 using namespace BWAPI;
 using namespace bats;
 
+std::string bats::TextColors::LIGHT_BLUE = "\x02";
+std::string bats::TextColors::DARK_YELLOW = "\x03";
+std::string bats::TextColors::WHITE = "\x04";
+std::string bats::TextColors::DARK_GREY = "\x05";
+std::string bats::TextColors::DARK_RED = "\x06";
+std::string bats::TextColors::GREEN = "\x07";
+std::string bats::TextColors::RED = "\x08";
+std::string bats::TextColors::BLUE = "\x0E";
+std::string bats::TextColors::TEAL = "\x0F";
+std::string bats::TextColors::PURPLE = "\x10";
+std::string bats::TextColors::ORANGE = "\x11";
+std::string bats::TextColors::BROWN = "\x15";
+std::string bats::TextColors::LIGHT_GREY = "\x16";
+std::string bats::TextColors::YELLOW = "\x17";
+std::string bats::TextColors::DARK_GREEN = "\x18";
+std::string bats::TextColors::LIGHT_YELLOW = "\x19";
+std::string bats::TextColors::PALE_PINK = "\x1B";
+std::string bats::TextColors::ROYAL_BLUE = "\x1C";
+std::string bats::TextColors::GREY_GREEN = "\x1D";
+std::string bats::TextColors::GREY_BLUE = "\x1E";
+std::string bats::TextColors::CYAN = "\x1F";
+
+bool bats::isGasStructure(BWAPI::Unit* pUnit) {
+	if (pUnit != NULL) {
+		const BWAPI::UnitType& unitType = pUnit->getType();
+
+		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser ||
+			unitType == BWAPI::UnitTypes::Terran_Refinery ||
+			unitType == BWAPI::UnitTypes::Protoss_Assimilator ||
+			unitType == BWAPI::UnitTypes::Zerg_Extractor)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 std::pair<Unit*,int> bats::getClosestAlliedStructure(const TilePosition& position) {
 	Unit* pClosestUnit = NULL;
 	int closestDistance = INT_MAX;

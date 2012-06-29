@@ -208,7 +208,7 @@ private:
 	bool mBig;
 	std::vector<BWAPI::Unit*> mUnits;
 	std::list<BWAPI::TilePosition> mCenter;
-	std::list<int> mHomeDistances;
+	std::list<int> mAlliedDistances;
 	std::list<int> mEnemyDistances;
 	AlliedSquadId mId;
 	States mState;

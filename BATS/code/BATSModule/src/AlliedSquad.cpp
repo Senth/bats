@@ -5,7 +5,8 @@
 #include "AlliedArmyManager.h"
 
 using namespace bats;
-using BWAPI::TilePosition;
+using namespace BWAPI;
+using namespace std;
 
 utilities::KeyHandler<_AlliedSquadType>* AlliedSquad::mpsKeyHandler = NULL;
 int AlliedSquad::mcsInstances = 0;
@@ -93,7 +94,7 @@ void AlliedSquad::removeUnit(BWAPI::Unit* pUnit) {
 	while (it != mUnits.end() && !found) {
 		if (*it == pUnit) {
 			found = true;
-			mUnits.erase(it);
+			it = mUnits.erase(it);
 		} else {
 			++it;
 		}
@@ -111,8 +112,8 @@ void AlliedSquad::onConstantChanged(config::ConstantName constanName) {
 		if (config::classification::squad::MEASURE_TIME < mCenter.size()) {
 			mCenter.resize(config::classification::squad::MEASURE_TIME);
 		}
-		if (config::classification::squad::MEASURE_TIME < mHomeDistances.size()) {
-			mHomeDistances.resize(config::classification::squad::MEASURE_TIME);
+		if (config::classification::squad::MEASURE_TIME < mAlliedDistances.size()) {
+			mAlliedDistances.resize(config::classification::squad::MEASURE_TIME);
 		}
 		if (config::classification::squad::MEASURE_TIME < mEnemyDistances.size()) {
 			mEnemyDistances.resize(config::classification::squad::MEASURE_TIME);
@@ -194,28 +195,35 @@ bool AlliedSquad::isMovingToAttack() const {
 		return false;
 	}
 
+	//// At least attack_percent_away_min % away from our structures
+	//int enemyDistance = mEnemyDistances.front();
+	//int alliedDistance = mAlliedDistances.front();
 
-	// At least attack_percent_away_min % away from our structures
-	int enemyDistance = mEnemyDistances.front();
-	int alliedDistance = mHomeDistances.front();
+	//// Compare
+	//int totalDistance = enemyDistance + alliedDistance;
+	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
+	//if (fractionDistanceFromOurBases < config::classification::squad::ATTACK_FRACTION_AWAY_MIN) {
+	//	return false;
+	//}
 
-	// Compare
-	int totalDistance = enemyDistance + alliedDistance;
-	double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	if (fractionDistanceFromOurBases < config::classification::squad::ATTACK_FRACTION_AWAY_MIN) {
+
+	// At least away_distance from allied structures
+	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
 		return false;
 	}
 
 
 	// Moving towards enemy base
-	// If the squad increases the distance from home, or decreases the distance to the enemy
-	// it is treated as it's moving towards the enemy base. Note in code this will be negated because
-	// the if should be false
-	if (mHomeDistances.front() < mHomeDistances.back() &&
-		mEnemyDistances.front() > mEnemyDistances.back())
-	{
+	// If we haven't seen any enemy structure yet, only check if the distance from allies increases
+	// Else enemy distance shall be decreased
+	if (mAlliedDistances.empty()) {
+		if (mAlliedDistances.front() < mAlliedDistances.back()) {
+			return false;
+		}
+	} else if (mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) {
 		return false;
 	}
+	
 
 
 	return true;
@@ -233,20 +241,30 @@ bool AlliedSquad::isRetreating() const {
 	}
 
 
-	// At least retreat_percent_away_min % away form our structures
-	int enemyDistance = mEnemyDistances.front();
-	int alliedDistance = mHomeDistances.front();
-
-	// Compare
-	int totalDistance = enemyDistance + alliedDistance;
-	double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	// At least away_distance from allied structures
+	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
 		return false;
 	}
 
+	//// At least retreat_percent_away_min % away form our structures
+	//int enemyDistance = mEnemyDistances.front();
+	//int alliedDistance = mAlliedDistances.front();
 
-	// Shall move away from enemy structures, will this work?
-	if (mEnemyDistances.front() < mEnemyDistances.back()) {
+	//// Compare
+	//int totalDistance = enemyDistance + alliedDistance;
+	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
+	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	//	return false;
+	//}
+
+
+	// If we have spotted enemy structures, squad hall move away from enemy structures.
+	// Else use allied structures and we shall move towards allied structures.
+	if (!mEnemyDistances.empty()) {
+		if (mEnemyDistances.front() < mEnemyDistances.back()) {
+			return false;
+		}
+	} else if (mAlliedDistances.empty() || mAlliedDistances.front() > mAlliedDistances.back()) {
 		return false;
 	}
 
@@ -272,19 +290,27 @@ bool AlliedSquad::isAttacking() const {
 		return false;
 	}
 
-
-	// At least retreat_percent_away_min % away form our structures
-	int enemyDistance = mEnemyDistances.front();
-	int alliedDistance = mHomeDistances.front();
-
-	// Compare
-	int totalDistance = enemyDistance + alliedDistance;
-	double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	
+	// At least away_distance from allied structures
+	if (mAlliedDistances.empty() ||
+		mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
+	{
 		return false;
 	}
 
-	return false;
+
+	//// At least retreat_percent_away_min % away form our structures
+	//int enemyDistance = mEnemyDistances.front();
+	//int alliedDistance = mAlliedDistances.front();
+
+	//// Compare
+	//int totalDistance = enemyDistance + alliedDistance;
+	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
+	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	//	return false;
+	//}
+
+	return true;
 }
 
 bool AlliedSquad::hasAttackHalted() const {
@@ -293,24 +319,30 @@ bool AlliedSquad::hasAttackHalted() const {
 		return false;
 	}
 
+
 	// Moved MAXIMUM x tiles
 	if (getDistanceTraveledSquared() >= config::classification::squad::MOVED_TILES_MIN_SQUARED) {
 		return false;
 	}
 
 
-	// At least retreat_percent_away_min % away form our structures
-	int enemyDistance = mEnemyDistances.front();
-	int alliedDistance = mHomeDistances.front();
-
-	// Compare
-	int totalDistance = enemyDistance + alliedDistance;
-	double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	// At least away_distance from allied structures
+	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
 		return false;
 	}
 
-	return false;
+	//// At least retreat_percent_away_min % away form our structures
+	//int enemyDistance = mEnemyDistances.front();
+	//int alliedDistance = mAlliedDistances.front();
+
+	//// Compare
+	//int totalDistance = enemyDistance + alliedDistance;
+	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
+	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
+	//	return false;
+	//}
+
+	return true;
 }
 
 void AlliedSquad::updateCenter() {
@@ -339,15 +371,24 @@ void AlliedSquad::updateCenter() {
 
 void AlliedSquad::updateClosestDistances() {
 	// Save distances from closest allied and enemy structures
-	int enemyDistance = mpsExplorationManager->getClosestSpottedBuilding(mCenter.front()).second;
-	int alliedDistance = getClosestAlliedStructure(mCenter.front()).second;
+	pair<TilePosition, int> enemyStructure = mpsExplorationManager->getClosestSpottedBuilding(mCenter.front());
+	pair<Unit*, int> alliedStructure = getClosestAlliedStructure(mCenter.front());
 
-	mEnemyDistances.push_front(enemyDistance);
-	mHomeDistances.push_front(alliedDistance);
+	DEBUG_MESSAGE(utilities::LogLevel_Finest, "AlliedSquad::updateClosestDistance() | id: " <<
+		mId << ", center: " << mCenter.front() << ", Enemy: " << enemyStructure.first <<
+		" distance: " << enemyStructure.second << ", Allied: " <<
+		alliedStructure.first->getTilePosition() << " distance: " << alliedStructure.second);
+
+	if (enemyStructure.first.isValid()) {
+		mEnemyDistances.push_front(enemyStructure.second);
+	}
+	if (alliedStructure.first->getTilePosition().isValid()){
+		mAlliedDistances.push_front(alliedStructure.second);
+	}
 
 	// Delete the oldest (if full)
-	if (config::classification::squad::MEASURE_TIME < mHomeDistances.size()) {
-		mHomeDistances.pop_back();
+	if (config::classification::squad::MEASURE_TIME < mAlliedDistances.size()) {
+		mAlliedDistances.pop_back();
 	}
 	if (config::classification::squad::MEASURE_TIME < mEnemyDistances.size()) {
 		mEnemyDistances.pop_back();
@@ -367,12 +408,28 @@ void AlliedSquad::printInfo() {
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
 		if (!mCenter.empty()) {
 			BWAPI::Position squadCenterOnMap = BWAPI::Position(mCenter.front());
+
+			string format =
+				TextColors::LIGHT_BLUE + "Id: " + TextColors::WHITE + "%i\n" +
+				TextColors::LIGHT_BLUE + "State: " + TextColors::WHITE + "%s\n" +
+				TextColors::LIGHT_BLUE + "Units: " + TextColors::WHITE + "%i\n" +
+				TextColors::LIGHT_BLUE + "Supplies: " + TextColors::WHITE + "%g\n" +
+				TextColors::LIGHT_BLUE + "Distance: " + TextColors::WHITE + "%i";
+
+			int alliedDistance = 0;
+			if (!mAlliedDistances.empty()) {
+				alliedDistance = mAlliedDistances.front();
+			}
+
 			BWAPI::Broodwar->drawTextMap(
-					squadCenterOnMap.x(), squadCenterOnMap.y(),
-					"\x02Id: \x04%i\n\x02State: \x04%s\n\x02Units: \x04%i\n\x02Supplies: \x04%g",
-					mId, getStateString(), getUnitCount(),
-					static_cast<double>(getSupplyCount()) * 0.5
-				);
+				squadCenterOnMap.x(), squadCenterOnMap.y(),
+				format.c_str(),
+				mId,
+				getStateString().c_str(),
+				getUnitCount(),
+				static_cast<double>(getSupplyCount()) * 0.5,
+				alliedDistance
+			);
 		}
 	}
 
@@ -380,7 +437,27 @@ void AlliedSquad::printInfo() {
 	// Medium
 	// Draw line from the front and back center, display the length of this line
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
-		/// @todo medium draw line and length of line
+		if (!mCenter.empty()) {
+			pair<Position, Position> squadMovement = make_pair(Position(mCenter.front()), mCenter.back());
+			
+			// Length
+			double length = (mCenter.front() - mCenter.back()).getLength();
+			
+			// Draw line
+			Broodwar->drawLineMap(
+				squadMovement.first.x(), squadMovement.first.y(),
+				squadMovement.second.x(), squadMovement.second.y(),
+				Colors::Grey
+			);
+
+			// Draw text in back of line
+			Broodwar->drawTextMap(
+				squadMovement.second.x(), squadMovement.second.y(),
+				"\x10Length: %g",
+				length
+			);
+			
+		}
 	}
 }
 
