@@ -76,10 +76,11 @@ namespace attack_coordinator {
 namespace classification {
 	namespace squad {
 		size_t MEASURE_TIME = 5;
+		double ATTACK_TIMEOUT = 0.0;
+		double RETREAT_TIMEOUT = 0.0;
+		double RETREAT_TIME_WHEN_SAFE = 0.0;
 		int MOVED_TILES_MIN = 0;
 		int MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
-		double ATTACK_FRACTION_AWAY_MIN = 0.0; // deprecated
-		double RETREAT_FRACTION_AWAY_MIN = 0.0; // deprecated
 		int AWAY_DISTANCE = 0;
 		int AWAY_DISTANCE_SQUARED = AWAY_DISTANCE * AWAY_DISTANCE;
 		int INCLUDE_DISTANCE = 0;
@@ -325,20 +326,24 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(MEASURE_TIME);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(MEASURE_TIME));
 		MEASURE_TIME = variableInfo;
+	} else if (variableInfo.name == "attack_timeout") {
+		gOldValue = toString(ATTACK_TIMEOUT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ATTACK_TIMEOUT));
+		ATTACK_TIMEOUT = variableInfo;
+	} else if (variableInfo.name == "retreat_timeout") {
+		gOldValue = toString(RETREAT_TIMEOUT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(RETREAT_TIMEOUT));
+		RETREAT_TIMEOUT = variableInfo;
+	} else if (variableInfo.name == "retreat_time_when_safe") {
+		gOldValue = toString(RETREAT_TIME_WHEN_SAFE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(RETREAT_TIME_WHEN_SAFE));
+		RETREAT_TIME_WHEN_SAFE = variableInfo;
 	} else if (variableInfo.name == "moved_tiles_min") {
 		gOldValue = toString(MOVED_TILES_MIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(MOVED_TILES_MIN));
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(MOVED_TILES_MIN_SQUARED));
 		MOVED_TILES_MIN = variableInfo;
 		MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
-	} else if (variableInfo.name == "attack_fraction_away_min") {
-		gOldValue = toString(ATTACK_FRACTION_AWAY_MIN);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(ATTACK_FRACTION_AWAY_MIN));
-		ATTACK_FRACTION_AWAY_MIN = variableInfo;
-	} else if (variableInfo.name == "retreat_fraction_away_min") {
-		gOldValue = toString(RETREAT_FRACTION_AWAY_MIN);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(RETREAT_FRACTION_AWAY_MIN));
-		RETREAT_FRACTION_AWAY_MIN = variableInfo;
 	} else if (variableInfo.name == "away_distance") {
 		gOldValue = toString(AWAY_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(AWAY_DISTANCE));

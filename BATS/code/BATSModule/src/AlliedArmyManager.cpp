@@ -187,7 +187,6 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 	// Queue and checked units that are 100% certain in range of exclude range.
 	// Includes same square, squares with direct borders to the current square,
 	// not diagonally squares.
-	// Squads with different squad than old squad OR new squad checked later.
 	std::list<Unit*> queuedUnits;
 
 	//const TilePosition& unitPos = pUnit->getTilePosition();
@@ -206,6 +205,11 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 						// If the unit is part of the old (valid) squad, include those too
 						AlliedSquadId unitSquadId = mUnitSquad[unitIt->first];
 						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
+							queuedUnits.push_back(unitIt->first);
+							setUnitAsChecked(unitIt->first);
+						}
+						// Another squad - check include range
+						else if (withinIncludeDistance(pUnit, unitIt->first)) {
 							queuedUnits.push_back(unitIt->first);
 							setUnitAsChecked(unitIt->first);
 						}

@@ -74,6 +74,9 @@ private:
 	int mLoadQueueSpaces;
 	std::vector<UnitAgent*> mLoadQueue;
 	bool mUnloading;
+
+	mutable int mLoadCached;
+	mutable int mLastFrameUpdate;
 };
 
 #endif

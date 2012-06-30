@@ -102,6 +102,21 @@ namespace bats {
 			namespace squad {
 				/** Time to measure distance traveled and the direction of the squad */
 				extern size_t MEASURE_TIME;
+				/** How long time must have passed since the squad has attacked or been attacked
+				 * before it is actually treated as non-attacking or non-attacked. In
+				 * seconds.
+				 * @note the squad can still be treated as retreating although it is
+				 * attacking or being attacked */
+				extern double ATTACK_TIMEOUT;
+				/** How long time must have passed since the squad has started it's retreating
+				 * before it is actually treated as non-retreating. I.e. no other state can
+				 * override retreating until at least this amount of time has passed. */
+				extern double RETREAT_TIMEOUT;
+				/** How long time must have passed until the squad is treated as retreating
+				 * when it is safe. Used when the squad isn't attacking or is under attack.
+				 * When the squad is attacking or under attack, it will use MOVED_TILES_MIN
+				 * to see if the squad is retreating or not */
+				extern double RETREAT_TIME_WHEN_SAFE;
 				/** Minimum distance a squad shall move until it is treated as attacking or
 				 * retreating */
 				extern int MOVED_TILES_MIN;
@@ -109,14 +124,6 @@ namespace bats {
 				 * used for faster calculation.
 				 * @see MOVED_TILES_MIN. */
 				extern int MOVED_TILES_MIN_SQUARED;
-				/** @deprecated
-				 * Minimum fraction distance from our structures to the enemy structures
-				 * until the squad can be treated as attacking, uses closest structures */
-				extern double ATTACK_FRACTION_AWAY_MIN;
-				/** @deprecated
-				 * Minimum fraction distance from our structures to the enemy structures
-				 * until the squad can be treated as retreating */
-				extern double RETREAT_FRACTION_AWAY_MIN;
 				/** How far away from our home (allied structures) the squad has to be until
 				 * it can be treated as either attacking or retreating. */
 				extern int AWAY_DISTANCE;

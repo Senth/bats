@@ -13,16 +13,17 @@ TransportAgent::TransportAgent(Unit* pUnit) : UnitAgent(pUnit)
 
 	mLoadMax = type.spaceProvided();
 	mLoadQueueSpaces = 0;
+	mUnloading = false;
+	mLoadCached = 0;
+	mLastFrameUpdate = 0;
 }
 
 int TransportAgent::getFreeLoadSpace(bool includeQueuedUnits) const {
 	// Don't calculate it every frame, use cached result then
-	static int sLoadCached = 0;
-	static int sLastFrameUpdate = 0;
-	if (sLastFrameUpdate != Broodwar->getFrameCount()) {
-		sLastFrameUpdate = Broodwar->getFrameCount();
+	if (mLastFrameUpdate != Broodwar->getFrameCount()) {
+		mLastFrameUpdate = Broodwar->getFrameCount();
 	} else {
-		int load = sLoadCached;
+		int load = mLoadCached;
 		if (includeQueuedUnits) {
 			load -= mLoadQueueSpaces;
 		}
@@ -46,7 +47,7 @@ int TransportAgent::getFreeLoadSpace(bool includeQueuedUnits) const {
 			}
 		}
 
-		sLoadCached = load;
+		mLoadCached = load;
 	}
 	// Else check with all our units
 	else {

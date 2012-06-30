@@ -3,6 +3,7 @@
 #include "ExplorationManager.h"
 #include "GameTime.h"
 #include "AlliedArmyManager.h"
+#include <cmath>
 
 using namespace bats;
 using namespace BWAPI;
@@ -38,7 +39,12 @@ AlliedSquad::AlliedSquad(bool big) : mId(AlliedSquadId::INVALID_KEY) {
 	// Add listener
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_TIME), this);
 
-	mLastUpdate = 0.0;
+	mUpdateLast = 0.0;
+	mAttackLast = mpsGameTime->getElapsedTime() - config::classification::squad::ATTACK_TIMEOUT;
+	mUnderAttackLast = mpsGameTime->getElapsedTime() - config::classification::squad::ATTACK_TIMEOUT;
+	mRetreatStartedTime = 0.0;
+	mRetreatStartTestTime = 0.0;
+	mRetreatedLastCall = false;
 }
 
 AlliedSquad::~AlliedSquad() {
@@ -132,14 +138,17 @@ void AlliedSquad::update() {
 	}
 
 	// Check if it has passed one second
-	if (mpsGameTime->getElapsedTime() - mLastUpdate < 1.0) {
+	if (mpsGameTime->getElapsedTime() - mUpdateLast < 1.0) {
 		return;
 	}
-	mLastUpdate = mpsGameTime->getElapsedTime();
+	mUpdateLast = mpsGameTime->getElapsedTime();
 
 
 	updateCenter();
 	updateClosestDistances();
+
+
+	/// @todo check if under attack
 
 
 	// Retreating
@@ -195,20 +204,11 @@ bool AlliedSquad::isMovingToAttack() const {
 		return false;
 	}
 
-	//// At least attack_percent_away_min % away from our structures
-	//int enemyDistance = mEnemyDistances.front();
-	//int alliedDistance = mAlliedDistances.front();
-
-	//// Compare
-	//int totalDistance = enemyDistance + alliedDistance;
-	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	//if (fractionDistanceFromOurBases < config::classification::squad::ATTACK_FRACTION_AWAY_MIN) {
-	//	return false;
-	//}
-
 
 	// At least away_distance from allied structures
-	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
+	if (mAlliedDistances.empty() ||
+		mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
+	{
 		return false;
 	}
 
@@ -216,24 +216,71 @@ bool AlliedSquad::isMovingToAttack() const {
 	// Moving towards enemy base
 	// If we haven't seen any enemy structure yet, only check if the distance from allies increases
 	// Else enemy distance shall be decreased
-	if (mAlliedDistances.empty()) {
-		if (mAlliedDistances.front() < mAlliedDistances.back()) {
-			return false;
-		}
-	} else if (mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) {
+	if ((mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) &&
+		(mAlliedDistances.empty() || mAlliedDistances.front() < mAlliedDistances.back()))
+	{
 		return false;
-	}
-	
+	}	
 
 
 	return true;
 }
 
+bool AlliedSquad::hasRetreatTimedout() const {
+	return mRetreatStartedTime + config::classification::squad::RETREAT_TIMEOUT
+		>=
+		mpsGameTime->getElapsedTime();
+}
+
 bool AlliedSquad::isRetreating() const {
+	bool retreating = false;
+
+	if (mState == State_Retreating && hasRetreatTimedout()) {
+		retreating = true;
+	} else {
+		// Is already retreating, attacking, or under attack
+		if (mState == State_Retreating || mState == State_Attacking /** @todo || isUnderAttack() */) {
+			if (isRetreatingFrame()) {
+				mRetreatedLastCall = true;
+				mRetreatStartedTime = mpsGameTime->getElapsedTime();
+				retreating = true;
+			} else {
+				mRetreatedLastCall = false;
+			}
+		}
+		// Else - Squad is safe
+		else {
+			if (isRetreatingFrame()) {
+				if (mRetreatedLastCall) {
+					if (mRetreatStartTestTime + config::classification::squad::RETREAT_TIME_WHEN_SAFE
+						<
+						mpsGameTime->getElapsedTime())
+					{
+						mRetreatStartedTime = mpsGameTime->getElapsedTime();
+						retreating = true;
+					}
+				}
+				// Set starting to try retreating
+				else {
+					mRetreatedLastCall = true;
+					mRetreatStartTestTime = mpsGameTime->getElapsedTime();
+				}
+			} else {
+				mRetreatedLastCall = false;
+			}
+		}
+	}
+
+
+	return retreating;
+}
+
+bool AlliedSquad::isRetreatingFrame() const {
 	// Skip if we haven't all readings
 	if (config::classification::squad::MEASURE_TIME != mCenter.size()) {
 		return false;
 	}
+
 
 	// Moved minimum x tiles
 	if (getDistanceTraveledSquared() < config::classification::squad::MOVED_TILES_MIN_SQUARED) {
@@ -242,20 +289,11 @@ bool AlliedSquad::isRetreating() const {
 
 
 	// At least away_distance from allied structures
-	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
+	if (mAlliedDistances.empty() ||
+		mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
+	{
 		return false;
 	}
-
-	//// At least retreat_percent_away_min % away form our structures
-	//int enemyDistance = mEnemyDistances.front();
-	//int alliedDistance = mAlliedDistances.front();
-
-	//// Compare
-	//int totalDistance = enemyDistance + alliedDistance;
-	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
-	//	return false;
-	//}
 
 
 	// If we have spotted enemy structures, squad hall move away from enemy structures.
@@ -269,10 +307,25 @@ bool AlliedSquad::isRetreating() const {
 	}
 
 
-	return false;
+	return true;
 }
 
 bool AlliedSquad::isAttacking() const {
+	bool bFrameAttacking = isAttackingFrame();
+
+	if (bFrameAttacking) {
+		mAttackLast = mpsGameTime->getElapsedTime();
+	}
+
+
+	if (mAttackLast + config::classification::squad::ATTACK_TIMEOUT > mpsGameTime->getElapsedTime()) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool AlliedSquad::isAttackingFrame() const {
 	// At least one of the squad units is attacking something
 	bool isAttacking = false;
 	size_t i = 0;
@@ -299,17 +352,6 @@ bool AlliedSquad::isAttacking() const {
 	}
 
 
-	//// At least retreat_percent_away_min % away form our structures
-	//int enemyDistance = mEnemyDistances.front();
-	//int alliedDistance = mAlliedDistances.front();
-
-	//// Compare
-	//int totalDistance = enemyDistance + alliedDistance;
-	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
-	//	return false;
-	//}
-
 	return true;
 }
 
@@ -327,20 +369,12 @@ bool AlliedSquad::hasAttackHalted() const {
 
 
 	// At least away_distance from allied structures
-	if (mAlliedDistances.empty() || mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED) {
+	if (mAlliedDistances.empty() ||
+		mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
+	{
 		return false;
 	}
 
-	//// At least retreat_percent_away_min % away form our structures
-	//int enemyDistance = mEnemyDistances.front();
-	//int alliedDistance = mAlliedDistances.front();
-
-	//// Compare
-	//int totalDistance = enemyDistance + alliedDistance;
-	//double fractionDistanceFromOurBases = static_cast<double>(alliedDistance) / static_cast<double>(totalDistance);
-	//if (fractionDistanceFromOurBases < config::classification::squad::RETREAT_FRACTION_AWAY_MIN) {
-	//	return false;
-	//}
 
 	return true;
 }
@@ -414,11 +448,11 @@ void AlliedSquad::printInfo() {
 				TextColors::LIGHT_BLUE + "State: " + TextColors::WHITE + "%s\n" +
 				TextColors::LIGHT_BLUE + "Units: " + TextColors::WHITE + "%i\n" +
 				TextColors::LIGHT_BLUE + "Supplies: " + TextColors::WHITE + "%g\n" +
-				TextColors::LIGHT_BLUE + "Distance: " + TextColors::WHITE + "%i";
+				TextColors::LIGHT_BLUE + "Distance: " + TextColors::WHITE + "%g";
 
-			int alliedDistance = 0;
+			double alliedDistance = 0.0;
 			if (!mAlliedDistances.empty()) {
-				alliedDistance = mAlliedDistances.front();
+				alliedDistance = sqrt(static_cast<double>(mAlliedDistances.front()));
 			}
 
 			BWAPI::Broodwar->drawTextMap(
@@ -447,12 +481,14 @@ void AlliedSquad::printInfo() {
 			Broodwar->drawLineMap(
 				squadMovement.first.x(), squadMovement.first.y(),
 				squadMovement.second.x(), squadMovement.second.y(),
-				Colors::Grey
+				Colors::Purple
 			);
+
+			int xOffset = -64;
 
 			// Draw text in back of line
 			Broodwar->drawTextMap(
-				squadMovement.second.x(), squadMovement.second.y(),
+				squadMovement.second.x() + xOffset, squadMovement.second.y(),
 				"\x10Length: %g",
 				length
 			);

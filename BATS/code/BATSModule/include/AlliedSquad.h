@@ -160,28 +160,61 @@ private:
 	/**
 	 * Calculate whether the squad is moving to attack or not.
 	 * @return true when
-	 * \li Moving towards enemy base, delta measure_time
-	 * \li Moved moved_tiles_min, delta measure_time
-	 * \li Squad center is at least attack_percent_away_min percentage away from
-	 * our structures. Uses closest buildings from allied to enemy.
+	 * \li Moving towards enemy base or away from our bases, delta MEASURE_TIME
+	 * \li Moved MOVED_TILES_MIN, delta MEASURE_TIME
+	 * \li Squad center is at least AWAY_DISTANCE from our structures
 	 */
 	bool isMovingToAttack() const;
 
 	/**
-	 * Calculate whether the squad is retreating, almost same as isMovingToAttack().
-	 * @return true when
-	 * \li Moving away from closest enemy structure, delta measure_time
-	 * \li Moved moved_tiles_min, delta measure_time
-	 * \li Squad center is at least retreat_percent_away_min percentage away from our structures.
-	 * Uses closest buildings from allied to enemy.
+	 * Checks if the retreat has timed out
+	 * @return true if the retreat has passed RETREAT_TIMEOUT
+	 */
+	bool hasRetreatTimedout() const;
+
+	/**
+	 * Calculates when the squad is retreating. This takes into account if the squad is 
+	 * attacking or under attack. If the squad is attacking or under attack it is more
+	 * generous setting the squad as retreating as it will return true as fast as 
+	 * isRetreatingFrame() returs true. If on the other hand the squad is safe and hasn't
+	 * been attacking or attacked for ATTACK_TIMEOUT seconds isRetreatingFrame() needs
+	 * to return true continuously for at least RETREAT_TIME_WHEN_SAFE seconds.
+	 * @return true when the squad is treated as retreating
+	 * @see isRetreatingFrame()
 	 */
 	bool isRetreating() const;
 
 	/**
-	 * Checks whether the squad is attacking something, either at home or somewhere else.
-	 * @return true if the squad is attacking something
+	 * Calculate whether the squad is retreating for the current frame. This doesn't mean
+	 * that the squad shall be treated as retreating.
+	 * @return true when
+	 * <ul>
+	 * <li>Moving away from closest enemy structure, delta measure_time</li>
+	 * <li>If no enemy structure is available: moving towards our bases</li>
+	 * <li>Squad center is at least away_distance from our structures</li>
+	 * <li>Moved moved_tiles_min, delta measure_time</li>
+	 * </ul>	
+	 * @see isRetreating() that acts as a wrapper for this function.
+	 */
+	bool isRetreatingFrame() const;
+
+	/**
+	 * Checks whether the squad is attacking something. This will always return
+	 * true for ATTACK_TIMEOUT seconds after it actually attacked the last time.
+	 * It still checks if the squad is attacking even when the attack hasn't timed out,
+	 * this will update the time of the timeout.
+	 * @return true when the squad is treated as attacking something, or has done so within
+	 * ATTACK_TIMEOUT seconds.
 	 */
 	bool isAttacking() const;
+
+	/**
+	 * Checks whether the squad is attacking something this specific frame,
+	 * Could be attacking something either at home or somewhere else.
+	 * @return true if the squad is attacking something
+	 * @see isAttacking() that acts as a wrapper for this function.
+	 */
+	bool isAttackingFrame() const;
 
 	/**
 	 * Checks whether the squad has stopped to move while moving to attack outside home
@@ -212,7 +245,12 @@ private:
 	std::list<int> mEnemyDistances;
 	AlliedSquadId mId;
 	States mState;
-	double mLastUpdate;
+	double mUpdateLast;
+	mutable double mAttackLast;
+	double mUnderAttackLast;
+	mutable double mRetreatStartedTime;
+	mutable double mRetreatStartTestTime;
+	mutable bool mRetreatedLastCall;
 
 	static utilities::KeyHandler<_AlliedSquadType>* mpsKeyHandler;
 	static int mcsInstances;
