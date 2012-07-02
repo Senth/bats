@@ -6,7 +6,7 @@
 #include <BWTA.h>
 #include "BWTAExtern.h"
 #include "Utilities/KeyType.h"
-#include "BATSModule/include/IdTypes.h"
+#include "BATSModule/include/TypeDefs.h"
 
 /** The BaseAgent is the base agent class all agent classes directly or indirectly must extend. It contains some
  * common logic that is needed for several other agent implementations.

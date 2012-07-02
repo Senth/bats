@@ -518,3 +518,11 @@ std::string AlliedSquad::getStateString() const {
 			return "Unknown state";
 	}
 }
+
+const TilePosition& AlliedSquad::getCenter() const {
+	if (!mCenter.empty()) {
+		return mCenter.front();
+	} else {
+		return TilePositions::Invalid;
+	}
+}

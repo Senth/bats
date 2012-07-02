@@ -2,6 +2,8 @@
 #include "AttackCoordinator.h"
 #include "Config.h"
 #include "ExplorationManager.h"
+#include "AlliedSquad.h"
+#include "AlliedArmyManager.h"
 
 using namespace bats;
 using BWAPI::TilePosition;
@@ -10,6 +12,7 @@ using namespace std::tr1;
 
 AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
 ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
+AlliedArmyManager* AttackSquad::mpsAlliedArmyManager = NULL;
 
 const std::string ATTACK_SQUAD_NAME = "AttackSquad";
 
@@ -26,6 +29,7 @@ AttackSquad::AttackSquad(
 	if (mpsAttackCoordinator == NULL) {
 		mpsAttackCoordinator = AttackCoordinator::getInstance();
 		mpsExplorationManager = ExplorationManager::getInstance();
+		mpsAlliedArmyManager = AlliedArmyManager::getInstance();
 	}
 }
 
@@ -34,21 +38,55 @@ AttackSquad::~AttackSquad() {
 }
 
 void AttackSquad::computeSquadSpecificActions() {
-	// Create a wait position when we're in position, if we shall wait that is.
-	if (mWaitInPosition && isInPosition()) {
-		if (hasTemporaryGoalPosition()) {
-			// All wait goals done, continue to goal
-			if (!hasWaitGoals()) {
-				mWaitInPosition = false;
-				setTemporaryGoalPosition(BWAPI::TilePositions::Invalid);
+	// Find a new squad to follow if we're a frontal attack
+	if (NULL == mpAlliedSquadFollow && !isDistracting()) {
+		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getBigSquad();
+
+		// Check if squad is outside of home
+		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
+			if (pBigAlliedSquad->getState() != AlliedSquad::State_Idle) {
+				mpAlliedSquadFollow = pBigAlliedSquad;
 			}
-		} else {
-			setTemporaryGoalPosition(getCenter());
-		} 
+		}
+	}
+
+
+	// Not following any allied squad
+	if (NULL == mpAlliedSquadFollow) {
+		// Create a wait position when we're in position, if we shall wait that is.
+		if (mWaitInPosition && isInPosition()) {
+			if (hasTemporaryGoalPosition()) {
+				// All wait goals done, continue to goal
+				if (!hasWaitGoals()) {
+					mWaitInPosition = false;
+					setTemporaryGoalPosition(BWAPI::TilePositions::Invalid);
+				}
+			} else {
+				setTemporaryGoalPosition(getCenter());
+			} 
+		}
+	}
+	// Else - Following an allied squad
+	else {
+		/// @todo Allied squad might have merged, search for a close squad (that's not home)
+		if(mpAlliedSquadFollow->isEmpty()) {
+			mpAlliedSquadFollow.reset();
+		}
+
+		/// @todo follow the allied squad
+		if (NULL != mpAlliedSquadFollow) {
+
+		}
+		/// @todo Else - Did not find an empty squad, what to do?
+		else {
+
+		}
 	}
 }
 
 bool AttackSquad::createGoal() {
+	/// @todo check if allied big frontal attack is out of home
+
 	shared_ptr<AttackSquad> thisAttackSquad = getThis();
 	mpsAttackCoordinator->requestAttack(thisAttackSquad);
 	return true;

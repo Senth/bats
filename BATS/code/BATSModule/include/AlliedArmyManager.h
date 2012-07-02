@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IdTypes.h"
+#include "TypeDefs.h"
 #include "Config.h"
 #include <memory>
 #include <vector>
@@ -41,13 +41,6 @@ public:
 	void update();
 
 	/**
-	 * Rearranges the squads so that all limitations are met. Meaning it will split squads,
-	 * move units from one squad to another squad if squads are within include_distance or
-	 * outside exclude_distance
-	 */
-	void rearrangeSquads();
-
-	/**
 	 * Called when a constant has been updated (that this class listens to).
 	 * Currently it only listens these variables:
 	 * \code
@@ -75,11 +68,37 @@ public:
 	 */
 	void printInfo();
 
+	/**
+	 * Returns the biggest squad if one exists.
+	 * @return biggest squad, if no squad exist it will return NULL instead
+	 */
+	AlliedSquadCstPtr getBigSquad() const;
+
+	/**
+	 * Finds the closest squad to the specified position. An optional distance parameter
+	 * can be set not to return any squad further away than this distance.
+	 * @param position from where to find the closest squad
+	 * @param distanceMax maximum distance away the squad can be, defaults to INT_MAX
+	 * @return a pair where first is the squad (NULL if no squad was found) and second is the
+	 * squared distance (INT_MAX if no squad was found).
+	 */
+	std::pair<AlliedSquadCstPtr, int> getClosestSquad(
+		const BWAPI::TilePosition& position,
+		int distanceMax = INT_MAX
+	) const;
+
 private:
 	/**
 	 * Singleton constructor to enforce singleton usage.
 	 */
 	AlliedArmyManager();
+
+	/**
+	 * Rearranges the squads so that all limitations are met. Meaning it will split squads,
+	 * move units from one squad to another squad if squads are within include_distance or
+	 * outside exclude_distance
+	 */
+	void rearrangeSquads();
 
 	/**
 	 * Checks if the two units are within exclude_distance
@@ -192,7 +211,7 @@ private:
 	void addUnitToGrid(BWAPI::Unit* pUnit);
 
 	int mLastFrameUpdate;
-	std::vector<std::tr1::shared_ptr<AlliedSquad>> mSquads;
+	std::vector<AlliedSquadPtr> mSquads;
 	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad; /**< A unit bound to an id */
 
 	/** Look-up table for where the unit is located. */

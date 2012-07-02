@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Squad.h"
+#include "Typedefs.h"
 #include <vector>
 
 // Namespace for the project
@@ -8,6 +9,7 @@ namespace bats {
 
 class AttackCoordinator;
 class ExplorationManager;
+class AlliedArmyManager;
 
 /**
  * Attacks a point on the map. The squad will intercept all enemy units on the way to
@@ -32,7 +34,6 @@ public:
 	 * Destructor
 	 */
 	virtual ~AttackSquad();
-
 
 	/**
 	 * Checks whether the attack squad is "in position". In position means the squad is
@@ -90,8 +91,10 @@ protected:
 
 	static AttackCoordinator* mpsAttackCoordinator;
 	static ExplorationManager* mpsExplorationManager;
+	static AlliedArmyManager* mpsAlliedArmyManager;
 private:
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;
+	AlliedSquadCstPtr mpAlliedSquadFollow;
 };
 }

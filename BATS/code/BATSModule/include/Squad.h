@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
-#include "IdTypes.h"
+#include "TypeDefs.h"
 #include "Utilities/KeyType.h"
 #include "Utilities/KeyHandler.h"
 #include "UnitSet.h"

@@ -54,9 +54,6 @@
     <ClInclude Include="include\Squad.h">
       <Filter>Squads</Filter>
     </ClInclude>
-    <ClInclude Include="include\IdTypes.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="include\Config.h">
       <Filter>Helpers</Filter>
     </ClInclude>
@@ -125,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="include\AlliedArmyManager.h">
       <Filter>Allied</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TypeDefs.h">
+      <Filter>Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

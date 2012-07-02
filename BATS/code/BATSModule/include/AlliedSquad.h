@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IdTypes.h"
+#include "TypeDefs.h"
 #include "Config.h"
 #include <vector>
 #include <list>
@@ -140,6 +140,12 @@ public:
 	 * @return maximum amount of AlliedSquads that are allowed to be created.
 	 */
 	static int getMaxKeys();
+
+	/**
+	 * Returns the current center position of the squad.
+	 * @return current center position of the squad.
+	 */
+	const BWAPI::TilePosition& getCenter() const;
 
 private:
 	/**

@@ -125,7 +125,7 @@
     <ClInclude Include="include\ExploreData.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
-    <ClInclude Include="include\IdTypes.h" />
+    <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceCounter.h" />
     <ClInclude Include="include\ResourceGroup.h" />

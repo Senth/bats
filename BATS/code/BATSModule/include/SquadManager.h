@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IdTypes.h"
+#include "TypeDefs.h"
 #include <vector>
 #include <map>
-#include <memory.h>
+#include <memory>
 
 // Namespace for the project
 namespace bats {

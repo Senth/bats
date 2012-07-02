@@ -18,7 +18,8 @@ bool requiresLessSpace(UnitAgent* pLeftUnit, UnitAgent* pRightUnit) {
 }
 
 
-DropSquad::DropSquad(const std::vector<UnitAgent*>& units, const UnitComposition& unitComposition) :
+DropSquad::DropSquad(
+	const std::vector<UnitAgent*>& units, const UnitComposition& unitComposition) :
 	AttackSquad(units, true, unitComposition)
 {
 	mStartTime = 0.0;

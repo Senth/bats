@@ -398,7 +398,7 @@ void AlliedArmyManager::setBigSquad() {
 }
 
 void AlliedArmyManager::addSquad(AlliedSquad* pSquad) {
-	mSquads[pSquad->getId()] = std::tr1::shared_ptr<AlliedSquad>(pSquad);
+	mSquads[pSquad->getId()] = AlliedSquadPtr(pSquad);
 }
 
 void AlliedArmyManager::removeSquad(AlliedSquadId squadId) {
@@ -411,6 +411,40 @@ void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
 	if (gridPos != Positions::Invalid) {
 		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = false;
 	}
+}
+
+AlliedSquadCstPtr AlliedArmyManager::getBigSquad() const {
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i] && mSquads[i]->isBig()) {
+			return mSquads[i];
+		}
+	}
+	return AlliedSquadCstPtr();
+}
+
+std::pair<AlliedSquadCstPtr, int> AlliedArmyManager::getClosestSquad(
+	const BWAPI::TilePosition& position,
+	int distanceMax) const
+{
+	std::pair<AlliedSquadCstPtr, int> closestSquad;
+	if (distanceMax == INT_MAX) {
+		closestSquad.second = distanceMax;
+	} else {
+		closestSquad.second = distanceMax * distanceMax;
+	}
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
+			int squaredDistance = getSquaredDistance(position, mSquads[i]->getCenter());
+
+			if (squaredDistance < closestSquad.second) {
+				closestSquad.second = squaredDistance;
+				closestSquad.first = mSquads[i];
+			}
+		}
+	}
+
+	return closestSquad;
 }
 
 void AlliedArmyManager::printInfo() {

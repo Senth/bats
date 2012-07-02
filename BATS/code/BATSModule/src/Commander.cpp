@@ -111,10 +111,18 @@ void Commander::finishWaitingSquad() {
 }
 
 void Commander::createAttack() {
-	///@ todo handle already existing waiting squad.
+	// Handle already existing waiting squad.
 	if (NULL != mSquadWaiting) {
 		finishWaitingSquad();
 	}
+
+
+	/// @todo If we have a frontal attack and allied has a big attack and frontal attack
+	/// isn't following any attack. Follow frontal attack now.
+
+
+	/// @todo Never do a frontal attack if we're under attack (defending)
+
 
 	// Get free units
 	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
@@ -145,10 +153,16 @@ void Commander::createDrop() {
 		finishWaitingSquad();
 	}
 
+
+	/// @todo Check how many attacks we have (frontal, distracting)
+	/// Can we create a distracting attack?
+
+
 	// Get available unit compositions
 	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
 	std::vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
+
 
 	// Create drop
 	if (!availableUnitCompositions.empty()) {
