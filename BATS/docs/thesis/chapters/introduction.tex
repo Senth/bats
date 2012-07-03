@@ -57,17 +57,25 @@ All Zerg units and structures automatically regenerates health at a very slow ra
 
 Protoss units are a bit special, they have two health bar, one being the health and one being shields. Usually these are divided by half, meaning units have equal amount of health as shields, an exception is Archons which have 10 HP and 350 shield points (SP). Shields regenerate much faster than Zerg’s regeneration ability, including in battle, but always takes full damage from all damage types. Terran Science Vessels can drain all the shield instantly through its EMP ability. Shields can, however, be fully recharged by protoss support structure, shield battery, which converts its energy to shields, just as medics can heal biological units.
 
-\subsubsection{Why StarCraft?}
-Why choose StarCraft and not another game? Other games, or engines, the AI could be implemented in is SpringRTS\cite{springrts} which is an RTS game engine, it is by itself not a game and requires a game mod\footnote{A game mod in this case is the set of rules, units, graphics, to create a new RTS game.}, which there is plenty of. ORTS\cite{orts}, another RTS game, is aimed for developers and researching, and finally, Wargus\cite{wargus}, a WarCraft II clone that allows for modifications and implementation of an AI. So why not choose one of these instead of StarCraft?
+\subsection{Why StarCraft?}
+\marginpar{Move “Why StarCraft?” to Background?}
+Why choose StarCraft and not another RTS game? Other games, or engines, the AI could be implemented in is SpringRTS\cite{springrts} which is an RTS game engine, it is by itself not a game and requires a game mod\footnote{A game mod in this case is the set of rules, units, graphics, to create a new RTS game.}, which there are plenty of. ORTS\cite{orts} is aimed for developers and researching, and finally, Wargus\cite{wargus}, a WarCraft II clone that allows for modifications and implementation of an AI. So why not choose one of these instead of StarCraft?
 
-StarCraft: Brood War has been around since 1998, and Blizzard Entertainment continued patching it until beginning of 2009.
+\paragraph{Carefully balanced}
+Blizzard Entertainment released StarCraft: Brood War in 1998 and continued to patch it until beginning of 2009.
 %: Cite patching
-Thus it has been carefully balanced by Blizzard. This might be because it was such a success in South Korea where StarCraft has become a huge sport, meaning it needs to balanced.
-%: Cite huge sport in korea
+The other games have neither had the time nor the amount of players to carefully balance the game. One factor might be because StarCraft has become a huge sport in South Korea\cite{scKotakuKorea}.
 
-\subsubsection{Balanced}
+\paragraph{Easy to find experienced players}
+Because StarCraft have been around for so long and is a commercial successful game it is easy to find experienced players to test the game. By using experienced players as testers, the players do not have to learn the game mechanics and can focus on evaluating the bot instead of the game.
+
+\paragraph{Big community}
+StarCraft has a big community, this makes it easy to find and ask people what functionality they would like to see in a teammate bot to gain more ideas, but also evaluate our ideas.
+
+\paragraph{Extending an already existing bot} We have the opportunity to extend an already existing bot, BTHAI\cite{bthai}, for BWAPI\cite{bwapi}. By extending a bot we can focus on making the bot a good teammate and not worry about all the other details; such as good path finding, building placement. Sometimes we, however, improve some already existing systems, e.g. build order, to meet our needs, but we do not have to build the entire system from scratch. In addition, BTHAI is developed by our supervisor, Hagelbäck, and we can therefore get fast help of the system if needed. While we have not searched for other bots to extended, we figured it would be hard to top the support we would get from BTHAI.
 
 \section{Teammate}
+A teammate is a player, either human or bot, that helps the team work towards a common goal. Teammate bots often prioritize the human player because it is their experience, thus it is more the bot helps the player then the team.
 
 \subsection{Player}
 
