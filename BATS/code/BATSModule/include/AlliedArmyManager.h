@@ -87,6 +87,21 @@ public:
 		int distanceMax = INT_MAX
 	) const;
 
+	/**
+	 * Returns a vector with all squads within the specified distance from the position.
+	 * @param position from where to search for the squads
+	 * @param distanceMax maximum distance away the squad can be
+	 * @param bSort if we want to sort the vector, shorters distance will be first in the
+	 * vector, defaults to false.
+	 * @return vector with a pair where first is the squad and second is the squared distance
+	 * to the squad. If no squads are found within the distance an empty vector is returned.
+	 */
+	std::vector<std::pair<AlliedSquadCstPtr, int>> getSquadsWithin(
+		const BWAPI::TilePosition& position,
+		int distanceMax,
+		bool bSort = false
+	) const;
+
 private:
 	/**
 	 * Singleton constructor to enforce singleton usage.

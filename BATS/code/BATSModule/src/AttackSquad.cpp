@@ -4,11 +4,12 @@
 #include "ExplorationManager.h"
 #include "AlliedSquad.h"
 #include "AlliedArmyManager.h"
+#include "Helper.h"
 
 using namespace bats;
-using BWAPI::TilePosition;
-using BWAPI::Broodwar;
+using namespace BWAPI;
 using namespace std::tr1;
+using namespace std;
 
 AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
 ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
@@ -38,19 +39,6 @@ AttackSquad::~AttackSquad() {
 }
 
 void AttackSquad::computeSquadSpecificActions() {
-	// Find a new squad to follow if we're a frontal attack
-	if (NULL == mpAlliedSquadFollow && !isDistracting()) {
-		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getBigSquad();
-
-		// Check if squad is outside of home
-		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
-			if (pBigAlliedSquad->getState() != AlliedSquad::State_Idle) {
-				mpAlliedSquadFollow = pBigAlliedSquad;
-			}
-		}
-	}
-
-
 	// Not following any allied squad
 	if (NULL == mpAlliedSquadFollow) {
 		// Create a wait position when we're in position, if we shall wait that is.
@@ -66,43 +54,126 @@ void AttackSquad::computeSquadSpecificActions() {
 			} 
 		}
 	}
+
+
 	// Else - Following an allied squad
 	else {
-		/// @todo Allied squad might have merged, search for a close squad (that's not home)
+		// Allied squad might have merged, search for a close squad (that's not home)
 		if(mpAlliedSquadFollow->isEmpty()) {
 			mpAlliedSquadFollow.reset();
+
+			vector<pair<AlliedSquadCstPtr, int>> foundSquads;
+			foundSquads = mpsAlliedArmyManager->getSquadsWithin(
+				getCenter(),
+				config::squad::attack::FIND_ALLIED_SQUAD_DISTANCE,
+				true
+			);
+
+			// Chose the closest squad that is outside home (not idle)
+			vector<pair<AlliedSquadCstPtr, int>>::const_iterator squadIt = foundSquads.begin();
+			while (NULL != mpAlliedSquadFollow && squadIt != foundSquads.end()) {
+				if (squadIt->first->getState() != AlliedSquad::State_Idle) {
+					mpAlliedSquadFollow = squadIt->first;
+				}
+
+				++squadIt;
+			}
 		}
 
-		/// @todo follow the allied squad
+		// Follow the allied squad
 		if (NULL != mpAlliedSquadFollow) {
+			// Regroup with allied force if far away
+			if (getTemporaryGoalPosition() == TilePositions::Invalid) {
+				if (needsAlliedRegrouping()) {
+					setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+					setAvoidEnemyUnits(true);
+				}
+			}
+			// Currently regrouping, update regroup position if not finished
+			else {
+				if (finishedAlliedRegrouping()) {
+					setTemporaryGoalPosition(TilePositions::Invalid);
+					setAvoidEnemyUnits(false);
+				} else {
+					setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+				}
+			}
 
+			// No regrouping
+			if (getTemporaryGoalPosition() == TilePositions::Invalid) {
+				switch (mpAlliedSquadFollow->getState()) {
+					// Allied are still -> do nothing
+					case AlliedSquad::State_AttackHalted:
+						setAvoidEnemyUnits(true);
+						break;
+				
+					// Allied is retreating ->
+					// Allied is moving		-> follow, but don't attack
+					case AlliedSquad::State_Retreating:
+					case AlliedSquad::State_MovingToAttack:
+						setGoalPosition(mpAlliedSquadFollow->getCenter());
+						setAvoidEnemyUnits(true);
+						break;
+
+					// Allied is attacking -> Find something close to attack
+					case AlliedSquad::State_Attacking:
+						/// @todo don't call request attack every frame!
+						setAvoidEnemyUnits(false);
+						mpsAttackCoordinator->requestAttack(getThis());
+						break;
+
+					/// @todo Allied is safe -> disband (change to retreat)
+					case AlliedSquad::State_Idle:
+						forceDisband();
+						mpAlliedSquadFollow.reset();
+						break;
+				}
+			}
 		}
-		/// @todo Else - Did not find an empty squad, what to do?
+		// @todo Did not find an allied squad, disband (change to retreat)
 		else {
-
+			forceDisband();
 		}
 	}
 }
 
 bool AttackSquad::createGoal() {
-	/// @todo check if allied big frontal attack is out of home
+	// Check if allied big frontal attack is out of home
+	if (NULL == mpAlliedSquadFollow && !isDistracting()) {
+		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getBigSquad();
 
-	shared_ptr<AttackSquad> thisAttackSquad = getThis();
-	mpsAttackCoordinator->requestAttack(thisAttackSquad);
+		// Check if squad is outside of home
+		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
+			if (pBigAlliedSquad->getState() != AlliedSquad::State_Idle) {
+				mpAlliedSquadFollow = pBigAlliedSquad;
+				setCanRegroup(false);
+			}
+		}
+	}
+
+
+	// Not following allied -> request regular attack
+	if (NULL == mpAlliedSquadFollow) {
+		mpsAttackCoordinator->requestAttack(getThis());
+	}
+
 	return true;
 }
 
 Squad::GoalStates AttackSquad::checkGoalState() const {
 	Squad::GoalStates goalState = Squad::GoalState_NotCompleted;
 
-	// Check if all enemy structures are dead nearby
-	if (isEnemyStructuresNearGoalDead()) {
-		goalState = Squad::GoalState_Succeeded;
+	// Only check goal if we're not following an allied squad
+	if (NULL == mpAlliedSquadFollow) {
+		// Check if all enemy structures are dead nearby
+		if (isEnemyStructuresNearGoalDead()) {
+			goalState = Squad::GoalState_Succeeded;
+		}
+
+		/// @todo check if enemy force is too strong.
+
+		/// @todo check for enemy units to kill them?
 	}
-
-	/// @todo check if enemy force is too strong.
-
-	/// @todo check for enemy units to kill them?
 
 	return goalState;
 }
@@ -144,6 +215,14 @@ bool AttackSquad::isDistracting() const {
 	return mDistraction;
 }
 
+bool AttackSquad::isFollowingAlliedSquad() const {
+	return NULL != mpAlliedSquadFollow;
+}
+
+AlliedSquadCstPtr AttackSquad::getAlliedSquad() const {
+	return mpAlliedSquadFollow;
+}
+
 std::string AttackSquad::getName() const {
 	return ATTACK_SQUAD_NAME;
 }
@@ -158,3 +237,33 @@ void AttackSquad::onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitG
 	mWaitInPosition = true;
 }
 #pragma warning(pop)
+
+bool AttackSquad::needsAlliedRegrouping() const {
+	if (NULL != mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
+		return false;
+	}
+
+	if (getSquaredDistance(getCenter(), mpAlliedSquadFollow->getCenter())
+		>=
+		config::squad::attack::ALLIED_REGROUP_BEGIN_SQUARED)
+	{
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool AttackSquad::finishedAlliedRegrouping() const {
+	if (NULL != mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
+		return true;
+	}
+
+	if (getSquaredDistance(getCenter(), mpAlliedSquadFollow->getCenter())
+		<=
+		config::squad::attack::ALLIED_REGROUP_END_SQUARED)
+	{
+		return true;
+	} else {
+		return false;
+	}
+}

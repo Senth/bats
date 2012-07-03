@@ -2,4 +2,4 @@
 ; e.g early > mid > late
 ; 
 
-dropships > mid-y > late-z
+default > mid-y > late-z

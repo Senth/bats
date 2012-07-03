@@ -7,6 +7,7 @@
 #include "ResourceGroup.h"
 #include "WaitGoalManager.h"
 #include "WaitReadySquad.h"
+#include "AlliedSquad.h"
 #include "Config.h"
 #include <cstdlib>
 #include <algorithm>
@@ -82,7 +83,24 @@ AttackCoordinator* AttackCoordinator::getInstance() {
 }
 
 void AttackCoordinator::requestAttack(shared_ptr<AttackSquad> squad) {
-	/// @todo Check whether player is attacking
+	// Special case when squad is big and player squad has attacking big
+	if (squad->isDistracting() && squad->isFollowingAlliedSquad()) {
+		AlliedSquadCstPtr alliedSquad = squad->getAlliedSquad();
+		const TilePosition alliedCenter = alliedSquad->getCenter();
+		if (TilePositions::Invalid != alliedCenter) {
+			// Find closest attack position to allied squad
+			std::pair<TilePosition, int> attackPosition = mpExplorationManager->getClosestSpottedBuilding(alliedCenter);
+
+			// Found position
+			if (TilePositions::Invalid != attackPosition.first) {
+				squad->setGoalPosition(attackPosition.first);
+			}
+			// Else use squad center instead
+			else {
+				squad->setGoalPosition(alliedCenter);
+			}
+		}
+	}
 
 
 	// Attack position
@@ -113,7 +131,10 @@ void AttackCoordinator::requestAttack(shared_ptr<AttackSquad> squad) {
 	for (squadIt = mpSquadManager->begin(); squadIt != mpSquadManager->end(); ++squadIt) {
 		shared_ptr<AttackSquad> currentAttackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 
-		if (NULL != currentAttackSquad && currentAttackSquad->getState() == Squad::State_Active) {
+		if (NULL != currentAttackSquad &&
+			currentAttackSquad != squad &&
+			currentAttackSquad->getState() == Squad::State_Active)
+		{
 			currentAttackSquad->addWaitGoal(newWaitGoal);
 		}
 	}
@@ -212,6 +233,10 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 			++cAttackSquads;
 		}
 	}
+
+	
+	/// @todo check where player is attacking
+
 
 	// Found attacking squads
 	if (cAttackSquads > 0) {

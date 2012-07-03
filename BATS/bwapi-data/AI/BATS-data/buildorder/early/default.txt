@@ -1,0 +1,19 @@
+<name>
+Default
+<description>
+Only for testing purposes
+<available-transitions>
+mid-x
+<build-order>
+Terran_Supply_Depot
+Terran_Barracks
+Terran_Barracks
+Terran_Refinery
+Terran_Barracks
+Terran_Academy
+Terran_Bunker
+<units>
+80% Terran_Marine
+20% Terran_Medic
+<must-have>
+2 Terran_Medic

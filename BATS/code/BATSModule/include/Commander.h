@@ -13,6 +13,7 @@ class Squad;
 class SquadManager;
 class UnitCompositionFactory;
 class UnitManager;
+class AlliedArmyManager;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -81,6 +82,12 @@ private:
 	Commander();
 
 	/**
+	 * Computes reactive player behavior, i.e. if it shall attack when an allied moves
+	 * out to attack etc.
+	 */
+	void computeReactions();
+
+	/**
 	 * Finishes and executes the squad command.
 	 */
 	void finishWaitingSquad();
@@ -104,6 +111,7 @@ private:
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;
+	AlliedArmyManager* mpAlliedArmyManager;
 	std::set<const std::string> mAvailableCommands;
 
 	static Commander* mpsInstance;

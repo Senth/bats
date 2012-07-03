@@ -10,6 +10,9 @@ namespace bats {
 
 class Squad;
 
+typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator SquadIt;
+typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator SquadCstIt;
+
 /**
  * Handles all squads.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
@@ -42,25 +45,25 @@ public:
 	 * Get the beginning of the squad iterator
 	 * @return beginning of the iterator
 	 */
-	std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator begin();
+	SquadIt begin();
 
 	/**
 	 * Get the beginning of the squad iterator as const
 	 * @return beginning of the const_iterator
 	 */
-	std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator begin() const;
+	SquadCstIt begin() const;
 
 	/**
 	 * Get the end of the squad iterator
 	 * @return end of the squad iterator
 	 */
-	std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator end();
+	SquadIt end();
 
 	/**
 	 * Get the end of the squad iterator as const
 	 * @return end of the squad const_iterator
 	 */
-	std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator end() const;
+	SquadCstIt end() const;
 
 	/**
 	 * Called every frame. Calls all squad's bats::Squad::computeActions() to update the squads.

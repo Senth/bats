@@ -121,21 +121,21 @@ namespace bats {
 				 * retreating */
 				extern int MOVED_TILES_MIN;
 				/** Cannot be set through the config file, will set automatically,
-				 * used for faster calculation.
+				 * used for faster calculation. Does not send an event.
 				 * @see MOVED_TILES_MIN. */
 				extern int MOVED_TILES_MIN_SQUARED;
 				/** How far away from our home (allied structures) the squad has to be until
 				 * it can be treated as either attacking or retreating. */
 				extern int AWAY_DISTANCE;
 				/** Cannot be set through the config file, will set automatically, used for
-				 * faster calculation.
+				 * faster calculation. Does not send an event.
 				 * @see AWAY_DISTANCE */
 				extern int AWAY_DISTANCE_SQUARED;
 				/** Distance a unit has to be to another unit in the squad until
 				 * it is treated as included in the squad. The distance is in TilePositions. */
 				extern int INCLUDE_DISTANCE;
 				/** Cannot be set through the config file, will set automatically,
-				 * used for faster calculation.
+				 * used for faster calculation. Does not send an event.
 				 * @see INCLUDE_DISTANCE */
 				extern int INCLUDE_DISTANCE_SQUARED;
 				/** If a unit is in a squad and the distance to the closest squad unit is
@@ -145,7 +145,7 @@ namespace bats {
 				 * GRID_SQUARE_DISTANCE calculation. */
 				extern int EXCLUDE_DISTANCE;
 				/** Cannot be set through the config file, will set automatically,
-				 * used for faster calculation.
+				 * used for faster calculation. Does not send an event.
 				 * @see EXCLUDE_DISTANCE */
 				extern int EXCLUDE_DISTANCE_SQUARED;
 				/** Cannot be set through the config file, will set automatically when
@@ -243,8 +243,8 @@ namespace bats {
 			 */
 			extern double REGROUP_DISTANCE_BEGIN;
 			/** Cannot be set through the config file, will set automatically,
-			 * used for faster calculation.
-			 * @see REGROUP_DISTANCE_BEGIN, the squared version. */
+			 * used for faster calculation. Does not send an event.
+			 * @see REGROUP_DISTANCE_BEGIN */
 			extern double REGROUP_DISTANCE_BEGIN_SQUARED;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
@@ -252,8 +252,8 @@ namespace bats {
 			 */
 			extern double REGROUP_DISTANCE_END;
 			/** Cannot be set through the config file, will set automatically,
-			 * used for faster calculation.
-			 * @see REGROUP_DISTANCE_END, the squared version. */
+			 * used for faster calculation. Does not send an event.
+			 * @see REGROUP_DISTANCE_END */
 			extern double REGROUP_DISTANCE_END_SQUARED;
 			/** Time before trying with a new regroup position when a unit is still */
 			extern double REGROUP_NEW_POSITION_TIME;
@@ -281,6 +281,21 @@ namespace bats {
 				/** The distance from the goal position to check if all buildings have
 				 * been destroyed to complete the goal. */
 				extern double STRUCTURES_DESTROYED_GOAL_DISTANCE;
+				/** Maximum distance to an allied squad when searching for another
+				 * squad once either the current following squad died or merged. */
+				extern int FIND_ALLIED_SQUAD_DISTANCE;
+				/** Distance away from allied squad when regrouping with allied squad begins. */
+				extern int ALLIED_REGROUP_BEGIN;
+				/** Cannot be set through the config file, will set automatically,
+				 * used for faster calculation. Does not send an event.
+				 * @see ALLIED_REGROUP_BEGIN */
+				extern int ALLIED_REGROUP_BEGIN_SQUARED;
+				/** Distance away from allied squad when regrouping is finished. */
+				extern int ALLIED_REGROUP_END;
+				/** Cannot be set through the config file, will set automatically,
+				 * used for faster calculation. Does not send an event.
+				 * ALLIED_REGOURP_END_SQUARED */
+				extern int ALLIED_REGROUP_END_SQUARED;
 			}
 
 			/**

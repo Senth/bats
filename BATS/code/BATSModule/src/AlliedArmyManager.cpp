@@ -8,9 +8,11 @@
 #include <BWAPI/Constants.h>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
 using namespace bats;
 using namespace BWAPI;
+using namespace std;
 using std::tr1::shared_ptr;
 
 AlliedArmyManager* AlliedArmyManager::mpsInstance = NULL;
@@ -435,16 +437,41 @@ std::pair<AlliedSquadCstPtr, int> AlliedArmyManager::getClosestSquad(
 
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
-			int squaredDistance = getSquaredDistance(position, mSquads[i]->getCenter());
+			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
 
-			if (squaredDistance < closestSquad.second) {
-				closestSquad.second = squaredDistance;
+			if (distanceSquared < closestSquad.second) {
+				closestSquad.second = distanceSquared;
 				closestSquad.first = mSquads[i];
 			}
 		}
 	}
 
 	return closestSquad;
+}
+
+vector<pair<AlliedSquadCstPtr, int>> AlliedArmyManager::getSquadsWithin(
+	const BWAPI::TilePosition& position,
+	int distanceMax,
+	bool bSort) const
+{
+	int distanceMaxSquared = distanceMax * distanceMax;
+	vector<pair<AlliedSquadCstPtr, int>> foundSquads;
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
+			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
+
+			if (distanceSquared <= distanceMaxSquared) {
+				foundSquads.push_back(make_pair(mSquads[i], distanceSquared));
+			}
+		}
+	}
+
+	if (bSort) {
+		sort(foundSquads.begin(), foundSquads.end(), PairCompareSecond<AlliedSquadCstPtr, int>());
+	}
+
+	return foundSquads;
 }
 
 void AlliedArmyManager::printInfo() {

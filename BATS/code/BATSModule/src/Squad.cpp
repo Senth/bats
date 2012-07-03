@@ -668,6 +668,18 @@ void Squad::updateUnitMovement() {
 	}
 }
 
+void Squad::setAvoidEnemyUnits(bool bAvoidEnemyUnits) {
+	mAvoidEnemyUnits = bAvoidEnemyUnits;
+}
+
+void Squad::clearMovement() {
+	mViaPath.clear();
+	mGoalPosition = TilePositions::Invalid;
+	mTempGoalPosition = TilePositions::Invalid;
+	mRegroupPosition = TilePositions::Invalid;
+	mRetreatPosition = TilePositions::Invalid;
+}
+
 TilePosition Squad::getPriorityMoveToPosition() const {
 	TilePosition movePosition = TilePositions::Invalid;
 

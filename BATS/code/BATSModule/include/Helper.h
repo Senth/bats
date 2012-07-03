@@ -164,4 +164,25 @@ std::ostream& operator<<(std::ostream& out, const BWAPI::TilePosition& position)
  * \copydoc operator<<(std::ostream&,const BWPAI::Tileposition&)
  */
 std::ostream& operator<<(std::ostream& out, const BWAPI::Position& position);
+
+
+/**
+ * Class to compare the second variable in a pair.
+ */
+template<typename Object, typename Compare>
+struct PairCompareSecond
+{
+public:
+	/**
+	 * Returns which second is less in a pair of variables. Used for std::sort
+	 * @param lhs left hand of the, i.e. should be less if returned true
+	 * @param rhs right hand
+	 * @return true if lhs < rhs.
+	 * @pre container contain a pair where the second variable is the one that is compared.
+	 */
+	bool operator()(const std::pair<Object, Compare>& lhs, const std::pair<Object, Compare>& rhs)
+	{
+		return lhs.second < rhs.second;
+	}
+};
 }

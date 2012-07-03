@@ -149,6 +149,11 @@ namespace squad {
 	namespace attack {
 		double WAITING_POSITION_DISTANCE_FROM_GOAL = 0.0;
 		double STRUCTURES_DESTROYED_GOAL_DISTANCE = 0.0;
+		int FIND_ALLIED_SQUAD_DISTANCE = 0;
+		int ALLIED_REGROUP_BEGIN = 0;
+		int ALLIED_REGROUP_BEGIN_SQUARED = ALLIED_REGROUP_BEGIN * ALLIED_REGROUP_BEGIN;
+		int ALLIED_REGROUP_END = 0;
+		int ALLIED_REGROUP_END_SQUARED = ALLIED_REGROUP_END * ALLIED_REGROUP_END;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -341,25 +346,21 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 	} else if (variableInfo.name == "moved_tiles_min") {
 		gOldValue = toString(MOVED_TILES_MIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(MOVED_TILES_MIN));
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(MOVED_TILES_MIN_SQUARED));
 		MOVED_TILES_MIN = variableInfo;
 		MOVED_TILES_MIN_SQUARED = MOVED_TILES_MIN * MOVED_TILES_MIN;
 	} else if (variableInfo.name == "away_distance") {
 		gOldValue = toString(AWAY_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(AWAY_DISTANCE));
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(AWAY_DISTANCE_SQUARED));
 		AWAY_DISTANCE = variableInfo;
 		AWAY_DISTANCE_SQUARED = AWAY_DISTANCE * AWAY_DISTANCE;
 	} else if (variableInfo.name == "include_distance") {
 		gOldValue = toString(INCLUDE_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(INCLUDE_DISTANCE));
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(INCLUDE_DISTANCE_SQUARED));
 		INCLUDE_DISTANCE = variableInfo;
 		INCLUDE_DISTANCE_SQUARED = INCLUDE_DISTANCE * INCLUDE_DISTANCE;
 	} else if (variableInfo.name == "exclude_distance") {
 		gOldValue = toString(EXCLUDE_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXCLUDE_DISTANCE));
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXCLUDE_DISTANCE_SQUARED));
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(GRID_SQUARE_DISTANCE));
 		EXCLUDE_DISTANCE = variableInfo;
 		EXCLUDE_DISTANCE_SQUARED = EXCLUDE_DISTANCE * EXCLUDE_DISTANCE;
@@ -384,7 +385,8 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY));
 	#endif
 		} else if (variableInfo.name == "graphics_verbosity_in_release") {
-			gOldValue = toString(GRAPHICS_VERBOSITY_IN_RELEASE); gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY_IN_RELEASE));
+			gOldValue = toString(GRAPHICS_VERBOSITY_IN_RELEASE);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY_IN_RELEASE));
 			GRAPHICS_VERBOSITY_IN_RELEASE = variableInfo;
 	#ifndef _DEBUG
 			GRAPHICS_VERBOSITY = variableInfo;
@@ -466,13 +468,11 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 		} else if (variableInfo.name == "regroup_distance_begin") {
 			gOldValue = toString(REGROUP_DISTANCE_BEGIN);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_BEGIN));
-			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_BEGIN_SQUARED));
 			REGROUP_DISTANCE_BEGIN = variableInfo;
 			REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 		} else if (variableInfo.name == "regroup_distance_end") {
 			gOldValue = toString(REGROUP_DISTANCE_END);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_END));
-			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_END_SQUARED));
 			REGROUP_DISTANCE_END = variableInfo;
 			REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 		} else if (variableInfo.name == "regroup_new_position_time") {
@@ -511,6 +511,20 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(STRUCTURES_DESTROYED_GOAL_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(STRUCTURES_DESTROYED_GOAL_DISTANCE));
 		STRUCTURES_DESTROYED_GOAL_DISTANCE = variableInfo;
+	} else if (variableInfo.name == "find_allied_squad_distance") {
+		gOldValue = toString(FIND_ALLIED_SQUAD_DISTANCE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(FIND_ALLIED_SQUAD_DISTANCE));
+		FIND_ALLIED_SQUAD_DISTANCE = variableInfo;
+	} else if (variableInfo.name == "allied_regroup_begin") {
+		gOldValue = toString(ALLIED_REGROUP_BEGIN);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_BEGIN));
+		ALLIED_REGROUP_BEGIN = variableInfo;
+		ALLIED_REGROUP_BEGIN_SQUARED = ALLIED_REGROUP_BEGIN * ALLIED_REGROUP_BEGIN;
+	} else  if (variableInfo.name == "allied_regroup_end") {
+		gOldValue = toString(ALLIED_REGROUP_END);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_END));
+		ALLIED_REGROUP_END = variableInfo;
+		ALLIED_REGROUP_END_SQUARED = ALLIED_REGROUP_END * ALLIED_REGROUP_END;
 	} else {
 		return false;
 	}

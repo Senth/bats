@@ -42,19 +42,19 @@ shared_ptr<const Squad> SquadManager::getSquad(const SquadId& squadId) const {
 	}
 }
 
-std::map<SquadId, shared_ptr<Squad>>::iterator SquadManager::begin() {
+SquadIt SquadManager::begin() {
 	return mSquads.begin();
 }
 
-std::map<SquadId, shared_ptr<Squad>>::const_iterator SquadManager::begin() const {
+SquadCstIt SquadManager::begin() const {
 	return mSquads.begin();
 }
 
-std::map<SquadId, shared_ptr<Squad>>::iterator SquadManager::end() {
+SquadIt SquadManager::end() {
 	return mSquads.end();
 }
 
-std::map<SquadId, shared_ptr<Squad>>::const_iterator SquadManager::end() const {
+SquadCstIt SquadManager::end() const {
 	return mSquads.end();
 }
 

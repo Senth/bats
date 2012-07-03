@@ -217,9 +217,11 @@ public:
 	/**
 	 * Sets the position to move to as a goal. This will reset all current goal positions.
 	 * @param position the new goal position to move to.
-	 * @see setGoalPositions() to set a list of positions, and reset current positions.
-	 * @see addGoalPosition() to add one position to the back of the queue, without resetting.
-	 * @see addGoalPositions() to add several position to the back of the queue, without resetting.
+	 * @see setViaPath() to set a list of positions, and reset current via positions.
+	 * @see addViaPath(BWAPI::TilePosition) to add one position to the back of the queue,
+	 * without resetting.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue, without resetting.
 	 */
 	void setGoalPosition(const BWAPI::TilePosition& position);
 
@@ -229,7 +231,8 @@ public:
 	 * via path and set them to 0.
 	 * @see setGoalPosition() to set one goal position, and reset current positions.
 	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
-	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back of the queue.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue.
 	 */
 	void setViaPath(const std::list<BWAPI::TilePosition>& positions);
 
@@ -238,7 +241,8 @@ public:
 	 * @param position the goal position to add at the back of the queue.
 	 * @see setGoalPosition() to set one position, and reset current positions.
 	 * @see setViaPath() to set a new via path removing the old.
-	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back of the queue.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue.
 	 */
 	void addViaPath(const BWAPI::TilePosition& position);
 
@@ -501,6 +505,17 @@ protected:
 	 */
 	double getSightDistance() const;
 
+	/**
+	 * Clears all movement positions, goal, via, regroup, etc.
+	 */
+	void clearMovement();
+
+	/**
+	 * Sets if the squad shall avoid enemy units
+	 * @param bAvoidEnemyUnits if the squad shall avoid enemy units or not
+	 */
+	void setAvoidEnemyUnits(bool bAvoidEnemyUnits);
+
 #pragma warning(push)
 #pragma warning(disable:4100)
 	/**
@@ -612,10 +627,10 @@ private:
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mViaPath;
 	BWAPI::TilePosition mGoalPosition;
-	UnitComposition mUnitComposition;
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;
 	BWAPI::TilePosition mRetreatPosition;
+	UnitComposition mUnitComposition;
 	double mRegroupStartTime;
 	bool mCanRegroup;
 

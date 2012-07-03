@@ -4,6 +4,8 @@
 #include "UnitManager.h"
 #include "Squad.h"
 #include "SquadManager.h"
+#include "AlliedArmyManager.h"
+#include "AlliedSquad.h"
 #include "UnitManager.h"
 #include "UnitCompositionFactory.h"
 #include "BTHAIModule/Source/CoverMap.h"
@@ -24,7 +26,9 @@ Commander::Commander() {
 	mpUnitCompositionFactory = NULL;
 	mpUnitManager = NULL;
 	mpSquadManager = NULL;
+	mpAlliedArmyManager = NULL;
 
+	mpAlliedArmyManager = AlliedArmyManager::getInstance();
 	mpSquadManager = SquadManager::getInstance();
 	mpUnitManager = UnitManager::getInstance();
 	mpUnitCompositionFactory = UnitCompositionFactory::getInstance();
@@ -43,6 +47,7 @@ Commander::~Commander() {
 
 	mpSquadManager = NULL;
 	mpUnitManager = NULL;
+	mpAlliedArmyManager = NULL;
 	mpsInstance = NULL;
 }
 
@@ -56,7 +61,44 @@ Commander* Commander::getInstance() {
 void Commander::computeActions() {
 	/// @todo Commander computer actions more complex actions
 
+	computeReactions();
 	mpSquadManager->computeActions();
+}
+
+void Commander::computeReactions() {
+	// Allied is outside home with big attack
+	AlliedSquadCstPtr bigSquad = mpAlliedArmyManager->getBigSquad();
+	if (NULL != bigSquad && bigSquad->getState() != AlliedSquad::State_Idle) {
+		// Check for our frontal attack and if it's following an allied squad or not
+		bool haveFrontalAttack = false;
+		bool followingAlliedSquad = false;
+		SquadIt squadIt = mpSquadManager->begin();
+		while (!haveFrontalAttack && squadIt != mpSquadManager->end()) {
+			shared_ptr<AttackSquad> attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+			if (NULL != attackSquad) {
+				if (!attackSquad->isDistracting()) {
+					haveFrontalAttack = true;
+
+					if (attackSquad->isFollowingAlliedSquad()) {
+						followingAlliedSquad = true;
+					}
+				}
+			}
+
+			++squadIt;
+		}
+
+		// Create frontal attack
+		if (!haveFrontalAttack) {
+			issueCommand("attack");
+		}
+		// Create distraction
+		else if (!followingAlliedSquad) {
+			issueCommand("drop");
+		}
+	}
+	/// @todo Allied is outside home with any attack
+		// We don't have any attack -> Create frontal or distracting attack
 }
 
 bool Commander::issueCommand(const std::string& command) {

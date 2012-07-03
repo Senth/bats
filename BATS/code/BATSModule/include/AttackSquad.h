@@ -66,6 +66,18 @@ public:
 	bool isDistracting() const;
 
 	/**
+	 * Returns true if the squad is following an allied squad
+	 * @return true if the squad is following an allied squad
+	 */
+	bool isFollowingAlliedSquad() const;
+
+	/**
+	 * Returns the allied squad this squad is following
+	 * @return allied squad this squad is following, NULL if not following any allied squad
+	 */
+	AlliedSquadCstPtr getAlliedSquad() const;
+
+	/**
 	 * Returns an AttackSquad shared_ptr instead of the original Squad shared_ptr.
 	 * @note This function is not overridden, but more a helper function to return the
 	 * right pointer for an attackSquad.
@@ -93,6 +105,20 @@ protected:
 	static ExplorationManager* mpsExplorationManager;
 	static AlliedArmyManager* mpsAlliedArmyManager;
 private:
+	/**
+	 * Check if the squad needs to regroup with the allied forces.
+	 * @return true if the squad needs to regroup, always returns false if we're not
+	 * following any allied squad.
+	 */
+	bool needsAlliedRegrouping() const;
+
+	/**
+	 * Checks if we're done with regrouping with the allied forces.
+	 * @return true if squad finished regrouping with allied squad or if we're not
+	 * following any allied squad.
+	 */
+	bool finishedAlliedRegrouping() const;
+
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;
 	AlliedSquadCstPtr mpAlliedSquadFollow;
