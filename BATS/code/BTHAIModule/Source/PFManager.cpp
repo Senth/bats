@@ -231,6 +231,26 @@ float PFManager::getAttackingUnitP(BaseAgent* agent, int cX, int cY, bool defens
         p += ptmp;
 	}
 
+	//Allied units
+	// Matteus Magnusson
+	const set<Player*>& players = Broodwar->getPlayers();
+	set<Player*>::const_iterator playerIt;
+	for (playerIt = players.begin(); playerIt != players.end(); ++playerIt)
+	{
+		if (*playerIt != Broodwar->self() && (*playerIt)->isAlly(Broodwar->self()))
+		{
+			const set<Unit*>& units = (*playerIt)->getUnits();
+			set<Unit*>::const_iterator unitIt;
+			for (unitIt = units.begin(); unitIt != units.end(); ++unitIt)
+			{
+				float dist = PFFunctions::getDistance(pos, *unitIt);
+				float ptmp = PFFunctions::calcOwnUnitP(dist, agent->getUnit(), *unitIt);
+
+				p += ptmp;
+			}
+		}
+	}
+
 	//Broodwar->printf("[%d] o=%d", agent->getUnitID(), (int)p);
 
 	//Terrain

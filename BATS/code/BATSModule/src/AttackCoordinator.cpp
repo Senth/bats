@@ -82,29 +82,42 @@ AttackCoordinator* AttackCoordinator::getInstance() {
 	return mpsInstance;
 }
 
-void AttackCoordinator::requestAttack(shared_ptr<AttackSquad> squad) {
-	// Special case when squad is big and player squad has attacking big
-	if (squad->isDistracting() && squad->isFollowingAlliedSquad()) {
+void AttackCoordinator::requestAttack(AttackSquadRef squad) {
+	// Special case when squad is frontal attack and player squad has attacking big
+	if (!squad->isDistracting() && squad->isFollowingAlliedSquad()) {
 		AlliedSquadCstPtr alliedSquad = squad->getAlliedSquad();
-		const TilePosition alliedCenter = alliedSquad->getCenter();
+		const TilePosition& alliedCenter = alliedSquad->getCenter();
 		if (TilePositions::Invalid != alliedCenter) {
 			// Find closest attack position to allied squad
-			std::pair<TilePosition, int> attackPosition = mpExplorationManager->getClosestSpottedBuilding(alliedCenter);
+			std::pair<TilePosition, int> foundAttackPosition = mpExplorationManager->getClosestSpottedBuilding(alliedCenter);
+
+			TilePosition attackTarget = TilePositions::Invalid;
 
 			// Found position
-			if (TilePositions::Invalid != attackPosition.first) {
-				squad->setGoalPosition(attackPosition.first);
+			if (TilePositions::Invalid != foundAttackPosition.first) {
+				attackTarget = foundAttackPosition.first;
 			}
-			// Else use squad center instead
+			// Else use squad attack target
 			else {
-				squad->setGoalPosition(alliedCenter);
+				const TilePosition alliedTarget = alliedSquad->getTargetPosition();
+				if (TilePositions::Invalid != alliedTarget) {
+					attackTarget = alliedTarget;
+				} else {
+					attackTarget = alliedCenter;
+				}
+			}
+
+			if (TilePositions::Invalid != attackTarget) {
+				squad->setGoalPosition(attackTarget);
 			}
 		}
+
+		return;
 	}
 
 
 	// Attack position
-	TilePosition bestAttackPosition = calculateAttackPosition(squad->isDistracting());
+	TilePosition bestAttackPosition = calculateAttackPosition(squad->isDistracting(), squad);
 	squad->setGoalPosition(bestAttackPosition);
 
 
@@ -140,7 +153,7 @@ void AttackCoordinator::requestAttack(shared_ptr<AttackSquad> squad) {
 	}
 }
 
-BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedWeight) const {
+BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedWeight, AttackSquadRef squad) const {
 	WeightedPosition highestWeight(BWAPI::TilePositions::Invalid);
 
 	highestWeight.distanceWeight = 0.0;
@@ -156,7 +169,7 @@ BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedW
 		WeightedPosition weightedPosition(notScoutedExpansions[i]);
 
 		// Distance
-		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position);
+		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
 
 		// Type
 		weightedPosition.typeWeight = config::attack_coordinator::weights::EXPANSION_NOT_CHECKED;
@@ -182,7 +195,7 @@ BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedW
 		WeightedPosition weightedPosition(spottedObjects[i]->getTilePosition());
 		
 		// Distance
-		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position);
+		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
 
 		// Type
 		weightedPosition.typeWeight = calculateStructureTypeWeight(*spottedObjects[i]);
@@ -208,7 +221,7 @@ BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedW
 	return highestWeight.position;
 }
 
-double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& attackPosition) const {
+double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& attackPosition, AttackSquadRef squad) const {
 	double distanceWeight = 0.0;
 	int cAttackSquads = 0;
 
@@ -217,8 +230,8 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 	for (squadIt = mpSquadManager->begin(); squadIt != mpSquadManager->end(); ++squadIt) {
 		shared_ptr<AttackSquad> attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 
-		// It's an active attack squad
-		if (NULL != attackSquad && attackSquad->getState() == Squad::State_Active) {
+		// It's not this squad and it's active
+		if (NULL != attackSquad && attackSquad != squad && attackSquad->getState() == Squad::State_Active) {
 			DEBUG_MESSAGE_CONDITION(attackSquad->getGoal() == BWAPI::TilePositions::Invalid,
 				utilities::LogLevel_Severe, "AttackCoordinator::calculateDistanceWeight() | " <<
 				"AttackSquad doesn't have a valid goal!");

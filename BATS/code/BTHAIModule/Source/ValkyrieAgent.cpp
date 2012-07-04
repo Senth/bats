@@ -31,6 +31,12 @@ void ValkyrieAgent::computeActions()
 		return;
 	}
 
-	bool defensive = useDefensiveMode();
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+	if (useDefensiveMode())
+	{
+		computeAttackingActions(true);
+	}
+	else
+	{
+		computeAttackingActions();
+	}
 }

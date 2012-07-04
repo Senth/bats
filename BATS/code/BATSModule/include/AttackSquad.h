@@ -85,7 +85,8 @@ public:
 	 */
 	std::tr1::shared_ptr<AttackSquad> getThis() const;
 
-	std::string getName() const;
+	virtual std::string getName() const;
+	virtual std::string getDebugInfo() const;
 
 protected:
 	/**
@@ -118,6 +119,22 @@ private:
 	 * following any allied squad.
 	 */
 	bool finishedAlliedRegrouping() const;
+
+	/**
+	 * Handle allied regrouping, checks whether the squads needs to regroup.
+	 */
+	void handleAlliedRegrouping();
+
+	/**
+	 * Checks if the squad is regrouping with the allied squad
+	 * @return true if the squad is regrouping with the allied squad.
+	 */
+	bool isRegroupingWithAllied() const;
+
+	/**
+	 * Clears the allied regrouping, i.e. it will not try to regroup with the allied squad.
+	 */
+	void clearAlliedRegrouping();
 
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;

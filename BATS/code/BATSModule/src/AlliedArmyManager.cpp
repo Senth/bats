@@ -168,9 +168,8 @@ void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
 	std::map<Unit*, AlliedSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
 	if (unitIt != mUnitSquad.end() && unitIt->second.isValid()) {
 		mSquads[unitIt->second]->removeUnit(pUnit);
+		mUnitSquad.erase(unitIt);
 	}
-
-	mUnitSquad.erase(unitIt);
 }
 
 void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId squadId) {
@@ -474,7 +473,7 @@ vector<pair<AlliedSquadCstPtr, int>> AlliedArmyManager::getSquadsWithin(
 	return foundSquads;
 }
 
-void AlliedArmyManager::printInfo() {
+void AlliedArmyManager::printGraphicDebugInfo() {
 	// Skip if not turned on
 	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off) {
 		return;
@@ -524,7 +523,7 @@ void AlliedArmyManager::printInfo() {
 	// Print all squads
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i]) {
-			mSquads[i]->printInfo();
+			mSquads[i]->printGraphicDebugInfo();
 		}
 	}
 	

@@ -4,6 +4,7 @@
 #include <BWAPI/TilePosition.h>
 #include <BWAPI/UnitType.h>
 #include "BTHAIModule/Source/SpottedObject.h"
+#include "TypeDefs.h"
 
 // Namespace for the project
 namespace bats {
@@ -62,7 +63,7 @@ public:
 	 * get ready (Squad::isReady()).
 	 * @param[in,out] squad the squad that requests an attack
 	 */
-	void requestAttack(std::tr1::shared_ptr<AttackSquad> squad);
+	void requestAttack(AttackSquadRef squad);
 
 private:
 	/**
@@ -74,21 +75,22 @@ private:
 	 * Calculates and returns the highest priority position depending on the state of the
 	 * game.
 	 * @param useDefendedWeight if the calculation shall include defended weight.
+	 * @param squad the squad we want to calculate the attack position for
 	 * @return a TilePosition with the highest priority for attacking.
 	 */
-	BWAPI::TilePosition calculateAttackPosition(bool useDefendedWeight) const;
+	BWAPI::TilePosition calculateAttackPosition(bool useDefendedWeight, AttackSquadRef squad) const;
 
 	/**
 	 * Calculates the distance weight depending on other attack squad positions. The
 	 * further away the greater the weight. If more two or more squads exist it will
 	 * normalize the weight by sum the weight and divide it by the squads.
-	 * 
 	 * The weight is an exponential function.
 	 * 
 	 * @param attackPosition where to calculate the weight.
+	 * @param squad the squad we want to calculate the weight for
 	 * @return normalized distance weight [0.0,1.0]
 	 */
-	double calculateDistanceWeight(const BWAPI::TilePosition& attackPosition) const;
+	double calculateDistanceWeight(const BWAPI::TilePosition& attackPosition, AttackSquadRef squad) const;
 
 	/**
 	 * Calculates the weight depending on the structure type.

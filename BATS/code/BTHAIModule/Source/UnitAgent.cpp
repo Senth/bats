@@ -5,6 +5,7 @@
 #include "SpottedObject.h"
 #include "BATSModule/include/Helper.h"
 #include "BATSModule/include/SquadManager.h"
+#include "BATSModule/include/Squad.h"
 #include "Utilities/Logger.h"
 
 using namespace BWAPI;
@@ -12,6 +13,7 @@ using namespace std;
 using bats::operator<<;
 
 bats::SquadManager* UnitAgent::mpsSquadManager = NULL;
+PFManager* UnitAgent::mpsPfManager = NULL;
 
 UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 {
@@ -20,6 +22,7 @@ UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 
 	if (mpsSquadManager == NULL) {
 		mpsSquadManager = bats::SquadManager::getInstance();
+		mpsPfManager = PFManager::getInstance();
 	}
 }
 
@@ -90,7 +93,7 @@ void UnitAgent::debug_showGoal()
 void UnitAgent::computeActions()
 {
 #if DISABLE_UNIT_AI == 0
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
+	mpsPfManager->computeAttackingUnitActions(this, goal, false);
 #endif
 }
 
@@ -121,8 +124,30 @@ void UnitAgent::computeKitingActions()
 	}
 	else
 	{
-		PFManager::getInstance()->computeAttackingUnitActions(this, goal, false, false);
+		mpsPfManager->computeAttackingUnitActions(this, goal, false, false);
 	}
+}
+
+void UnitAgent::computeAttackingActions()
+{
+	bool defensive = false;
+	bool forceMove = false;
+
+	// Check unit's squad state
+	if (getSquadId().isValid()) {
+		bats::SquadPtr squad = mpsSquadManager->getSquad(getSquadId());
+		if (NULL != squad && squad->isAvoidingEnemies()) {
+			defensive = true;
+			forceMove = true;
+		}
+	}
+
+	computeAttackingActions(defensive, forceMove);
+}
+
+void UnitAgent::computeAttackingActions(bool defensive, bool forceMove)
+{
+	mpsPfManager->computeAttackingUnitActions(this, goal, defensive, forceMove);
 }
 
 int UnitAgent::enemyUnitsWithinRange(int maxRange) const

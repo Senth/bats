@@ -5,6 +5,8 @@
 #include "AlliedSquad.h"
 #include "AlliedArmyManager.h"
 #include "Helper.h"
+#include <sstream>
+#include <iomanip>
 
 using namespace bats;
 using namespace BWAPI;
@@ -36,6 +38,37 @@ AttackSquad::AttackSquad(
 
 AttackSquad::~AttackSquad() {
 	// Does nothing
+}
+
+void AttackSquad::handleAlliedRegrouping() {
+	if (NULL == mpAlliedSquadFollow) {
+		return;
+	}
+
+	// Regroup with allied force if far away
+	if (getTemporaryGoalPosition() == TilePositions::Invalid) {
+		if (needsAlliedRegrouping()) {
+			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+			setAvoidEnemyUnits(true);
+		}
+	}
+	// Currently regrouping, update regroup position if not finished
+	else {
+		if (finishedAlliedRegrouping()) {
+			clearAlliedRegrouping();
+			setAvoidEnemyUnits(false);
+		} else {
+			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+		}
+	}
+}
+
+bool AttackSquad::isRegroupingWithAllied() const {
+	return getTemporaryGoalPosition().isValid();
+}
+
+void AttackSquad::clearAlliedRegrouping() {
+	setTemporaryGoalPosition(TilePositions::Invalid);
 }
 
 void AttackSquad::computeSquadSpecificActions() {
@@ -71,7 +104,7 @@ void AttackSquad::computeSquadSpecificActions() {
 
 			// Chose the closest squad that is outside home (not idle)
 			vector<pair<AlliedSquadCstPtr, int>>::const_iterator squadIt = foundSquads.begin();
-			while (NULL != mpAlliedSquadFollow && squadIt != foundSquads.end()) {
+			while (NULL == mpAlliedSquadFollow && squadIt != foundSquads.end()) {
 				if (squadIt->first->getState() != AlliedSquad::State_Idle) {
 					mpAlliedSquadFollow = squadIt->first;
 				}
@@ -82,52 +115,57 @@ void AttackSquad::computeSquadSpecificActions() {
 
 		// Follow the allied squad
 		if (NULL != mpAlliedSquadFollow) {
-			// Regroup with allied force if far away
-			if (getTemporaryGoalPosition() == TilePositions::Invalid) {
-				if (needsAlliedRegrouping()) {
-					setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+
+			switch (mpAlliedSquadFollow->getState()) {
+				// Allied are still -> do nothing
+				case AlliedSquad::State_AttackHalted:
 					setAvoidEnemyUnits(true);
-				}
-			}
-			// Currently regrouping, update regroup position if not finished
-			else {
-				if (finishedAlliedRegrouping()) {
-					setTemporaryGoalPosition(TilePositions::Invalid);
-					setAvoidEnemyUnits(false);
-				} else {
-					setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
-				}
-			}
-
-			// No regrouping
-			if (getTemporaryGoalPosition() == TilePositions::Invalid) {
-				switch (mpAlliedSquadFollow->getState()) {
-					// Allied are still -> do nothing
-					case AlliedSquad::State_AttackHalted:
-						setAvoidEnemyUnits(true);
-						break;
+					handleAlliedRegrouping();
+					break;
 				
-					// Allied is retreating ->
-					// Allied is moving		-> follow, but don't attack
-					case AlliedSquad::State_Retreating:
-					case AlliedSquad::State_MovingToAttack:
-						setGoalPosition(mpAlliedSquadFollow->getCenter());
-						setAvoidEnemyUnits(true);
-						break;
+				// Allied is retreating -> go to target position, don't attack
+				case AlliedSquad::State_Retreating: {
+					if (isRegroupingWithAllied()) {
+						clearAlliedRegrouping();
+					}
+					TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
+					// Only update position if it changed
+					if (getGoal() != targetPosition) {
+						setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
+					}
+					setAvoidEnemyUnits(true);
+					break;
+				}
 
-					// Allied is attacking -> Find something close to attack
-					case AlliedSquad::State_Attacking:
-						/// @todo don't call request attack every frame!
+				// Allied is moving	-> go to target position, attack if see anything.
+				case AlliedSquad::State_MovingToAttack: {
+					if (isRegroupingWithAllied()) {
+						clearAlliedRegrouping();
+					}
+					TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
+					// Only update position if it changed
+					if (getGoal() != targetPosition) {
+						setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
+					}
+					setAvoidEnemyUnits(false);
+					break;
+				}
+
+				// Allied is attacking -> Find something close to attack
+				case AlliedSquad::State_Attacking:
+					/// @todo don't call request attack every frame!
+					handleAlliedRegrouping();
+					if (!isRegroupingWithAllied()) {
 						setAvoidEnemyUnits(false);
 						mpsAttackCoordinator->requestAttack(getThis());
-						break;
+					}
+					break;
 
-					/// @todo Allied is safe -> disband (change to retreat)
-					case AlliedSquad::State_Idle:
-						forceDisband();
-						mpAlliedSquadFollow.reset();
-						break;
-				}
+				/// @todo Allied is safe -> disband (change to retreat)
+				case AlliedSquad::State_Idle:
+					forceDisband();
+					mpAlliedSquadFollow.reset();
+					break;
 			}
 		}
 		// @todo Did not find an allied squad, disband (change to retreat)
@@ -266,4 +304,21 @@ bool AttackSquad::finishedAlliedRegrouping() const {
 	} else {
 		return false;
 	}
+}
+
+string AttackSquad::getDebugInfo() const {
+
+
+	stringstream ss;
+	ss << left << setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Follow: ";
+
+	if (NULL != mpAlliedSquadFollow) {
+		ss << mpAlliedSquadFollow->getId();
+	} else {
+		ss << "None";
+	}
+
+	ss << "\n";
+
+	return Squad::getDebugInfo() + ss.str();
 }

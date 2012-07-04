@@ -99,6 +99,7 @@ namespace debug {
 	int GRAPHICS_VERBOSITY_IN_DEBUG = 0;
 	int GRAPHICS_VERBOSITY_IN_RELEASE = 0;
 	int GRAPHICS_VERBOSITY = 0;
+	int GRAPHICS_COLUMN_WIDTH = 0;
 
 	namespace classes {
 		bool ALLIED_ARMY_MANAGER = false;
@@ -391,7 +392,11 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 	#ifndef _DEBUG
 			GRAPHICS_VERBOSITY = variableInfo;
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_VERBOSITY));
-	#endif	
+	#endif
+		} else if (variableInfo.name == "graphics_column_width") {
+			gOldValue = toString(GRAPHICS_COLUMN_WIDTH);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(GRAPHICS_COLUMN_WIDTH));
+			GRAPHICS_COLUMN_WIDTH = variableInfo;
 		} else {
 			return false;
 		}

@@ -6,6 +6,8 @@
 
 #define DISABLE_UNIT_AI 0
 
+class PFManager;
+
 namespace bats {
 	class SquadManager;
 }
@@ -15,13 +17,12 @@ namespace bats {
  * assist building under enemy fire, but cannot use any special abilities. To use abilities such as Terran Vultures
  * dropping spider mines, an agent implementation for that unit type must be created.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Matteus Magnusson (mattues.magnusso@gmail.com)
+ * Implemented retreat functionality
+ * and moved some common calculations from the units to UnitAgent.
  */
-class UnitAgent : public BaseAgent {
-
-protected:
-	static bats::SquadManager* mpsSquadManager;
-	
+class UnitAgent : public BaseAgent {	
 public:
 	UnitAgent(BWAPI::Unit* mUnit);
 
@@ -35,6 +36,22 @@ public:
 
 	/** Handles actions for kiting agents. */
 	void computeKitingActions();
+
+	/**
+	 * Handles attacking unit actions, this function takes into account if the squad 
+	 * is currently retreating to make the unit defensive.
+	 * @see computeAttackingActions(bool,bool) if you want to override the squad's state.
+	 */
+	void computeAttackingActions();
+
+	/**
+	 * Handles attacking unit actions. Either sets the unit as defensive or not and
+	 * does not take into account the squad's state.
+	 * @param defensive set to true if the unit shall avoid all enemies
+	 * @param forceMove set to true to force the unit to move, defaults to false
+	 * @see computeAttackingActions() if you want to use the squad's behavior.
+	 */
+	void computeAttackingActions(bool defensive, bool forceMove = false);
 
 	/**
 	 * Returns true if the unit is an air unit
@@ -130,6 +147,12 @@ public:
 
 	/** Used to print info about this agent to the screen. */
 	void printInfo() const;
+
+protected:
+	static bats::SquadManager* mpsSquadManager;
+
+private:
+	static PFManager* mpsPfManager;
 };
 
 #endif

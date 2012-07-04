@@ -334,6 +334,31 @@ public:
 	 * @return true if the squad has ground units
 	 */
 	bool hasGround() const;
+
+	/**
+	 * Checks whether the squad is currently retreating or not. This is not the same as disband
+	 * @return true if the squad is retreating.
+	 */
+	bool isRetreating() const;
+
+	/**
+	 * Prints graphical debug information
+	 */
+	virtual void printGraphicDebugInfo();
+
+	/**
+	 * Returns the number of units in the squad
+	 * @return number of units in the squad
+	 */
+	int getUnitCount() const;
+
+	/**
+	 * Returns the supply count of all units in the squad
+	 * @note this is actually the double amount of supplies, since that's BWAPI standard
+	 * (because Zerglings take up 0.5 supplies)
+	 * @return how many supplies the squad occupies.
+	 */
+	int getSupplyCount() const;
 	
 protected:
 	/**
@@ -394,12 +419,6 @@ protected:
 	 * create a new goal repeating goal.
 	 */
 	virtual void onGoalSucceeded();
-
-	/**
-	 * Checks whether the squad is currently retreating or not. This is not the same as disband
-	 * @return true if the squad is retreating.
-	 */
-	bool isRetreating() const;
 
 	/**
 	 * Sets the current retreating goal, this will also disable any regrouping functionality
@@ -515,6 +534,12 @@ protected:
 	 * @param bAvoidEnemyUnits if the squad shall avoid enemy units or not
 	 */
 	void setAvoidEnemyUnits(bool bAvoidEnemyUnits);
+
+	/**
+	 * Returns extra graphical debug information about the squad.
+	 * @return formatted text for debugging purposes.
+	 */
+	virtual std::string getDebugInfo() const;
 
 #pragma warning(push)
 #pragma warning(disable:4100)

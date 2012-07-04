@@ -4,6 +4,8 @@
 #include "GameTime.h"
 #include "AlliedArmyManager.h"
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 using namespace bats;
 using namespace BWAPI;
@@ -216,11 +218,11 @@ bool AlliedSquad::isMovingToAttack() const {
 	// Moving towards enemy base
 	// If we haven't seen any enemy structure yet, only check if the distance from allies increases
 	// Else enemy distance shall be decreased
-	if ((mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) &&
-		(mAlliedDistances.empty() || mAlliedDistances.front() < mAlliedDistances.back()))
-	{
-		return false;
-	}	
+	//if ((mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) &&
+	//	(mAlliedDistances.empty() || mAlliedDistances.front() < mAlliedDistances.back()))
+	//{
+	//	return false;
+	//}	
 
 
 	return true;
@@ -429,7 +431,7 @@ void AlliedSquad::updateClosestDistances() {
 	}
 }
 
-void AlliedSquad::printInfo() {
+void AlliedSquad::printGraphicDebugInfo() {
 	// Skip if not turned on
 	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off ||
 		config::debug::classes::ALLIED_SQUAD == false) {
@@ -443,27 +445,21 @@ void AlliedSquad::printInfo() {
 		if (!mCenter.empty()) {
 			BWAPI::Position squadCenterOnMap = BWAPI::Position(mCenter.front());
 
-			string format =
-				TextColors::LIGHT_BLUE + "Id: " + TextColors::WHITE + "%i\n" +
-				TextColors::LIGHT_BLUE + "State: " + TextColors::WHITE + "%s\n" +
-				TextColors::LIGHT_BLUE + "Units: " + TextColors::WHITE + "%i\n" +
-				TextColors::LIGHT_BLUE + "Supplies: " + TextColors::WHITE + "%g\n" +
-				TextColors::LIGHT_BLUE + "Distance: " + TextColors::WHITE + "%g";
-
 			double alliedDistance = 0.0;
 			if (!mAlliedDistances.empty()) {
 				alliedDistance = sqrt(static_cast<double>(mAlliedDistances.front()));
 			}
 
-			BWAPI::Broodwar->drawTextMap(
-				squadCenterOnMap.x(), squadCenterOnMap.y(),
-				format.c_str(),
-				mId,
-				getStateString().c_str(),
-				getUnitCount(),
-				static_cast<double>(getSupplyCount()) * 0.5,
-				alliedDistance
-			);
+			stringstream ss;
+			ss << TextColors::WHITE << left << setprecision(2) <<
+				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << mId << "\n" <<
+				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "State: " << getStateString() << "\n" <<
+				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Units: " << getUnitCount() << "\n" <<
+				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Supplies: " << getSupplyCount() << "\n" <<
+				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Distance: " << alliedDistance;
+
+
+			BWAPI::Broodwar->drawTextMap(squadCenterOnMap.x(), squadCenterOnMap.y(), "%s", ss.str().c_str());
 		}
 	}
 
@@ -525,4 +521,30 @@ const TilePosition& AlliedSquad::getCenter() const {
 	} else {
 		return TilePositions::Invalid;
 	}
+}
+
+TilePosition AlliedSquad::getTargetPosition() const {
+	// Get common target for majority of the units
+	map<TilePosition, int> positions;
+	
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		TilePosition targetPosition = TilePosition(mUnits[i]->getTargetPosition());
+		if (targetPosition != TilePositions::Invalid) {
+			positions[targetPosition]++;
+		}
+	}
+
+	// Return the position which most unit use
+	int cMaxUnits = 0;
+	TilePosition mostTargetedPosition = TilePositions::Invalid;
+
+	map<TilePosition, int>::const_iterator positionIt;
+	for (positionIt = positions.begin(); positionIt != positions.end(); ++positionIt) {
+		if (positionIt->second > cMaxUnits) {
+			cMaxUnits = positionIt->second;
+			mostTargetedPosition = positionIt->first;
+		}
+	}
+
+	return mostTargetedPosition;
 }

@@ -40,5 +40,5 @@ void BattlecruiserAgent::computeActions()
 		return;
 	}
 
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
+	computeAttackingActions();
 }

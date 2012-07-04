@@ -53,12 +53,6 @@ void MarineAgent::computeActions()
 		}
 	}
 
-	bool defensive = false;
-	if (unit->getGroundWeaponCooldown() > 0)
-	{
-		defensive = true;
-	}
-
 	Unit* target = TargetingAgent::findTarget(this);
 	if (target != NULL)
 	{
@@ -66,5 +60,12 @@ void MarineAgent::computeActions()
 		return;
 	}
 
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+	if (unit->getGroundWeaponCooldown() > 0)
+	{
+		computeAttackingActions(true);
+	}
+	else
+	{
+		computeAttackingActions();
+	}
 }

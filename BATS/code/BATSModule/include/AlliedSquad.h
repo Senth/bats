@@ -130,10 +130,10 @@ public:
 	void update();
 
 	/**
-	 * Prints debug information, id of squad, number of units and number of supply in
-	 * the center of the squad.
+	 * Prints graphical debug information, id of squad, number of units and
+	 * number of supply in the center of the squad.
 	 */
-	void printInfo();
+	void printGraphicDebugInfo();
 
 	/**
 	 * Returns the maximum amount of AlliedSquads that are allowed to be created.
@@ -146,6 +146,12 @@ public:
 	 * @return current center position of the squad.
 	 */
 	const BWAPI::TilePosition& getCenter() const;
+
+	/**
+	 * Returns the target position of the squad, e.g. where the units are moving to
+	 * @return squads target position, TilePositions::Invalid if no target was found.
+	 */
+	BWAPI::TilePosition getTargetPosition() const;
 
 private:
 	/**

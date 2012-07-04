@@ -8,8 +8,6 @@
 // Namespace for the project
 namespace bats {
 
-class Squad;
-
 typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator SquadIt;
 typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator SquadCstIt;
 
@@ -34,12 +32,12 @@ public:
 	 * @param squadId the squad id of the squad to return
 	 * @return pointer to the squad, NULL if the squad was not found.
 	 */
-	std::tr1::shared_ptr<Squad> getSquad(const SquadId& squadId);
+	SquadPtr getSquad(SquadId squadId);
 
 	/**
 	 * \copydoc getSquad()
 	 */
-	std::tr1::shared_ptr<const Squad> getSquad(const SquadId& squadId) const;
+	SquadCstPtr getSquad(SquadId squadId) const;
 
 	/**
 	 * Get the beginning of the squad iterator
@@ -82,13 +80,18 @@ public:
 	 */
 	void removeSquad(const SquadId& squadId);
 
+	/**
+	 * Prints graphical debugging information
+	 */
+	void printGraphicDebugInfo();
+
 private:
 	/**
 	 * Private constructor to enforce singleton usage.
 	 */
 	SquadManager();
 
-	std::map<SquadId, std::tr1::shared_ptr<Squad>> mSquads;
+	std::map<SquadId, SquadPtr> mSquads;
 	static SquadManager* mpsInstance;
 };
 }

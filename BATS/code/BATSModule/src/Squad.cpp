@@ -8,6 +8,8 @@
 #include "Helper.h"
 #include <algorithm>
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 #include "BTHAIModule/Source/WorkerAgent.h"
 
@@ -125,11 +127,6 @@ bool Squad::tryDisband() {
 }
 
 void Squad::computeActions() {
-	/// @todo avoid enemy units
-	if (mAvoidEnemyUnits) {
-
-	}
-
 	// Check if this is the first time calling, then add all the initial units
 	if (!mInitialized) {
 		mInitialized = true;
@@ -466,7 +463,7 @@ bool Squad::isCloseTo(const TilePosition& position, double range) const {
 }
 
 bool Squad::isAvoidingEnemies() const {
-	return mAvoidEnemyUnits;
+	return mAvoidEnemyUnits || isRetreating();
 }
 
 void Squad::computeSquadSpecificActions() {
@@ -689,8 +686,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		
 		DEBUG_MESSAGE_CONDITION(
 			movePosition != TilePositions::Invalid,
-			utilities::LogLevel_Fine,
-			getName() << ": New regroup position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+			utilities::LogLevel_Finer,
+			getName() << ": New regroup position, " << movePosition
 		);
 	}
 
@@ -700,8 +697,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		
 		DEBUG_MESSAGE_CONDITION(
 			movePosition != TilePositions::Invalid,
-			utilities::LogLevel_Fine,
-			getName() << ": New temp position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+			utilities::LogLevel_Finer,
+			getName() << ": New temp position, " << movePosition
 		);
 	}
 
@@ -711,8 +708,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		
 		DEBUG_MESSAGE_CONDITION(
 			movePosition != TilePositions::Invalid,
-			utilities::LogLevel_Fine,
-			getName() << ": New via position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+			utilities::LogLevel_Finer,
+			getName() << ": New via position, " << movePosition
 		);
 	}
 
@@ -722,8 +719,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 
 		DEBUG_MESSAGE_CONDITION(
 			movePosition != TilePositions::Invalid,
-			utilities::LogLevel_Fine,
-			getName() << ": New retreat position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+			utilities::LogLevel_Finer,
+			getName() << ": New retreat position, " << movePosition
 		);
 	}
 
@@ -733,8 +730,8 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 		
 		DEBUG_MESSAGE_CONDITION(
 			movePosition != TilePositions::Invalid,
-			utilities::LogLevel_Fine,
-			getName() << ": New goal position, (" << movePosition.x() << ", " << movePosition.y() << ")"
+			utilities::LogLevel_Finer,
+			getName() << ": New goal position, " << movePosition
 		);
 	}
 
@@ -851,4 +848,40 @@ double Squad::getSightDistance() const {
 	}
 
 	return maxSight * config::squad::SIGHT_DISTANCE_MULTIPLIER;
+}
+
+void Squad::printGraphicDebugInfo() {
+	// Low
+	// Print type, id, number of units, number of supplies of squad
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
+		string info = getDebugInfo();
+
+		Position squadCenterOnMap = Position(getCenter());
+
+		BWAPI::Broodwar->drawTextMap(squadCenterOnMap.x(), squadCenterOnMap.y(), "%s", info.c_str());
+	}
+}
+
+string Squad::getDebugInfo() const {
+	stringstream ss;
+	ss << TextColors::ROYAL_BLUE << left <<
+		setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << mId << "\n" <<
+		setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Type: " << getName() << "\n" <<
+		setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Units: " << getUnitCount() << "\n" <<
+		setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Supplies: " << getSupplyCount() << "\n";
+
+	return ss.str();
+}
+
+int Squad::getUnitCount() const {
+	return static_cast<int>(mUnits.size());
+}
+
+int Squad::getSupplyCount() const {
+	int cSupply = 0;
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		cSupply += mUnits[i]->getUnitType().supplyRequired();
+	}
+
+	return cSupply;
 }

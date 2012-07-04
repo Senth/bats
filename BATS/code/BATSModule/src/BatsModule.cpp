@@ -393,7 +393,8 @@ void BatsModule::releaseGameClasses() {
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
-		mpAlliedArmyManager->printInfo();
+		mpAlliedArmyManager->printGraphicDebugInfo();
+		mpSquadManager->printGraphicDebugInfo();
 
 		// Low
 		/// @todo Commander::getInstance()->printInfo();

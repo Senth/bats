@@ -17,7 +17,7 @@ void MedicAgent::computeActions()
 		return;
 	}
 
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, true);
+	computeAttackingActions(true);
 }
 
 bool MedicAgent::checkUnitsToHeal()

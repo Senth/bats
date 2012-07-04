@@ -170,6 +170,8 @@ namespace bats {
 			/** Current debug value, this get initially set by GRAPHICS_VERBOSITY_IN_X
 			 * where X is the current mode running. Cannot be set in the config file. */
 			extern int GRAPHICS_VERBOSITY;
+			/** Graphical spacing between columns when printing information */
+			extern int GRAPHICS_COLUMN_WIDTH;
 
 			/**
 			 * Enumerations for the graphics debugging levels

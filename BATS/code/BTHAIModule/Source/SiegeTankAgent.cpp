@@ -37,6 +37,6 @@ void SiegeTankAgent::computeActions()
 	//The tank cant move if sieged
 	if (!unit->isSieged())
 	{
-		PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
+		computeAttackingActions();
 	}
 }

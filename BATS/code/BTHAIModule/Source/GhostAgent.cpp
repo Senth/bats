@@ -50,7 +50,7 @@ void GhostAgent::computeActions()
 		return;
 	}
 
-	PFManager::getInstance()->computeAttackingUnitActions(this, goal, false);
+	computeAttackingActions();
 }
 
 Unit* GhostAgent::findLockdownTarget()

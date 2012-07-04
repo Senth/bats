@@ -24,21 +24,21 @@ SquadManager* SquadManager::getInstance() {
 	return mpsInstance;
 }
 
-shared_ptr<Squad> SquadManager::getSquad(const SquadId& squadId) {
-	const shared_ptr<const Squad> constPtr = const_cast<const SquadManager*>(this)->getSquad(squadId);
-	const shared_ptr<Squad> squad = const_pointer_cast<Squad>(constPtr);
+SquadPtr SquadManager::getSquad(SquadId squadId) {
+	const SquadCstPtr constPtr = const_cast<const SquadManager*>(this)->getSquad(squadId);
+	const SquadPtr squad = const_pointer_cast<Squad>(constPtr);
 	return squad;
 }
 
-shared_ptr<const Squad> SquadManager::getSquad(const SquadId& squadId) const {
-	std::map<SquadId, shared_ptr<Squad>>::const_iterator foundSquad;
+SquadCstPtr SquadManager::getSquad(SquadId squadId) const {
+	std::map<SquadId, SquadPtr>::const_iterator foundSquad;
 	foundSquad = mSquads.find(squadId);
 	if (foundSquad != mSquads.end()) {
-		const shared_ptr<const Squad>& constPtr = const_pointer_cast<const Squad>(foundSquad->second);
+		const SquadCstPtr& constPtr = const_pointer_cast<const Squad>(foundSquad->second);
 		return constPtr;
 	} else {
 		ERROR_MESSAGE(false, "Could not find squad with squad id: "	<< squadId);
-		return shared_ptr<Squad>();
+		return SquadPtr();
 	}
 }
 
@@ -59,7 +59,7 @@ SquadCstIt SquadManager::end() const {
 }
 
 void SquadManager::computeActions() {
-	std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mSquads.begin();
+	std::map<SquadId, SquadPtr>::iterator squadIt = mSquads.begin();
 	while(squadIt != mSquads.end()) {
 		if (!squadIt->second->isEmpty()) {
 			// Only compute squads that aren't inactive
@@ -75,7 +75,7 @@ void SquadManager::computeActions() {
 	}
 }
 
-void SquadManager::addSquad(const shared_ptr<Squad>& pSquad) {
+void SquadManager::addSquad(const SquadPtr& pSquad) {
 	assert(pSquad != NULL);
 	mSquads[pSquad->getSquadId()] = pSquad;
 }
@@ -85,5 +85,12 @@ void SquadManager::removeSquad(const SquadId& squadId) {
 	size_t cErased = mSquads.erase(squadId);
 	if (cErased == 0) {
 		ERROR_MESSAGE(false, "Could not find the squad to erase with id: " << squadId);
+	}
+}
+
+void SquadManager::printGraphicDebugInfo() {
+	std::map<SquadId, SquadPtr>::iterator squadIt;
+	for (squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
+		squadIt->second->printGraphicDebugInfo();
 	}
 }

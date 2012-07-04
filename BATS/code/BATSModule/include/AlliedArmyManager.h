@@ -63,10 +63,10 @@ public:
 	void removeUnit(BWAPI::Unit* pUnit);
 
 	/**
-	 * Prints out various debug information depending on the current
+	 * Prints graphical debug information depending on the current
 	 * GRAPHICS_VERBOSITY.
 	 */
-	void printInfo();
+	void printGraphicDebugInfo();
 
 	/**
 	 * Returns the biggest squad if one exists.
