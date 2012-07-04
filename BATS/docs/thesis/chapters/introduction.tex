@@ -75,18 +75,20 @@ StarCraft has a big community, this makes it easy to find and ask people what fu
 \paragraph{Extending an already existing bot} We have the opportunity to extend an already existing bot, BTHAI\cite{bthai}, for BWAPI\cite{bwapi}. By extending a bot we can focus on making the bot a good teammate and not worry about all the other details; such as good path finding, building placement. Sometimes we, however, improve some already existing systems, e.g. build order, to meet our needs, but we do not have to build the entire system from scratch. In addition, BTHAI is developed by our supervisor, Hagelbäck, and we can therefore get fast help of the system if needed. While we have not searched for other bots to extended, we figured it would be hard to top the support we would get from BTHAI.
 
 \section{Teammate}
-A teammate is a player, either human or bot, that helps the team work towards a common goal. Teammate bots often prioritize the human player because it is their experience, thus it is more the bot helps the player then the team.
+A teammate is a player, either human or bot, that helps the team towards a common goal. Teammate bots often prioritize the human player because it is their experience, thus it is more the bot helps the player then the team.
 
-\subsection{Player}
+\subsection{Human teammate}
+You can divide human teams into essentially two groups. Where players more or less cooperate with each other and teams whose players “do their own thing” not caring about what the others do. It is a gray scale, and often players do not only cooperate or only do their own thing, but instead it varies throughout the gameplay.
 
-\subsubsection{General}
+Humans are good at forming complex strategies, or at least complex to program an AI to understand what to do. They can come and aid their teammate intuitively without the teammate asking for help.
 
-\subsubsection{RTS}
+When playing together with other humans, communication is important. If verbal communication is possible, players can tell their intentions to the teammates—e.g. attacking, defending, moving—other important game changes—e.g. enemy missing, getting shot, spotting an enemy—or just requesting help. When the player cannot communicate verbally, text messages through the games is often possible, but this can disrupt gameplay since actions are often disabled while typing (depending on the game). Short text messages are often sent instead to convey the entire message; e.g. “attack” instead of “I’m going to attack the enemy base from this side, join me.” 
 
-\subsection{AI}
+\paragraph{StarCraft}
+In StarCraft, players that know each other usually decide what strategy to use before starting the game, whereas if the players do not know each other they talk about what common strategy to use, announce their strategies, or both. If verbal communication is possible, players like to talk about tactics during the game, they like to convey their intentions to the teammate player.
 
-\subsubsection{General}
+\subsection{AI teammate}
 
-\subsubsection{RTS}
-
-\subsection{Voice Communication}
+\paragraph{StarCraft}
+The standard AI in StarCraft, does not interact with the player in team matches. It acts on its own and tries to win the game by its own, not helping the player or taking help from the player.
+%: Check if this is actually true in the game
