@@ -112,8 +112,9 @@ bool UnitCreator::compareByPriority(ProductionQueueItem &a, ProductionQueueItem 
 	p1 = (float) a.remainingLeft / a.quantity;
 	p2 = (float) b.remainingLeft / b.quantity;
 	if(canProceedToNextUnit(a.unit))
-		return p1 < p2;
-	return p1 > p2;
+		return false;
+	else
+		return p1 > p2;
 }
 
 BWAPI::UnitType UnitCreator::getNextProducableUnit(BWAPI::Unit* builder){
