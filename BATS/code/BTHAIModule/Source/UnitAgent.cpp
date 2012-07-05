@@ -2,6 +2,7 @@
 #include "PFManager.h"
 #include "AgentManager.h"
 #include "ExplorationManager.h"
+#include "TargetingAgent.h"
 #include "SpottedObject.h"
 #include "BATSModule/include/Helper.h"
 #include "BATSModule/include/SquadManager.h"
@@ -128,7 +129,27 @@ void UnitAgent::computeKitingActions()
 	}
 }
 
-void UnitAgent::computeAttackingActions()
+void UnitAgent::findAndTryAttack()
+{
+	bool avoidingEnemies = false; 
+
+	// Check unit's squad state
+	if (getSquadId().isValid()) {
+		bats::SquadPtr squad = mpsSquadManager->getSquad(getSquadId());
+		if (NULL != squad && squad->isAvoidingEnemies()) {
+			avoidingEnemies = true;
+		}
+	}
+
+	if (!avoidingEnemies) {
+		Unit* pTargetUnit = TargetingAgent::findTarget(this);
+		if (NULL != pTargetUnit) {
+			unit->attack(pTargetUnit);
+		}
+	}
+}
+
+void UnitAgent::computeMoveAction()
 {
 	bool defensive = false;
 	bool forceMove = false;
@@ -142,10 +163,10 @@ void UnitAgent::computeAttackingActions()
 		}
 	}
 
-	computeAttackingActions(defensive, forceMove);
+	computeMoveAction(defensive, forceMove);
 }
 
-void UnitAgent::computeAttackingActions(bool defensive, bool forceMove)
+void UnitAgent::computeMoveAction(bool defensive, bool forceMove)
 {
 	mpsPfManager->computeAttackingUnitActions(this, goal, defensive, forceMove);
 }
@@ -343,7 +364,7 @@ int UnitAgent::enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRan
 
 bool UnitAgent::useDefensiveMode() const
 {
-	if (unit->getGroundWeaponCooldown() > 0 || unit->getAirWeaponCooldown() > 0)
+	if (isWeaponCooldown())
 	{
 		if (enemyAttackingUnitsWithinRange() > 0)
 		{

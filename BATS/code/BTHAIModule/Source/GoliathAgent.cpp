@@ -12,12 +12,6 @@ GoliathAgent::GoliathAgent(Unit* mUnit) : UnitAgent(mUnit)
 
 void GoliathAgent::computeActions()
 {
-	Unit* target = TargetingAgent::findTarget(this);
-	if (target != NULL)
-	{
-		unit->attack(target);
-		return;
-	}
-
-	computeAttackingActions();
+	findAndTryAttack();
+	computeMoveAction();
 }

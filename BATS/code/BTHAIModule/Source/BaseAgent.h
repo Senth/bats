@@ -32,6 +32,12 @@ protected:
 	bool bBlock;
 	std::string agentType;
 
+	/**
+	 * Returns true if the unit has any cooldown on either ground or air weapons
+	 * @return true if the unit has cooldown on either ground or air weapons.
+	 */
+	bool isWeaponCooldown() const;
+
 public:
 	/** Constructor. */
 	BaseAgent(BWAPI::Unit* mUnit);

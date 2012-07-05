@@ -18,5 +18,5 @@ Terran_Science_Facility
 Terran_Missile_Turret
 Terran_Starport
 <units>
-80% marines
-20% medics
+80% Terran_Marine
+20% Terran_Medic

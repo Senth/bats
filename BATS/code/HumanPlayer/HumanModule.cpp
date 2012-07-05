@@ -1,4 +1,5 @@
 #include "HumanModule.h"
+#include <sstream>
 
 using namespace human;
 using namespace BWAPI;
@@ -18,6 +19,17 @@ void HumanModule::onFrame() {
 void HumanModule::onSendText(std::string text) {
 	if (text == "test") {
 		Broodwar->printf("It's working!");
+	} else if (startsWith(text, "speed")) {
+		int speed = -1;
+
+		std::string speedValueStr = text.substr(5);
+		std::stringstream ss;
+		ss << speedValueStr;
+		ss >> speed;
+
+		Broodwar->setLocalSpeed(speed);
+		Broodwar->printf("Global speed set to: %i", speed);
+		Broodwar->sendText(text.c_str());
 	}
 }
 void HumanModule::onReceiveText(BWAPI::Player* player, std::string text) {}
@@ -34,3 +46,17 @@ void HumanModule::onUnitRenegade(BWAPI::Unit* unit) {}
 void HumanModule::onSaveGame(std::string gameName) {}
 void HumanModule::onUnitComplete(BWAPI::Unit *unit) {}
 #pragma warning(pop)
+
+bool HumanModule::startsWith(const std::string& text,const std::string& token) {
+
+	if(text.length() < token.length() || text.length() == 0 || token.length() == 0)
+		return false;
+
+	for(unsigned int i=0; i<token.length(); ++i)
+	{
+		if(text[i] != token[i])
+			return false;
+	}
+
+	return true;
+}

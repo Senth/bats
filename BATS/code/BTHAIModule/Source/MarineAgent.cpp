@@ -53,19 +53,14 @@ void MarineAgent::computeActions()
 		}
 	}
 
-	Unit* target = TargetingAgent::findTarget(this);
-	if (target != NULL)
-	{
-		unit->attack(target);
-		return;
-	}
 
-	if (unit->getGroundWeaponCooldown() > 0)
+	if (isWeaponCooldown())
 	{
-		computeAttackingActions(true);
+		computeMoveAction(true);
 	}
 	else
 	{
-		computeAttackingActions();
+		findAndTryAttack();
+		computeMoveAction();
 	}
 }

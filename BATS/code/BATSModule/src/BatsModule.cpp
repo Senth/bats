@@ -195,11 +195,43 @@ void BatsModule::onSendText(std::string text) {
 	} else if (text == "/reload config") {
 		config::loadConfig();
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Configuration reloaded");
+	} else if (startsWith(text, "speed")) {
+		int speed = -1;
+
+		std::string speedValueStr = text.substr(5);
+		std::stringstream ss;
+		ss << speedValueStr;
+		ss >> speed;
+
+		Broodwar->setLocalSpeed(speed);
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);
 	}
 }
+
+#pragma warning(push)
+#pragma warning(disable:4100)
+void BatsModule::onReceiveText(BWAPI::Player* pPlayer, std::string text) {
+	TEST_SELF();
+
+	utilities::string::toLower(text);
+
+	if (startsWith(text, "speed")) {
+		int speed = -1;
+
+		std::string speedValueStr = text.substr(5);
+		std::stringstream ss;
+		ss << speedValueStr;
+		ss >> speed;
+
+		Broodwar->setLocalSpeed(speed);
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received speed message, speed set to: " << speed);
+	} else {
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received message: " << text);
+	}
+}
+#pragma warning(pop)
 
 bool BatsModule::startsWith(const std::string& text,const std::string& token) {
 	

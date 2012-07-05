@@ -363,3 +363,6 @@ const TilePosition& BaseAgent::getGoal() const
 	return goal;
 }
 
+bool BaseAgent::isWeaponCooldown() const {
+	return unit->getGroundWeaponCooldown() > 0 || unit->getAirWeaponCooldown() > 0;
+}

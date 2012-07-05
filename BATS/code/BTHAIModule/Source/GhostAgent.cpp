@@ -43,14 +43,8 @@ void GhostAgent::computeActions()
 		}
 	}
 
-	Unit* target = TargetingAgent::findTarget(this);
-	if (target != NULL)
-	{
-		unit->attack(target);
-		return;
-	}
-
-	computeAttackingActions();
+	findAndTryAttack();
+	computeMoveAction();
 }
 
 Unit* GhostAgent::findLockdownTarget()

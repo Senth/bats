@@ -38,20 +38,26 @@ public:
 	void computeKitingActions();
 
 	/**
+	 * Finds an target for the unit to attack. But only attacks if the unit isn't in
+	 * a squad that avoids enemies.
+	 */
+	void findAndTryAttack();
+
+	/**
 	 * Handles attacking unit actions, this function takes into account if the squad 
 	 * is currently retreating to make the unit defensive.
-	 * @see computeAttackingActions(bool,bool) if you want to override the squad's state.
+	 * @see computeMoveActions(bool,bool) if you want to override the squad's state.
 	 */
-	void computeAttackingActions();
+	void computeMoveAction();
 
 	/**
 	 * Handles attacking unit actions. Either sets the unit as defensive or not and
 	 * does not take into account the squad's state.
 	 * @param defensive set to true if the unit shall avoid all enemies
 	 * @param forceMove set to true to force the unit to move, defaults to false
-	 * @see computeAttackingActions() if you want to use the squad's behavior.
+	 * @see computeMoveActions() if you want to use the squad's behavior.
 	 */
-	void computeAttackingActions(bool defensive, bool forceMove = false);
+	void computeMoveAction(bool defensive, bool forceMove = false);
 
 	/**
 	 * Returns true if the unit is an air unit

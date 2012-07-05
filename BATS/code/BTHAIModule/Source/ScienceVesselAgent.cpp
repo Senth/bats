@@ -77,7 +77,7 @@ void ScienceVesselAgent::computeActions()
 		}
 	}
 
-	computeAttackingActions(true);
+	computeMoveAction(true);
 }
 
 BaseAgent* ScienceVesselAgent::findImportantUnit()

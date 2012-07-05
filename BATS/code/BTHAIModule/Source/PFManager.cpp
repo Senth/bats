@@ -53,7 +53,7 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
 		return;
 	}
 
-	if (!defensive || !forceMove)
+	if (!defensive && !forceMove)
 	{
 		//if (agent->getUnit()->isStartingAttack()) return;
 		if (agent->getUnit()->isAttacking()) return;
@@ -125,18 +125,20 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
 	// Using this instead for bats
 	if (goal != TilePositions::Invalid)
 	{
-		moveToGoal(agent, goal, goal);
+		moveToGoal(agent, goal, goal, defensive, forceMove);
 	}
 }
 
-bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosition goal)
+bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosition goal, bool defensive, bool forceMove)
 {
 	if (checkpoint == TilePositions::Invalid || goal == TilePositions::Invalid) return false;
 	Unit* unit = agent->getUnit();
 
-	if (unit->isStartingAttack() || unit->isAttacking())
-	{
-		return false;
+	if (!defensive && !forceMove) {
+		if (unit->isStartingAttack() || unit->isAttacking())
+		{
+			return false;
+		}
 	}
 
 	Position toReach = Position(checkpoint);
@@ -161,7 +163,13 @@ bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosit
 	//Move
 	//if (!unit->isMoving()) return unit->attack(toReach);
 	//else return true;
-	return unit->attack(toReach);
+	
+	// Don't attack when defensive
+	if (defensive || forceMove) {
+		return unit->move(toReach);
+	} else {
+		return unit->attack(toReach);
+	}
 }
 
 float PFManager::getAttackingUnitP(BaseAgent* agent, int cX, int cY, bool defensive)

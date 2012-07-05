@@ -24,19 +24,14 @@ void ValkyrieAgent::computeActions()
 	//	}
 	//}
 
-	Unit* target = TargetingAgent::findTarget(this);
-	if (target != NULL)
-	{
-		unit->attack(target);
-		return;
-	}
 
 	if (useDefensiveMode())
 	{
-		computeAttackingActions(true);
+		computeMoveAction(true);
 	}
 	else
 	{
-		computeAttackingActions();
+		findAndTryAttack();
+		computeMoveAction();
 	}
 }

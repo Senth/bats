@@ -207,11 +207,22 @@ bool AlliedSquad::isMovingToAttack() const {
 	}
 
 
-	// At least away_distance from allied structures
-	if (mAlliedDistances.empty() ||
-		mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
-	{
-		return false;
+	// Target at least away_distance from allied structures
+	TilePosition targetPosition = getTargetPosition();
+	if (targetPosition != TilePositions::Invalid) {
+		pair<BWAPI::Unit*, int> closestAlliedStructure = getClosestAlliedStructure(targetPosition);
+		if (closestAlliedStructure.second < config::classification::squad::AWAY_DISTANCE_SQUARED)
+		{
+			return false;
+		}
+	}
+	// Else - if no target -> squad needs to be at least away distance from allied structures
+	else {
+		if (mAlliedDistances.empty() ||
+			mAlliedDistances.front() < config::classification::squad::AWAY_DISTANCE_SQUARED)
+		{
+			return false;
+		}
 	}
 
 

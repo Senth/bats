@@ -45,7 +45,7 @@ public:
 
 	/** Moves a unit to the specified goal using the pathfinder, and stops at a distance where the
 	* potential field navigation system should be used instead. */
-	bool moveToGoal(BaseAgent* agent, BWAPI::TilePosition checkpoint, BWAPI::TilePosition goal);
+	bool moveToGoal(BaseAgent* agent, BWAPI::TilePosition checkpoint, BWAPI::TilePosition goal, bool defensive = false, bool forceMove = false);
 	
 };
 

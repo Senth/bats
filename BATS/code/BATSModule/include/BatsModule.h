@@ -56,6 +56,13 @@ public:
 	virtual void onSendText(std::string text);
 
 	/**
+	 * Called when received text from another player
+	 * @param pPlayer the player that sent the text
+	 * @param text the text that we received
+	 */
+	virtual void onReceiveText(BWAPI::Player* pPlayer, std::string text);
+
+	/**
 	 * Called when a player leaves the game
 	 * @param player the player that left the game
 	 */

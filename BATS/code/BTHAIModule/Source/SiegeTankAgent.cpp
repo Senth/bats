@@ -14,6 +14,7 @@ void SiegeTankAgent::computeActions()
 {
 	if (Broodwar->self()->hasResearched(TechTypes::Tank_Siege_Mode))
 	{
+		// @todo always siege in defensive mode
 		int eCnt = enemyGroundUnitsWithinRange(getGroundRange(UnitTypes::Terran_Siege_Tank_Siege_Mode));
 		if (eCnt > 0 && !unit->isSieged())
 		{
@@ -27,16 +28,11 @@ void SiegeTankAgent::computeActions()
 		}
 	}
 
-	Unit* target = TargetingAgent::findTarget(this);
-	if (target != NULL)
-	{
-		unit->attack(target);
-		return;
-	}
+	findAndTryAttack();
 
 	//The tank cant move if sieged
 	if (!unit->isSieged())
 	{
-		computeAttackingActions();
+		computeMoveAction();
 	}
 }

@@ -49,14 +49,12 @@ void AttackSquad::handleAlliedRegrouping() {
 	if (getTemporaryGoalPosition() == TilePositions::Invalid) {
 		if (needsAlliedRegrouping()) {
 			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
-			setAvoidEnemyUnits(true);
 		}
 	}
 	// Currently regrouping, update regroup position if not finished
 	else {
 		if (finishedAlliedRegrouping()) {
 			clearAlliedRegrouping();
-			setAvoidEnemyUnits(false);
 		} else {
 			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
 		}
@@ -119,8 +117,8 @@ void AttackSquad::computeSquadSpecificActions() {
 			switch (mpAlliedSquadFollow->getState()) {
 				// Allied are still -> do nothing
 				case AlliedSquad::State_AttackHalted:
-					setAvoidEnemyUnits(true);
 					handleAlliedRegrouping();
+					setAvoidEnemyUnits(true);
 					break;
 				
 				// Allied is retreating -> go to target position, don't attack
@@ -277,7 +275,7 @@ void AttackSquad::onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitG
 #pragma warning(pop)
 
 bool AttackSquad::needsAlliedRegrouping() const {
-	if (NULL != mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
+	if (NULL == mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
 		return false;
 	}
 

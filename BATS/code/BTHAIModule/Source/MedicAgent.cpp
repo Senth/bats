@@ -17,7 +17,7 @@ void MedicAgent::computeActions()
 		return;
 	}
 
-	computeAttackingActions(true);
+	computeMoveAction(true);
 }
 
 bool MedicAgent::checkUnitsToHeal()

@@ -3,7 +3,7 @@ Default
 <description>
 Only for testing purposes
 <available-transitions>
-mid-x
+default
 <build-order>
 Terran_Supply_Depot
 Terran_Barracks
