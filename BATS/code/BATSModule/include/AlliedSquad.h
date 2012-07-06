@@ -153,6 +153,12 @@ public:
 	 */
 	BWAPI::TilePosition getTargetPosition() const;
 
+	/**
+	 * Checks whether the squad is under attack or not
+	 * @return true if the squad is under attack
+	 */
+	bool isUnderAttack() const;
+
 private:
 	/**
 	 * Returns the direction of the squad, the direction is measured by the current center
@@ -249,6 +255,13 @@ private:
 	 * @return current state as string
 	 */
 	std::string getStateString() const;
+
+	/**
+	 * Checks if the specified unit belongs to this squad
+	 * @param pUnit unit to check if it belongs to this squad
+	 * @return true if the unit belongs to this squad
+	 */
+	bool belongsToThisSquad(BWAPI::Unit* pUnit) const;
 
 	bool mBig;
 	std::vector<BWAPI::Unit*> mUnits;

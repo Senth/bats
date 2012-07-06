@@ -192,6 +192,9 @@ namespace bats {
 			namespace classes {
 				extern bool ALLIED_SQUAD;
 				extern bool ALLIED_ARMY_MANAGER;
+				extern bool AGENT_UNIT;
+				extern bool AGENT_STRUCTURE;
+				extern bool AGENT_WORKER;
 			}
 		}
 

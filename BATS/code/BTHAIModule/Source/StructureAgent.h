@@ -30,7 +30,7 @@ public:
 	virtual void computeActions();
 
 	/** Used in debug modes to show a line to the agents' goal. */
-	virtual void debug_showGoal();
+	virtual void printGraphicDebugInfo();
 
 	/** Checks if the agent can morph into the specified type. Zerg only. */
 	bool canMorphInto(BWAPI::UnitType type) const;

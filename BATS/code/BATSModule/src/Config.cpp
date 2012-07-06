@@ -104,6 +104,9 @@ namespace debug {
 	namespace classes {
 		bool ALLIED_ARMY_MANAGER = false;
 		bool ALLIED_SQUAD = false;
+		bool AGENT_UNIT = false;
+		bool AGENT_STRUCTURE = false;
+		bool AGENT_WORKER = false;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -417,6 +420,18 @@ bool debug::classes::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_ARMY_MANAGER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_ARMY_MANAGER));
 		ALLIED_ARMY_MANAGER = variableInfo;
+	} else if (variableInfo.name == "agent_unit") {
+		gOldValue = toString(AGENT_UNIT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_UNIT));
+		AGENT_UNIT = variableInfo;
+	} else if (variableInfo.name == "agent_structure") {
+		gOldValue = toString(AGENT_STRUCTURE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_STRUCTURE));
+		AGENT_STRUCTURE = variableInfo;
+	} else if (variableInfo.name == "agent_worker") {
+		gOldValue = toString(AGENT_WORKER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_WORKER));
+		AGENT_WORKER = variableInfo;
 	} else {
 		return false;
 	}

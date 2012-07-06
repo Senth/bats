@@ -58,8 +58,8 @@ public:
 	/** Called each update to issue orders. */
 	virtual void computeActions() = 0;
 
-	/** Used in debug modes to show a line to the agents' goal. */
-	virtual void debug_showGoal() {}
+	/** Used to print info about this agent to the screen. */
+	virtual void printGraphicDebugInfo() {}
 
 	/** Returns the number of enemy units within weapon range of the agent. */
 	int noUnitsInWeaponRange() const;
@@ -145,9 +145,6 @@ public:
 
 	/** Returns true if the unit is currently being built */
 	bool isBeingBuilt() const;
-
-	/** Used to print info about this agent to the screen. */
-	void printGraphicDebugInfo();
 
 	/** Returns true if this agent can build units of the specified type. */
 	virtual bool canBuild(BWAPI::UnitType type) const;

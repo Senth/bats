@@ -52,29 +52,6 @@ bool BaseAgent::isBeingBuilt() const {
 	return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
 }
 
-void BaseAgent::printGraphicDebugInfo()
-{
-	// Low
-	// Show building information and goal
-	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low)
-	{
-		if (isBuilding())
-		{
-			debug_showGoal();
-		}
-	}
-
-	// Medium
-	// Show unit goal
-	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium)
-	{
-		if (!isBuilding())
-		{
-			debug_showGoal();
-		}
-	}
-}
-
 int BaseAgent::getUnitID() const
 {
 	return unitID;

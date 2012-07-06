@@ -152,14 +152,13 @@ void AlliedSquad::update() {
 
 	/// @todo check if under attack
 
-
-	// Retreating
-	if (isRetreating()) {
-		mState = State_Retreating;
-	}
 	// Attacking
-	else if (isAttacking()) {
+	if (isAttacking()) {
 		mState = State_Attacking;
+	}
+	// Retreating
+	else if (isRetreating()) {
+		mState = State_Retreating;
 	}
 	// Moving to attack
 	else if (isMovingToAttack()) {
@@ -195,6 +194,27 @@ double AlliedSquad::getDistanceTraveledSquared() const {
 	}
 }
 
+bool AlliedSquad::isUnderAttack() const {
+	// Check if an enemy unit has one of the squads as targets
+	// Enemy players
+	const set<Player*>& enemies = Broodwar->enemies();
+	set<Player*>::const_iterator enemyIt;
+	for (enemyIt = enemies.begin(); enemyIt != enemies.end(); ++enemyIt) {
+		// Enemy units
+		const set<Unit*>& enemyUnits = (*enemyIt)->getUnits();
+		set<Unit*>::const_iterator enemyUnitIt;
+		for (enemyUnitIt = enemyUnits.begin(); enemyUnitIt != enemyUnits.end(); ++enemyUnitIt) {
+			// Does the target belongs to this squad?
+			Unit* pEnemyTarget = (*enemyUnitIt)->getTarget();
+			if (pEnemyTarget != NULL && belongsToThisSquad(pEnemyTarget)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool AlliedSquad::isMovingToAttack() const {
 	// Skip if we haven't all readings
 	if (config::classification::squad::MEASURE_TIME != mCenter.size()) {
@@ -225,34 +245,23 @@ bool AlliedSquad::isMovingToAttack() const {
 		}
 	}
 
-
-	// Moving towards enemy base
-	// If we haven't seen any enemy structure yet, only check if the distance from allies increases
-	// Else enemy distance shall be decreased
-	//if ((mEnemyDistances.empty() || mEnemyDistances.front() > mEnemyDistances.back()) &&
-	//	(mAlliedDistances.empty() || mAlliedDistances.front() < mAlliedDistances.back()))
-	//{
-	//	return false;
-	//}	
-
-
 	return true;
 }
 
 bool AlliedSquad::hasRetreatTimedout() const {
 	return mRetreatStartedTime + config::classification::squad::RETREAT_TIMEOUT
-		>=
+		<=
 		mpsGameTime->getElapsedTime();
 }
 
 bool AlliedSquad::isRetreating() const {
 	bool retreating = false;
 
-	if (mState == State_Retreating && hasRetreatTimedout()) {
+	if (mState == State_Retreating && !hasRetreatTimedout()) {
 		retreating = true;
 	} else {
-		// Is already retreating, attacking, or under attack
-		if (mState == State_Retreating || mState == State_Attacking /** @todo || isUnderAttack() */) {
+		// Retreating, or not safe
+		if (mState == State_Retreating || isUnderAttack()) {
 			if (isRetreatingFrame()) {
 				mRetreatedLastCall = true;
 				mRetreatStartedTime = mpsGameTime->getElapsedTime();
@@ -558,4 +567,14 @@ TilePosition AlliedSquad::getTargetPosition() const {
 	}
 
 	return mostTargetedPosition;
+}
+
+bool AlliedSquad::belongsToThisSquad(BWAPI::Unit* pUnit) const {
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		if (mUnits[i] == pUnit) {
+			return true;
+		}
+	}
+
+	return false;
 }

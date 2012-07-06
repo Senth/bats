@@ -7,6 +7,7 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/SquadManager.h"
 #include "BatsModule/include/Squad.h"
+#include "BatsModule/include/Config.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
@@ -113,63 +114,76 @@ void WorkerAgent::handleKitingWorker()
 	unit->rightClick(Position(Broodwar->self()->getStartLocation()));
 }
 
-void WorkerAgent::debug_showGoal()
+void WorkerAgent::printGraphicDebugInfo()
 {
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
+		bats::config::debug::classes::AGENT_WORKER == false)
+	{
+		return;
+	}
+
 	if (!isAlive()) return;
 	if (!unit->isCompleted()) return;
-	Position a = Position(unit->getPosition());
-	Position b = Position(goal);
-	//Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "(%d %d %d)", getSquadId(), b.x(), b.y());
-	
-	if (currentState == GATHER_MINERALS || currentState == GATHER_GAS)
-	{
-		Unit* target = unit->getTarget();
-		if (target != NULL)
+
+
+
+	const Position& unitPos = unit->getPosition();
+	Position goalPos = Position(goal);
+
+	// Low
+	// Draw boxes when building stuff
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
+		if (currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
 		{
-			Position a = Position(unit->getPosition());
-			Position b = Position(target->getPosition());
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
+			if (buildSpot.x() > 0)
+			{
+				int w = toBuild.tileWidth() * 32;
+				int h = toBuild.tileHeight() * 32;
+
+				Position b = Position(buildSpot.x()*32 + w/2, buildSpot.y()*32 + h/2);
+				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+
+				Broodwar->drawBoxMap(buildSpot.x()*32,buildSpot.y()*32,buildSpot.x()*32+w,buildSpot.y()*32+h,Colors::Blue,false);
+			}
 		}
 	}
 
-	if (currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
-	{
-		if (buildSpot.x() > 0)
+
+	// Medium
+	// Draw line to mineral/gas unit is mining from
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
+		if (currentState == GATHER_MINERALS || currentState == GATHER_GAS)
 		{
-			int w = toBuild.tileWidth() * 32;
-			int h = toBuild.tileHeight() * 32;
-
-			Position a = Position(unit->getPosition());
-			Position b = Position(buildSpot.x()*32 + w/2, buildSpot.y()*32 + h/2);
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
-
-			Broodwar->drawBox(CoordinateType::Map,buildSpot.x()*32,buildSpot.y()*32,buildSpot.x()*32+w,buildSpot.y()*32+h,Colors::Blue,false);
+			Unit* target = unit->getTarget();
+			if (target != NULL)
+			{
+				const Position& targetPos = target->getPosition();
+				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),targetPos.x(),targetPos.y(),Colors::Teal);
+			}
 		}
-	}
 
-	if (unit->isRepairing())
-	{
-		Unit* targ = unit->getOrderTarget();
-		if (targ != NULL)
+		if (unit->isRepairing())
 		{
-			Position a = Position(unit->getPosition());
-			Position b = Position(targ->getPosition());
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
+			Unit* target = unit->getOrderTarget();
+			if (target != NULL)
+			{
+				Position a = Position(unit->getPosition());
+				Position b = Position(target->getPosition());
+				Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
 
-			Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Repairing %s", targ->getType().getName().c_str());
+				Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Repairing %s", target->getType().getName().c_str());
+			}
 		}
-	}
-
-	if (unit->isConstructing())
-	{
-		Unit* targ = unit->getOrderTarget();
-		if (targ != NULL)
+		else if (unit->isConstructing())
 		{
-			Position a = Position(unit->getPosition());
-			Position b = Position(targ->getPosition());
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
+			Unit* target = unit->getOrderTarget();
+			if (target != NULL)
+			{
+				Position b = target->getPosition();
+				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
 
-			Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Constructing %s", targ->getType().getName().c_str());
+				Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "Constructing %s", target->getType().getName().c_str());
+			}
 		}
 	}
 }
@@ -184,7 +198,9 @@ void WorkerAgent::computeActions()
 		shared_ptr<bats::Squad> squad = mpsSquadManager->getSquad(getSquadId());
 		if (NULL != squad) {
 			bool defensive = squad->isAvoidingEnemies();
-			PFManager::getInstance()->computeAttackingUnitActions(this, goal, defensive);
+			computeMoveAction(defensive, defensive);
+
+			/// @todo repair something?
 		} else {
 			ERROR_MESSAGE(false, "Squad is null for WorkerAgent, why is it this?");
 		}
@@ -329,7 +345,7 @@ void WorkerAgent::computeActions()
 bool WorkerAgent::isBuilt() const
 {
 	/// @author Matteus Magnusson (matteus.magnusson@gmail.com)
-	/// Changed logic a to test if the building is actually done, not begun
+	/// Changed logic to test if the building is actually done, not begun
 	const set<Unit*> tileUnits = Broodwar->getUnitsOnTile(buildSpot.x(), buildSpot.y());
 	set<Unit*>::const_iterator tileUnitIt;
 	for (tileUnitIt = tileUnits.begin(); tileUnitIt != tileUnits.end(); ++tileUnitIt)

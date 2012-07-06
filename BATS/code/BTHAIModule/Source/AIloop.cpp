@@ -99,8 +99,8 @@ void AIloop::show_debug()
 		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++)
 		{
-			if (agents.at(i)->isBuilding()) agents.at(i)->debug_showGoal();
-			if (!agents.at(i)->isBuilding() && debug_mode >= 2) agents.at(i)->debug_showGoal();
+			if (agents.at(i)->isBuilding()) agents.at(i)->printGraphicDebugInfo();
+			if (!agents.at(i)->isBuilding() && debug_mode >= 2) agents.at(i)->printGraphicDebugInfo();
 		}
 
 		bats::BuildPlanner::getInstance()->printInfo();

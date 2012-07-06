@@ -31,7 +31,7 @@ public:
 	void computeActions();
 
 	/** Used in debug modes to show a line to the agents' goal. */
-	void debug_showGoal();
+	void printGraphicDebugInfo();
 
 	/** Set the state of the worker. I.e. what does it do right now. 
 	 * Should only be set if the worker is getting a task not through the functions in this class. Then it is automatic. */

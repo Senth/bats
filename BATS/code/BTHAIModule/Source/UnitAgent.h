@@ -32,7 +32,7 @@ public:
 	void computeActions();
 
 	/** Used in debug modes to show a line to the agents' goal. */
-	void debug_showGoal();
+	void printGraphicDebugInfo();
 
 	/** Handles actions for kiting agents. */
 	void computeKitingActions();

@@ -30,85 +30,95 @@ UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 	}
 }
 
-void UnitAgent::debug_showGoal()
+void UnitAgent::printGraphicDebugInfo()
 {
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
+		bats::config::debug::classes::AGENT_UNIT == false)
+	{
+		return;
+	}
+
 	if (!isAlive()) return;
 	if (unit->isLoaded()) return;
 	if (unit->isBeingConstructed()) return;
 	if (!unit->isCompleted()) return;
 	
-	const Position& unitPos = unit->getPosition();
-	const TilePosition& unitTilePos = unit->getTilePosition();
 
-	stringstream ss;
-	ss << bats::TextColors::LIGHT_GREY <<
-		setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << getUnitID() << "\n";
+	// Medium
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
+		const Position& unitPos = unit->getPosition();
+		const TilePosition& unitTilePos = unit->getTilePosition();
 
-	// High
-	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
-		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Pos: " << unitTilePos << "\n";
-	}
+		stringstream ss;
+		ss << bats::TextColors::LIGHT_GREY <<
+			setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << getUnitID() << "\n";
 
-	if (goal != TilePositions::Invalid) {
-
-		string state = "Unknown";
-
-		if (unit->isMoving())
-		{
-			Position b = Position(goal);
-			Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
-
-			state = "Move";
+		// High
+		if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
+			ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Pos: " << unitTilePos << "\n";
 		}
-		if(unit->isIdle()){
-			Position b = Position(goal);		
-			Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
-			state = "Idle";
-		}
-		if (!unit->isIdle())
-		{
-			Unit* targ = unit->getOrderTarget();
-			if (targ != NULL)
+
+		if (goal != TilePositions::Invalid) {
+
+			string state = "Unknown";
+
+			if (unit->isMoving())
 			{
-				Position b = Position(targ->getPosition());
+				Position b = Position(goal);
+				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
 
-				if (targ->getPlayer()->isEnemy(Broodwar->self()))
+				state = "Move";
+			}
+			if(unit->isIdle()){
+				Position b = Position(goal);		
+				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+				state = "Idle";
+			}
+			if (!unit->isIdle())
+			{
+				Unit* targ = unit->getOrderTarget();
+				if (targ != NULL)
 				{
-					if (targ->exists())
+					Position b = Position(targ->getPosition());
+
+					if (targ->getPlayer()->isEnemy(Broodwar->self()))
 					{
-						Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Red);
-						state = "Attack";
+						if (targ->exists())
+						{
+							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Red);
+							state = "Attack";
+						}
 					}
-				}
-				else
-				{
-					if (targ->exists())
+					else
 					{
-						Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
-						state = "Support";
+						if (targ->exists())
+						{
+							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
+							state = "Support";
+						}
 					}
 				}
 			}
+
+			state += ": ";
+
+			ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << state << goal << "\n";
 		}
 
-		state += ": ";
+		if (unit->isBeingHealed())
+		{
+			Broodwar->drawCircleMap(unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White);
+		}
 
-		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << state << goal << "\n";
+		if (unit->getType().isDetector())
+		{
+			double range = unit->getType().sightRange();
+			Broodwar->drawCircleMap(unitPos.x(),unitPos.y(),(int)range, Colors::Red);
+		}
+
+		// Draw info text
+		Broodwar->drawTextMap(unitPos.x(), unitPos.y()-10, "%s", ss.str().c_str());
 	}
-
-	if (unit->isBeingHealed())
-	{
-		Broodwar->drawCircleMap(unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White);
-	}
-
-	if (unit->getType().isDetector())
-	{
-		double range = unit->getType().sightRange();
-		Broodwar->drawCircleMap(unitPos.x(),unitPos.y(),(int)range, Colors::Red);
-	}
-
-	// Draw info text
-	Broodwar->drawTextMap(unitPos.x(), unitPos.y()-10, "%s", ss.str().c_str());
 }
 
 void UnitAgent::computeActions()

@@ -2,6 +2,7 @@
 #include "AgentManager.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ExplorationManager.h"
+#include "BatsModule/include/Config.h"
 #include "UpgradesPlanner.h"
 #include "Commander.h"
 #include "WorkerAgent.h"
@@ -18,95 +19,105 @@ StructureAgent::StructureAgent(Unit* mUnit) : BaseAgent(mUnit)
 	agentType = "StructureAgent";
 }
 
-void StructureAgent::debug_showGoal()
+void StructureAgent::printGraphicDebugInfo()
 {
 	if (!isAlive()) return;
 
-	int w = unit->getType().tileWidth() * 32 / 2;
-	Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w, unit->getPosition().y() - 10, unit->getType().getName().c_str());
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
+		bats::config::debug::classes::AGENT_STRUCTURE == false)
+	{
+		return;
+	}
 
-	//Draw "is working" box
-	int total = 0;
-	int done = 0;
-	string txt = "";
-	Color cColor = Colors::Blue;
-	int bar_h = 18;
 
-	if (unit->isBeingConstructed())
-	{
-		total = unit->getType().buildTime();
-		done = total - unit->getRemainingBuildTime();
-		txt = "";
-		bar_h = 8;
-	}
-	if (!unit->isBeingConstructed() && unit->getType().isResourceContainer())
-	{
-		total = unit->getInitialResources();
-		done = unit->getResources();
-		txt = "";
-		cColor = Colors::Orange;
-		bar_h = 8;
-	}
-	if (unit->isResearching())
-	{
-		total = unit->getTech().researchTime();
-		done = total - unit->getRemainingResearchTime();
-		txt = unit->getTech().getName();
-	}
-	if (unit->isUpgrading())
-	{
-		total = unit->getUpgrade().upgradeTime();
-		done = total - unit->getRemainingUpgradeTime();
-		txt = unit->getUpgrade().getName();
-	}
-	if (unit->isTraining())
-	{
-		if (unit->getTrainingQueue().size() > 0)
+	// Low
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
+		int w = unit->getType().tileWidth() * 32 / 2;
+		Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w, unit->getPosition().y() - 10, unit->getType().getName().c_str());
+
+		//Draw "is working" box
+		int total = 0;
+		int done = 0;
+		string txt = "";
+		Color cColor = Colors::Blue;
+		int bar_h = 18;
+
+		if (unit->isBeingConstructed())
 		{
-			UnitType t = *(unit->getTrainingQueue().begin());
-			total = t.buildTime();
-			txt = t.getName();
-			done = total - unit->getRemainingTrainTime();
+			total = unit->getType().buildTime();
+			done = total - unit->getRemainingBuildTime();
+			txt = "";
+			bar_h = 8;
 		}
-	}
-
-	if (total > 0)
-	{
-		int w = unit->getType().tileWidth() * 32;
-		int h = unit->getType().tileHeight() * 32;
-
-		//Start 
-		Position s = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - 30);
-		//End
-		Position e = Position(s.x() + w, s.y() + bar_h);
-		//Progress
-		int prg = (int)((double)done / (double)total * w);
-		Position p = Position(s.x() + prg, s.y() +  bar_h);
-
-		Broodwar->drawBox(CoordinateType::Map,s.x(),s.y(),e.x(),e.y(),cColor,false);
-		Broodwar->drawBox(CoordinateType::Map,s.x(),s.y(),p.x(),p.y(),cColor,true);
-
-		Broodwar->drawText(CoordinateType::Map, s.x() + 5, s.y() + 2, txt.c_str());
-	}
-
-	if (!unit->isBeingConstructed() && unit->getType().getID() == UnitTypes::Terran_Bunker.getID())
-	{
-		int w = unit->getType().tileWidth() * 32;
-		int h = unit->getType().tileHeight() * 32;
-
-		Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w / 2, unit->getPosition().y() - 10, unit->getType().getName().c_str());
-
-		//Draw Loaded box
-		Position a = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - h/2);
-		Position b = Position(a.x() + 94, a.y() + 6);
-		Broodwar->drawBox(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green,false);
-
-		if ((int)unit->getLoadedUnits().size() > 0)
+		if (!unit->isBeingConstructed() && unit->getType().isResourceContainer())
 		{
-			Position a = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - h/2);
-			Position b = Position(a.x() + unit->getLoadedUnits().size() * 24, a.y() + 6);
+			total = unit->getInitialResources();
+			done = unit->getResources();
+			txt = "";
+			cColor = Colors::Orange;
+			bar_h = 8;
+		}
+		if (unit->isResearching())
+		{
+			total = unit->getTech().researchTime();
+			done = total - unit->getRemainingResearchTime();
+			txt = unit->getTech().getName();
+		}
+		if (unit->isUpgrading())
+		{
+			total = unit->getUpgrade().upgradeTime();
+			done = total - unit->getRemainingUpgradeTime();
+			txt = unit->getUpgrade().getName();
+		}
+		if (unit->isTraining())
+		{
+			if (unit->getTrainingQueue().size() > 0)
+			{
+				UnitType t = *(unit->getTrainingQueue().begin());
+				total = t.buildTime();
+				txt = t.getName();
+				done = total - unit->getRemainingTrainTime();
+			}
+		}
 
-			Broodwar->drawBox(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green,true);
+		if (total > 0)
+		{
+			int w = unit->getType().tileWidth() * 32;
+			int h = unit->getType().tileHeight() * 32;
+
+			//Start 
+			Position s = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - 30);
+			//End
+			Position e = Position(s.x() + w, s.y() + bar_h);
+			//Progress
+			int prg = (int)((double)done / (double)total * w);
+			Position p = Position(s.x() + prg, s.y() +  bar_h);
+
+			Broodwar->drawBox(CoordinateType::Map,s.x(),s.y(),e.x(),e.y(),cColor,false);
+			Broodwar->drawBox(CoordinateType::Map,s.x(),s.y(),p.x(),p.y(),cColor,true);
+
+			Broodwar->drawText(CoordinateType::Map, s.x() + 5, s.y() + 2, txt.c_str());
+		}
+
+		if (!unit->isBeingConstructed() && unit->getType().getID() == UnitTypes::Terran_Bunker.getID())
+		{
+			int w = unit->getType().tileWidth() * 32;
+			int h = unit->getType().tileHeight() * 32;
+
+			Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w / 2, unit->getPosition().y() - 10, unit->getType().getName().c_str());
+
+			//Draw Loaded box
+			Position a = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - h/2);
+			Position b = Position(a.x() + 94, a.y() + 6);
+			Broodwar->drawBox(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green,false);
+
+			if ((int)unit->getLoadedUnits().size() > 0)
+			{
+				Position a = Position(unit->getPosition().x() - w/2, unit->getPosition().y() - h/2);
+				Position b = Position(a.x() + unit->getLoadedUnits().size() * 24, a.y() + 6);
+
+				Broodwar->drawBox(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green,true);
+			}
 		}
 	}
 }
