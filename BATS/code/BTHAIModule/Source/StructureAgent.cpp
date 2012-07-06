@@ -225,11 +225,6 @@ bool StructureAgent::canBuildUnit(UnitType type) const
 	return true;
 }
 
-void StructureAgent::printInfo() const
-{
-	Broodwar->printf("[%s-%d]", agentType.c_str(), unitID);
-}
-
 void StructureAgent::sendWorkers()
 {
 	//We have constructed a new base. Make some workers move here.

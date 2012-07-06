@@ -1,5 +1,6 @@
 #include "UnitCreator.h"
 #include "BuildPlanner.h"
+#include "Config.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "Utilities/Logger.h"
@@ -107,7 +108,8 @@ void UnitCreator::updatePopulation(BWAPI::UnitType unitType){
 	}
 }
 
-bool UnitCreator::compareByPriority(ProductionQueueItem &a, ProductionQueueItem &b){	
+bool UnitCreator::compareByPriority(ProductionQueueItem &a, ProductionQueueItem &b){
+	/// @todo fix priority
 	float p1,p2;
 	p1 = (float) a.remainingLeft / a.quantity;
 	p2 = (float) b.remainingLeft / b.quantity;
@@ -176,22 +178,26 @@ bool UnitCreator::canProceedToNextUnit(BWAPI::UnitType unitType){
 	}
 	return true;
 }
-void UnitCreator::printInfo(){	
-	int line = 1, y = 100;
-	std::stringstream info;
+void UnitCreator::printGraphicDebugInfo(){
+	// Low
+	// Print queue
+	if(config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
+		int line = 1, y = 100;
+		std::stringstream info;
 	
-	Broodwar->drawTextScreen(5,y,"UnitCreator:");
+		Broodwar->drawTextScreen(5,y,"UnitCreator:");
 	
-	for (int i = 0; i < (int)mProductionQueue.size(); i++){
-		info << mProductionQueue.at(i).unit.getName() + " : ";
-		info << mProductionQueue.at(i).quantity;
-		info << " : ";
-		info << mProductionQueue.at(i).remainingLeft;
-		Broodwar->drawTextScreen(5,y+16*line, info.str().c_str());
-		info.str("");
-		info.clear();
-		line++;
-	}	
+		for (int i = 0; i < (int)mProductionQueue.size(); i++){
+			info << mProductionQueue.at(i).unit.getName() + " : ";
+			info << mProductionQueue.at(i).quantity;
+			info << " : ";
+			info << mProductionQueue.at(i).remainingLeft;
+			Broodwar->drawTextScreen(5,y+16*line, info.str().c_str());
+			info.str("");
+			info.clear();
+			line++;
+		}
+	}
 }
 void UnitCreator::switchPhase(){
 	sLockForQueue = true;

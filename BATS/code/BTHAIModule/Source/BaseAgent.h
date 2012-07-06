@@ -26,7 +26,6 @@ protected:
 	BWAPI::UnitType type;
 	BWAPI::TilePosition goal;
 	int unitID;
-	//int squadID;
 	bool alive;
 	int lastActionFrame;
 	bool bBlock;
@@ -57,14 +56,10 @@ public:
 	const bats::SquadId& getSquadId() const;
 
 	/** Called each update to issue orders. */
-	virtual void computeActions()
-	{
-	}
+	virtual void computeActions() = 0;
 
 	/** Used in debug modes to show a line to the agents' goal. */
-	virtual void debug_showGoal()
-	{
-	}
+	virtual void debug_showGoal() {}
 
 	/** Returns the number of enemy units within weapon range of the agent. */
 	int noUnitsInWeaponRange() const;
@@ -152,7 +147,7 @@ public:
 	bool isBeingBuilt() const;
 
 	/** Used to print info about this agent to the screen. */
-	virtual void printInfo() const;
+	void printGraphicDebugInfo();
 
 	/** Returns true if this agent can build units of the specified type. */
 	virtual bool canBuild(BWAPI::UnitType type) const;

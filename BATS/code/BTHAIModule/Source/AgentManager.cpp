@@ -459,3 +459,9 @@ TilePosition AgentManager::getClosestDetector(TilePosition startPos)
 
 	return pos;
 }
+
+void AgentManager::printGraphicDebugInfo() {
+	for (size_t i = 0; i < agents.size(); ++i) {
+		agents[i]->printGraphicDebugInfo();
+	}
+}

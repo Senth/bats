@@ -61,68 +61,61 @@ void PFManager::computeAttackingUnitActions(BaseAgent* agent, TilePosition goal,
 	}
 	if (agent->getUnit()->isLoaded()) return;
 
+
 	//PF
 	int unitX = unit->getPosition().x();
 	int unitY = unit->getPosition().y();
 
-	float bestP = getAttackingUnitP(agent, unitX, unitY, defensive);
-	float cP = 0;
-	
-	float startP = bestP;
-    int bestX = -1;
-    int bestY = -1;
+	// Unit in attacking state
+	if (!forceMove) {
 
-	for (int cX = unitX - checkRange; cX <= unitX + checkRange; cX += stepSize)
-	{
-        for (int cY = unitY - checkRange; cY <= unitY + checkRange; cY += stepSize)
+		float bestP = getAttackingUnitP(agent, unitX, unitY, defensive);
+		float cP = 0;
+	
+		float startP = bestP;
+		int bestX = -1;
+		int bestY = -1;
+
+		for (int cX = unitX - checkRange; cX <= unitX + checkRange; cX += stepSize)
 		{
-            if (cX >= 0 && cY >= 0 && cX <= mapW && cY <= mapH)
+			for (int cY = unitY - checkRange; cY <= unitY + checkRange; cY += stepSize)
 			{
-				cP = getAttackingUnitP(agent, cX, cY, defensive);
-				//Broodwar->printf("p(%d,%d)=%d",cX,cY,cP);
-
-                if (cP != bestP)
+				if (cX >= 0 && cY >= 0 && cX <= mapW && cY <= mapH)
 				{
-					bestP = cP;
-                    bestX = cX;
-                    bestY = cY;
-                }
-            }
-        }
-    }
-	
-	if (bestX >= 0 && bestY >= 0)
-	{
-		Position toMove(bestX, bestY);
-		if (!defensive)
-		{
-			unit->attack(toMove);
-		}
-		else
-		{
-			unit->rightClick(toMove);
-		}
-		return;
-    }
-	//EndPF
+					cP = getAttackingUnitP(agent, cX, cY, defensive);
+					//Broodwar->printf("p(%d,%d)=%d",cX,cY,cP);
 
-	// Not needed for BATS
-	//TilePosition checkpoint = goal;
-	//if (agent->_deprecated_getSquadID() >= 0)
-	//{
-	//	Squad* sq = Commander::getInstance()->getSquad(agent->_deprecated_getSquadID());
-	//	if (sq != NULL)
-	//	{
-	//		checkpoint = sq->nextMovePosition();
-	//	}
-	//}
+					if (cP != bestP)
+					{
+						bestP = cP;
+						bestX = cX;
+						bestY = cY;
+					}
+				}
+			}
+		}
 	
-	//if (goal != TilePositions::Invalid)
-	//{
-	//	moveToGoal(agent, checkpoint, goal);
-	//}
+		if (bestX >= 0 && bestY >= 0)
+		{
+			Position toMove(bestX, bestY);
+			if (!defensive)
+			{
+				unit->attack(toMove);
+			}
+			else
+			{
+				unit->rightClick(toMove);
+			}
+			return; // RETURNING
+		}
+	}
+	/// @todo Else - Unit is force to move, probably retreating
+	else {
 	
-	// Using this instead for bats
+	}
+	//EndPF
+	
+	// If not found any position using potential fields, just move to the position
 	if (goal != TilePositions::Invalid)
 	{
 		moveToGoal(agent, goal, goal, defensive, forceMove);

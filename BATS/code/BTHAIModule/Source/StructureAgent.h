@@ -37,9 +37,6 @@ public:
 
 	/** Sends a number of workers to a newly constructed base. */
 	void sendWorkers();
-
-	/** Used to print info about this agent to the screen. */
-	void printInfo() const;
 };
 
 #endif

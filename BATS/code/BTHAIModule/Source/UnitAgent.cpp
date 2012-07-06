@@ -7,7 +7,10 @@
 #include "BATSModule/include/Helper.h"
 #include "BATSModule/include/SquadManager.h"
 #include "BATSModule/include/Squad.h"
+#include "BATSModule/include/Config.h"
 #include "Utilities/Logger.h"
+#include <sstream>
+#include <iomanip>
 
 using namespace BWAPI;
 using namespace std;
@@ -34,68 +37,83 @@ void UnitAgent::debug_showGoal()
 	if (unit->isBeingConstructed()) return;
 	if (!unit->isCompleted()) return;
 	
+	const Position& unitPos = unit->getPosition();
+	const TilePosition& unitTilePos = unit->getTilePosition();
+
+	stringstream ss;
+	ss << bats::TextColors::LIGHT_GREY <<
+		setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << getUnitID() << "\n";
+
+	// High
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
+		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Pos: " << unitTilePos << "\n";
+	}
+
 	if (goal != TilePositions::Invalid) {
+
+		string state = "Unknown";
+
 		if (unit->isMoving())
 		{
-			Position a = Position(unit->getPosition());
 			Position b = Position(goal);
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
+			Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
 
-			Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Move (%d,%d)", goal.x(), goal.y());
+			state = "Move";
 		}
 		if(unit->isIdle()){
-			Position a = Position(unit->getPosition());
 			Position b = Position(goal);		
-			Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Teal);
-			Broodwar->drawText(CoordinateType::Map, a.x(), a.y() - 5, "Idle (%d,%d)", goal.x(), goal.y());
+			Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+			state = "Idle";
 		}
 		if (!unit->isIdle())
 		{
 			Unit* targ = unit->getOrderTarget();
 			if (targ != NULL)
 			{
-				Position a = Position(unit->getPosition());
 				Position b = Position(targ->getPosition());
 
 				if (targ->getPlayer()->isEnemy(Broodwar->self()))
 				{
 					if (targ->exists())
 					{
-						Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Red);
-						Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Attack %s", targ->getType().getName().c_str());
+						Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Red);
+						state = "Attack";
 					}
 				}
 				else
 				{
 					if (targ->exists())
 					{
-						Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
-						Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "%s", targ->getType().getName().c_str());
+						Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
+						state = "Support";
 					}
 				}
 			}
 		}
+
+		state += ": ";
+
+		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << state << goal << "\n";
 	}
 
 	if (unit->isBeingHealed())
 	{
-		Broodwar->drawCircle(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White, false);
+		Broodwar->drawCircleMap(unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White);
 	}
 
 	if (unit->getType().isDetector())
 	{
 		double range = unit->getType().sightRange();
-		int x = unit->getPosition().x();
-		int y = unit->getPosition().y();
-		Broodwar->drawCircle(CoordinateType::Map,x,y,(int)range, Colors::Red, false);
+		Broodwar->drawCircleMap(unitPos.x(),unitPos.y(),(int)range, Colors::Red);
 	}
+
+	// Draw info text
+	Broodwar->drawTextMap(unitPos.x(), unitPos.y()-10, "%s", ss.str().c_str());
 }
 
 void UnitAgent::computeActions()
 {
-#if DISABLE_UNIT_AI == 0
-	mpsPfManager->computeAttackingUnitActions(this, goal, false);
-#endif
+	// Does nothing
 }
 
 void UnitAgent::computeKitingActions()
@@ -654,12 +672,6 @@ bool UnitAgent::isTransport() const
 		}
 	}
 	return isTransportType;
-}
-
-void UnitAgent::printInfo() const
-{
-	DEBUG_MESSAGE(utilities::LogLevel_Finer, "[" << agentType << "-" << unitID <<
-		"SquadId" << getSquadId() << " " << unit->getTilePosition() << goal);
 }
 
 bool UnitAgent::chargeShields()

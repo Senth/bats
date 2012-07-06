@@ -88,6 +88,6 @@ public:
 	void updatePopulation(BWAPI::UnitType typeDestroyed);
 	/** Prints debug information
 	*/
-	void printInfo();
+	void printGraphicDebugInfo();
 };
 }

@@ -118,6 +118,11 @@ public:
 
 	/** Removes inactive agents from the container. Shouldn't be called too often. */
 	void cleanup();
+
+	/**
+	 * Prints graphical debug information about all the agents
+	 */
+	void printGraphicDebugInfo();
 };
 
 #endif

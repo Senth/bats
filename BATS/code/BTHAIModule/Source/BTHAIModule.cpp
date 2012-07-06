@@ -184,7 +184,7 @@ void BTHAIModule::onSendText(std::string text)
 			BaseAgent* agent = AgentManager::getInstance()->getAgent(unitID);
 			if (agent != NULL) 
 			{
-				agent->printInfo();
+				agent->printGraphicDebugInfo();
 			}
 			else 
 			{

@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 #include "BATSModule/include/ExplorationManager.h"
 #include "Utilities/Logger.h"
+#include "BatsModule/include/Config.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -51,9 +52,27 @@ bool BaseAgent::isBeingBuilt() const {
 	return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
 }
 
-void BaseAgent::printInfo() const
+void BaseAgent::printGraphicDebugInfo()
 {
-	Broodwar->printf("[%d] (%s)", unitID, getTypeName().c_str());
+	// Low
+	// Show building information and goal
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low)
+	{
+		if (isBuilding())
+		{
+			debug_showGoal();
+		}
+	}
+
+	// Medium
+	// Show unit goal
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium)
+	{
+		if (!isBuilding())
+		{
+			debug_showGoal();
+		}
+	}
 }
 
 int BaseAgent::getUnitID() const

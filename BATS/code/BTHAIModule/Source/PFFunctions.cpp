@@ -190,11 +190,7 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 		return 0;
 	}
 	//Check if we can attack the type
-	if (enemy->getType().isFlyer() && !attacker->getType().airWeapon().targetsAir())
-	{
-		return 0;
-	}
-	if (!enemy->getType().isFlyer() && !attacker->getType().groundWeapon().targetsGround())
+	if (!canAttack(attacker, enemy))
 	{
 		return 0;
 	}
@@ -210,11 +206,11 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 		//Unit cannot attack, use sightrange instead
 		myMSD = attacker->getType().sightRange();
 	}
-	if (attacker->getType().getID() == UnitTypes::Terran_Medic.getID())
+	if (attacker->getType() == UnitTypes::Terran_Medic)
 	{
 		myMSD = 6*32;
 	}
-	if (attacker->getType().getID() == UnitTypes::Protoss_High_Templar.getID())
+	if (attacker->getType() == UnitTypes::Protoss_High_Templar)
 	{
 		myMSD = 6*32;
 	}
@@ -284,24 +280,22 @@ bool PFFunctions::canAttack(Unit* ownUnit, Unit* target)
 
 	if (tType.isFlyer())
 	{
-		//Own unit is air
 		if (oType.groundWeapon().targetsAir())
 		{
 			return true;
 		}
-		if (oType.airWeapon().targetsAir())
+		else if (oType.airWeapon().targetsAir())
 		{
 			return true;
 		}
 	}
 	else
 	{
-		//Own unit is ground
 		if (oType.groundWeapon().targetsGround())
 		{
 			return true;
 		}
-		if (oType.airWeapon().targetsGround())
+		else if (oType.airWeapon().targetsGround())
 		{
 			return true;
 		}

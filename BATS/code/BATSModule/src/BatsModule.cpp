@@ -427,40 +427,20 @@ void BatsModule::showDebug() const {
 	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
 		mpAlliedArmyManager->printGraphicDebugInfo();
 		mpSquadManager->printGraphicDebugInfo();
+		mpUnitManager->printGraphicDebugInfo();
+		UnitCreator::getInstance()->printGraphicDebugInfo();
 
 		// Low
 		/// @todo Commander::getInstance()->printInfo();
-		/// /// @todo Commander::getInstance()->debug_showGoal();
+		/// @todo Commander::getInstance()->debug_showGoal();
 		ExplorationManager::getInstance()->printInfo();
 		drawTerrainData();
-
-		// Only low
-		if(config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Low) {
-			UnitCreator::getInstance()->printInfo();
-		}
-
-				std::vector<BaseAgent*> agents = mpUnitManager->getAgents();
-
-		// Agents
-		for (int i = 0; i < (int)agents.size(); i++) {
-			// Low while building
-			if (agents.at(i)->isBuilding()) {
-				agents.at(i)->debug_showGoal();
-			}
-			// Medium if not building
-			if (!agents.at(i)->isBuilding() &&
-				config::debug::GRAPHICS_VERBOSITY_IN_DEBUG >= config::debug::GraphicsVerbosity_Medium)
-			{
-				agents.at(i)->debug_showGoal();
-			}
-		}
 
 
 		// Medium
 		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
 			ResourceManager::getInstance()->printInfo();
 		}
-
 		
 		// High
 		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {

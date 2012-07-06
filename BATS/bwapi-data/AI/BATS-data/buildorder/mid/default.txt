@@ -1,0 +1,23 @@
+<name>
+Default
+<description>
+Only for testing purposes
+<available-transitions>
+default
+<build-order>
+Terran_Refinery
+Terran_Engineering_Bay
+Terran_Factory
+Terran_Barracks
+Terran_Barracks
+Terran_Starport
+Terran_Engineering_Bay
+Terran_Barracks
+Terran_Barracks
+<units>
+20% Terran_Siege_Tank_Tank_Mode
+60% Terran_Marine
+20% Terran_Medic
+<must-have>
+2 Terran_Medic
+1 Terran_Wraith

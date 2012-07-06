@@ -151,9 +151,6 @@ public:
 	/** Orders a Protoss unit to recharge shields. */
 	bool chargeShields();
 
-	/** Used to print info about this agent to the screen. */
-	void printInfo() const;
-
 protected:
 	static bats::SquadManager* mpsSquadManager;
 
