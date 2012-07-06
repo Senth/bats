@@ -243,20 +243,20 @@ namespace bats {
 			 * @see REGROUP_DISTANCE_END for when regrouping shall end. These two variables
 			 * should not have the same value since this can cause threshold errors.
 			 */
-			extern double REGROUP_DISTANCE_BEGIN;
+			extern int REGROUP_DISTANCE_BEGIN;
 			/** Cannot be set through the config file, will set automatically,
 			 * used for faster calculation. Does not send an event.
 			 * @see REGROUP_DISTANCE_BEGIN */
-			extern double REGROUP_DISTANCE_BEGIN_SQUARED;
+			extern int REGROUP_DISTANCE_BEGIN_SQUARED;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
-			extern double REGROUP_DISTANCE_END;
+			extern int REGROUP_DISTANCE_END;
 			/** Cannot be set through the config file, will set automatically,
 			 * used for faster calculation. Does not send an event.
 			 * @see REGROUP_DISTANCE_END */
-			extern double REGROUP_DISTANCE_END_SQUARED;
+			extern int REGROUP_DISTANCE_END_SQUARED;
 			/** Time before trying with a new regroup position when a unit is still */
 			extern double REGROUP_NEW_POSITION_TIME;
 			/** How long time before recalculating the distance to the unit furthest away
@@ -265,7 +265,7 @@ namespace bats {
 			extern double CALC_FURTHEST_AWAY_TIME;
 			/** The default range when calculating distance between the center of the squad
 			 * and a position to test whether the squad is close to this position or not. */
-			extern double CLOSE_DISTANCE;
+			extern int CLOSE_DISTANCE;
 			/** How much the sight distance shall be multiplied with, this is used to check
 			 * if enemy units are within sight distance. The sight circle center position is the
 			 * center of the squad and the radius is unit with longest sight distance multiplied
@@ -279,10 +279,10 @@ namespace bats {
 				/** The distance from the goal that the waiting position will be set. If
 				 * the squad is a ground squad it will use ground distance and flying units
 				 * will use direct distance. */
-				extern double WAITING_POSITION_DISTANCE_FROM_GOAL;
+				extern int WAITING_POSITION_DISTANCE_FROM_GOAL;
 				/** The distance from the goal position to check if all buildings have
 				 * been destroyed to complete the goal. */
-				extern double STRUCTURES_DESTROYED_GOAL_DISTANCE;
+				extern int STRUCTURES_DESTROYED_GOAL_DISTANCE;
 				/** Maximum distance to an allied squad when searching for another
 				 * squad once either the current following squad died or merged. */
 				extern int FIND_ALLIED_SQUAD_DISTANCE;

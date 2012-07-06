@@ -522,7 +522,7 @@ protected:
 	 * under the squad section.
 	 * @return unit with longest sight multiplied with sight_distance_multiplier.
 	 */
-	double getSightDistance() const;
+	int getSightDistance() const;
 
 	/**
 	 * Clears all movement positions, goal, via, regroup, etc.

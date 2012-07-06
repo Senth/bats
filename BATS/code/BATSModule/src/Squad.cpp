@@ -837,7 +837,7 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 	return foundUnits;
 }
 
-double Squad::getSightDistance() const {
+int Squad::getSightDistance() const {
 	int maxSight = 0;
 	const std::vector<UnitAgent*> squadUnits = getUnits();
 	for (size_t i = 0; i < squadUnits.size(); ++i) {
@@ -847,7 +847,7 @@ double Squad::getSightDistance() const {
 		}
 	}
 
-	return maxSight * config::squad::SIGHT_DISTANCE_MULTIPLIER;
+	return static_cast<int>(maxSight * config::squad::SIGHT_DISTANCE_MULTIPLIER);
 }
 
 void Squad::printGraphicDebugInfo() {

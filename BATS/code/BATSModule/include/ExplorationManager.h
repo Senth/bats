@@ -176,7 +176,7 @@ public:
 	 * @param range the radius to check from the position
 	 * @return number of enemy structures in range.
 	 */
-	int countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, double range) const;
+	int countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, int range) const;
 
 	/**
 	 * Calculates whether there exist a spotted enemy structure within the specified range
@@ -186,7 +186,7 @@ public:
 	 * @return true if an enemy structure exists within the air range of the position.
 	 * @todo Implement functionality use ground range and not always air range.
 	 */
-	bool hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, double range) const;
+	bool hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, int range) const;
 
 	/**
 	 * Returns true if any enemy structures have been spotted.
@@ -254,11 +254,6 @@ private:
 	 * Private constructor to enforce singleton usage.
 	 */
 	ExplorationManager();
-
-	/**
-	 * Update the explored position depending on where our units are.
-	 */
-	void updateExploredRegions();
 
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedStructures;
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedUnits;

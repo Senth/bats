@@ -112,34 +112,28 @@ void bats::ExplorationManager::computeActions() {
 }
 
 TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_ptr<Squad>& squad) {
-	TilePosition currentPos = squad->getCenter();
-	TilePosition goal = squad->getGoal();
-
-	//Special case: No goal set, give the squad a new goal directly
-	if (goal == TilePositions::Invalid) {
-		BWTA::Region* pStartRegion = getRegion(currentPos);
-		if (NULL != pStartRegion) {
-			goal = TilePosition(pStartRegion->getCenter());
-		}
-		return goal;
-	}
-
-
 	// Sort the exploration data, one that hasn't been explored for furthest time.
-	std::sort(mExploreData.rbegin(), mExploreData.rend());
+	std::sort(mExploreData.begin(), mExploreData.end());
+
+
+	TilePosition currentPos = squad->getCenter();
+	TilePosition goal = TilePositions::Invalid;
 	
+
 	/// @todo check for close regions first when scouting
+
 
 	// Get the first in the queue that we can reach.
 	// GROUND
 	if (squad->travelsByGround()) {
 		vector<ExploreData>::iterator exploreIt = mExploreData.begin();
-		while (goal != TilePositions::Invalid && exploreIt != mExploreData.end()) {
+		while (goal == TilePositions::Invalid && exploreIt != mExploreData.end()) {
 
 			if (BWTA::isConnected(currentPos, exploreIt->getCenterPosition())) {
 				goal = exploreIt->getCenterPosition();
 
 				// Update visited so that we choose another one if we fail (because of enemy units)
+				// Or so another squad doesn't go there.
 				exploreIt->updateVisited();
 			}
 
@@ -152,15 +146,12 @@ TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_p
 			goal = mExploreData.front().getCenterPosition();
 
 			// Update visited so that we choose another one if we fail (because of enemy units)
+			// Or so another squad doesn't go there.
 			mExploreData.front().updateVisited();
 		}
 	}
 
 	return goal;
-}
-
-void bats::ExplorationManager::updateExploredRegions() {
-	vector<ExploreData> exploreCopy = mExploreData;
 }
 
 int bats::ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
@@ -364,11 +355,13 @@ void bats::ExplorationManager::cleanup() {
 	}
 }
 
-int bats::ExplorationManager::countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, double range) const {
+int bats::ExplorationManager::countSpottedBuildingsWithinRange(const BWAPI::TilePosition& position, int range) const {
 	int cStructuresInRange = 0;
+	int rangeSquared = range * range;
 	for (size_t i = 0; i < mSpottedStructures.size(); i++) {
 		if (mSpottedStructures[i]->isActive()) {
-			if (position.getDistance(mSpottedStructures[i]->getTilePosition()) <= range) {
+			int structureDistanceSquared = getSquaredDistance(mSpottedStructures[i]->getTilePosition(), position);
+			if (structureDistanceSquared <= rangeSquared) {
 				cStructuresInRange++;
 			}
 		}
@@ -377,11 +370,12 @@ int bats::ExplorationManager::countSpottedBuildingsWithinRange(const BWAPI::Tile
 	return cStructuresInRange;
 }
 
-bool bats::ExplorationManager::hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, double range) const {
+bool bats::ExplorationManager::hasSpottedBuildingWithinRange(const BWAPI::TilePosition& position, int range) const {
+	int rangeSquared = range * range;
 	for (size_t i = 0; i < mSpottedStructures.size(); ++i) {
 		if (mSpottedStructures[i]->isActive()) {
-			double squaredDistance = getSquaredDistance(mSpottedStructures[i]->getTilePosition(), position);
-			if (range * range <= squaredDistance) {
+			int structureDistanceSquared = getSquaredDistance(mSpottedStructures[i]->getTilePosition(), position);
+			if (structureDistanceSquared <= rangeSquared) {
 				return true; // QUICK RETURN
 			}
 		}
