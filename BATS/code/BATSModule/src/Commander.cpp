@@ -178,6 +178,7 @@ void Commander::createAttack() {
 			if (squadIt->second->getName() == "AttackSquad") {
 				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 			}
+			++squadIt;
 		}
 
 		if (oldSquad != NULL) {
