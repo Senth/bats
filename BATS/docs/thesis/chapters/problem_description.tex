@@ -3,9 +3,40 @@
 As has been stated, we have yet to find any work on communication with teammate bots for RTS games, to this point. The problem, or rather our hypothesis, is that we think a teammate bot that conveys its intentions, asks for guidance, and be somewhat controlled by the player (through messages) to execute various tactics will give more diversity to the game, opening up for new game experiences.
 
 \section{Aims and Objectives?}
+Create a teammate bot that communicates its intentions to the human player and where the control of the bot can be transfered to the player by letting the player send strategic and tactical commands.
+\begin{itemize}
+	\item Extend Hagelbäck's BTHAI\cite{bthai} to create a bot that
+	\begin{itemize}
+		\item Sends messages to the player, conveying its intentions and warns about enemy attacks.
+		\item Can receive tactical (attack, drop) and strategic (transition to next build order) commands from the player.
+		\item Prioritizes the player. 
+	\end{itemize}
+	\item Evaluate the bot by having human players playing our bot with and without communication, and controls. Evaluation will occur in two stages; first during the later stages of development—to receive feedback on what features need more tweaking—and last to answer the research questions below.
+\end{itemize}
 
 \section{Research Questions}
+\renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
+\renewcommand{\labelenumii}{\theenumii.}
 \begin{enumerate}
-\item Is a communicating and controllable bot more fun to play with than just a controllable bot?
-\item Test
+	\item	Which is most fun to play with, communicating bot, controllable bot, both communicating and controllable bot, or none?
+	\begin{enumerate}
+		\item Which features are most liked?
+		\item Which features are most disliked?
+		\item What features are missing?
+	\end{enumerate}
 \end{enumerate}
+
+\paragraph{Hypothesis}
+\begin{enumerate}
+	\item We think it will be most fun to play with both a communicating and controllable bot, then communicating, controllable bot, and last a bot with no of these features.
+	\begin{enumerate}
+		\item The most liked features are probably the ability to control the bot, that it communicates its intentions to the player, and that it feels as though its programmed to be a good teammate.
+		\item We cannot know, since we are not entirely sure how much time we will have left to tweaking.
+		\item Same as above.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Expected Outcomes}
+Game developers can use this teammate bot as a tool to create new fun game experience without having to put as much money into researching whether this would pay off; with an incorrect hypothesis (i.e. not fun) developers know what works and what does not. In general the bot and this paper will provide guidelines how to create, or not create, a teammate bot for RTS games, and what features are most liked, disliked, or missing (i.e. what players might want).
+
+For researchers, this work will either prove that further research in this field will be worthwhile, if the hypothesis is correct; if not, it can be better to focus the work on other areas. It will provide guidelines for future researchers what to do, and what to not do.
