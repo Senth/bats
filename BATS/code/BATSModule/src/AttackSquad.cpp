@@ -28,6 +28,7 @@ AttackSquad::AttackSquad(
 {
 	mDistraction = distracting;
 	mWaitInPosition = false;
+	mAttackedEnemyStructures = false;
 
 	if (mpsAttackCoordinator == NULL) {
 		mpsAttackCoordinator = AttackCoordinator::getInstance();
@@ -72,6 +73,11 @@ void AttackSquad::clearAlliedRegrouping() {
 void AttackSquad::computeSquadSpecificActions() {
 	// Not following any allied squad
 	if (NULL == mpAlliedSquadFollow) {
+		// Check if we're attacking an enemy structure.
+		if (!mAttackedEnemyStructures && isTargetingEnemyStructure()) {
+			mAttackedEnemyStructures = true;
+		}
+
 		// Create a wait position when we're in position, if we shall wait that is.
 		if (mWaitInPosition && isInPosition()) {
 			if (hasTemporaryGoalPosition()) {
@@ -201,7 +207,7 @@ Squad::GoalStates AttackSquad::checkGoalState() const {
 
 	// Only check goal if we're not following an allied squad
 	if (NULL == mpAlliedSquadFollow) {
-		// Check if all enemy structures are dead nearby
+		// Check if all enemy structures are dead nearby, and we have attacked one
 		if (isEnemyStructuresNearGoalDead()) {
 			goalState = Squad::GoalState_Succeeded;
 		}
@@ -319,4 +325,43 @@ string AttackSquad::getDebugInfo() const {
 	ss << "\n";
 
 	return Squad::getDebugInfo() + ss.str();
+}
+
+bool AttackSquad::isTargetingEnemyStructure() const {
+	const vector<UnitAgent*>& units = getUnits();
+
+	for (size_t i = 0; i < units.size(); ++i) {
+		Unit* pUnit = units[i]->getUnit();
+		Unit* pTarget = pUnit->getTarget();
+		Unit* pOrderTarget = pUnit->getOrderTarget();
+
+		// Target
+		if (NULL != pTarget &&
+			Broodwar->self()->isEnemy(pTarget->getPlayer()) &&
+			pTarget->getType().isBuilding())
+		{
+			return true;
+		}
+		// Order target
+		else if (NULL != pOrderTarget &&
+			Broodwar->self()->isEnemy(pOrderTarget->getPlayer()) &&
+			pOrderTarget->getType().isBuilding())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void AttackSquad::onGoalSucceeded() {
+	// If we succeeded without actually attacking anything, try another goal
+	if (!mAttackedEnemyStructures) {
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "AttackSquad never attacked, finding another goal...");
+		clearMovement();
+		createGoal();
+	} else {
+		/// @todo retreat to home instead of just disbanding
+		forceDisband();
+	}
 }

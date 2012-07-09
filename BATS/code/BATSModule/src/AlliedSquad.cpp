@@ -471,7 +471,7 @@ void AlliedSquad::printGraphicDebugInfo() {
 			}
 
 			stringstream ss;
-			ss << TextColors::WHITE << left << setprecision(2) <<
+			ss << TextColors::DARK_GREEN << left << setprecision(2) <<
 				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << mId << "\n" <<
 				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "State: " << getStateString() << "\n" <<
 				setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Units: " << getUnitCount() << "\n" <<
@@ -505,7 +505,8 @@ void AlliedSquad::printGraphicDebugInfo() {
 			// Draw text in back of line
 			Broodwar->drawTextMap(
 				squadMovement.second.x() + xOffset, squadMovement.second.y(),
-				"\x10Length: %g",
+				"%sLength: %g",
+				TextColors::PURPLE.c_str(),
 				length
 			);
 			

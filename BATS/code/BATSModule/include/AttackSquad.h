@@ -99,6 +99,7 @@ protected:
 
 	virtual void computeSquadSpecificActions();
 	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
+	virtual void onGoalSucceeded();
 	virtual bool createGoal();
 	virtual GoalStates checkGoalState() const;
 
@@ -136,8 +137,15 @@ private:
 	 */
 	void clearAlliedRegrouping();
 
+	/**
+	 * Checks if any unit in this squad targets a enemy structure.
+	 * @return true if any unit targets a enemy structure.
+	 */
+	bool isTargetingEnemyStructure() const;
+
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;
+	bool mAttackedEnemyStructures;
 	AlliedSquadCstPtr mpAlliedSquadFollow;
 };
 }
