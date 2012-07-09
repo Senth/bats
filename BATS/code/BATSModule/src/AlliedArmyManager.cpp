@@ -525,6 +525,17 @@ void AlliedArmyManager::printGraphicDebugInfo() {
 		if (NULL != mSquads[i]) {
 			mSquads[i]->printGraphicDebugInfo();
 		}
+	}	
+}
+
+vector<AlliedSquadCstPtr> AlliedArmyManager::getSquads() const {
+	vector<AlliedSquadCstPtr> squads;
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i]) {
+			squads.push_back(mSquads[i]);
+		}
 	}
-	
+
+	return squads;
 }

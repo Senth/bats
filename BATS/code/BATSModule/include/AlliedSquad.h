@@ -121,8 +121,17 @@ public:
 	 * Returns the current state of the AlliedSquad.
 	 * @return current state of the AlliedSquad.
 	 * @see AlliedSquad::States for the different states of the squad.
+	 * @see isActive()
 	 */
 	States getState() const;
+
+	/**
+	 * Returns true if the squad is active in some way. Equal to
+	 * getState() != State_idle
+	 * @return true if the squad is active in some way.
+	 * @see getState()
+	 */
+	bool isActive() const;
 
 	/**
 	 * Updates the center of the squad for isMoving() and isRetreaning() calculations

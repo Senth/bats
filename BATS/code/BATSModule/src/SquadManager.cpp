@@ -1,9 +1,9 @@
 #include "SquadManager.h"
 #include "Squad.h"
+#include "AttackSquad.h"
 
 using namespace bats;
-using std::tr1::shared_ptr;
-using std::tr1::const_pointer_cast;
+using namespace std::tr1;
 
 SquadManager* SquadManager::mpsInstance = NULL;
 
@@ -75,7 +75,7 @@ void SquadManager::computeActions() {
 	}
 }
 
-void SquadManager::addSquad(const SquadPtr& pSquad) {
+void SquadManager::addSquad(SquadRef pSquad) {
 	assert(pSquad != NULL);
 	mSquads[pSquad->getSquadId()] = pSquad;
 }
@@ -93,4 +93,40 @@ void SquadManager::printGraphicDebugInfo() {
 	for (squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
 		squadIt->second->printGraphicDebugInfo();
 	}
+}
+
+AttackSquadPtr SquadManager::getFrontalAttack() {
+	// Use const version
+	AttackSquadCstPtr attackSquad = const_cast<const SquadManager *>(this)->getFrontalAttack();
+	return const_pointer_cast<AttackSquad>(attackSquad);
+}
+
+AttackSquadCstPtr SquadManager::getFrontalAttack() const {
+	for (SquadCstIt squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
+		AttackSquadPtr attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+		if (NULL != attackSquad && attackSquad->isFrontalAttack()) {
+			return attackSquad;
+		}
+	}
+
+	return AttackSquadCstPtr();
+}
+
+std::vector<AttackSquadPtr> SquadManager::getDistractingAttacks() {
+	// Use const version
+	const std::vector<AttackSquadCstPtr>& distractingSquads = const_cast<const SquadManager*>(this)->getDistractingAttacks();
+	return *reinterpret_cast<std::vector<AttackSquadPtr>*>(const_cast<std::vector<AttackSquadCstPtr>*>(&distractingSquads));
+}
+
+std::vector<AttackSquadCstPtr> SquadManager::getDistractingAttacks() const {
+	std::vector<AttackSquadCstPtr> distractingSquads;
+
+	for (SquadCstIt squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
+		AttackSquadPtr attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
+		if (NULL != attackSquad && attackSquad->isDistracting()) {
+			distractingSquads.push_back(attackSquad);
+		}
+	}
+
+	return distractingSquads;
 }

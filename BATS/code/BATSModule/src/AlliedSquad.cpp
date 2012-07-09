@@ -579,3 +579,7 @@ bool AlliedSquad::belongsToThisSquad(BWAPI::Unit* pUnit) const {
 
 	return false;
 }
+
+bool AlliedSquad::isActive() const {
+	return mState != State_Idle;
+}

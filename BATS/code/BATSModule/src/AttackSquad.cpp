@@ -257,6 +257,10 @@ bool AttackSquad::isDistracting() const {
 	return mDistraction;
 }
 
+bool AttackSquad::isFrontalAttack() const {
+	return !mDistraction;
+}
+
 bool AttackSquad::isFollowingAlliedSquad() const {
 	return NULL != mpAlliedSquadFollow;
 }
@@ -269,7 +273,7 @@ std::string AttackSquad::getName() const {
 	return ATTACK_SQUAD_NAME;
 }
 
-shared_ptr<AttackSquad> AttackSquad::getThis() const {
+AttackSquadPtr AttackSquad::getThis() const {
 	return static_pointer_cast<AttackSquad>(Squad::getThis());
 }
 

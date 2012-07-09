@@ -137,6 +137,13 @@ namespace log {
 	const std::string OUTPUT_DIR = ROOT_DIR + "logs\\bats";
 }
 
+namespace module {
+	bool PLAYER_REACT = true;
+	bool OWN_INITIATIVE = true;
+
+	bool set(const utilities::VariableInfo& variableInfo);
+}
+
 namespace squad {
 	const std::string UNIT_COMPOSITION_DIR = CONFIG_DIR + "UnitCompositions";
 	double PING_WAIT_TIME_FIRST = 0.0;
@@ -464,6 +471,22 @@ bool game::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(SPEED);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(SPEED));
 		SPEED = variableInfo;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+bool module::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "player_react") {
+		gOldValue = toString(PLAYER_REACT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(PLAYER_REACT));
+		PLAYER_REACT = variableInfo;
+	} else if (variableInfo.name == "own_initiative") {
+		gOldValue = toString(OWN_INITIATIVE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(OWN_INITIATIVE));
+		OWN_INITIATIVE = variableInfo;
 	} else {
 		return false;
 	}

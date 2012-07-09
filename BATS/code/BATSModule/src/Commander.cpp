@@ -66,39 +66,46 @@ void Commander::computeActions() {
 }
 
 void Commander::computeReactions() {
-	// Allied is outside home with big attack
-	AlliedSquadCstPtr bigSquad = mpAlliedArmyManager->getBigSquad();
-	if (NULL != bigSquad && bigSquad->getState() != AlliedSquad::State_Idle) {
-		// Check for our frontal attack and if it's following an allied squad or not
-		bool haveFrontalAttack = false;
-		bool followingAlliedSquad = false;
-		SquadIt squadIt = mpSquadManager->begin();
-		while (!haveFrontalAttack && squadIt != mpSquadManager->end()) {
-			shared_ptr<AttackSquad> attackSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
-			if (NULL != attackSquad) {
-				if (!attackSquad->isDistracting()) {
-					haveFrontalAttack = true;
+	if (!config::module::PLAYER_REACT) {
+		return;
+	}
 
-					if (attackSquad->isFollowingAlliedSquad()) {
-						followingAlliedSquad = true;
-					}
-				}
+	// Check for active allied squads
+	vector<AlliedSquadCstPtr> squads = mpAlliedArmyManager->getSquads();
+	bool bigActive = false;
+	bool smallActive = false;
+	for (size_t i = 0; i < squads.size(); ++i) {
+		if (squads[i]->isActive()) {
+			// Big
+			if (squads[i]->isBig()) {
+				bigActive = true;
+			} else {
+				smallActive = true;
 			}
-
-			++squadIt;
 		}
+	}
 
-		// Create frontal attack
-		if (!haveFrontalAttack) {
+	
+	// Big is active -> we don't have any frontal attack, create frontal attack
+	if (bigActive) {
+		const AttackSquadPtr& frontalSquad = mpSquadManager->getFrontalAttack();
+
+		if (NULL == frontalSquad) {
 			issueCommand("attack");
 		}
-		// Create distraction
-		else if (!followingAlliedSquad) {
+	}
+
+	// Small is active -> Create distraction if we don't have a distraction out
+	if (smallActive) {
+		const vector<AttackSquadPtr>& distractingAttacks = mpSquadManager->getDistractingAttacks();
+
+		if (distractingAttacks.empty()) {
 			issueCommand("drop");
 		}
 	}
-	/// @todo Allied is outside home with any attack
-		// We don't have any attack -> Create frontal or distracting attack
+
+
+	// @todo check for player expanding
 }
 
 bool Commander::issueCommand(const std::string& command) {
@@ -124,7 +131,7 @@ bool Commander::issueCommand(const std::string& command) {
 	}
 	/// @todo abort
 
-	/// @todo remove activating squad directly 
+	/// @todo don't remove activating squad directly 
 	finishWaitingSquad();
 
 	return true;

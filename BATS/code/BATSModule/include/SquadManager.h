@@ -8,8 +8,8 @@
 // Namespace for the project
 namespace bats {
 
-typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::iterator SquadIt;
-typedef std::map<SquadId, std::tr1::shared_ptr<Squad>>::const_iterator SquadCstIt;
+typedef std::map<SquadId, SquadPtr>::iterator SquadIt;
+typedef std::map<SquadId, SquadPtr>::const_iterator SquadCstIt;
 
 /**
  * Handles all squads.
@@ -72,7 +72,7 @@ public:
 	 * Add a new squad.
 	 * @param pSquad pointer to the new squad.
 	 */
-	void addSquad(const std::tr1::shared_ptr<Squad>& pSquad);
+	void addSquad(SquadRef pSquad);
 
 	/**
 	 * Removes a squad from the squad handler.
@@ -84,6 +84,28 @@ public:
 	 * Prints graphical debugging information
 	 */
 	void printGraphicDebugInfo();
+
+	/**
+	 * Returns the frontal attack, if we have any
+	 * @return frontal attack if we have any, else NULL
+	 */
+	AttackSquadPtr getFrontalAttack();
+
+	/**
+	 * \copydoc getFrontalAttack()
+	 */
+	AttackSquadCstPtr getFrontalAttack() const;
+
+	/**
+	 * Returns all distracting attacks
+	 * @return all distracting attacks
+	 */
+	std::vector<AttackSquadPtr> getDistractingAttacks();
+
+	/**
+	 * \copydoc getDistractingAttacks()
+	 */
+	std::vector<AttackSquadCstPtr> getDistractingAttacks() const;
 
 private:
 	/**

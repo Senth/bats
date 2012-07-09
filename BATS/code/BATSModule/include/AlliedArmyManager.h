@@ -75,6 +75,12 @@ public:
 	AlliedSquadCstPtr getBigSquad() const;
 
 	/**
+	 * Returns all allied squads
+	 * @return all allied squads.
+	 */
+	std::vector<AlliedSquadCstPtr> getSquads() const;
+
+	/**
 	 * Finds the closest squad to the specified position. An optional distance parameter
 	 * can be set not to return any squad further away than this distance.
 	 * @param position from where to find the closest squad

@@ -3,6 +3,13 @@
 #include <string>
 
 namespace bats {
+/**
+ * Converts a constant to a "global" ConstantName
+ * @param constant the constant to convert
+ * @return name of the type ConstantName
+ */
+#define TO_CONSTANT_NAME(constant) const_cast<bats::config::ConstantName>(reinterpret_cast<void*>(&constant))
+
 	/**
 	 * Configuration variables for BATS. Most of these can be configured in
 	 * the config files. config_default.ini and config_override.ini
@@ -17,13 +24,6 @@ namespace bats {
 		public:
 			virtual void onConstantChanged(ConstantName constantName) = 0;
 		};
-
-/**
- * Converts a constant to a "global" ConstantName
- * @param constant the constant to convert
- * @return name of the type ConstantName
- */
-#define TO_CONSTANT_NAME(constant) const_cast<bats::config::ConstantName>(reinterpret_cast<void*>(&constant))
 
 		/**
 		 * Add a listener for the specified variable
@@ -229,6 +229,18 @@ namespace bats {
 		namespace log {
 			extern const std::string OUTPUT_DIR;
 			extern const std::string SETTINGS_FILE;
+		}
+
+		/**
+		 * Enabled modules
+		 */
+		namespace module {
+			/** Reaction module for the Commander. When enabled it will react to different
+			 * player actions */
+			extern bool PLAYER_REACT;
+			/** It's own initiative, i.e. not reacting, but creating commands when it feels
+			 * it's a good time to do so */
+			extern bool OWN_INITIATIVE;
 		}
 
 		/**

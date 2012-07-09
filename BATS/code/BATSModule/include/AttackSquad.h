@@ -60,10 +60,18 @@ public:
 	bool isReadyToAttack() const;
 
 	/**
-	 * Checks whether the AttackSquad is a distracting or frontal attack.
+	 * Checks whether the AttackSquad is a distracting instead of a frontal attack.
 	 * @return true if the attack is distracting, false if it is a frontal attack.
+	 * @see isFrontalAttack()
 	 */
 	bool isDistracting() const;
+
+	/**
+	 * Checks whether the AttackSquad is a frontal attack instead of a frontal attack.
+	 * @return true if the attack is a frontal attack, false if it is a distracting attack.
+	 * @see isDistracting()
+	 */
+	bool isFrontalAttack() const;
 
 	/**
 	 * Returns true if the squad is following an allied squad
@@ -83,7 +91,7 @@ public:
 	 * right pointer for an attackSquad.
 	 * @return shared_ptr to this AttackSquad
 	 */
-	std::tr1::shared_ptr<AttackSquad> getThis() const;
+	AttackSquadPtr getThis() const;
 
 	virtual std::string getName() const;
 	virtual std::string getDebugInfo() const;
