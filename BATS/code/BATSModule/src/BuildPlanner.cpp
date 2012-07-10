@@ -71,7 +71,7 @@ void BuildPlanner::switchToPhase(std::string fileName){
 				UnitCreator::getInstance()->switchPhase();
 			}
 			else
-				ERROR_MESSAGE(false, "Error loading file %s" << fileName);
+				ERROR_MESSAGE(false, "Error loading file " << fileName);
 		}
 		else{
 			DEBUG_MESSAGE(utilities::LogLevel_Fine, "All transition used");
@@ -653,7 +653,7 @@ int BuildPlanner::noInProduction(UnitType type){
 				for (list<UnitType>::const_iterator i=queue.begin(); i != queue.end(); i++)
 				{
 					if ((*i).getID() == type.getID())
-				{
+					{
 						no++;
 					}
 				}

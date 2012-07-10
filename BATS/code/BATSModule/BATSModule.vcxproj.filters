@@ -31,7 +31,7 @@
     <Filter Include="BuildOrder">
       <UniqueIdentifier>{6011d408-eb31-43dc-8f67-820df871d8af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Allied">
+    <Filter Include="Classification">
       <UniqueIdentifier>{0c5e75d3-5af0-4681-9e68-e498e1302ba7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -118,13 +118,16 @@
       <Filter>Squads\Types</Filter>
     </ClInclude>
     <ClInclude Include="include\AlliedSquad.h">
-      <Filter>Allied</Filter>
+      <Filter>Classification</Filter>
     </ClInclude>
     <ClInclude Include="include\AlliedArmyManager.h">
-      <Filter>Allied</Filter>
+      <Filter>Classification</Filter>
     </ClInclude>
     <ClInclude Include="include\TypeDefs.h">
       <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SelfClassifier.h">
+      <Filter>Classification</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -213,10 +216,13 @@
       <Filter>Squads\Types</Filter>
     </ClCompile>
     <ClCompile Include="src\AlliedSquad.cpp">
-      <Filter>Allied</Filter>
+      <Filter>Classification</Filter>
     </ClCompile>
     <ClCompile Include="src\AlliedArmyManager.cpp">
-      <Filter>Allied</Filter>
+      <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SelfClassifier.cpp">
+      <Filter>Classification</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

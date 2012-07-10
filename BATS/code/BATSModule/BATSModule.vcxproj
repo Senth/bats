@@ -106,6 +106,7 @@
     <ClCompile Include="src\ResourceCounter.cpp" />
     <ClCompile Include="src\ResourceGroup.cpp" />
     <ClCompile Include="src\ScoutSquad.cpp" />
+    <ClCompile Include="src\SelfClassifier.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="include\ExploreData.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
+    <ClInclude Include="include\SelfClassifier.h" />
     <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceCounter.h" />

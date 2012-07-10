@@ -12,51 +12,69 @@ using namespace BWAPI;
 using namespace std;
 
 int AgentManager::StartFrame = 0;
-AgentManager* AgentManager::instance = NULL;
+AgentManager* AgentManager::mpsInstance = NULL;
 
 AgentManager::AgentManager()
 {
-	lastCallFrame = Broodwar->getFrameCount();
+	mFrameLastCall = Broodwar->getFrameCount();
 }
 
 AgentManager::~AgentManager()
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		delete agents.at(i);
+		delete mAgents.at(i);
 	}
 
-	instance = NULL;
+	mpsInstance = NULL;
 }
 
 AgentManager* AgentManager::getInstance()
 {
-	if (instance == NULL)
+	if (mpsInstance == NULL)
 	{
-		instance = new AgentManager();
+		mpsInstance = new AgentManager();
 	}
-	return instance;
+	return mpsInstance;
 }
 
 vector<BaseAgent*> AgentManager::getAgents()
 {
+	return mAgents;
+}
+
+vector<BaseAgent*> AgentManager::getAgents(const UnitType& unitType) {
+	// Use const version
+	const AgentManager* pThis = const_cast<const AgentManager*>(this);
+	const vector<const BaseAgent*>& agents = pThis->getAgents(unitType);
+	return *reinterpret_cast<const vector<BaseAgent*>*>(&agents);
+}
+
+vector<const BaseAgent*> AgentManager::getAgents(const UnitType& unitType) const {
+	vector<const BaseAgent*> agents;
+	for (size_t i = 0; i < mAgents.size(); ++i) {
+		if (mAgents[i]->getUnitType() == unitType) {
+			agents.push_back(mAgents[i]);
+		}
+	}
+
 	return agents;
 }
 
 int AgentManager::size()
 {
-	return agents.size();
+	return mAgents.size();
 }
 
 BaseAgent* AgentManager::getAgent(int unitID)
 {
 	BaseAgent* agent = NULL;
 
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->getUnitID() == unitID)
+		if (mAgents.at(i)->getUnitID() == unitID)
 		{
-			agent = agents.at(i);
+			agent = mAgents.at(i);
 			break;
 		}
 	}
@@ -66,13 +84,13 @@ BaseAgent* AgentManager::getAgent(int unitID)
 
 void AgentManager::requestOverlord(TilePosition pos)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isOfType(UnitTypes::Zerg_Overlord) && agents.at(i)->isAlive())
+		if (mAgents.at(i)->isOfType(UnitTypes::Zerg_Overlord) && mAgents.at(i)->isAlive())
 		{
-			if (agents.at(i)->getGoal()== TilePositions::Invalid)
+			if (mAgents.at(i)->getGoal()== TilePositions::Invalid)
 			{
-				agents.at(i)->setGoal(pos);
+				mAgents.at(i)->setGoal(pos);
 				return;
 			}
 		}
@@ -81,11 +99,11 @@ void AgentManager::requestOverlord(TilePosition pos)
 
 BaseAgent* AgentManager::getAgent(UnitType type)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isOfType(type) && agents.at(i)->isAlive())
+		if (mAgents.at(i)->isOfType(type) && mAgents.at(i)->isAlive())
 		{
-			return agents.at(i);
+			return mAgents.at(i);
 		}
 	}
 	return NULL;
@@ -96,15 +114,15 @@ BaseAgent* AgentManager::getClosestBase(TilePosition pos)
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
 
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->getUnitType().isResourceDepot() && agents.at(i)->isAlive())
+		if (mAgents.at(i)->getUnitType().isResourceDepot() && mAgents.at(i)->isAlive())
 		{
-			double dist = agents.at(i)->getUnit()->getDistance(Position(pos));
+			double dist = mAgents.at(i)->getUnit()->getDistance(Position(pos));
 			if (dist < bestDist)
 			{
 				bestDist = dist;
-				agent = agents.at(i);
+				agent = mAgents.at(i);
 			}
 		}
 	}
@@ -116,15 +134,15 @@ BaseAgent* AgentManager::getClosestAgent(TilePosition pos, UnitType type)
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
 
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isOfType(type) && agents.at(i)->isAlive())
+		if (mAgents.at(i)->isOfType(type) && mAgents.at(i)->isAlive())
 		{
-			double dist = agents.at(i)->getUnit()->getDistance(Position(pos));
+			double dist = mAgents.at(i)->getUnit()->getDistance(Position(pos));
 			if (dist < bestDist)
 			{
 				bestDist = dist;
-				agent = agents.at(i);
+				agent = mAgents.at(i);
 			}
 		}
 	}
@@ -155,9 +173,9 @@ void AgentManager::addAgent(Unit* unit)
 	}
 
 	bool found = false;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->matches(unit))
+		if (mAgents.at(i)->matches(unit))
 		{
 			found = true;
 			break;
@@ -167,7 +185,7 @@ void AgentManager::addAgent(Unit* unit)
 	if (!found)
 	{
 		BaseAgent* newAgent = AgentFactory::getInstance()->createAgent(unit);
-		agents.push_back(newAgent);
+		mAgents.push_back(newAgent);
 
 		onAgentCreated(newAgent);
 	}
@@ -188,11 +206,11 @@ void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 
 void AgentManager::removeAgent(Unit* unit)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents[i]->matches(unit))
+		if (mAgents[i]->matches(unit))
 		{
-			onAgentDestroyed(agents[i]);	
+			onAgentDestroyed(mAgents[i]);	
 		}
 	}
 }
@@ -212,11 +230,11 @@ void AgentManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 
 void AgentManager::morphDrone(Unit* unit)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->matches(unit))
+		if (mAgents.at(i)->matches(unit))
 		{
-			agents.erase(agents.begin() + i);
+			mAgents.erase(mAgents.begin() + i);
 			addAgent(unit);
 			return;
 		}
@@ -243,35 +261,35 @@ void AgentManager::cleanup()
 
 	//Step 2. Do the cleanup.
 	int cnt = 0;
-	int oldSize = (int)agents.size();
-	for (int i = 0; i < (int)agents.size(); i++)
+	int oldSize = (int)mAgents.size();
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (!agents.at(i)->isAlive())
+		if (!mAgents.at(i)->isAlive())
 		{
-			delete agents.at(i);
-			agents.erase(agents.begin() + i);
+			delete mAgents.at(i);
+			mAgents.erase(mAgents.begin() + i);
 			cnt++;
 			i--;
 		}
 	}
-	int newSize = (int)agents.size();
+	int newSize = (int)mAgents.size();
 }
 
 void AgentManager::computeActions()
 {
 	//Dont call too often
 	int cFrame = Broodwar->getFrameCount();
-	if (cFrame - lastCallFrame < 10)
+	if (cFrame - mFrameLastCall < 10)
 	{
 		//return;
 	}
-	lastCallFrame = cFrame;
+	mFrameLastCall = cFrame;
 
 	int st = (int)GetTickCount();
 	int et = 0;
 	int elapsed = 0;
 
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
 		et = (int)GetTickCount();
 		elapsed = et - st;
@@ -280,15 +298,15 @@ void AgentManager::computeActions()
 			return;
 		}
 
-		if (agents.at(i)->isAlive())
+		if (mAgents.at(i)->isAlive())
 		{
-			int lastAF = agents.at(i)->getLastActionFrame();
+			int lastAF = mAgents.at(i)->getLastActionFrame();
 			if (Broodwar->getFrameCount() - lastAF > 20)
 			{
-				agents.at(i)->setActionFrame();
+				mAgents.at(i)->setActionFrame();
 
 				//Profiler::start();
-				agents.at(i)->computeActions();
+				mAgents.at(i)->computeActions();
 				//Profiler::end();
 				//if (Profiler::getElapsed() >= 40) Broodwar->printf("%s %d ms", agents.at(i)->getUnitType().getName().c_str(), Profiler::getElapsed());
 				//Profiler::show();
@@ -300,9 +318,9 @@ void AgentManager::computeActions()
 int AgentManager::getNoWorkers()
 {
 	int wCnt = 0;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		BaseAgent* agent = agents.at(i);
+		BaseAgent* agent = mAgents.at(i);
 		if (agent != NULL && agent->isWorker() && agent->isAlive())
 		{
 			wCnt++;
@@ -314,9 +332,9 @@ int AgentManager::getNoWorkers()
 int AgentManager::noMiningWorkers()
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		BaseAgent* agent = agents.at(i);
+		BaseAgent* agent = mAgents.at(i);
 		if (agent->isWorker() && agent->isAlive())
 		{
 			WorkerAgent* w = (WorkerAgent*)agent;
@@ -352,9 +370,9 @@ BaseAgent* AgentManager::findClosestFreeWorker(TilePosition pos)
 
 bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		BaseAgent* agent = agents.at(i);
+		BaseAgent* agent = mAgents.at(i);
 		if (agent->isAlive() && agent->isWorker())
 		{
 			Unit* unit = agent->getUnit();
@@ -371,11 +389,11 @@ bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
 int AgentManager::noInProduction(UnitType type)
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isAlive())
+		if (mAgents.at(i)->isAlive())
 		{
-			if (agents.at(i)->isOfType(type) && agents.at(i)->getUnit()->isBeingConstructed())
+			if (mAgents.at(i)->isOfType(type) && mAgents.at(i)->getUnit()->isBeingConstructed())
 			{
 				cnt++;
 			}
@@ -387,11 +405,11 @@ int AgentManager::noInProduction(UnitType type)
 int AgentManager::countNoUnits(UnitType type)
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isAlive())
+		if (mAgents.at(i)->isAlive())
 		{
-			if (agents.at(i)->isOfType(type))
+			if (mAgents.at(i)->isOfType(type))
 			{
 				cnt++;
 			}
@@ -403,11 +421,11 @@ int AgentManager::countNoUnits(UnitType type)
 int AgentManager::countNoBases()
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isAlive())
+		if (mAgents.at(i)->isAlive())
 		{
-			if (agents.at(i)->getUnitType().isResourceDepot())
+			if (mAgents.at(i)->getUnitType().isResourceDepot())
 			{
 				cnt++;
 			}
@@ -418,13 +436,13 @@ int AgentManager::countNoBases()
 
 bool AgentManager::unitsInArea(TilePosition pos, int tileWidth, int tileHeight, int unitID)
 {
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		if (agents.at(i)->isAlive())
+		if (mAgents.at(i)->isAlive())
 		{
-			if (agents.at(i)->getUnit()->getID() != unitID)
+			if (mAgents.at(i)->getUnit()->getID() != unitID)
 			{
-				TilePosition aPos = agents.at(i)->getUnit()->getTilePosition();
+				TilePosition aPos = mAgents.at(i)->getUnit()->getTilePosition();
 				if (aPos.x() >= pos.x() && aPos.x() <= pos.x() + tileWidth && aPos.y() >= pos.y() && aPos.y() <= pos.y() + tileWidth)
 				{
 					return true;
@@ -440,9 +458,9 @@ TilePosition AgentManager::getClosestDetector(TilePosition startPos)
 	TilePosition pos = TilePositions::Invalid;
 	double bestDist = 10000;
 
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (int i = 0; i < (int)mAgents.size(); i++)
 	{
-		BaseAgent* agent = agents.at(i);
+		BaseAgent* agent = mAgents.at(i);
 		if (agent->isAlive())
 		{
 			if (agent->getUnitType().isDetector() && agent->getUnitType().isBuilding())
@@ -461,7 +479,7 @@ TilePosition AgentManager::getClosestDetector(TilePosition startPos)
 }
 
 void AgentManager::printGraphicDebugInfo() {
-	for (size_t i = 0; i < agents.size(); ++i) {
-		agents[i]->printGraphicDebugInfo();
+	for (size_t i = 0; i < mAgents.size(); ++i) {
+		mAgents[i]->printGraphicDebugInfo();
 	}
 }

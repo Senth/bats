@@ -18,10 +18,10 @@
 class AgentManager {
 
 protected:
-	std::vector<BaseAgent*> agents;
-	int lastCallFrame;
+	std::vector<BaseAgent*> mAgents;
+	int mFrameLastCall;
 	AgentManager();
-	static AgentManager* instance;
+	static AgentManager* mpsInstance;
 
 	/** Called when an agent of our type is created. I.e. it will first create an agent through
 	 * addAgent then call this with the newly created agent. This function can be overridden.
@@ -86,8 +86,20 @@ public:
 	/** Returns the number of bases the player has. */
 	int countNoBases();
 
-	/** Returns a list of all agents in the container. */
+	/** Returns a list of all agents in the container.
+	 * @see getAgents(BWAPI::UnitType) */
 	std::vector<BaseAgent*> getAgents();
+
+	/**
+	 * Returns all agents of the specified type
+	 * @param unitType the unit type to return all agents of
+	 */
+	std::vector<BaseAgent*> getAgents(const BWAPI::UnitType& unitType);
+
+	/**
+	 * /copydoc getAgents(BWAPI::UnitType)
+	 */
+	std::vector<const BaseAgent*> getAgents(const BWAPI::UnitType& unitType) const;
 
 	/** Returns the number of agents the exists in the std::vector. */
 	int size();

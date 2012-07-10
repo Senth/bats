@@ -20,10 +20,10 @@ UnitManager::~UnitManager() {
 }
 
 UnitManager* UnitManager::getInstance() {
-	if (instance == NULL) {
-		instance = new UnitManager();
+	if (mpsInstance == NULL) {
+		mpsInstance = new UnitManager();
 	}
-	UnitManager* pUnitManager = dynamic_cast<UnitManager*>(instance);
+	UnitManager* pUnitManager = dynamic_cast<UnitManager*>(mpsInstance);
 	
 	// assert: Forgot to call UnitManager::getInstance() before AgentManager::getInstance().
 	assert(pUnitManager != NULL);
@@ -41,8 +41,8 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 
 std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 	std::vector<const UnitAgent*> foundUnits;
-	for (size_t i = 0; i < agents.size(); ++i) {
-		UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(agents[i]);
+	for (size_t i = 0; i < mAgents.size(); ++i) {
+		UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(mAgents[i]);
 		if (NULL != pUnitAgent) {
 			// Automatically skip constructing and dead units
 			if (pUnitAgent->isBeingBuilt() || !pUnitAgent->isAlive()) {
@@ -112,8 +112,8 @@ void UnitManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 	if (pUnitAgent != NULL) {
 		// Delete from squad if the unit had any
 		SquadId unitSquad = pUnitAgent->getSquadId();
-		if (unitSquad != SquadId::INVALID_KEY) {
-			const shared_ptr<Squad>& pSquad = mpSquadManager->getSquad(unitSquad);
+		if (unitSquad.isValid()) {
+			SquadRef pSquad = mpSquadManager->getSquad(unitSquad);
 			pSquad->removeUnit(pUnitAgent);
 		}
 	}
