@@ -38,15 +38,22 @@ To get find the teammate’s and enemies’ weaknesses one can make use of simpl
 
 If you strategy is bad, it does not matter how hard you try to win, you will still loose (unless the enemy is even worse). Because you need information, or a model/classification, of a player’s weaknesses, articles that focus on complementing the teammate weaknesses
 
-\section{Implementation in games}
+\section{Teammate Bot in Games}
 
-Today, no RTS games, that we know of, allows communication with a teammate bot; players can, however, play with a bot, but instead of trying to collaborate with player it acts more or less (depending on the game) on its own, it can try to complement the player's behavior but does not ask if this is the preferred choice for the player.
+
 %: cite a game that tries this
 
 \subsection{Communication}
 \label{sec:games_communication}
 Communication has been done in across several games and genres, most noteworthy are genres where you play as one character, such as FPS games, third-person (TPS) games. In these games some bots communicate you, warning when they spot enemies, get shot, or comes with tips when the enemy is stuck. 
 
+
+
+\subsection{Controllable}
 There are a handful games, that we know of, that implements the possibility for the player to actively control teammate bots (if they want to). Mass Effect\cite{masseffect}, a TPS game, does this by having the player the possibility to decide where the bots shall move for cover and hold a position, retreat for cover, even order the usage of certain abilities on target enemies.
 
+
 \subsection{RTS Games}
+Today, no RTS games, that we know of, allows for neither communicate with nor control a teammate bot; players can, however, play with a bot. The built in teammate bot acts more or less (depending on the game) on its own, i.e. it does not really collaborate with the player, it can try to complement the player's behavior but does not ask if this is the preferred choice for the player.
+
+The bot in the first StarCraft\cite{scbw} installment acts entirely on its own like it does not notice the player. In WarCraft 3: The Frozen Throne\cite{wc3ft} the bot reacts to the player and somewhat communicates with the player; it does this by coming to the players aid if s/he is under attack, and whenever the bot is about to attack an area it pings the minimap showing the location of attack, the player can then choose to join, attack in another area, or continue with his/her own business. Much like WarCraft 3, the bot in StarCraft 2: Wings of Liberty\footnote{First game in the StarCraft 2 trilogy.}\cite{sc2wol} aids the player when s/he is under attack, although it does not ping the minimap when it attacks. In Age of Empires 3\cite{ageofempires3} the bot acts almost entirely on its own; it can, however, request resources from the player and give the player hints.
