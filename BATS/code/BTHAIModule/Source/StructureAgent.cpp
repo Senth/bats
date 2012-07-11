@@ -24,7 +24,7 @@ void StructureAgent::printGraphicDebugInfo()
 	if (!isAlive()) return;
 
 	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
-		bats::config::debug::classes::AGENT_STRUCTURE == false)
+		bats::config::debug::modules::AGENT_STRUCTURE == false)
 	{
 		return;
 	}

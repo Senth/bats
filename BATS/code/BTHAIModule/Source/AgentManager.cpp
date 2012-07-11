@@ -285,6 +285,8 @@ void AgentManager::computeActions()
 	}
 	mFrameLastCall = cFrame;
 
+	Profiler::getInstance()->start("AgentManager::update()");
+
 	int st = (int)GetTickCount();
 	int et = 0;
 	int elapsed = 0;
@@ -305,14 +307,12 @@ void AgentManager::computeActions()
 			{
 				mAgents.at(i)->setActionFrame();
 
-				//Profiler::start();
 				mAgents.at(i)->computeActions();
-				//Profiler::end();
-				//if (Profiler::getElapsed() >= 40) Broodwar->printf("%s %d ms", agents.at(i)->getUnitType().getName().c_str(), Profiler::getElapsed());
-				//Profiler::show();
 			}
 		}
 	}
+
+	Profiler::getInstance()->end("AgentManager::update()");
 }
 
 int AgentManager::getNoWorkers()

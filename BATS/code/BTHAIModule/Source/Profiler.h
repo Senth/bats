@@ -1,7 +1,7 @@
-#include <windows.h>
-#include <BWAPI.h>
-#include "BaseAgent.h"
-#include "ProfilerObj.h"
+#include <string>
+#include <vector>
+
+class ProfilerObj;
 
 /** This class is used to measure the time (in milliseconds) it takes to execute a codeblock.
  * It also counts timeouts according to the rules from the AIIDE 2011 bot competition. If one of
@@ -21,7 +21,7 @@ class Profiler {
 
 	private:
 		std::vector<ProfilerObj*> obj;
-		ProfilerObj* getObj(std::string mId);
+		ProfilerObj* getObj(const std::string& mId);
 
 		Profiler();
 		static Profiler* instance;
@@ -36,17 +36,17 @@ class Profiler {
 
 		/** Starts measuring. Put at beginning of a codeblock. 
 		 * Make sure the startiId is the same as the end id. */
-		void start(std::string mId);
+		void start(const std::string& mId);
 
 		/** Stops measuring. Put at the end of a codeblock.
 		 * Make sure the startiId is the same as the end id. */
-		void end(std::string mId);
+		void end(const std::string& mId);
 
 		/** Returns the time elapsed between start and end. */
-		int getElapsed(std::string mId);
+		int getElapsed(const std::string& mId);
 
 		/** Outputs result to the in-game chat window. */
-		void show(std::string mId);
+		void show(const std::string& mId);
 		
 		/** Outputs result from all profiles to the in-game chat window. */
 		void showAll();

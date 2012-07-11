@@ -6,6 +6,7 @@
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "BTHAIModule/Source/SpottedObject.h"
+#include "BTHAIModule/Source/Profiler.h"
 #include "Config.h"
 #include "Helper.h"
 #include <set>
@@ -64,7 +65,7 @@ ExplorationManager* bats::ExplorationManager::getInstance() {
 	return mpsInstance;
 }
 
-void bats::ExplorationManager::computeActions() {
+void bats::ExplorationManager::update() {
 	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - mFrameLastCall < config::frame_distribution::EXPLORATION_MANAGER) {
@@ -76,7 +77,8 @@ void bats::ExplorationManager::computeActions() {
 		return;
 	}
 	
-	
+	Profiler::getInstance()->start("ExplorationManager::update()");
+
 	// Use a rotation algorithm to calculate enemy, our, and player forces every 3 third time.
 	switch (mCalcTurnCurrent) {
 	case CalcTurn_Enemy:
@@ -109,6 +111,8 @@ void bats::ExplorationManager::computeActions() {
 
 
 	/// @todo update position on visible buildings that have moved.
+
+	Profiler::getInstance()->end("ExplorationManager::update()");
 }
 
 TilePosition bats::ExplorationManager::getNextToExplore(const std::tr1::shared_ptr<Squad>& squad) {

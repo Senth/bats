@@ -3,9 +3,11 @@
 #include "AlliedSquad.h"
 #include "Helper.h"
 #include "Utilities/KeyHandler.h"
+#include "BTHAIModule/Source/Profiler.h"
 #include <cstdlib> // For NULL
 #include <BWAPI/Game.h>
 #include <BWAPI/Constants.h>
+#include <BWAPI/Position.h>
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -28,12 +30,6 @@ AlliedArmyManager::AlliedArmyManager() {
 	mLastFrameUpdate = 0;
 
 	mSquads.resize(AlliedSquad::getMaxKeys());
-
-	// Initialize size of grid
-	mGridUnits.resize(mLookupTableGridPosition.size());
-	for (size_t x = 0; x < mGridUnits.size(); ++x) {
-		mGridUnits[x].resize(mLookupTableGridPosition[0].size());
-	}
 }
 
 AlliedArmyManager::~AlliedArmyManager() {
@@ -49,39 +45,48 @@ AlliedArmyManager* AlliedArmyManager::getInstance() {
 }
 
 void AlliedArmyManager::update() {
+	
+
 	// Computational heavy, don't call every frame.
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - mLastFrameUpdate >= config::frame_distribution::ALLIED_ARMY_REARRANGE_SQUADS) {
 		mLastFrameUpdate = cFrame;
+
+		Profiler::getInstance()->start("AlliedArmyManager::update()");
 
 		rearrangeSquads();
 
 		disbandEmptySquads();
 
 		setBigSquad();
+
+		Profiler::getInstance()->end("AlliedArmyManager::update()");
 	}
 
+
+	Profiler::getInstance()->start("AlliedSquads::update()");
 	// Update all squads "every frame". Squads limit their update themselves
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i]) {
 			mSquads[i]->update();
 		}
 	}
+	Profiler::getInstance()->end("AlliedSquads::update()");
 }
 
 void AlliedArmyManager::rearrangeSquads() {
+	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads()");
+
+
+	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Initialization");
 	mUnitsToCheck = mUnitSquad;
 
-
-	// Create the grid with units
-	// 2D grid, each square can hold any number of units (3rd vector), each unit has information
-	// if they have been checked or not (bool in pair).
-	mGridUnits.clear();
-
-	// Initialize size of grid
-	mGridUnits.resize(mLookupTableGridPosition.size());
+	
+	// Remove all existing units from the grid
 	for (size_t x = 0; x < mGridUnits.size(); ++x) {
-		mGridUnits[x].resize(mLookupTableGridPosition[0].size());
+		for (size_t y = 0; y < mGridUnits[x].size(); ++y) {
+			mGridUnits[x][y].clear();
+		}
 	}
 
 	// Add all units to the grid
@@ -90,6 +95,8 @@ void AlliedArmyManager::rearrangeSquads() {
 		addUnitToGrid(unitIt->first);
 	}
 
+	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Initialization");
+	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Find not checked unit");
 
 	// Find a non-checked unit in a non-checked squad, i.e. iterate through all existing squads
 	// first. This will avoid creating and then merging unnecessary squads. I.e. all units that
@@ -128,6 +135,9 @@ void AlliedArmyManager::rearrangeSquads() {
 
 	} while (foundUnit);
 
+	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Find not checked unit");
+	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Create squads for rest");
+
 
 	// Create squads for the rest of the units that went out of the squad's bounds
 	while (!mUnitsToCheck.empty()) {
@@ -141,6 +151,9 @@ void AlliedArmyManager::rearrangeSquads() {
 
 		addCloseUnitsToSquad(currentUnit, pNewSquad->getId());
 	}
+
+	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Create squads for rest");
+	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads()");
 }
 
 void AlliedArmyManager::onConstantChanged(config::ConstantName constantName) {
@@ -364,6 +377,13 @@ void AlliedArmyManager::recalculateLookupTable() {
 			mLookupTableGridPosition[x][y] = BWAPI::Position(x / gridSquareDistance, y / gridSquareDistance);
 		}
 	}
+
+	// Initialize size of grid
+	mGridUnits.clear();
+	mGridUnits.resize(mLookupTableGridPosition.size());
+	for (size_t x = 0; x < mGridUnits.size(); ++x) {
+		mGridUnits[x].resize(mLookupTableGridPosition[0].size());
+	}
 }
 
 void AlliedArmyManager::disbandEmptySquads() {
@@ -481,7 +501,7 @@ void AlliedArmyManager::printGraphicDebugInfo() {
 
 
 	// Only draw if turned on
-	if (config::debug::classes::ALLIED_ARMY_MANAGER) {
+	if (config::debug::modules::ALLIED_ARMY_MANAGER) {
 		// High 
 		// Draw two circles around each unit, orange for excluding, green for including
 		// Draw id on each unit

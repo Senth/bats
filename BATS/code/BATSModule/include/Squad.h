@@ -671,6 +671,8 @@ private:
 	std::tr1::weak_ptr<Squad> mThis;
 	GoalStates mGoalState;
 
+	int mFrameLastCall;
+
 	// Calculating furthest unit away distance
 	mutable double mFurthestUnitAwayDistance;
 	mutable double mFurthestUnitAwayLastTime;

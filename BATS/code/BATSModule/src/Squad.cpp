@@ -48,7 +48,8 @@ Squad::Squad(
 	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
 	mGoalState(GoalState_Lim),
 	mState(State_Inactive),
-	mCanRegroup(true)
+	mCanRegroup(true),
+	mFrameLastCall(0)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
@@ -127,6 +128,13 @@ bool Squad::tryDisband() {
 }
 
 void Squad::computeActions() {
+	// Don't call to often
+	if (mFrameLastCall + config::frame_distribution::SQUAD > mpsGameTime->getFrameCount()) {
+		return;
+	}
+	mFrameLastCall = mpsGameTime->getFrameCount();
+
+
 	// Check if this is the first time calling, then add all the initial units
 	if (!mInitialized) {
 		mInitialized = true;
@@ -134,6 +142,7 @@ void Squad::computeActions() {
 			onUnitAdded(mUnits[i]);
 		}
 	}
+
 
 	switch (mState) {
 	case State_Initializing:

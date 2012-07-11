@@ -9,6 +9,7 @@
 #include "UnitManager.h"
 #include "UnitCompositionFactory.h"
 #include "BTHAIModule/Source/CoverMap.h"
+#include "BTHAIModule/Source/Profiler.h"
 #include <memory.h>
 
 #include "AttackSquad.h"
@@ -59,10 +60,14 @@ Commander* Commander::getInstance() {
 }
 
 void Commander::computeActions() {
+	Profiler::getInstance()->start("Commander::update()");
+
 	/// @todo Commander computer actions more complex actions
 
 	computeReactions();
 	mpSquadManager->computeActions();
+
+	Profiler::getInstance()->end("Commander::update()");
 }
 
 void Commander::computeReactions() {

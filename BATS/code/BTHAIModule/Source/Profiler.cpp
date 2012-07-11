@@ -1,4 +1,7 @@
 #include "Profiler.h"
+#include "ProfilerObj.h"
+#include <BWAPI.h>
+#include <windows.h>
 #include <iostream>
 #include <fstream>
 
@@ -31,7 +34,7 @@ Profiler* Profiler::getInstance()
 	return instance;
 }
 
-ProfilerObj* Profiler::getObj(string mId)
+ProfilerObj* Profiler::getObj(const string& mId)
 {
 	for (int i = 0; i < (int)obj.size(); i++)
 	{
@@ -44,7 +47,7 @@ ProfilerObj* Profiler::getObj(string mId)
 }
 
 
-void Profiler::start(string mId)
+void Profiler::start(const string& mId)
 {
 	ProfilerObj* cObj = getObj(mId);
 	if (cObj != NULL) 
@@ -59,20 +62,20 @@ void Profiler::start(string mId)
 	}
 }
 
-void Profiler::end(string mId)
+void Profiler::end(const string& mId)
 {
 	ProfilerObj* cObj = getObj(mId);
 	if (cObj != NULL) cObj->end();
 }
 
-int Profiler::getElapsed(string mId) 
+int Profiler::getElapsed(const string& mId) 
 {
 	ProfilerObj* cObj = getObj(mId);
 	if (cObj != NULL) return cObj->getElapsed();
 	return 0;
 }
 
-void Profiler::show(string mId)
+void Profiler::show(const string& mId)
 {
 	ProfilerObj* cObj = getObj(mId);
 	if (cObj != NULL) cObj->show();

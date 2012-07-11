@@ -122,7 +122,7 @@ public:
 	BWAPI::Unit* findClosestMineral(BWAPI::TilePosition workerPos);
 
 	/** Shows debug info on screen. */
-	void debug();
+	void printGraphicDebugInfo();
 
 	/** Tile is buildable. */
 	static const int BUILDABLE = 1;

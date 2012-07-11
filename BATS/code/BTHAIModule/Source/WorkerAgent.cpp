@@ -117,7 +117,7 @@ void WorkerAgent::handleKitingWorker()
 void WorkerAgent::printGraphicDebugInfo()
 {
 	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
-		bats::config::debug::classes::AGENT_WORKER == false)
+		bats::config::debug::modules::AGENT_WORKER == false)
 	{
 		return;
 	}

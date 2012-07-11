@@ -184,17 +184,19 @@ namespace bats {
 			};
 
 			/**
-			 * Enabled classes, if these are enable they will show
+			 * Enabled classes/modules, if these are enable they will show
 			 * debugging information, provided that GRAPHICS_VERBOSITY is set
 			 * to something other than Off.
 			 * @note Some classes only print out debugging information for medium or high.
 			 */
-			namespace classes {
+			namespace modules {
 				extern bool ALLIED_SQUAD;
 				extern bool ALLIED_ARMY_MANAGER;
 				extern bool AGENT_UNIT;
 				extern bool AGENT_STRUCTURE;
 				extern bool AGENT_WORKER;
+				extern bool TERRAIN;
+				extern bool COVER_MAP;
 			}
 		}
 
@@ -213,6 +215,7 @@ namespace bats {
 			extern int EXPLORATION_MANAGER;
 			extern int RESOURCE_COUNTER;
 			extern int ALLIED_ARMY_REARRANGE_SQUADS;
+			extern int SQUAD;
 		}
 
 		/**

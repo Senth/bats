@@ -1,6 +1,7 @@
 #include "SquadManager.h"
 #include "Squad.h"
 #include "AttackSquad.h"
+#include "BTHAIModule/Source/Profiler.h"
 
 using namespace bats;
 using namespace std::tr1;
@@ -59,6 +60,8 @@ SquadCstIt SquadManager::end() const {
 }
 
 void SquadManager::computeActions() {
+	Profiler::getInstance()->start("SquadManager::update()");
+
 	std::map<SquadId, SquadPtr>::iterator squadIt = mSquads.begin();
 	while(squadIt != mSquads.end()) {
 		if (!squadIt->second->isEmpty()) {
@@ -73,6 +76,8 @@ void SquadManager::computeActions() {
 			squadIt = mSquads.erase(squadIt);
 		}	
 	}
+
+	Profiler::getInstance()->end("SquadManager::update()");
 }
 
 void SquadManager::addSquad(SquadRef pSquad) {

@@ -3,6 +3,7 @@
 #include "BaseAgent.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ExplorationManager.h"
+#include "BatsModule/include/Config.h"
 #include "Profiler.h"
 
 using namespace BWAPI;
@@ -1021,19 +1022,31 @@ bool CoverMap::suitableForDetector(TilePosition pos)
 	return true;
 }
 
-void CoverMap::debug()
+void CoverMap::printGraphicDebugInfo()
 {
-	for (int x = 0; x < w; x++)
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
+		bats::config::debug::modules::COVER_MAP == false)
 	{
-		for (int y = 0; y < h; y++)
+		return;
+	}
+
+
+	// High
+	// Draw blocked and temporarily blocked squares
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High)
+	{
+		for (int x = 0; x < w; x++)
 		{
-			if (cover_map[x][y] == TEMPBLOCKED)
+			for (int y = 0; y < h; y++)
 			{
-				Broodwar->drawBox(CoordinateType::Map,x*32,y*32,x*32+31,y*32+31,Colors::Green,false);
-			}
-			if (cover_map[x][y] == BLOCKED)
-			{
-				Broodwar->drawBox(CoordinateType::Map,x*32,y*32,x*32+31,y*32+31,Colors::Red,false);
+				if (cover_map[x][y] == TEMPBLOCKED)
+				{
+					Broodwar->drawBoxMap(x*32,y*32,x*32+31,y*32+31,Colors::Green);
+				}
+				if (cover_map[x][y] == BLOCKED)
+				{
+					Broodwar->drawBoxMap(x*32,y*32,x*32+31,y*32+31,Colors::Red);
+				}
 			}
 		}
 	}

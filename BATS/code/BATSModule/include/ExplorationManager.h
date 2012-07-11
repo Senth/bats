@@ -129,7 +129,7 @@ public:
 	bool isActive() const;
 
 	/** Called each update to issue orders. */
-	void computeActions();
+	void update();
 
 	/** Returns the next position to explore for this squad. This will calculate
 	 * a close valid position to go to explore. It will prioritize areas that haven't

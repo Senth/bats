@@ -41,7 +41,7 @@ void AIloop::computeActions()
 	AgentManager::getInstance()->computeActions();
 	bats::BuildPlanner::getInstance()->computeActions();
 	Commander::getInstance()->computeActions();
-	ExplorationManager::getInstance()->computeActions();
+	ExplorationManager::getInstance()->update();
 }
 
 void AIloop::addUnit(Unit* unit)
@@ -107,7 +107,7 @@ void AIloop::show_debug()
 		ExplorationManager::getInstance()->printInfo();
 		Commander::getInstance()->printInfo();
 		
-		if (debug_mode >= 3) CoverMap::getInstance()->debug();
+		if (debug_mode >= 3) CoverMap::getInstance()->printGraphicDebugInfo();
 		if (debug_mode >= 2) ResourceManager::getInstance()->printInfo();
 
 		Commander::getInstance()->debug_showGoal();

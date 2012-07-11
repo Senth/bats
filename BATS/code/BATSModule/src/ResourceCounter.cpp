@@ -3,6 +3,7 @@
 #include "Resource.h"
 #include "Config.h"
 #include "Utilities/Logger.h"
+#include "BTHAIModule/Source/Profiler.h"
 #include <cstdlib> // For NULL
 #include <BWAPI/Game.h>
 #include <BWTA.h>
@@ -10,8 +11,7 @@
 using namespace bats;
 using namespace BWAPI;
 using namespace BWTA;
-using std::map;
-using std::set;
+using namespace std;
 using std::tr1::shared_ptr;
 
 ResourceCounter* ResourceCounter::mpsInstance = NULL;
@@ -69,6 +69,7 @@ void ResourceCounter::update() {
 	}
 	mFrameLastCall = cFrame;
 
+	Profiler::getInstance()->start("ResourceCounter::update()");
 
 	// Update all existing first
 	map<int, shared_ptr<ResourceGroup>>::iterator groupIt;
@@ -93,9 +94,13 @@ void ResourceCounter::update() {
 				groupIt->second->addResource((*mineralIt));
 			}
 		} else {
-			ERROR_MESSAGE(false, "Could not find the resource group, this shall never happen!");
+			ERROR_MESSAGE(false, "Could not find the resource group (" <<
+				(*mineralIt)->getResourceGroup() << ")!"
+			);
 		}
 	}
+
+	Profiler::getInstance()->end("ResourceCounter::update()");
 }
 
 void ResourceCounter::addResourceGroups() {
@@ -118,17 +123,13 @@ void ResourceCounter::addResourceGroups() {
 				pCurrentBase->getTilePosition(),
 				resourceGroupId
 			);
-			shared_ptr<ResourceGroup> resourceGroup = shared_ptr<ResourceGroup>(pNewResourceGroup);
+			shared_ptr<ResourceGroup> resourceGroup(pNewResourceGroup);
 
 			// Add to maps
-			mGroupsById.insert(std::pair<int, shared_ptr<ResourceGroup>>(
-				resourceGroupId,
-				resourceGroup
-			));
-			mGroupsByPosition.insert(std::pair<TilePosition, shared_ptr<ResourceGroup>>(
-				resourceGroup->getExpansionPosition(),
-				resourceGroup
-			));
+			mGroupsById.insert(make_pair(resourceGroupId,resourceGroup));
+			mGroupsByPosition.insert(make_pair(resourceGroup->getExpansionPosition(), resourceGroup));
+
+			DEBUG_MESSAGE(utilities::LogLevel_Finest, "Resource group added: " << resourceGroupId);
 		} else {
 			ERROR_MESSAGE(false, "Did not find any minerals for the current Baselocation (" <<
 				pCurrentBase->getTilePosition().x() << ", " <<

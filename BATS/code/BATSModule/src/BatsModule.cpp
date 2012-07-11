@@ -56,6 +56,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 }
 
 BatsModule::~BatsModule() {
+	mpProfiler->dumpToFile();
 	SAFE_DELETE(mpProfiler);
 
 	// Release game classes, if the game was ended abruptly onEnd() might not have been called.
@@ -367,6 +368,8 @@ bool BatsModule::areWePlaying() const {
 }
 
 void BatsModule::updateGame() {
+	mpProfiler->start("updateGame");
+
 	// Quit the game if the game is lost
 	if (isGameLost()) {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "No workers left; bailing out.");
@@ -384,7 +387,9 @@ void BatsModule::updateGame() {
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
-	mpExplorationManager->computeActions();
+	mpExplorationManager->update();
+
+	mpProfiler->end("updateGame");
 }
 
 void BatsModule::initGameClasses() {
@@ -425,71 +430,115 @@ void BatsModule::releaseGameClasses() {
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
+		mpProfiler->start("printGraphicDebugInfo()");
+
+
 		mpAlliedArmyManager->printGraphicDebugInfo();
 		mpSquadManager->printGraphicDebugInfo();
 		mpUnitManager->printGraphicDebugInfo();
 		UnitCreator::getInstance()->printGraphicDebugInfo();
+		drawTerrainData();
+		CoverMap::getInstance()->printGraphicDebugInfo();
 
 		// Low
 		/// @todo Commander::getInstance()->printInfo();
 		/// @todo Commander::getInstance()->debug_showGoal();
-		ExplorationManager::getInstance()->printInfo();
-		drawTerrainData();
+		//ExplorationManager::getInstance()->printInfo();
 
 
 		// Medium
 		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
 			ResourceManager::getInstance()->printInfo();
 		}
-		
-		// High
-		if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
-			CoverMap::getInstance()->debug();
-		}
+
+		mpProfiler->end("printGraphicDebugInfo()");
 	}
 }
 
 void BatsModule::drawTerrainData() const {
-	//we will iterate through all the base locations, and draw their outlines.
-	std::set<BWTA::BaseLocation*>::const_iterator baseLocationIt;
-	for(baseLocationIt = BWTA::getBaseLocations().begin();
-		baseLocationIt != BWTA::getBaseLocations().end();
-		++baseLocationIt)
+	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off ||
+		config::debug::modules::TERRAIN == false)
 	{
-		TilePosition p=(*baseLocationIt)->getTilePosition();
-		Position c=(*baseLocationIt)->getPosition();
+		return;
+	}
+
+
+	// Low
+	// Draw resource bars. High -> draw resource group id
+	// Zerg egg progress
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
 
 		//Draw a progress bar at each resource
+		std::set<BWAPI::Unit*> resources = Broodwar->getStaticMinerals();
+		resources.insert(Broodwar->getStaticGeysers().begin(), Broodwar->getStaticGeysers().end());
 		std::set<BWAPI::Unit*>::const_iterator resourceIt;
-		for(resourceIt = (*baseLocationIt)->getStaticMinerals().begin();
-			resourceIt != (*baseLocationIt)->getStaticMinerals().end();
-			++resourceIt)
-		{
+		for(resourceIt = resources.begin(); resourceIt != resources.end(); ++resourceIt) {
+			int resourceWidth = 60;
 			if ((*resourceIt)->getResources() > 0) {
 				int total = (*resourceIt)->getInitialResources();
 				int done = (*resourceIt)->getResources();
 
-				int width = 60;
-				//int h = 64;
-
-				Position startPos = Position((*resourceIt)->getPosition().x() - width/2 + 2,
+				Position startPos = Position((*resourceIt)->getPosition().x() - resourceWidth / 2 + 2,
 					(*resourceIt)->getPosition().y() - 4);
-				Position endPos = Position(startPos.x() + width, startPos.y() + 8);
-				int progress = (int)((double)done / (double)total * width);
+				Position endPos = Position(startPos.x() + resourceWidth, startPos.y() + 8);
+				int progress = (int)((double)done / (double)total * resourceWidth);
 				Position progressPart = Position(startPos.x() + progress, startPos.y() +  8);
 
-				Broodwar->drawBox(CoordinateType::Map, startPos.x(), startPos.y(),
+				Broodwar->drawBoxMap(startPos.x(), startPos.y(),
 					endPos.x(), endPos.y(),	Colors::Orange, false);
-				Broodwar->drawBox(CoordinateType::Map, startPos.x(), startPos.y(),
+				Broodwar->drawBoxMap(startPos.x(), startPos.y(),
 					progressPart.x(), progressPart.y(),	Colors::Orange, true);
+
+				// High -> Draw resource group
+				if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
+					int resourceGroupId = (*resourceIt)->getResourceGroup();
+					const Position& resourcePos = (*resourceIt)->getInitialPosition();
+					Broodwar->drawTextMap(
+						resourcePos.x() - resourceWidth / 2 + 2,
+						resourcePos.y() + 4,
+						"%sGroup: %i",
+						TextColors::ORANGE.c_str(),
+						resourceGroupId);
+				}
+			}
+		}
+
+		//locate Zerg eggs and draw progress bars
+		if (BuildPlanner::isZerg()) {
+			std::set<Unit*>::const_iterator unitIt;
+			for(unitIt = Broodwar->self()->getUnits().begin();
+				unitIt != Broodwar->self()->getUnits().end();
+				++unitIt)
+			{
+				if ((*unitIt)->getType().getID() == UnitTypes::Zerg_Egg.getID() ||
+					(*unitIt)->getType().getID() == UnitTypes::Zerg_Lurker_Egg.getID()
+					|| (*unitIt)->getType().getID() == UnitTypes::Zerg_Cocoon.getID())
+				{
+					int total = (*unitIt)->getBuildType().buildTime();
+					int done = total - (*unitIt)->getRemainingBuildTime();
+
+					int width = (*unitIt)->getType().tileWidth() * 32;
+					//int height = (*unitIt)->getType().tileHeight() * 32;
+
+					Position startPos = Position((*unitIt)->getPosition().x() - width/2,
+						(*unitIt)->getPosition().y() - 4);
+					Position endPos = Position(startPos.x() + width, startPos.y() + 8);
+					int progress = (int)((double)done / (double)total * width);
+					Position progressPos = Position(startPos.x() + progress, startPos.y() +  8);
+
+					Broodwar->drawBoxMap(startPos.x(), startPos.y(),
+						endPos.x(), endPos.y(), Colors::Blue, false);
+					Broodwar->drawBoxMap(startPos.x(), startPos.y(),
+						progressPos.x(), progressPos.y(), Colors::Blue, true);
+				}
 			}
 		}
 	}
 
 	
 	// Medium
-	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium)
-	{
+	// Draw outlines for regions 
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
 		//we will iterate through all the regions and draw the polygon outline of it in white.
 		std::set<BWTA::Region*>::const_iterator regionIt;
 		for(regionIt = BWTA::getRegions().begin();
@@ -497,20 +546,16 @@ void BatsModule::drawTerrainData() const {
 			++regionIt) {
 
 			BWTA::Polygon polygon=(*regionIt)->getPolygon();
-			for(int polygonPoint = 0; polygonPoint < (int)polygon.size(); polygonPoint++)
-			{
+			for(int polygonPoint = 0; polygonPoint < (int)polygon.size(); ++polygonPoint) {
 				Position currentPoint = polygon[polygonPoint];
 				Position nextPoint = polygon[(polygonPoint+1) % polygon.size()];
-				Broodwar->drawLine(CoordinateType::Map,currentPoint.x(), currentPoint.y(),
+				Broodwar->drawLineMap(currentPoint.x(), currentPoint.y(),
 					nextPoint.x(), nextPoint.y(), Colors::Brown);
 			}
 		}
 
 		//we will visualize the chokepoints with yellow lines
-		for(regionIt = BWTA::getRegions().begin();
-			regionIt != BWTA::getRegions().end();
-			++regionIt)
-		{
+		for(regionIt = BWTA::getRegions().begin(); regionIt != BWTA::getRegions().end(); ++regionIt) {
 			std::set<BWTA::Chokepoint*>::const_iterator chokepointIt;
 			for(chokepointIt = (*regionIt)->getChokepoints().begin();
 				chokepointIt != (*regionIt)->getChokepoints().end();
@@ -518,39 +563,8 @@ void BatsModule::drawTerrainData() const {
 			{
 				Position point1 = (*chokepointIt)->getSides().first;
 				Position point2 = (*chokepointIt)->getSides().second;
-				Broodwar->drawLine(CoordinateType::Map, point1.x(), point1.y(),
+				Broodwar->drawLineMap(point1.x(), point1.y(),
 					point2.x(), point2.y(), Colors::Yellow);
-			}
-		}
-	}
-
-	//locate zerg eggs and draw progress bars
-	if (BuildPlanner::isZerg()) {
-		std::set<Unit*>::const_iterator unitIt;
-		for(unitIt = Broodwar->self()->getUnits().begin();
-			unitIt != Broodwar->self()->getUnits().end();
-			++unitIt)
-		{
-			if ((*unitIt)->getType().getID() == UnitTypes::Zerg_Egg.getID() ||
-				(*unitIt)->getType().getID() == UnitTypes::Zerg_Lurker_Egg.getID()
-				|| (*unitIt)->getType().getID() == UnitTypes::Zerg_Cocoon.getID())
-			{
-				int total = (*unitIt)->getBuildType().buildTime();
-				int done = total - (*unitIt)->getRemainingBuildTime();
-
-				int width = (*unitIt)->getType().tileWidth() * 32;
-				//int height = (*unitIt)->getType().tileHeight() * 32;
-
-				Position startPos = Position((*unitIt)->getPosition().x() - width/2,
-					(*unitIt)->getPosition().y() - 4);
-				Position endPos = Position(startPos.x() + width, startPos.y() + 8);
-				int progress = (int)((double)done / (double)total * width);
-				Position progressPos = Position(startPos.x() + progress, startPos.y() +  8);
-
-				Broodwar->drawBox(CoordinateType::Map, startPos.x(), startPos.y(),
-					endPos.x(), endPos.y(), Colors::Blue, false);
-				Broodwar->drawBox(CoordinateType::Map, startPos.x(), startPos.y(),
-					progressPos.x(), progressPos.y(), Colors::Blue, true);
 			}
 		}
 	}

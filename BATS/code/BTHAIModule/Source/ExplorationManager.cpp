@@ -67,7 +67,7 @@ ExplorationManager* ExplorationManager::getInstance()
 	return instance;
 }
 
-void ExplorationManager::computeActions()
+void ExplorationManager::update()
 {
 	//Dont call too often
 	int cFrame = Broodwar->getFrameCount();

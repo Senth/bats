@@ -101,12 +101,14 @@ namespace debug {
 	int GRAPHICS_VERBOSITY = 0;
 	int GRAPHICS_COLUMN_WIDTH = 0;
 
-	namespace classes {
+	namespace modules {
 		bool ALLIED_ARMY_MANAGER = false;
 		bool ALLIED_SQUAD = false;
 		bool AGENT_UNIT = false;
 		bool AGENT_STRUCTURE = false;
 		bool AGENT_WORKER = false;
+		bool TERRAIN = false;
+		bool COVER_MAP = false;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -119,9 +121,10 @@ namespace build_order {
 }
 
 namespace frame_distribution {
-	int EXPLORATION_MANAGER = 61;
-	int RESOURCE_COUNTER = 23;
-	int ALLIED_ARMY_REARRANGE_SQUADS = 45;
+	int EXPLORATION_MANAGER = 0;
+	int RESOURCE_COUNTER = 0;
+	int ALLIED_ARMY_REARRANGE_SQUADS = 0;
+	int SQUAD = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -228,6 +231,8 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 		success = frame_distribution::set(variableInfo);
 	} else if (variableInfo.section == "game") {
 		success = game::set(variableInfo);
+	} else if (variableInfo.section == "module") {
+		success = module::set(variableInfo);
 	} else if (variableInfo.section == "squad") {
 		success = squad::set(variableInfo);
 	} else {
@@ -384,8 +389,8 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool debug::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.subsection == "classes") {
-		debug::classes::set(variableInfo);
+	if (variableInfo.subsection == "modules") {
+		debug::modules::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "graphics_verbosity_in_debug") {
 			gOldValue = toString(GRAPHICS_VERBOSITY_IN_DEBUG);
@@ -418,7 +423,7 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 	return true;
 }
 
-bool debug::classes::set(const utilities::VariableInfo& variableInfo) {
+bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "allied_squad") {
 		gOldValue = toString(ALLIED_SQUAD);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_SQUAD));
@@ -439,6 +444,14 @@ bool debug::classes::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(AGENT_WORKER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_WORKER));
 		AGENT_WORKER = variableInfo;
+	} else if (variableInfo.name == "terrain") {
+		gOldValue = toString(TERRAIN);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(TERRAIN));
+		TERRAIN = variableInfo;
+	} else if (variableInfo.name == "cover_map") {
+		gOldValue = toString(COVER_MAP);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(COVER_MAP));
+		COVER_MAP = variableInfo;
 	} else {
 		return false;
 	}
@@ -459,6 +472,10 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_ARMY_REARRANGE_SQUADS);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_ARMY_REARRANGE_SQUADS));
 		ALLIED_ARMY_REARRANGE_SQUADS = variableInfo;
+	} else if (variableInfo.name == "squad") {
+		gOldValue = toString(SQUAD);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(SQUAD));
+		SQUAD = variableInfo;
 	} else {
 		return false;
 	}
