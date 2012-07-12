@@ -70,7 +70,7 @@ void AttackSquad::clearAlliedRegrouping() {
 	setTemporaryGoalPosition(TilePositions::Invalid);
 }
 
-void AttackSquad::computeSquadSpecificActions() {
+void AttackSquad::updateDerived() {
 	// Not following any allied squad
 	if (NULL == mpAlliedSquadFollow) {
 		// Check if we're attacking an enemy structure.
@@ -134,7 +134,7 @@ void AttackSquad::computeSquadSpecificActions() {
 					}
 					TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
 					// Only update position if it changed
-					if (getGoal() != targetPosition) {
+					if (getGoalPosition() != targetPosition) {
 						setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
 					}
 					setAvoidEnemyUnits(true);
@@ -148,7 +148,7 @@ void AttackSquad::computeSquadSpecificActions() {
 					}
 					TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
 					// Only update position if it changed
-					if (getGoal() != targetPosition) {
+					if (getGoalPosition() != targetPosition) {
 						setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
 					}
 					setAvoidEnemyUnits(false);
@@ -223,8 +223,8 @@ Squad::GoalStates AttackSquad::checkGoalState() const {
 bool AttackSquad::isEnemyStructuresNearGoalDead() const {
 	/// @todo check the whole radius for buildings, some structures might be hidden from the view
 	/// all will therefore not be seen (and thus the goal is completed when it should not be).
-	if (Broodwar->isVisible(getGoal()) &&
-		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoal(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
+	if (Broodwar->isVisible(getGoalPosition()) &&
+		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoalPosition(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
 	{
 		return true;
 	} else {
@@ -233,7 +233,7 @@ bool AttackSquad::isEnemyStructuresNearGoalDead() const {
 }
 
 bool AttackSquad::isInPosition() const {
-	return isCloseTo(getGoal(), config::squad::attack::WAITING_POSITION_DISTANCE_FROM_GOAL);
+	return isCloseTo(getGoalPosition(), config::squad::attack::WAITING_POSITION_DISTANCE_FROM_GOAL);
 }
 
 bool AttackSquad::isAttacking() const {

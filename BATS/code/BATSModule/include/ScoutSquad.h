@@ -12,18 +12,20 @@ class ScoutSquad : public Squad{
 		/**
 		 * Constructor that takes units to be used with the squad.
 		 * @param units all units to be added to the squad.
-		 * @param avoidEnemy avoid enemy if spotted and explores remaining part of the map. Defaults to true
+		 * @param avoidEnemy avoid enemy if spotted and explores remaining part of the map,
+		 * defaults to true
 		 */
 		ScoutSquad(const std::vector<UnitAgent*> units, 
 			bool avoidEnemy = true, 
 			const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
+		
 		/**
 		 * Destructor
 		 */
 		virtual ~ScoutSquad();
 		
 	protected:
-		virtual void computeSquadSpecificActions();		
+		virtual void updateDerived();
 		virtual bool createGoal();
 		virtual Squad::GoalStates checkGoalState() const;
 		virtual void onGoalFailed();

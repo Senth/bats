@@ -1,4 +1,4 @@
-#include "DefensiveManager.h"
+#include "DefenseManager.h"
 #include "UnitManager.h"
 #include <BWAPI/Unit.h>
 #include <cstdlib> // For NULL
@@ -7,35 +7,35 @@ using namespace bats;
 using namespace BWAPI;
 using namespace std;
 
-DefensiveManager* DefensiveManager::mpsInstance = NULL;
+DefenseManager* DefenseManager::mpsInstance = NULL;
 
-DefensiveManager::DefensiveManager() {
+DefenseManager::DefenseManager() {
 	mpUnitManager = NULL;
 
 	mpUnitManager = UnitManager::getInstance();
 }
 
-DefensiveManager::~DefensiveManager() {
+DefenseManager::~DefenseManager() {
 	mpsInstance = NULL;
 }
 
-DefensiveManager* DefensiveManager::getInstance() {
+DefenseManager* DefenseManager::getInstance() {
 	if (NULL == mpsInstance) {
-		mpsInstance = new DefensiveManager();
+		mpsInstance = new DefenseManager();
 	}
 	return mpsInstance;
 }
 
-void DefensiveManager::update() {
+void DefenseManager::update() {
 	/// @todo stub
 }
 
-vector<Unit*> DefensiveManager::getAllFreeUnits() {
+vector<Unit*> DefenseManager::getAllFreeUnits() {
 	/// @todo stub
 	return vector<Unit*>();
 }
 
-bool DefensiveManager::isUnderAttack() const {
+bool DefenseManager::isUnderAttack() const {
 	/// @todo stub
 	return false;
 }

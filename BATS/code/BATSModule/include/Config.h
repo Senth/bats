@@ -319,6 +319,22 @@ namespace bats {
 			}
 
 			/**
+			 * Variables for various Defend squads
+			 */
+			namespace defend {
+				/** Everything within this distance is treated as within the defended
+				 * perimeter. DefenseMoveSquad uses this for finding enemies within this
+				 * perimeter to attack. */
+				extern int PERIMETER;
+				/** Enemies within this distance are treated as offensive move towards that
+				 * defended position. This distance is used for alerting DefenseMoveSquad
+				 * about a possible position the enemy will attack. While enemies are within
+				 * this distance, the squad will not move out of the way.
+				 */
+				extern int ENEMY_OFFENSIVE_PERIMETER;
+			}
+
+			/**
 			 * Variables for DropSquad
 			 */
 			namespace drop {

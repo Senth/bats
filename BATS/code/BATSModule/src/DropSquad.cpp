@@ -32,8 +32,8 @@ DropSquad::~DropSquad() {
 	// Does nothing
 }
 
-void DropSquad::computeSquadSpecificActions() {
-	AttackSquad::computeSquadSpecificActions();
+void DropSquad::updateDerived() {
+	AttackSquad::updateDerived();
 
 	if (!mInitialized) {
 		mStartTime = GameTime::getInstance()->getElapsedTime();
@@ -262,7 +262,7 @@ bool DropSquad::isTransportsInGoalRegion() const {
 		BWTA::Region* transportRegion = BWTA::getRegion(transportPos);
 
 		// Goal region
-		BWTA::Region* goalRegion = BWTA::getRegion(getGoal());
+		BWTA::Region* goalRegion = BWTA::getRegion(getGoalPosition());
 
 		if (goalRegion != transportRegion) {
 			return false;
@@ -305,7 +305,7 @@ void DropSquad::createViaPath() {
 	if (isRetreating()) {
 		goalBorderPosition = getClosestBorder(getRetreatPosition());
 	} else {
-		goalBorderPosition = getClosestBorder(getGoal());
+		goalBorderPosition = getClosestBorder(getGoalPosition());
 	}
 
 	// Which sides do the borders lie on the map?

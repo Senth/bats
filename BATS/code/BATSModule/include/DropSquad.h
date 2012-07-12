@@ -40,7 +40,7 @@ public:
 	std::string getName() const;
 
 protected:
-	virtual void computeSquadSpecificActions();
+	virtual void updateDerived();
 	virtual GoalStates checkGoalState() const;
 	virtual void onUnitAdded(UnitAgent* pAddedUnit);
 	virtual void onUnitRemoved(UnitAgent* pRemovedUnit);

@@ -3,7 +3,7 @@
 #include <vector>
 #include "TypeDefs.h"
 
-// Fordward declaration
+// Forward declaration
 namespace BWAPI {
 	class Unit;
 }
@@ -20,18 +20,18 @@ class UnitManager;
  * base.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
-class DefensiveManager {
+class DefenseManager {
 public:
 	/**
 	 * Destructor
 	 */
-	virtual ~DefensiveManager();
+	virtual ~DefenseManager();
 
 	/**
 	 * Returns the instance of DefensiveManager.
 	 * @return instance of DefensiveManager.
 	 */
-	static DefensiveManager* getInstance();
+	static DefenseManager* getInstance();
 
 	/**
 	 * Checks for places that needs defending and for free units to add to defending
@@ -57,12 +57,12 @@ private:
 	/**
 	 * Singleton constructor to enforce singleton usage.
 	 */
-	DefensiveManager();
+	DefenseManager();
 
 	UnitManager* mpUnitManager;
 
 	/// @todo add vector with squads.
 
-	static DefensiveManager* mpsInstance;
+	static DefenseManager* mpsInstance;
 };
 }

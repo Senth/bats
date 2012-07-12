@@ -67,7 +67,7 @@ void SquadManager::computeActions() {
 		if (!squadIt->second->isEmpty()) {
 			// Only compute squads that aren't inactive
 			if (squadIt->second->getState() != Squad::State_Inactive) {
-				squadIt->second->computeActions();
+				squadIt->second->update();
 			}
 			++squadIt;
 		}

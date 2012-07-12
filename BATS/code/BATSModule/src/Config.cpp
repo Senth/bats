@@ -172,6 +172,13 @@ namespace squad {
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
 
+	namespace defend {
+		int PERIMETER = 0;
+		int ENEMY_OFFENSIVE_PERIMETER = 0;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
+
 	namespace drop {
 		double ATTACK_TIMEOUT = 0.0;
 		double LOAD_TIMEOUT = 0.0;
@@ -516,6 +523,8 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 		return attack::set(variableInfo);
 	} else if (variableInfo.subsection == "drop") {
 		return drop::set(variableInfo);
+	} else if (variableInfo.subsection == "defend") {
+		return defend::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		if (variableInfo.name == "ping_wait_time_first") {
 			gOldValue = toString(PING_WAIT_TIME_FIRST);
@@ -589,6 +598,22 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 		return false;
 	}
 	
+	return true;
+}
+
+bool squad::defend::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "perimeter") {
+		gOldValue = toString(PERIMETER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(PERIMETER));
+		PERIMETER = variableInfo;
+	} else if (variableInfo.name == "enemy_offensive_perimeter") {
+		gOldValue = toString(ENEMY_OFFENSIVE_PERIMETER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_OFFENSIVE_PERIMETER));
+		ENEMY_OFFENSIVE_PERIMETER = variableInfo;
+	} else {
+		return false;
+	}
+
 	return true;
 }
 

@@ -105,7 +105,7 @@ protected:
 	 */
 	bool isEnemyStructuresNearGoalDead() const;
 
-	virtual void computeSquadSpecificActions();
+	virtual void updateDerived();
 	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
 	virtual void onGoalSucceeded();
 	virtual bool createGoal();
@@ -150,6 +150,8 @@ private:
 	 * @return true if any unit targets a enemy structure.
 	 */
 	bool isTargetingEnemyStructure() const;
+
+	friend AttackCoordinator; // For setting goal position.
 
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;

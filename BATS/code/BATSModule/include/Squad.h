@@ -100,10 +100,9 @@ public:
 	virtual bool tryDisband();
 
 	/**
-	 * Computes general actions every frame. Calls computerSquadSpecificActions() if a goal exists
-	 * and wasn't completed.
+	 * Computes general actions every frame. Calls updateDerived() where 
 	 */
-	void computeActions();
+	void update();
 
 	/**
 	 * Returns the center of the squad.
@@ -212,48 +211,7 @@ public:
 	 * @return current goal position.  If the squad has no goal it will return
 	 * BWAPI::TilePositions::Invalid.
 	 */
-	const BWAPI::TilePosition& getGoal() const;
-
-	/**
-	 * Sets the position to move to as a goal. This will reset all current goal positions.
-	 * @param position the new goal position to move to.
-	 * @see setViaPath() to set a list of positions, and reset current via positions.
-	 * @see addViaPath(BWAPI::TilePosition) to add one position to the back of the queue,
-	 * without resetting.
-	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
-	 * of the queue, without resetting.
-	 */
-	void setGoalPosition(const BWAPI::TilePosition& position);
-
-	/**
-	 * Sets a new via path to the current goal. The bot will always go via the 'via' positions.
-	 * @param positions the new via path that will be used. An empty list will remove the current
-	 * via path and set them to 0.
-	 * @see setGoalPosition() to set one goal position, and reset current positions.
-	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
-	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
-	 * of the queue.
-	 */
-	void setViaPath(const std::list<BWAPI::TilePosition>& positions);
-
-	/**
-	 * Adds the position to the via path at the back of the queue
-	 * @param position the goal position to add at the back of the queue.
-	 * @see setGoalPosition() to set one position, and reset current positions.
-	 * @see setViaPath() to set a new via path removing the old.
-	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
-	 * of the queue.
-	 */
-	void addViaPath(const BWAPI::TilePosition& position);
-
-	/**
-	 * Adds the positions at the back of the queue.
-	 * @param positions the goal positions to add at the back of the queue.
-	 * @see setGoalPosition() to set one position, and reset current positions.
-	 * @see setViaPath() to set a new via path removing the old.
-	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
-	 */
-	void addViaPath(const std::list<BWAPI::TilePosition>& positions);
+	const BWAPI::TilePosition& getGoalPosition() const;
 
 	/**
 	 * Returns all the squad's units
@@ -373,29 +331,74 @@ protected:
 	};
 
 	/**
+	 * Sets the position to move to as a goal. This will reset all current goal positions.
+	 * @param position the new goal position to move to.
+	 * @see setViaPath() to set a list of positions, and reset current via positions.
+	 * @see addViaPath(BWAPI::TilePosition) to add one position to the back of the queue,
+	 * without resetting.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue, without resetting.
+	 */
+	void setGoalPosition(const BWAPI::TilePosition& position);
+
+	/**
+	 * Sets a new via path to the current goal. The bot will always go via the 'via' positions.
+	 * @param positions the new via path that will be used. An empty list will remove the current
+	 * via path and set them to 0.
+	 * @see setGoalPosition() to set one goal position, and reset current positions.
+	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue.
+	 */
+	void setViaPath(const std::list<BWAPI::TilePosition>& positions);
+
+	/**
+	 * Adds the position to the via path at the back of the queue
+	 * @param position the goal position to add at the back of the queue.
+	 * @see setGoalPosition() to set one position, and reset current positions.
+	 * @see setViaPath() to set a new via path removing the old.
+	 * @see addViaPath(std::list<BWAPI::TilePosition>) to add several position to the back
+	 * of the queue.
+	 */
+	void addViaPath(const BWAPI::TilePosition& position);
+
+	/**
+	 * Adds the positions at the back of the queue.
+	 * @param positions the goal positions to add at the back of the queue.
+	 * @see setGoalPosition() to set one position, and reset current positions.
+	 * @see setViaPath() to set a new via path removing the old.
+	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
+	 */
+	void addViaPath(const std::list<BWAPI::TilePosition>& positions);
+
+	/**
 	 * Returns all the squad's units
 	 * @return all squad's units
 	 */
 	std::vector<UnitAgent*>& getUnits();
 
 	/**
-	 * Virtual compute actions function. This function is called by computeActions().
+	 * Virtual compute actions function. This function is called by update().
 	 * Implement this function to create specific squad behavior.
 	 */
-	virtual void computeSquadSpecificActions();
+	virtual void updateDerived();
 
 	/**
 	 * Check whether the goal is completed or not. Shall return whether
 	 * the current goal state of the squad.
+	 * @deprecated Will be removed in future versions. Test this in computeSquadSpecificActions()
+	 * instead
 	 * @return current goal state of the squad.
 	 */
-	virtual GoalStates checkGoalState() const = 0;
+	virtual GoalStates checkGoalState() const {return GoalState_NotCompleted;}
 
 	/**
 	 * Called when a new goal shall be created.
+	 * @deprecated Will be removed in future versions. Create the goal in
+	 * computeSquadSpecificActions(), constructor, or somewhere else.
 	 * @returns true a goal was successfully created.
 	 */
-	virtual bool createGoal() = 0;
+	virtual bool createGoal() {return false;}
 
 	/**
 	 * Sets whether the squad shall mainly be used for air transportation.
@@ -411,12 +414,14 @@ protected:
 	/**
 	 * Called when a goal fails. Disbands the squad, derive this function if you want to
 	 * create a new repeating goal.
+	 * @deprecated Will be removed in future versions.
 	 */
 	virtual void onGoalFailed();
 
 	/**
 	 * Called when a goal succeeds. Disbands the squad, derive this function if you want to
 	 * create a new goal repeating goal.
+	 * @deprecated Will be removed in future versions.
 	 */
 	virtual void onGoalSucceeded();
 
@@ -560,7 +565,7 @@ protected:
 
 private:
 	/**
-	 * Handle retreats, checks if we're the retreat is complete and then calls
+	 * Handle retreats, checks if the retreat is complete and then calls
 	 * onRetreatCompleted().
 	 */
 	void handleRetreat();
@@ -632,8 +637,9 @@ private:
 	 * <b>Priority:</b>
 	 * <ol>
 	 * <li>RegroupPosition</li>
-	 * <li>TemporaryPosition</li>
+	 * <li>TemporaryPosition (not used when retreating)</li>
 	 * <li>ViaPath</li>
+	 * <li>Retreat</li>
 	 * <li>GoalPosition</li>
 	 * </ol>
 	 * @return position with the highest priority to move to.

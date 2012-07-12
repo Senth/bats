@@ -232,12 +232,12 @@ double AttackCoordinator::calculateDistanceWeight(const BWAPI::TilePosition& att
 
 		// It's not this squad and it's active
 		if (NULL != attackSquad && attackSquad != squad && attackSquad->getState() == Squad::State_Active) {
-			DEBUG_MESSAGE_CONDITION(attackSquad->getGoal() == BWAPI::TilePositions::Invalid,
+			DEBUG_MESSAGE_CONDITION(attackSquad->getGoalPosition() == BWAPI::TilePositions::Invalid,
 				utilities::LogLevel_Severe, "AttackCoordinator::calculateDistanceWeight() | " <<
 				"AttackSquad doesn't have a valid goal!");
-			assert(BWAPI::TilePositions::Invalid != attackSquad->getGoal());
+			assert(BWAPI::TilePositions::Invalid != attackSquad->getGoalPosition());
 
-			BWAPI::TilePosition diffPosition = attackPosition - attackSquad->getGoal();
+			BWAPI::TilePosition diffPosition = attackPosition - attackSquad->getGoalPosition();
 			double distanceSquared =
 				diffPosition.x() * diffPosition.x() +
 				diffPosition.y() * diffPosition.y();

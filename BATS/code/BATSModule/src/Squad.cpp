@@ -76,7 +76,7 @@ Squad::Squad(
 	mInitialized = false;
 
 	// Add to squad manager
-	shared_ptr<Squad> strongPtr = shared_ptr<Squad>(this);
+	SquadPtr strongPtr(this);
 	mThis = weak_ptr<Squad>(strongPtr);
 	mpsSquadManager->addSquad(strongPtr);
 }
@@ -127,7 +127,7 @@ bool Squad::tryDisband() {
 	}
 }
 
-void Squad::computeActions() {
+void Squad::update() {
 	// Don't call to often
 	if (mFrameLastCall + config::frame_distribution::SQUAD > mpsGameTime->getFrameCount()) {
 		return;
@@ -174,7 +174,7 @@ void Squad::computeActions() {
 
 
 		// Squad specific and goals
-		computeSquadSpecificActions();
+		updateDerived();
 
 
 		// Handle goals and retreats if we're not retreating
@@ -438,7 +438,7 @@ const SquadId & Squad::getSquadId() const {
 	return mId;
 }
 
-const BWAPI::TilePosition& Squad::getGoal() const {
+const BWAPI::TilePosition& Squad::getGoalPosition() const {
 	return mGoalPosition;
 }
 
@@ -475,7 +475,7 @@ bool Squad::isAvoidingEnemies() const {
 	return mAvoidEnemyUnits || isRetreating();
 }
 
-void Squad::computeSquadSpecificActions() {
+void Squad::updateDerived() {
 	// Does nothing
 }
 
@@ -777,7 +777,7 @@ bool Squad::isEnemyAttackUnitsWithinSight() const {
 	double sightDistanceSquared = getSightDistance();
 	sightDistanceSquared *= sightDistanceSquared;
 
-	TilePosition center = getCenter();
+	const TilePosition& center = getCenter();
 
 	// Check for nearby enemies, RETURN early
 	const std::set<Unit*>& units = Broodwar->getAllUnits();	
@@ -820,7 +820,7 @@ bool Squad::isEnemyAttackUnitsWithinSight() const {
 
 vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 
-	double sightDistanceSquared = getSightDistance();
+	int sightDistanceSquared = getSightDistance();
 	sightDistanceSquared *= sightDistanceSquared;
 	TilePosition center = getCenter();
 
@@ -835,7 +835,7 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 			if (!onlyAttackingUnits || (*unitIt)->getType().canAttack()) {
 
 				// Check if the unit is within range
-				double diffDistance = static_cast<double>(getSquaredDistance(center, (*unitIt)->getTilePosition()));
+				int diffDistance = getSquaredDistance(center, (*unitIt)->getTilePosition());
 				if (diffDistance <= sightDistanceSquared) {
 					foundUnits.push_back(*unitIt);
 				}

@@ -10,22 +10,19 @@ ScoutSquad::ScoutSquad(
 	bool avoidEnemy,
 	const UnitComposition& unitComposition)
 	:	
-	Squad(units, avoidEnemy, true, unitComposition),
-	mAvoidEnemy(avoidEnemy){
-		//activate();
+	Squad(units, avoidEnemy, true, unitComposition)
+{
+	// Does nothing
 }
 
 ScoutSquad::~ScoutSquad(){
+	// Does nothing
 }
 
 bool ScoutSquad::createGoal(){
 	TilePosition nGoal = ExplorationManager::getInstance()->getNextToExplore(getThis());
 	setGoalPosition(nGoal);
 	return true;
-}
-
-void ScoutSquad::computeSquadSpecificActions(){	
-	
 }
 
 void ScoutSquad::onGoalFailed(){
@@ -40,9 +37,13 @@ std::string ScoutSquad::getName() const{
 	return "ScoutSquad";
 }
 
+void ScoutSquad::updateDerived() {
+	/// @todo move create goal, and check goal state here.
+}
+
 Squad::GoalStates ScoutSquad::checkGoalState() const{
 	TilePosition currentPos = getCenter();
-	TilePosition goal = getGoal();
+	TilePosition goal = getGoalPosition();
 	if (goal == BWAPI::TilePositions::Invalid) {
 		return Squad::GoalState_Succeeded;
 	} else if (isCloseTo(goal)) {

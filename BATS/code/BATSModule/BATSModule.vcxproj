@@ -97,7 +97,8 @@
     <ClCompile Include="src\AlliedArmyManager.cpp" />
     <ClCompile Include="src\AlliedSquad.cpp" />
     <ClCompile Include="src\AttackCoordinator.cpp" />
-    <ClCompile Include="src\DefensiveManager.cpp" />
+    <ClCompile Include="src\DefenseManager.cpp" />
+    <ClCompile Include="src\DefenseMoveSquad.cpp" />
     <ClCompile Include="src\DropSquad.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\ExploreData.cpp" />
@@ -110,6 +111,7 @@
     <ClCompile Include="src\SelfClassifier.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
+    <ClCompile Include="src\UnitManager.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitGoalManager.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
@@ -122,7 +124,8 @@
     <ClInclude Include="include\BuildPlanner.h" />
     <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
-    <ClInclude Include="include\DefensiveManager.h" />
+    <ClInclude Include="include\DefenseManager.h" />
+    <ClInclude Include="include\DefenseMoveSquad.h" />
     <ClInclude Include="include\DropSquad.h" />
     <ClInclude Include="include\ExplorationManager.h" />
     <ClInclude Include="include\ExploreData.h" />
@@ -142,9 +145,6 @@
     <ClInclude Include="include\UnitCreator.h" />
     <ClInclude Include="include\UnitManager.h" />
     <ClInclude Include="include\UnitSet.h" />
-    <ClCompile Include="src\UnitManager.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
     <ClInclude Include="include\WaitGoal.h" />
     <ClInclude Include="include\WaitGoalManager.h" />
     <ClInclude Include="include\WaitReadySquad.h" />

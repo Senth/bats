@@ -129,7 +129,10 @@
     <ClInclude Include="include\SelfClassifier.h">
       <Filter>Classification</Filter>
     </ClInclude>
-    <ClInclude Include="include\DefensiveManager.h">
+    <ClInclude Include="include\DefenseMoveSquad.h">
+      <Filter>Squads\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DefenseManager.h">
       <Filter>Commander</Filter>
     </ClInclude>
   </ItemGroup>
@@ -169,9 +172,6 @@
     </ClCompile>
     <ClCompile Include="src\AttackSquad.cpp">
       <Filter>Squads\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UnitManager.cpp">
-      <Filter>Commander</Filter>
     </ClCompile>
     <ClCompile Include="src\WaitReadySquad.cpp">
       <Filter>WaitGoal</Filter>
@@ -227,8 +227,14 @@
     <ClCompile Include="src\SelfClassifier.cpp">
       <Filter>Classification</Filter>
     </ClCompile>
-    <ClCompile Include="src\DefensiveManager.cpp">
+    <ClCompile Include="src\DefenseManager.cpp">
       <Filter>Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnitManager.cpp">
+      <Filter>Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DefenseMoveSquad.cpp">
+      <Filter>Squads\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
