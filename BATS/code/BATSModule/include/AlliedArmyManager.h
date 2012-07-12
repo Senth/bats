@@ -233,7 +233,7 @@ private:
 
 	int mLastFrameUpdate;
 	std::vector<AlliedSquadPtr> mSquads;
-	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad; /**< A unit bound to an id */
+	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad; /**< A unit bound to a squad id */
 
 	/** Look-up table for where the unit is located. */
 	std::vector<std::vector<BWAPI::Position>> mLookupTableGridPosition;

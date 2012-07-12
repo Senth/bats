@@ -3,7 +3,6 @@
 #include "WorkerAgent.h"
 #include "PFManager.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "Commander.h"
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
 

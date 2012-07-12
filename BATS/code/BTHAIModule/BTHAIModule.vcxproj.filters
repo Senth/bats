@@ -40,9 +40,6 @@
     <Filter Include="Source Files\Managers">
       <UniqueIdentifier>{3158e0a8-06e9-445e-8079-669a4dd1a24e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Commander">
-      <UniqueIdentifier>{77bdb633-d00c-418b-a90d-32a2af5e218e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Statistics">
       <UniqueIdentifier>{7db1b4d9-0474-45d2-99b0-42218d655d3f}</UniqueIdentifier>
     </Filter>
@@ -86,9 +83,6 @@
     <Filter Include="Header Files\Managers">
       <UniqueIdentifier>{795c75bc-2d3b-47c2-badc-3e4ad78004ae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Commander">
-      <UniqueIdentifier>{ef29311b-9222-43c3-8aad-8e1b11460e92}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Statistics">
       <UniqueIdentifier>{ed84275a-992c-4b3a-897f-7b2684c578b7}</UniqueIdentifier>
     </Filter>
@@ -101,13 +95,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\AIloop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BTHAIModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Dll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\PFFunctions.cpp">
@@ -254,16 +242,7 @@
     <ClCompile Include="Source\AgentManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BuildOrderFileReader.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BuildPlanner.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Source\CoverMap.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ExplorationManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="Source\MapDataReader.cpp">
@@ -272,38 +251,11 @@
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SpottedObject.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UpgradesFileReader.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="Source\UpgradesPlanner.cpp">
       <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ChokeHarassSquad.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Commander.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ExplorationSquad.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\KiteSquad.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RushSquad.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Squad.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SquadFileReader.cpp">
-      <Filter>Source Files\Commander</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitSetup.cpp">
-      <Filter>Source Files\Commander</Filter>
     </ClCompile>
     <ClCompile Include="Source\Statistics.cpp">
       <Filter>Source Files\Statistics</Filter>
@@ -328,6 +280,12 @@
     </ClCompile>
     <ClCompile Include="Source\ProfilerObj.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpottedObject.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UnitSetup.cpp">
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -484,16 +442,7 @@
     <ClInclude Include="Source\AgentManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BuildOrderFileReader.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BuildPlanner.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\CoverMap.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ExplorationManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Source\MapDataReader.h">
@@ -502,38 +451,11 @@
     <ClInclude Include="Source\ResourceManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SpottedObject.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UpgradesFileReader.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Source\UpgradesPlanner.h">
       <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ChokeHarassSquad.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Commander.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ExplorationSquad.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\KiteSquad.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RushSquad.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Squad.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SquadFileReader.h">
-      <Filter>Header Files\Commander</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitSetup.h">
-      <Filter>Header Files\Commander</Filter>
     </ClInclude>
     <ClInclude Include="source\Statistics.h">
       <Filter>Header Files\Statistics</Filter>
@@ -558,6 +480,12 @@
     </ClInclude>
     <ClInclude Include="Source\ProfilerObj.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpottedObject.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UnitSetup.h">
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

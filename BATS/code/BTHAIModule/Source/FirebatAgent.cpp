@@ -1,7 +1,5 @@
 #include "FirebatAgent.h"
 #include "PFManager.h"
-#include "Commander.h"
-#include "Squad.h"
 #include "TargetingAgent.h"
 #include "AgentManager.h"
 

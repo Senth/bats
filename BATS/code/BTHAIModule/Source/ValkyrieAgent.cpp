@@ -1,6 +1,5 @@
 #include "ValkyrieAgent.h"
 #include "PFManager.h"
-#include "Commander.h"
 #include "TargetingAgent.h"
 
 using namespace BWAPI;

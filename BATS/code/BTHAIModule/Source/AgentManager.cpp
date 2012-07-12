@@ -1,8 +1,6 @@
 #include "AgentManager.h"
 #include "AgentFactory.h"
 #include "CoverMap.h"
-#include "Commander.h"
-
 #include "ResourceManager.h"
 #include "WorkerAgent.h"
 #include "Profiler.h"

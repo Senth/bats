@@ -1,5 +1,4 @@
 #include "BuildOrderFileReader.h"
-#include "BTHAIModule/Source/ExplorationManager.h"
 #include "BuildPlanner.h"
 #include "Utilities/Logger.h"
 #include "Utilities/String.h"

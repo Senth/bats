@@ -102,18 +102,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\AIloop.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\BTHAIModule.cpp" />
-    <ClCompile Include="Source\Dll.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\PFFunctions.cpp" />
     <ClCompile Include="Source\PFManager.cpp" />
     <ClCompile Include="Source\RefineryAgent.cpp" />
+    <ClCompile Include="Source\SpottedObject.cpp" />
     <ClCompile Include="Source\StructureAgent.cpp" />
     <ClCompile Include="Source\CommandCenterAgent.cpp" />
     <ClCompile Include="Source\ComsatAgent.cpp" />
@@ -129,6 +122,7 @@
     <ClCompile Include="Source\MedicAgent.cpp" />
     <ClCompile Include="Source\ScienceVesselAgent.cpp" />
     <ClCompile Include="Source\SiegeTankAgent.cpp" />
+    <ClCompile Include="Source\UnitSetup.cpp" />
     <ClCompile Include="Source\ValkyrieAgent.cpp" />
     <ClCompile Include="Source\VultureAgent.cpp" />
     <ClCompile Include="Source\WraithAgent.cpp" />
@@ -225,56 +219,11 @@
     <ClCompile Include="Source\TargetingAgent.cpp" />
     <ClCompile Include="Source\WorkerAgent.cpp" />
     <ClCompile Include="Source\AgentManager.cpp" />
-    <ClCompile Include="Source\BuildOrderFileReader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\BuildPlanner.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\CoverMap.cpp" />
-    <ClCompile Include="Source\ExplorationManager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\MapDataReader.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\SpottedObject.cpp" />
     <ClCompile Include="Source\UpgradesFileReader.cpp" />
     <ClCompile Include="Source\UpgradesPlanner.cpp" />
-    <ClCompile Include="Source\ChokeHarassSquad.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\Commander.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\ExplorationSquad.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\KiteSquad.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\RushSquad.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\Squad.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\SquadFileReader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Source\UnitSetup.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Source\Statistics.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\cthread.cpp" />
@@ -289,6 +238,7 @@
     <ClInclude Include="Source\BTHAIModule.h" />
     <ClInclude Include="Source\BWTAExtern.h" />
     <ClInclude Include="Source\RefineryAgent.h" />
+    <ClInclude Include="Source\SpottedObject.h" />
     <ClInclude Include="Source\StructureAgent.h" />
     <ClInclude Include="Source\CommandCenterAgent.h" />
     <ClInclude Include="Source\ComsatAgent.h" />
@@ -304,6 +254,7 @@
     <ClInclude Include="Source\MedicAgent.h" />
     <ClInclude Include="Source\ScienceVesselAgent.h" />
     <ClInclude Include="Source\SiegeTankAgent.h" />
+    <ClInclude Include="Source\UnitSetup.h" />
     <ClInclude Include="Source\ValkyrieAgent.h" />
     <ClInclude Include="Source\VultureAgent.h" />
     <ClInclude Include="Source\WraithAgent.h" />
@@ -336,23 +287,11 @@
     <ClInclude Include="Source\TargetingAgent.h" />
     <ClInclude Include="Source\WorkerAgent.h" />
     <ClInclude Include="Source\AgentManager.h" />
-    <ClInclude Include="Source\BuildOrderFileReader.h" />
-    <ClInclude Include="Source\BuildPlanner.h" />
     <ClInclude Include="Source\CoverMap.h" />
-    <ClInclude Include="Source\ExplorationManager.h" />
     <ClInclude Include="Source\MapDataReader.h" />
     <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\SpottedObject.h" />
     <ClInclude Include="Source\UpgradesFileReader.h" />
     <ClInclude Include="Source\UpgradesPlanner.h" />
-    <ClInclude Include="Source\ChokeHarassSquad.h" />
-    <ClInclude Include="Source\Commander.h" />
-    <ClInclude Include="Source\ExplorationSquad.h" />
-    <ClInclude Include="Source\KiteSquad.h" />
-    <ClInclude Include="Source\RushSquad.h" />
-    <ClInclude Include="Source\Squad.h" />
-    <ClInclude Include="Source\SquadFileReader.h" />
-    <ClInclude Include="Source\UnitSetup.h" />
     <ClInclude Include="source\Statistics.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\cthread.h" />

@@ -129,6 +129,9 @@
     <ClInclude Include="include\SelfClassifier.h">
       <Filter>Classification</Filter>
     </ClInclude>
+    <ClInclude Include="include\DefensiveManager.h">
+      <Filter>Commander</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="src\SelfClassifier.cpp">
       <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DefensiveManager.cpp">
+      <Filter>Commander</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

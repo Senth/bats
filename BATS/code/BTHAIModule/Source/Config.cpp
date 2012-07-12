@@ -1,6 +1,5 @@
 #include "Config.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "ExplorationManager.h"
 #include <fstream>
 #include <sstream>
 

@@ -1,7 +1,6 @@
 #include "UnitAgent.h"
 #include "WorkerAgent.h"
 #include "AgentManager.h"
-#include "ExplorationManager.h"
 #include "PFManager.h"
 #include "CoverMap.h"
 #include "BatsModule/include/BuildPlanner.h"

@@ -3,7 +3,6 @@
 #include "WorkerAgent.h"
 #include "PFManager.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "ExplorationManager.h"
 #include "ResourceManager.h"
 
 using namespace BWAPI;

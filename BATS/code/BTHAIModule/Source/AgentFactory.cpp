@@ -2,7 +2,6 @@
 #include "WorkerAgent.h"
 #include "StructureAgent.h"
 #include "UnitAgent.h"
-#include "Commander.h"
 #include "TransportAgent.h"
 
 /** Terran agents */

@@ -1,5 +1,4 @@
 #include "Pathfinder.h"
-#include "ExplorationManager.h"
 #include "Profiler.h"
 #include <fstream>
 #include <sstream>

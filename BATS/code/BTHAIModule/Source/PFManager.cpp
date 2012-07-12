@@ -2,9 +2,6 @@
 #include "PFFunctions.h"
 #include "UnitAgent.h"
 #include "AgentManager.h"
-#include "ExplorationManager.h"
-#include "Commander.h"
-#include "Squad.h"
 #include "CoverMap.h"
 #include "Profiler.h"
 

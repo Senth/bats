@@ -1,6 +1,5 @@
 #include "MarineAgent.h"
 #include "PFManager.h"
-#include "Commander.h"
 #include "TargetingAgent.h"
 #include "AgentManager.h"
 #include "BATSModule/include/SquadManager.h"

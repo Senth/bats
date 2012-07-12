@@ -4,10 +4,8 @@
 #include "BatsModule/include/ExplorationManager.h"
 #include "BatsModule/include/Config.h"
 #include "UpgradesPlanner.h"
-#include "Commander.h"
 #include "WorkerAgent.h"
 #include "ResourceManager.h"
-#include "ExplorationManager.h"
 
 using namespace BWAPI;
 using namespace BWTA;

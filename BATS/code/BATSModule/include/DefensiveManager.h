@@ -1,0 +1,68 @@
+#pragma once
+
+#include <vector>
+#include "TypeDefs.h"
+
+// Fordward declaration
+namespace BWAPI {
+	class Unit;
+}
+
+// Namespace for the project
+namespace bats {
+
+// Forward declaration
+class UnitManager;
+
+/**
+ * Manages the defense for the team. Creates DefensiveHoldSquad and DefensivePatrolSquad
+ * and checks which areas shall be defended, both around our base and around the player's
+ * base.
+ * @author Matteus Magnusson <matteus.magnusson@gmail.com>
+ */
+class DefensiveManager {
+public:
+	/**
+	 * Destructor
+	 */
+	virtual ~DefensiveManager();
+
+	/**
+	 * Returns the instance of DefensiveManager.
+	 * @return instance of DefensiveManager.
+	 */
+	static DefensiveManager* getInstance();
+
+	/**
+	 * Checks for places that needs defending and for free units to add to defending
+	 * squads.
+	 */
+	void update();
+
+	/**
+	 * Returns all units that are free to use for another squad. This generally means all
+	 * units in the DefensivePatrolSquad and DefensiveHoldSquads if we're not under attack.
+	 * If we're under attack it will return no units.
+	 * @return returns all free units that aren't occupied with defending. I.e. all or none.
+	 */
+	std::vector<BWAPI::Unit*> getAllFreeUnits();
+
+	/**
+	 * Checks whether either we or the player is under attack.
+	 * @return true if we or the player is under attack.
+	 */
+	bool isUnderAttack() const;
+
+private:
+	/**
+	 * Singleton constructor to enforce singleton usage.
+	 */
+	DefensiveManager();
+
+	UnitManager* mpUnitManager;
+
+	/// @todo add vector with squads.
+
+	static DefensiveManager* mpsInstance;
+};
+}

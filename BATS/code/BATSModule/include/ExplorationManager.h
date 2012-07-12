@@ -274,9 +274,6 @@ private:
 	bool mActive;
 	int mFrameLastCall;
 
-	//int mSiteSetFrame;
-	//BWAPI::TilePosition mExpansionSite;
-
 	/**
 	 * When we shall calculate the specific force
 	 */

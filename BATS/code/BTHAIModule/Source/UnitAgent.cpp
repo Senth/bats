@@ -1,7 +1,6 @@
 #include "UnitAgent.h"
 #include "PFManager.h"
 #include "AgentManager.h"
-#include "ExplorationManager.h"
 #include "TargetingAgent.h"
 #include "SpottedObject.h"
 #include "BATSModule/include/Helper.h"
