@@ -161,7 +161,7 @@ BWAPI::TilePosition getCorner(Borders borderOne, Borders borderTwo);
 std::ostream& operator<<(std::ostream& out, const BWAPI::TilePosition& position);
 
 /**
- * \copydoc operator<<(std::ostream&,const BWAPI::Tileposition&)
+ * \copydoc operator<<(std::ostream&,const BWAPI::TilePosition&)
  */
 std::ostream& operator<<(std::ostream& out, const BWAPI::Position& position);
 

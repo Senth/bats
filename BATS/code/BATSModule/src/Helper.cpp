@@ -190,9 +190,6 @@ std::ostream& bats::operator<<(std::ostream& out, const BWAPI::TilePosition& pos
 	return out;
 }
 
-/**
- * \copydoc operator<<(std::ostream&,BWPAI::Tileposition&)
- */
 std::ostream& bats::operator<<(std::ostream& out, const BWAPI::Position& position) {
 	out << "(" << position.x() << ", " << position.y() << ")";
 	return out;

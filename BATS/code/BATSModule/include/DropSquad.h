@@ -86,7 +86,7 @@ private:
 	 * @param enemyUnits units to check if they are faster than our transportation
 	 * @return true if any enemy unit can travel faster than our transportation
 	 */
-	bool isEnemyFasterThanTransport(const std::vector<BWAPI::Unit*> enemyUnits) const;
+	bool isEnemyFasterThanTransport(const std::vector<BWAPI::Unit*>& enemyUnits) const;
 
 	/**
 	 * Check if all transports are in the same region as the goal.

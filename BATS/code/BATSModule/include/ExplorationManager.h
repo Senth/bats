@@ -204,19 +204,19 @@ public:
 	 * @return true if the ground unit can reach position 'destination' from 'source'.
 	 * Else false
 	 */
-	static bool canReach(BWAPI::TilePosition source, BWAPI::TilePosition destination);
+	static bool canReach(const BWAPI::TilePosition& source, const BWAPI::TilePosition& destination);
 
 	/** Returns true if a unit can reach position 'destination'. 
 	 * @param pUnit the unit to check if it can move
 	 * @param destination the location pUnit wants to check
-	 * @return true if the unit can reach position 'destination'. Else false
+	 * @return true if the unit can reach position 'destination', else false
 	 */
-	static bool canReach(BaseAgent* pUnit, BWAPI::TilePosition destination);
+	static bool canReach(BaseAgent* pUnit, const BWAPI::TilePosition& destination);
 
-	///**
+	// /*
 	// * Scans for vulnerable enemy bases, i.e. bases without protection from detectors.
 	// */
-	//BWAPI::TilePosition scanForVulnerableBase();
+	// BWAPI::TilePosition scanForVulnerableBase();
 
 	/** Checks if an enemy detector is covering the specified position.
 	 * This can give a false negative, i.e. when an observer is located at that position
