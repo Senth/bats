@@ -5,7 +5,6 @@
 #include "Pathfinder.h"
 #include "UpgradesPlanner.h"
 #include "ResourceManager.h"
-//#include "AIloop.h"
 #include "Statistics.h"
 #include "Profiler.h"
 #include "Config.h"
