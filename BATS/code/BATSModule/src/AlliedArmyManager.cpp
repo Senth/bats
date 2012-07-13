@@ -493,7 +493,7 @@ vector<pair<AlliedSquadCstPtr, int>> AlliedArmyManager::getSquadsWithin(
 	return foundSquads;
 }
 
-void AlliedArmyManager::printGraphicDebugInfo() {
+void AlliedArmyManager::printGraphicDebugInfo() const {
 	// Skip if not turned on
 	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off) {
 		return;

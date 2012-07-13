@@ -66,7 +66,7 @@ public:
 	 * Prints graphical debug information depending on the current
 	 * GRAPHICS_VERBOSITY.
 	 */
-	void printGraphicDebugInfo();
+	void printGraphicDebugInfo() const;
 
 	/**
 	 * Returns the biggest squad if one exists.

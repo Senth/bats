@@ -58,7 +58,6 @@ public:
 	DefenseMoveSquadPtr getThis() const;
 
 	virtual std::string getName() const;
-	virtual void printGraphicDebugInfo();
 
 protected:
 	virtual void updateDerived();

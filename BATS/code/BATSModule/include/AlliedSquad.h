@@ -142,7 +142,7 @@ public:
 	 * Prints graphical debug information, id of squad, number of units and
 	 * number of supply in the center of the squad.
 	 */
-	void printGraphicDebugInfo();
+	void printGraphicDebugInfo() const;
 
 	/**
 	 * Returns the maximum amount of AlliedSquads that are allowed to be created.

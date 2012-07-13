@@ -273,7 +273,7 @@ public:
 	 * false if the center position isn't in range or if the squad is regrouping.
 	 * @see isCloseTo(const BWAPI::TilePosition&) for using the default radius.
 	 */
-	bool isCloseTo(const BWAPI::TilePosition& position, double range) const;
+	bool isCloseTo(const BWAPI::TilePosition& position, int range) const;
 
 	/**
 	 * Returns the name of the squad. Almost purely for debugging purposes
@@ -302,7 +302,7 @@ public:
 	/**
 	 * Prints graphical debug information
 	 */
-	virtual void printGraphicDebugInfo();
+	virtual void printGraphicDebugInfo() const;
 
 	/**
 	 * Returns the number of units in the squad

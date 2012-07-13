@@ -451,7 +451,7 @@ void AlliedSquad::updateClosestDistances() {
 	}
 }
 
-void AlliedSquad::printGraphicDebugInfo() {
+void AlliedSquad::printGraphicDebugInfo() const {
 	// Skip if not turned on
 	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off ||
 		config::debug::modules::ALLIED_SQUAD == false)

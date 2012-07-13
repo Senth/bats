@@ -197,6 +197,7 @@ namespace bats {
 				extern bool AGENT_WORKER;
 				extern bool TERRAIN;
 				extern bool COVER_MAP;
+				extern bool DEFENSE;
 			}
 		}
 

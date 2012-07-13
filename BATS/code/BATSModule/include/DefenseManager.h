@@ -53,6 +53,13 @@ public:
 	 */
 	bool isUnderAttack() const;
 
+	/**
+	 * Prints graphical debug information.
+	 * \li Defense perimeter
+	 * \li Enemy offensive perimeter
+	 */
+	void printGraphicDebugInfo() const;
+
 private:
 	/**
 	 * Singleton constructor to enforce singleton usage.

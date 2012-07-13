@@ -109,6 +109,7 @@ namespace debug {
 		bool AGENT_WORKER = false;
 		bool TERRAIN = false;
 		bool COVER_MAP = false;
+		bool DEFENSE = false;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -459,6 +460,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(COVER_MAP);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(COVER_MAP));
 		COVER_MAP = variableInfo;
+	} else if (variableInfo.name == "defense") {
+		gOldValue = toString(DEFENSE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE));
+		DEFENSE = variableInfo;
 	} else {
 		return false;
 	}

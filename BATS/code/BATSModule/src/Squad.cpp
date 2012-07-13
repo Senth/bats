@@ -450,7 +450,7 @@ bool Squad::isCloseTo(const TilePosition& position) const {
 	return isCloseTo(position, config::squad::CLOSE_DISTANCE);
 }
 
-bool Squad::isCloseTo(const TilePosition& position, double range) const {
+bool Squad::isCloseTo(const TilePosition& position, int range) const {
 	// Skip when regrouping
 	if (isRegrouping()) {
 		return false;
@@ -460,11 +460,11 @@ bool Squad::isCloseTo(const TilePosition& position, double range) const {
 
 	// To be more effective, use squared distance. If we're in range check for ground distance
 	// if the squad travels by ground. Ground distance is very computational heavy
-	double squaredDistance = getSquaredDistance(position, getCenter());
+	int squaredDistance = getSquaredDistance(position, getCenter());
 	bClose = squaredDistance <= range * range;
 
 	if (bClose && travelsByGround()) {
-		double groundDistance = BWTA::getGroundDistance(getCenter(), position) * FROM_POSITION_TO_TILE;
+		int groundDistance = static_cast<int>(BWTA::getGroundDistance(getCenter(), position) * FROM_POSITION_TO_TILE + 0.5);
 		bClose = groundDistance <= range;
 	}
 
@@ -859,13 +859,13 @@ int Squad::getSightDistance() const {
 	return static_cast<int>(maxSight * config::squad::SIGHT_DISTANCE_MULTIPLIER);
 }
 
-void Squad::printGraphicDebugInfo() {
+void Squad::printGraphicDebugInfo() const {
 	// Low
 	// Print type, id, number of units, number of supplies of squad
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
-		string info = getDebugInfo();
+		const string& info = getDebugInfo();
 
-		Position squadCenterOnMap = Position(getCenter());
+		const Position& squadCenterOnMap = Position(getCenter());
 
 		BWAPI::Broodwar->drawTextMap(squadCenterOnMap.x(), squadCenterOnMap.y(), "%s", info.c_str());
 	}

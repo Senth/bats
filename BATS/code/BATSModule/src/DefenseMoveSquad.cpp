@@ -1,4 +1,5 @@
 #include "DefenseMoveSquad.h"
+#include "Config.h"
 
 using namespace bats;
 using namespace BWAPI;
@@ -75,20 +76,29 @@ bool DefenseMoveSquad::isDefending() const {
 }
 
 bool DefenseMoveSquad::isWithinDefendPerimeter() const {
-	/// @todo
-	return false;
+	return isCloseTo(mDefendPosition, config::squad::defend::PERIMETER);
 }
 
 bool DefenseMoveSquad::isEnemyWithinOffensivePerimeter() const {
-	/// @todo
+	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(mDefendPosition), config::squad::defend::ENEMY_OFFENSIVE_PERIMETER * TILE_SIZE);
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self())) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
 BWAPI::TilePosition DefenseMoveSquad::findEnemyPositionWithinDefendPerimeter() const {
-	/// @todo
-	return TilePositions::Invalid;
-}
+	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(mDefendPosition), config::squad::defend::PERIMETER * TILE_SIZE);
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self()) && (*unitIt)->getTilePosition().isValid()) {
+			return (*unitIt)->getTilePosition();
+		}
+	}
 
-void DefenseMoveSquad::printGraphicDebugInfo() {
-	/// @todo print circle for the defense perimeter
+	return TilePositions::Invalid;
 }
