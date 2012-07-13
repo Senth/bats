@@ -15,10 +15,9 @@ class KeyType
 {
 public:
 	/**
-	* Default Constructor for Key Type with a key
-	* @param key the key value, default INVALID_KEY
+	* Default Constructor, creates an invalid key.
 	*/
-	inline explicit KeyType() : mKey(INVALID_KEY) {}
+	inline KeyType() : mKey(INVALID_KEY) {}
 
 	/**
 	* Assignment operator

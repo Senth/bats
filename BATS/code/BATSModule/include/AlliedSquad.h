@@ -45,7 +45,7 @@ public:
 	enum States {
 		State_Idle,	/**< Home in base */
 		State_MovingToAttack, /**< Outside home and moving */
-		State_Attacking, /**< Attacking, both @home or @enemy */
+		State_Attacking, /**< Attacking, both at home or at enemy */
 		State_Retreating, /**< Retreating from somewhere to home */
 		State_AttackHalted /**< Outside home and still */
 	};

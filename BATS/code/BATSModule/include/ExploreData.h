@@ -54,7 +54,7 @@ public:
 	 * @param pRegion the region to test
 	 * @return true if the regions match
 	 */
-	bool matches(BWTA::Region* region) const;
+	bool matches(BWTA::Region* pRegion) const;
 
 	/**
 	 * Checks whether the specified TilePosition is within this exploration region.

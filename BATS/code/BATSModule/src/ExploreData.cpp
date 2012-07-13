@@ -25,11 +25,11 @@ const TilePosition& ExploreData::getCenterPosition() const {
 	return mPosition;
 }
 
-bool ExploreData::matches(BWTA::Region* region) const {
-	if (region == NULL) {
+bool ExploreData::matches(BWTA::Region* pRegion) const {
+	if (pRegion == NULL) {
 		return false;
 	}
-	BWAPI::TilePosition center = BWAPI::TilePosition(region->getCenter());
+	BWAPI::TilePosition center = BWAPI::TilePosition(pRegion->getCenter());
 	return matches(center);
 }
 

@@ -214,7 +214,7 @@ bool DropSquad::isEnemyFasterThanTransport() const {
 	return isEnemyFasterThanTransport(getEnemyUnitsWithinSight(true));
 }
 
-bool DropSquad::isEnemyFasterThanTransport(const vector<Unit*> enemyUnits) const {
+bool DropSquad::isEnemyFasterThanTransport(const vector<BWAPI::Unit*> enemyUnits) const {
 	// Get the transportations top speed
 	Player* self = BWAPI::Broodwar->self();
 	double transportSpeed = 0.0;

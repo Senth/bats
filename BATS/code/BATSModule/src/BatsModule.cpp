@@ -440,10 +440,7 @@ void BatsModule::showDebug() const {
 		drawTerrainData();
 		CoverMap::getInstance()->printGraphicDebugInfo();
 
-		// Low
-		/// @todo Commander::getInstance()->printInfo();
-		/// @todo Commander::getInstance()->debug_showGoal();
-		//ExplorationManager::getInstance()->printInfo();
+		// ExplorationManager::getInstance()->printInfo();
 
 
 		// Medium

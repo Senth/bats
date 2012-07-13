@@ -128,7 +128,7 @@ enum Borders {
  * Returns what border the position lies in. If the border is a border to two sides
  * it will only return one of them. Meaning if it's in the lower left corner it will either
  * return Border_Left or Border_Bottom.
- * @param position the position to test which border it belongs to.
+ * @param borderPosition the position to test which border it belongs to.
  * @return what border the position lies in, if it doesn't lie in a border it will return
  * Border_Lim
  */
@@ -161,7 +161,7 @@ BWAPI::TilePosition getCorner(Borders borderOne, Borders borderTwo);
 std::ostream& operator<<(std::ostream& out, const BWAPI::TilePosition& position);
 
 /**
- * \copydoc operator<<(std::ostream&,const BWPAI::Tileposition&)
+ * \copydoc operator<<(std::ostream&,const BWAPI::Tileposition&)
  */
 std::ostream& operator<<(std::ostream& out, const BWAPI::Position& position);
 

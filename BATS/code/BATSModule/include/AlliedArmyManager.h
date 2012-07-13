@@ -191,7 +191,7 @@ private:
 	/**
 	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
 	 * it as checked in mGridUnits.
-	 * @param pUnit the unit to be set as checked.
+	 * @param unitIt the unit to be set as checked.
 	 * @return iterator returned by mUnitsToBeChecked.erase(unitIt);
 	 */
 	std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator setUnitAsChecked(const std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator& unitIt);

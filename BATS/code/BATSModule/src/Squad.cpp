@@ -446,11 +446,11 @@ shared_ptr<Squad> Squad::getThis() const {
 	return mThis.lock();
 }
 
-bool Squad::isCloseTo(const TilePosition& position) const {
+bool Squad::isCloseTo(const BWAPI::TilePosition& position) const {
 	return isCloseTo(position, config::squad::CLOSE_DISTANCE);
 }
 
-bool Squad::isCloseTo(const TilePosition& position, int range) const {
+bool Squad::isCloseTo(const BWAPI::TilePosition& position, int range) const {
 	// Skip when regrouping
 	if (isRegrouping()) {
 		return false;
@@ -497,7 +497,7 @@ bool Squad::isRetreating() const {
 	return mRetreatPosition != TilePositions::Invalid;
 }
 
-void Squad::setRetreatPosition(const TilePosition& retreatPosition) {
+void Squad::setRetreatPosition(const BWAPI::TilePosition& retreatPosition) {
 	mRetreatPosition = retreatPosition;
 	if (mRetreatPosition != TilePositions::Invalid) {
 		mRegroupPosition = TilePositions::Invalid;
@@ -544,12 +544,12 @@ void Squad::setViaPath(const std::list<TilePosition>& positions) {
 	updateUnitMovement();
 }
 
-void Squad::addViaPath(const TilePosition& position) {
+void Squad::addViaPath(const BWAPI::TilePosition& position) {
 	mViaPath.push_back(position);
 	updateUnitMovement();
 }
 
-void Squad::addViaPath(const std::list<TilePosition>& positions) {
+void Squad::addViaPath(const std::list<BWAPI::TilePosition>& positions) {
 	mViaPath.insert(mViaPath.end(), positions.begin(), positions.end());
 	updateUnitMovement();
 }

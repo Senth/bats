@@ -45,7 +45,7 @@ bool bats::isGasStructure(BWAPI::Unit* pUnit) {
 	return false;
 }
 
-std::pair<Unit*,int> bats::getClosestAlliedStructure(const TilePosition& position) {
+std::pair<Unit*,int> bats::getClosestAlliedStructure(const BWAPI::TilePosition& position) {
 	Unit* pClosestUnit = NULL;
 	int closestDistance = INT_MAX;
 
@@ -81,7 +81,7 @@ std::pair<Unit*,int> bats::getClosestAlliedStructure(const TilePosition& positio
 	return std::make_pair(pClosestUnit, closestDistance);
 }
 
-TilePosition bats::getClosestBorder(const TilePosition& position) {
+BWAPI::TilePosition bats::getClosestBorder(const BWAPI::TilePosition& position) {
 	// Which horizontal border is closest, left or right?
 	int leftDiff = position.x();
 	int rightDiff = Broodwar->mapWidth() -1 - position.x();
@@ -116,7 +116,7 @@ TilePosition bats::getClosestBorder(const TilePosition& position) {
 	}
 }
 
-bats::Borders bats::getAtWhichBorder(const TilePosition& borderPosition) {
+bats::Borders bats::getAtWhichBorder(const BWAPI::TilePosition& borderPosition) {
 	if (borderPosition.x() == 0) {
 		return Border_Left;
 	} else if (borderPosition.y() == 0) {
@@ -156,7 +156,7 @@ bool bats::areBordersNeighbors(bats::Borders borderOne, bats::Borders borderTwo)
 	return false;
 }
 
-TilePosition bats::getCorner(bats::Borders borderOne, bats::Borders borderTwo) {
+BWAPI::TilePosition bats::getCorner(bats::Borders borderOne, bats::Borders borderTwo) {
 	// Left - Top
 	if ((borderOne == Border_Left && borderTwo == Border_Top) ||
 		(borderOne == Border_Top && borderTwo == Border_Left))
@@ -185,7 +185,7 @@ TilePosition bats::getCorner(bats::Borders borderOne, bats::Borders borderTwo) {
 	return TilePositions::Invalid;
 }
 
-std::ostream& bats::operator<<(std::ostream& out, const TilePosition& position) {
+std::ostream& bats::operator<<(std::ostream& out, const BWAPI::TilePosition& position) {
 	out << "(" << position.x() << ", " << position.y() << ")";
 	return out;
 }
@@ -193,7 +193,7 @@ std::ostream& bats::operator<<(std::ostream& out, const TilePosition& position) 
 /**
  * \copydoc operator<<(std::ostream&,BWPAI::Tileposition&)
  */
-std::ostream& bats::operator<<(std::ostream& out, const Position& position) {
+std::ostream& bats::operator<<(std::ostream& out, const BWAPI::Position& position) {
 	out << "(" << position.x() << ", " << position.y() << ")";
 	return out;
 }

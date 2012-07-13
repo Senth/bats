@@ -14,6 +14,7 @@ class ScoutSquad : public Squad{
 		 * @param units all units to be added to the squad.
 		 * @param avoidEnemy avoid enemy if spotted and explores remaining part of the map,
 		 * defaults to true
+		 * @param unitComposition the unit composition to use for the squad.
 		 */
 		ScoutSquad(const std::vector<UnitAgent*> units, 
 			bool avoidEnemy = true, 

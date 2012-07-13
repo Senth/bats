@@ -159,7 +159,7 @@ public:
 	const std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings() const;
 
 	/**
-	 * \copydoc getSpottedBuildings()
+	 * \copydoc getSpottedBuildings() const
 	 */
 	std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings();
 
