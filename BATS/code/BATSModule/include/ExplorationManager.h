@@ -197,7 +197,8 @@ public:
 	/** Shows some data about the enemy on screen. */
 	void showIntellData() const;
 
-	/** Returns true if a ground unit can reach position 'destination' from position 'source'.
+	/**
+	 * Returns true if a ground unit can reach position 'destination' from position 'source'.
 	 * Uses BWTA.
 	 * @param source the position a ground unit is located now.
 	 * @param destination the location a ground unit want to move to.
@@ -206,7 +207,8 @@ public:
 	 */
 	static bool canReach(const BWAPI::TilePosition& source, const BWAPI::TilePosition& destination);
 
-	/** Returns true if a unit can reach position 'destination'. 
+	/**
+	 * Returns true if a unit can reach position 'destination'. 
 	 * @param pUnit the unit to check if it can move
 	 * @param destination the location pUnit wants to check
 	 * @return true if the unit can reach position 'destination', else false

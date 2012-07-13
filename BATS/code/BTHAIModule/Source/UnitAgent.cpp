@@ -29,7 +29,7 @@ UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 	}
 }
 
-void UnitAgent::printGraphicDebugInfo()
+void UnitAgent::printGraphicDebugInfo() const
 {
 	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
 		bats::config::debug::modules::AGENT_UNIT == false)

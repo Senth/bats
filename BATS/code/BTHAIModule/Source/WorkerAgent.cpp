@@ -113,7 +113,7 @@ void WorkerAgent::handleKitingWorker()
 	unit->rightClick(Position(Broodwar->self()->getStartLocation()));
 }
 
-void WorkerAgent::printGraphicDebugInfo()
+void WorkerAgent::printGraphicDebugInfo() const
 {
 	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
 		bats::config::debug::modules::AGENT_WORKER == false)

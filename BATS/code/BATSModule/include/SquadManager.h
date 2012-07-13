@@ -28,6 +28,23 @@ public:
 	static SquadManager* getInstance();
 
 	/**
+	 * Finds all squads that either is of the specified SquadType or has it as its base
+	 * class.
+	 * @tparam SquadType finds all squads that can be dynamically converted to this
+	 * class. E.g. the type Squad would return all squads, whereas AttackSquad would return
+	 * types of AttackSquad and DropSquad (since DropSquad is an AttackSquad).
+	 * @return all squads that can be dynamically casted to SquadType.
+	 */
+	template <typename SquadType>
+	std::vector<std::tr1::shared_ptr<const SquadType>> getSquads() const;
+
+	/**
+	 * /copydoc getSquads() const
+	 */
+	template <typename SquadType>
+	std::vector<std::tr1::shared_ptr<SquadType>> getSquads();
+
+	/**
 	 * Returns the specified squad.
 	 * @param squadId the squad id of the squad to return
 	 * @return pointer to the squad, NULL if the squad was not found.
@@ -116,4 +133,33 @@ private:
 	std::map<SquadId, SquadPtr> mSquads;
 	static SquadManager* mpsInstance;
 };
+
+
+// Implementation of templates
+template <typename SquadType>
+std::vector<std::tr1::shared_ptr<const SquadType>> SquadManager::getSquads() const {
+	SquadManager* pSquadManager = const_cast<SquadManager*>(this);
+	const std::vector<std::tr1::shared_ptr<SquadType>>& squads = pSquadManager->getSquads<SquadType>();
+	const std::vector<std::tr1::shared_ptr<const SquadType>>& squadCst = *
+		reinterpret_cast<const std::vector<std::tr1::shared_ptr<const SquadType>>*>(&squads);
+
+	return squadCst;
+}
+
+template <typename SquadType>
+std::vector<std::tr1::shared_ptr<SquadType>> SquadManager::getSquads() {
+	std::vector<std::tr1::shared_ptr<SquadType>> foundSquads;
+
+	for (SquadIt squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
+		std::tr1::shared_ptr<SquadType> pSquad(
+			std::tr1::dynamic_pointer_cast<SquadType>(squadIt->second)
+			);
+
+		if (NULL != pSquad) {
+			foundSquads.push_back(pSquad);
+		}
+	}
+
+	return foundSquads;
+}
 }

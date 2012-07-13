@@ -34,6 +34,9 @@
     <Filter Include="Classification">
       <UniqueIdentifier>{0c5e75d3-5af0-4681-9e68-e498e1302ba7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExplorationAndMap\Resources">
+      <UniqueIdentifier>{00609cc1-9f3c-47e8-af76-38f5cd320038}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -96,15 +99,6 @@
     <ClInclude Include="include\ExplorationManager.h">
       <Filter>ExplorationAndMap</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resource.h">
-      <Filter>ExplorationAndMap</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ResourceGroup.h">
-      <Filter>ExplorationAndMap</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ResourceCounter.h">
-      <Filter>ExplorationAndMap</Filter>
-    </ClInclude>
     <ClInclude Include="include\WaitGoalManager.h">
       <Filter>WaitGoal</Filter>
     </ClInclude>
@@ -134,6 +128,15 @@
     </ClInclude>
     <ClInclude Include="include\DefenseManager.h">
       <Filter>Commander</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceGroup.h">
+      <Filter>ExplorationAndMap\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource.h">
+      <Filter>ExplorationAndMap\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceCounter.h">
+      <Filter>ExplorationAndMap\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -194,15 +197,6 @@
     <ClCompile Include="src\ExplorationManager.cpp">
       <Filter>ExplorationAndMap</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resource.cpp">
-      <Filter>ExplorationAndMap</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ResourceGroup.cpp">
-      <Filter>ExplorationAndMap</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ResourceCounter.cpp">
-      <Filter>ExplorationAndMap</Filter>
-    </ClCompile>
     <ClCompile Include="src\WaitGoalManager.cpp">
       <Filter>WaitGoal</Filter>
     </ClCompile>
@@ -235,6 +229,15 @@
     </ClCompile>
     <ClCompile Include="src\DefenseMoveSquad.cpp">
       <Filter>Squads\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource.cpp">
+      <Filter>ExplorationAndMap\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceCounter.cpp">
+      <Filter>ExplorationAndMap\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceGroup.cpp">
+      <Filter>ExplorationAndMap\Resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

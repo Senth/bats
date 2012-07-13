@@ -4,12 +4,12 @@
 #include <set>
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
+#include "TypeDefs.h"
 
 // Namespace for the project
 namespace bats {
 
 // Forward declarations
-class Squad;
 class SquadManager;
 class UnitCompositionFactory;
 class UnitManager;
@@ -24,7 +24,7 @@ class AlliedArmyManager;
  * The commander also prints out information messages what this AI is up to, when issuing commands
  * or if they are invalid, in that case why.
  * 
- * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+ * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
 class Commander {
 public:
@@ -73,7 +73,7 @@ public:
 	 * @return position the squad shall retreat to, TilePositions::Invalid if the squad
 	 * shall not retreat anywhere but stay and fight!
 	 */
-	virtual BWAPI::TilePosition getRetreatPosition(const std::tr1::shared_ptr<Squad>& squad) const;
+	virtual BWAPI::TilePosition getRetreatPosition(SquadRef squad) const;
 	
 private:
 	/**
@@ -107,7 +107,7 @@ private:
 	 */
 	void createScout();
 
-	std::tr1::shared_ptr<Squad> mSquadWaiting;
+	SquadPtr mSquadWaiting;
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;

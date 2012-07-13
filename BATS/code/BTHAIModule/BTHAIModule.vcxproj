@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\BTHAIModule.cpp" />
+    <ClCompile Include="Source\CoverMap.cpp" />
     <ClCompile Include="Source\PFFunctions.cpp" />
     <ClCompile Include="Source\PFManager.cpp" />
     <ClCompile Include="Source\RefineryAgent.cpp" />
@@ -219,7 +220,6 @@
     <ClCompile Include="Source\TargetingAgent.cpp" />
     <ClCompile Include="Source\WorkerAgent.cpp" />
     <ClCompile Include="Source\AgentManager.cpp" />
-    <ClCompile Include="Source\CoverMap.cpp" />
     <ClCompile Include="Source\MapDataReader.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\UpgradesFileReader.cpp" />
@@ -234,9 +234,9 @@
     <ClCompile Include="Source\ProfilerObj.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\AIloop.h" />
     <ClInclude Include="Source\BTHAIModule.h" />
     <ClInclude Include="Source\BWTAExtern.h" />
+    <ClInclude Include="Source\CoverMap.h" />
     <ClInclude Include="Source\RefineryAgent.h" />
     <ClInclude Include="Source\SpottedObject.h" />
     <ClInclude Include="Source\StructureAgent.h" />
@@ -287,7 +287,6 @@
     <ClInclude Include="Source\TargetingAgent.h" />
     <ClInclude Include="Source\WorkerAgent.h" />
     <ClInclude Include="Source\AgentManager.h" />
-    <ClInclude Include="Source\CoverMap.h" />
     <ClInclude Include="Source\MapDataReader.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\UpgradesFileReader.h" />

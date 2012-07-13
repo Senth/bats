@@ -13,6 +13,7 @@ namespace bats {
 
 // Forward declaration
 class UnitManager;
+class SquadManager;
 
 /**
  * Manages the defense for the team. Creates DefensiveHoldSquad and DefensivePatrolSquad
@@ -62,13 +63,17 @@ public:
 
 private:
 	/**
-	 * Singleton constructor to enforce singleton usage.
+	 * Private constructor to enforce singleton usage.
 	 */
 	DefenseManager();
 
-	UnitManager* mpUnitManager;
+	/**
+	 * Searches for and finds all choke points that needs defending.
+	 */
+	void updateDefendPositions();
 
-	/// @todo add vector with squads.
+	UnitManager* mpUnitManager;
+	SquadManager* mpSquadManager;
 
 	static DefenseManager* mpsInstance;
 };

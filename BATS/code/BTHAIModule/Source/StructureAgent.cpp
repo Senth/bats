@@ -17,7 +17,7 @@ StructureAgent::StructureAgent(Unit* mUnit) : BaseAgent(mUnit)
 	agentType = "StructureAgent";
 }
 
-void StructureAgent::printGraphicDebugInfo()
+void StructureAgent::printGraphicDebugInfo() const
 {
 	if (!isAlive()) return;
 

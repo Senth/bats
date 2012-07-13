@@ -59,7 +59,7 @@ public:
 	virtual void computeActions() = 0;
 
 	/** Used to print info about this agent to the screen. */
-	virtual void printGraphicDebugInfo() {}
+	virtual void printGraphicDebugInfo() const {}
 
 	/** Returns the number of enemy units within weapon range of the agent. */
 	int noUnitsInWeaponRange() const;

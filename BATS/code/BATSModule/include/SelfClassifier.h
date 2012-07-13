@@ -49,13 +49,9 @@ public:
 
 private:
 	/**
-	 * Singleton constructor to enforce singleton usage.
+	 * Private constructor to enforce singleton usage.
 	 */
 	SelfClassifier();
-
-	/**
-	 * Helper for getting the bot's main base type (CommandCenter, Nexus, or Hatchery)
-	 */
 
 	AgentManager* mpAgentManager;
 	BuildPlanner* mpBuildPlanner;

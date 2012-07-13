@@ -242,9 +242,6 @@
     <ClCompile Include="Source\AgentManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\CoverMap.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MapDataReader.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -287,11 +284,11 @@
     <ClCompile Include="Source\UnitSetup.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\CoverMap.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\AIloop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\BTHAIModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -442,9 +439,6 @@
     <ClInclude Include="Source\AgentManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CoverMap.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MapDataReader.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
@@ -485,6 +479,9 @@
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Source\UnitSetup.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CoverMap.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>
