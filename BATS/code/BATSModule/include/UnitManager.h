@@ -13,14 +13,13 @@ class SquadManager;
  * Filters used for getting specific units
  */
 enum UnitFilters {
-	/** All units including workers. Effectively the same as
-	 * UnitFilter_UnitsAll | UnitFilter_WorkersAll */
+	/** All units including workers. Same as UnitFilter_UnitsAll | UnitFilter_WorkersAll */
 	UnitFilter_NoFilter				= 0x0000,
 	UnitFilter_HasNoSquad			= 0x0001,	/**< Non-workers that aren't in a squad */
 	UnitFilter_InDisbandableSquad	= 0x0002,	/**< Non-workers that are in a disbandable squad */
 	UnitFilter_UnitsAll				= 0x0004,	/**< All non-workers */
 	UnitFilter_WorkersAll			= 0x0010,	/**< All workers */
-	UnitFilter_WorkersFree		= 0x0020	/**< Workers in no squads */
+	UnitFilter_WorkersFree			= 0x0020	/**< Workers in no squads */
 };
 
 /**

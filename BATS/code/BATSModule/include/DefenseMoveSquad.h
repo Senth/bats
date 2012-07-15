@@ -19,11 +19,11 @@ public:
 	/**
 	 * Constructs the squad with the specified initial units.
 	 * @param units initial units to add
-	 * @param waitPosition the position for the squad to wait in
+	 * @param waitPosition the position for the squad to wait in, defaults to TilePositions::Invalid
 	 */
 	DefenseMoveSquad(
 		const std::vector<UnitAgent*>& units,
-		const BWAPI::TilePosition& waitPosition
+		const BWAPI::TilePosition& waitPosition = BWAPI::TilePositions::Invalid
 	);
 
 	/**

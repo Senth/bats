@@ -31,16 +31,15 @@ UnitManager* UnitManager::getInstance() {
 	return pUnitManager;
 }
 
-std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
-	std::vector<const UnitAgent*> constUnits;
-	constUnits = const_cast<const UnitManager*>(this)->getUnitsByFilter(filter);
+std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
+	std::vector<UnitAgent*>& units = const_cast<UnitManager*>(this)->getUnitsByFilter(filter);
 	
-	std::vector<UnitAgent*>& foundUnits = *reinterpret_cast<std::vector<UnitAgent*>* >(&constUnits);
+	std::vector<const UnitAgent*>& foundUnits = *reinterpret_cast<std::vector<const UnitAgent*>* >(&units);
 	return foundUnits;
 }
 
-std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
-	std::vector<const UnitAgent*> foundUnits;
+std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
+	std::vector<UnitAgent*> foundUnits;
 	for (size_t i = 0; i < mAgents.size(); ++i) {
 		UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(mAgents[i]);
 		if (NULL != pUnitAgent) {
