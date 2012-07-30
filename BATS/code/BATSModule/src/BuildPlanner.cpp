@@ -431,28 +431,19 @@ bool BuildPlanner::executeOrder(UnitType type){
 	}
 
 	//Check if we have resources
-	if (!ResourceManager::getInstance()->hasResources(type))
-	{
+	if (!ResourceManager::getInstance()->hasResources(type)){
 		return false;
-	}
-	//TODO check with unitcreator?
-	//if(UnitCreator::sLockForQueue)
-	//	return false;
+	}	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
-	{
+	for (int i = 0; i < (int)agents.size(); i++){
 		BaseAgent* agent = agents.at(i);
-		if (agent != NULL && agent->isAlive())
-		{
-			if (agent->canBuild(type))
-			{
-				if (agent->assignToBuild(type))
-				{
+		if (agent != NULL && agent->isAlive()){
+			if (agent->canBuild(type)){
+				if (agent->assignToBuild(type)){
 					lock(0, agent->getUnitID());
 					return true;
 				}
-				else
-				{
+				else{
 					//Unable to find a buildspot. Dont bother checking for all
 					//other workers
 					handleNoBuildspotFound(type);
@@ -465,24 +456,21 @@ bool BuildPlanner::executeOrder(UnitType type){
 }
 
 bool BuildPlanner::isTerran(){
-	if (Broodwar->self()->getRace().getID() == Races::Terran.getID())
-	{
+	if (Broodwar->self()->getRace().getID() == Races::Terran.getID()){
 		return true;
 	}
 	return false;
 }
 
 bool BuildPlanner::isProtoss(){
-	if (Broodwar->self()->getRace().getID() == Races::Protoss.getID())
-	{
+	if (Broodwar->self()->getRace().getID() == Races::Protoss.getID()){
 		return true;
 	}
 	return false;
 }
 
 bool BuildPlanner::isZerg(){
-	if (Broodwar->self()->getRace().getID() == Races::Zerg.getID())
-	{
+	if (Broodwar->self()->getRace().getID() == Races::Zerg.getID()){
 		return true;
 	}
 	return false;
@@ -491,8 +479,7 @@ bool BuildPlanner::isZerg(){
 void BuildPlanner::addRefinery(){
 	UnitType refinery = Broodwar->self()->getRace().getRefinery();
 
-	if (!this->nextIsOfType(refinery))
-	{
+	if (!this->nextIsOfType(refinery)){
 		buildOrder.insert(buildOrder.begin(), refinery);
 	}
 }
@@ -636,6 +623,19 @@ void BuildPlanner::expand(UnitType commandCenterUnit){
 	}
 
 	buildOrder.insert(buildOrder.begin(), commandCenterUnit);
+}
+
+bool BuildPlanner::isExpansionAvailable(UnitType commandCenterUnit){
+	if (containsType(commandCenterUnit)){
+		return false;
+	}
+
+	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
+	if (pos== TilePositions::Invalid){
+		//No expansion site found.
+		return false;
+	}
+	return true;
 }
 
 int BuildPlanner::noInProduction(UnitType type){

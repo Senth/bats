@@ -15,6 +15,7 @@
 #include "AttackSquad.h"
 #include "DropSquad.h"
 #include "ScoutSquad.h"
+#include "BuildPlanner.h"
 
 using namespace bats;
 using namespace std::tr1;
@@ -129,7 +130,10 @@ bool Commander::issueCommand(const std::string& command) {
 	} else if (command == "counter-attack") {
 		/// @todo counter-attack command
 	} else if (command == "expand") {
-		/// @todo expand command
+		if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter()))
+			BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
+		else
+			BWAPI::Broodwar->printf("Expansion not available yet");
 	} else if (command == "move") {
 		/// @todo move command
 	} else if (command == "scout") {
@@ -244,7 +248,7 @@ void Commander::createScout() {
 	if (NULL != mSquadWaiting) {
 		finishWaitingSquad();
 	}
-	/*
+	
 	// Get available unit compositions
 	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
 	if(freeUnits.size() <= 0)
@@ -254,7 +258,7 @@ void Commander::createScout() {
 	freeUnits.push_back(unit);
 	ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
 	mSquadWaiting = pScoutSuad->getThis();
-	*/
+	/*
 		// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
 	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
 
@@ -273,7 +277,7 @@ void Commander::createScout() {
 	if (!availableUnitCompositions.empty()) {
 		ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
 		mSquadWaiting = pScoutSquad->getThis();
-	}
+	}*/
 }
 
 #pragma warning(push)	// Disabled until the squad is actually used.

@@ -110,6 +110,9 @@ public:
 	/** Requests to expand the base. */
 	void expand(BWAPI::UnitType commandCenterUnit);
 
+	/** Check if expansion is available. */
+	bool isExpansionAvailable(BWAPI::UnitType commandCenterUnit);
+
 	/** Adds a refinery to the buildorder list. */
 	void addRefinery();
 

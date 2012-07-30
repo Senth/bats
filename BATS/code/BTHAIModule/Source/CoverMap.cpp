@@ -941,10 +941,11 @@ TilePosition CoverMap::findExpansionSite()
 		{
 			if (mpsExplorationManager->canReach(Broodwar->self()->getStartLocation(), pos))
 			{
-				double dist = mapData.getDistance(Broodwar->self()->getStartLocation(), pos);
-				if (dist <= bestDist)
+				double ourDistance;
+				ourDistance = mapData.getDistance(Broodwar->self()->getStartLocation(), pos);
+				if (ourDistance <= bestDist)
 				{
-					bestDist = dist;
+					bestDist = ourDistance;
 					bestPos = pos;
 				}
 			}

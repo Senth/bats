@@ -44,8 +44,12 @@ void ScoutSquad::updateDerived() {
 Squad::GoalStates ScoutSquad::checkGoalState() const{
 	TilePosition currentPos = getCenter();
 	TilePosition goal = getGoalPosition();
-	if (goal == BWAPI::TilePositions::Invalid) {
+	if(isEnemyAttackUnitsWithinSight()){
+		BWAPI::Broodwar->printf("Enemy detected");
 		return Squad::GoalState_Succeeded;
+	}
+	if (goal == BWAPI::TilePositions::Invalid) {
+	return Squad::GoalState_Succeeded;
 	} else if (isCloseTo(goal)) {
 		return Squad::GoalState_Succeeded;
 	}
