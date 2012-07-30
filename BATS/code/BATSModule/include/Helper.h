@@ -69,6 +69,14 @@ inline bool isEnemy(BWAPI::Unit* pUnit) {
 }
 
 /**
+ * Returns true if an enemy is within the specified radius from the position.
+ * @param position the position to check from.
+ * @param radius maximum range from the position the enemy can be. Should be in tile size.
+ * @return true if an enemy is found within the radius.
+ */
+bool isEnemyWithinRadius(const BWAPI::TilePosition& position, int radius);
+
+/**
 * Returns the closest allied structure (including our structures).
 * @param[in] position where we measure from
 * @return closest allied structure including the <strong>squared</strong> distance.
@@ -90,19 +98,6 @@ inline int getSquaredDistance(const T& a, const T& b) {
 	diffDistance.x() = a.x() - b.x();
 	diffDistance.y() = a.y() - b.y();
 	return diffDistance.x() * diffDistance.x() + diffDistance.y() * diffDistance.y();
-}
-
-/**
- * Returns the approximate distance between two positions. This function only uses one
- * multiplication 
- */
-template<typename T>
-inline double getApproxDistance(const T& a, const T& b) {
-	T diffDistance;
-	//@todo Implement this function.
-	diffDistance.x() = 0;
-	diffDistance.y() = 0;
-	return diffDistance;
 }
 
 /**

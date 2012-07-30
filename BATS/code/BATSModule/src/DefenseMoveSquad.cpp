@@ -1,5 +1,6 @@
 #include "DefenseMoveSquad.h"
 #include "Config.h"
+#include "Helper.h"
 
 using namespace bats;
 using namespace BWAPI;
@@ -80,15 +81,7 @@ bool DefenseMoveSquad::isWithinDefendPerimeter() const {
 }
 
 bool DefenseMoveSquad::isEnemyWithinOffensivePerimeter() const {
-	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(mDefendPosition), config::squad::defend::ENEMY_OFFENSIVE_PERIMETER * TILE_SIZE);
-	std::set<Unit*>::const_iterator unitIt;
-	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
-		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self())) {
-			return true;
-		}
-	}
-
-	return false;
+	return isEnemyWithinRadius(mDefendPosition, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER);
 }
 
 BWAPI::TilePosition DefenseMoveSquad::findEnemyPositionWithinDefendPerimeter() const {

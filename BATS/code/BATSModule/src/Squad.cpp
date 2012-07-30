@@ -143,14 +143,15 @@ void Squad::update() {
 		}
 	}
 
-
+	/// @todo Remove states in a future version
 	switch (mState) {
 	case State_Initializing:
-		// Only try to create a goal if the player hasn't specified one
-		if (mGoalPosition == TilePositions::Invalid &&
-			(!mUnitComposition.isValid() ||
-			mUnitComposition.isFull()))
-		{
+		// Player set a goal directly, active the squad
+		if (mGoalPosition != TilePositions::Invalid) {
+			mState = State_Active;
+		}
+		// Else create a goal
+		else if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
 			bool goalCreated = createGoal();
 			if (goalCreated) {
 				mState = State_Active;

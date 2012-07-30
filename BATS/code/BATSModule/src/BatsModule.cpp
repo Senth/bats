@@ -11,6 +11,7 @@
 #include "AttackCoordinator.h"
 #include "WaitGoalManager.h"
 #include "AlliedArmyManager.h"
+#include "DefenseManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
@@ -45,6 +46,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpSquadManager = NULL;
 	mpGameTime = NULL;
 	mpAlliedArmyManager = NULL;
+	mpDefenseManager = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -381,12 +383,12 @@ void BatsModule::updateGame() {
 	mpGameTime->update();
 	mpResourceCounter->update();
 	mpWaitGoalManager->update();
-
 	mpAlliedArmyManager->update();
 
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
 	mpCommander->computeActions();
+	mpDefenseManager->update();
 	mpExplorationManager->update();
 
 	mpProfiler->end("updateGame");
@@ -408,9 +410,11 @@ void BatsModule::initGameClasses() {
 	Pathfinder::getInstance();
 	mpExplorationManager = ExplorationManager::getInstance();
 	mpAlliedArmyManager = AlliedArmyManager::getInstance();
+	mpDefenseManager = DefenseManager::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
+	SAFE_DELETE(mpDefenseManager);
 	SAFE_DELETE(mpAlliedArmyManager);
 	SAFE_DELETE(mpExplorationManager);
 	delete Pathfinder::getInstance();
@@ -436,6 +440,7 @@ void BatsModule::showDebug() const {
 		mpAlliedArmyManager->printGraphicDebugInfo();
 		mpSquadManager->printGraphicDebugInfo();
 		mpUnitManager->printGraphicDebugInfo();
+		mpDefenseManager->printGraphicDebugInfo();
 		UnitCreator::getInstance()->printGraphicDebugInfo();
 		drawTerrainData();
 		CoverMap::getInstance()->printGraphicDebugInfo();

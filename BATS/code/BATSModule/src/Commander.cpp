@@ -49,6 +49,7 @@ Commander::~Commander() {
 	mpSquadManager = NULL;
 	mpUnitManager = NULL;
 	mpAlliedArmyManager = NULL;
+
 	mpsInstance = NULL;
 }
 
@@ -65,7 +66,7 @@ void Commander::computeActions() {
 	/// @todo Commander computer actions more complex actions
 
 	computeReactions();
-	mpSquadManager->computeActions();
+	mpSquadManager->update();
 
 	Profiler::getInstance()->end("Commander::update()");
 }

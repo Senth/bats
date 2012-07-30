@@ -83,7 +83,7 @@ public:
 	/**
 	 * Called every frame. Calls all squad's bats::Squad::computeActions() to update the squads.
 	 */
-	void computeActions();
+	void update();
 
 	/**
 	 * Add a new squad.

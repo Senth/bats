@@ -93,6 +93,14 @@ namespace bats {
 		}
 
 		/**
+		 * Build order configuration variables
+		 */
+		namespace build_order {
+			/** Directory of the build orders */
+			extern const std::string DIR;
+		}
+
+		/**
 		 * Classification rules for player and enemies
 		 */
 		namespace classification {
@@ -202,11 +210,18 @@ namespace bats {
 		}
 
 		/**
-		 * Build order configuration variables
+		 * Defending attributes
+		 * @note some defending attributes are in squad::defend.
 		 */
-		namespace build_order {
-			/** Directory of the build orders */
-			extern const std::string DIR;
+		namespace defense {
+			/** Minimum distance from the choke point units need to be to find a defend
+			 * position
+			 * @see CHOKEPOINT_DISTANCE_MAX */
+			extern int CHOKEPOINT_DISTANCE_MIN;
+			/** Maximum distance from the choke point unist need to be to find a defend
+			 * position
+			 * @see CHOKEPOINT_DISTANCE_MAX */
+			extern int CHOKEPOINT_DISTANCE_MAX;
 		}
 
 		/**
@@ -217,6 +232,7 @@ namespace bats {
 			extern int RESOURCE_COUNTER;
 			extern int ALLIED_ARMY_REARRANGE_SQUADS;
 			extern int SQUAD;
+			extern int DEFENSE_MANAGER;
 		}
 
 		/**

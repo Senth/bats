@@ -117,6 +117,13 @@ namespace debug {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
+namespace defense {
+	int CHOKEPOINT_DISTANCE_MIN = 0;
+	int CHOKEPOINT_DISTANCE_MAX = 0;
+
+	bool set(const utilities::VariableInfo& variableInfo);
+}
+
 namespace build_order {
 	const std::string DIR = CONFIG_DIR + "buildorder\\";
 }
@@ -126,6 +133,7 @@ namespace frame_distribution {
 	int RESOURCE_COUNTER = 0;
 	int ALLIED_ARMY_REARRANGE_SQUADS = 0;
 	int SQUAD = 0;
+	int DEFENSE_MANAGER = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -235,6 +243,8 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 		success = classification::set(variableInfo);
 	} else if (variableInfo.section == "debug") {
 		success = debug::set(variableInfo);
+	} else if (variableInfo.section == "defense") {
+		success = defense::set(variableInfo);
 	} else if (variableInfo.section == "frame_distribution") {
 		success = frame_distribution::set(variableInfo);
 	} else if (variableInfo.section == "game") {
@@ -471,6 +481,22 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 	return true;
 }
 
+bool defense::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "chokepoint_distance_min") {
+		gOldValue = toString(CHOKEPOINT_DISTANCE_MIN);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(CHOKEPOINT_DISTANCE_MIN));
+		CHOKEPOINT_DISTANCE_MIN = variableInfo;
+	} else if (variableInfo.name == "chokepoint_distance_max") {
+		gOldValue = toString(CHOKEPOINT_DISTANCE_MAX);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(CHOKEPOINT_DISTANCE_MAX));
+		CHOKEPOINT_DISTANCE_MAX = variableInfo;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
 bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.name == "exploration_manager") {
 		gOldValue = toString(EXPLORATION_MANAGER);
@@ -488,6 +514,10 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(SQUAD);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(SQUAD));
 		SQUAD = variableInfo;
+	} else if (variableInfo.name == "defense_manager") {
+		gOldValue = toString(DEFENSE_MANAGER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE_MANAGER));
+		DEFENSE_MANAGER = variableInfo;
 	} else {
 		return false;
 	}

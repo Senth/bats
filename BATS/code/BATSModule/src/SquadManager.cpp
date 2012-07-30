@@ -59,7 +59,7 @@ SquadCstIt SquadManager::end() const {
 	return mSquads.end();
 }
 
-void SquadManager::computeActions() {
+void SquadManager::update() {
 	Profiler::getInstance()->start("SquadManager::update()");
 
 	std::map<SquadId, SquadPtr>::iterator squadIt = mSquads.begin();

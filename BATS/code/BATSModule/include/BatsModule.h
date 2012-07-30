@@ -16,6 +16,7 @@ class WaitGoalManager;
 class SquadManager;
 class GameTime;
 class AlliedArmyManager;
+class DefenseManager;
 
 /**
  * Main module for BATS
@@ -101,7 +102,7 @@ protected:
 	virtual bool isGameLost() const;
 
 	/**
-	 * Checks whether we are actually playing a game, i.e. not a reply and the game has started.
+	 * Checks whether we are actually playing a game, i.e. not a replay and the game has started.
 	 * Note that it will return true even if the game is paused.
 	 * @return true if the game is being played
 	 */
@@ -116,6 +117,7 @@ protected:
 	SquadManager* mpSquadManager;
 	GameTime* mpGameTime;
 	AlliedArmyManager* mpAlliedArmyManager;
+	DefenseManager* mpDefenseManager;
 
 private:
 	/**

@@ -112,6 +112,7 @@ private:
 	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;
 	AlliedArmyManager* mpAlliedArmyManager;
+
 	std::set<const std::string> mAvailableCommands;
 
 	static Commander* mpsInstance;

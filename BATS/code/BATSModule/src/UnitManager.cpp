@@ -32,7 +32,7 @@ UnitManager* UnitManager::getInstance() {
 }
 
 std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
-	std::vector<UnitAgent*>& units = const_cast<UnitManager*>(this)->getUnitsByFilter(filter);
+	std::vector<UnitAgent*> units = const_cast<UnitManager*>(this)->getUnitsByFilter(filter);
 	
 	std::vector<const UnitAgent*>& foundUnits = *reinterpret_cast<std::vector<const UnitAgent*>* >(&units);
 	return foundUnits;

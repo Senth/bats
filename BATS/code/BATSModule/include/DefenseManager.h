@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <BWAPI/TilePosition.h>
 #include "TypeDefs.h"
 
@@ -19,6 +20,7 @@ namespace bats {
 // Forward declaration
 class UnitManager;
 class SquadManager;
+class GameTime;
 
 /**
  * Manages the defense for the team. Creates DefensiveHoldSquad and DefensivePatrolSquad
@@ -110,11 +112,44 @@ private:
 	 */
 	static BWAPI::TilePosition getDefendPosition(BWTA::Chokepoint* pChokepoint);
 
+	/**
+	 * Returns the center of all defending choke points
+	 * @return center of all defending positions, TilePositions::Invalid df we don't have any
+	 * position to defend.
+	 */
+	BWAPI::TilePosition getCenterDefendPosition() const;
+
+	/**
+	 * Updates the move squad. I.e. adds units and a new wait position.
+	 */
+	void updateMoveSquad();
+
+	/**
+	 * Checks if some defend positions are under attack. This includes enemies just being
+	 * in the offensive perimeter.
+	 */
+	void updateUnderAttackPositions();
+
+	struct DefendPosition {
+		BWAPI::TilePosition position;
+		bool underAttack;
+
+		/**
+		 * Default constructor
+		 */
+		DefendPosition(const BWAPI::TilePosition position = BWAPI::TilePositions::Invalid) :
+		position(position), underAttack(false) {}
+	};
+
 	UnitManager* mpUnitManager;
 	SquadManager* mpSquadManager;
+	GameTime* mpGameTime;
+	bool mUnderAttack;
 
-	std::vector<BWAPI::TilePosition> mDefendPositions;
+	typedef std::map<BWTA::Chokepoint*, DefendPosition> DefendMap;
+	DefendMap mDefendPositions;
 
+	int mFrameCallLast;
 	static DefenseManager* mpsInstance;
 };
 }

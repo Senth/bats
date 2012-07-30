@@ -1,6 +1,7 @@
 #include "Helper.h"
 #include <ostream>
 #include <BWAPI/Game.h>
+#include <BWAPI/Constants.h>
 #include <set>
 #include <cfloat>
 
@@ -38,6 +39,18 @@ bool bats::isGasStructure(BWAPI::Unit* pUnit) {
 			unitType == BWAPI::UnitTypes::Protoss_Assimilator ||
 			unitType == BWAPI::UnitTypes::Zerg_Extractor)
 		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool bats::isEnemyWithinRadius(const BWAPI::TilePosition& position, int radius) {
+	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(position), radius * TILE_SIZE);
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self())) {
 			return true;
 		}
 	}
