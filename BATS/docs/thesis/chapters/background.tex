@@ -12,7 +12,7 @@ In the next section related research topics will be covered, beginning with team
 %: Write some text
 
 \subsection{Teammate bots}
-As mentioned, little research has been done in the area of teammate bots, especially for RTS games. To our knowledge there exist one survey on teammate bots; in 2010 McGee and Abraham conducted a survey, first presenting their definition of real-time teammate, which their survey is limited to\cite{mcgee10}. Their definition, although summarized, reads; a real-time teammate bot
+As mentioned, little research has been done in the area of teammate bots, especially for RTS games. To our knowledge there exist one paper on teammate bots\cite{mcgee10}; in their survey, McGee and Abraham, presents their definition of real-time teammate, which their survey is limited to. A summary of their definition reads; a real-time teammate bot
 \begin{enumerate}
 	\item works together with team players while taking into account the state, needs, behavior, goals, plans and intentions of these players;
 	\item uses coordinated behaviors or decision-making\ldots
@@ -23,9 +23,9 @@ As mentioned, little research has been done in the area of teammate bots, especi
 
 We will use the same definition in our paper and pointing out if other work is lacking in one or more of these five points.
 
-In their survey\cite{mcgee10} McGee and Abraham noticed that, although human player participation and engagement are one key functionality of a game\cite{reynolds03}, often the player's preferences are neglected and the bot(s) behave what it thinks is the best for either just itself or both the player and itself; this might sound as if it prioritizes the player, but what it does is steer the player into how to play rather than the player steering the bot. When the bot prioritizes the player, some challenges arise; how to create priority rules that do their job correctly\cite{mcgee10}, i.e. the bot has to know, or use a qualified guess, what the player wants. This is no easy task, probably impossible in the near future; humans have a hard time understanding each others intentions, why think AIs that humans have created understands us better\cite{norman07} without even asking?.
+In their survey\cite{mcgee10} McGee and Abraham noticed that, although human player participation and engagement are one key functionality of a game\cite{reynolds03}, often the player's preferences are neglected and the bot(s) behave what it thinks is the best for either just itself or both the player and itself; while the second option might sound as if it prioritizes the player, it does not, it steers the player into how to play rather than the player steering the bot. When the bot prioritizes the player, some challenges arise; how to create priority rules that do their job correctly\cite{mcgee10}, i.e. the bot has to know, or use a qualified guess, what the player wants. This is no easy task, probably impossible in the near future; humans have a hard time understanding each others intentions, why think AIs (that humans have created) understands us better\cite{norman07} without even asking?.
 
-An important discovery was the lack of research of communication between human players and bots, “This survey suggests that there are also some aspects of real-time team-mate AI where there seems to be little or no work: ..., and communication.”\cite{mcgee10} Meaning “little or no work” spans through multiple topics and multiple genres; we ourselves have yet to find any topic that talks about communication between human players and bots, for any genre. Some games in other genres has, however, implemented some sort of communication between human players and bots, this is covered below in section \ref{sec:game_communication}
+McGee and Abraham points out the lack of research on communication between human players and bots, “This survey suggests that there are also some aspects of real-time team-mate AI where there seems to be little or no work: ..., and communication.”\cite{mcgee10} Meaning “little or no work” spans through multiple topics and multiple genres; we have yet to find any paper that talks about communication between human players and bots, for any genre. Games in other genres has, however, implemented some sort of communication between human players and bots, this is covered in section \ref{sec:game_communication}
 
 \paragraph{Teammate bots across all genres}
 Abraham and McGee created a teammate bot for a simple game: Capture the gunner\cite{abraham10}. The goal of this game is to capture the gunner by touching him from both sides while not being shot. The game required cooperation with their bot because selfish players never passed the first level. Players had great responsibility over the teammate, because of this they found that even if the bot died by the gunner players never felt it was unfair; in fact, some players felt that it was partly their fault if the bot died.
@@ -36,19 +36,20 @@ To beat an enemy in an RTS game, as a team or a single player, you need a strate
 
 To get find the teammate’s and enemies’ weaknesses one can make use of simple classification rules, or make it more advanced and use a model. Articles that focus on complementing the teammate’s weaknesses\cite{jansen07, pucheng11,houlette03} and those that focus on exploiting enemy weaknesses\cite{kabanza10, schadd07, synnaeve11} can be used for both purposes; information gathering and what to execute will, however, be different.
 
-If you strategy is bad, it does not matter how hard you try to win, you will still loose (unless the enemy is even worse). Because you need information, or a model/classification, of a player’s weaknesses, articles that focus on complementing the teammate weaknesses
+While our focus lies on communication and conveying intentions, a bot still needs a decent strategy and tactics to win and be useful for the player. There does, however, not exist any specific research on what is a good cooperation strategy, especially for prioritizing the player.
 
 \section{Teammate Bot in Games}
 Teammate bots have been around for quite a while in sports game, such as FIFA\cite{fifa}, but have just started to make a breakthrough in other genres. In most games\cite{callofduty, brotherinarms, rainbow6} the teammate bots cannot be replaced by another player as they either are a part of the story, and thus might not be around all the time, die, or have something else happen to them. In games that are meant be played cooperatively with friends (or strangers), these can be replaced with bots\cite{residentevil5, lostplanet2}.
 
 
 \subsection{Communication}
-\label{sec:games_communication}
+\label{sec:game_communication}
 Communication has been done in across several games and genres, most noteworthy are genres where you play as one character, such as FPS games, third-person (TPS) games. In these games some bots communicate you, warning when they spot enemies, get shot, or comes with tips when the enemy is stuck.
 
 Mass effect, a TPS game, does this in its game by letting the bots tell the player when enemies are sighted, or area is cleared. Mass Effect 3, goes beyond regular communication and lets players on Xbox 360 to control the bots through voice commands, like a squad leader. This creates a better flow in the game since players do not have to open the action screen (which pauses the game) as often.
 
-\subsection{Controllable}
+
+\subsection{Controllable bots}
 \label{sec:games_controllable}
 Today there exists quite a few games that implements the possibility for the player to actively control teammate bots (if the player wants to). We cannot possibly find and go through each game that lets you control its teammate bots, but we will mention a few to show that the feature can be found in games.
 
