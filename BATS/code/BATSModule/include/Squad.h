@@ -565,6 +565,7 @@ protected:
 	/**
 	 * Called when a unit has been successfully removed from the squad.
 	 * @param pRemovedUnit the unit that has been removed
+	 * @todo reset the unit to its default behavior.
 	 */
 	virtual void onUnitRemoved(UnitAgent* pRemovedUnit) {}
 #pragma warning(pop)

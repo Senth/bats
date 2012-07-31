@@ -103,6 +103,7 @@
     <ClCompile Include="src\ExploreData.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\Helper.cpp" />
+    <ClCompile Include="src\HoldSquad.cpp" />
     <ClCompile Include="src\PatrolSquad.cpp" />
     <ClCompile Include="src\Resource.cpp" />
     <ClCompile Include="src\ResourceCounter.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="include\ExploreData.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
+    <ClInclude Include="include\HoldSquad.h" />
     <ClInclude Include="include\PatrolSquad.h" />
     <ClInclude Include="include\SelfClassifier.h" />
     <ClInclude Include="include\TypeDefs.h" />

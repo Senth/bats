@@ -13,7 +13,8 @@
  * @todo move protected variables to private
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
- * 
+ * @author Matteus Magnusson (mattues.magnusson@gmail.com)
+ * Added and removed some functionality.
  */
 class BaseAgent {
 
@@ -209,14 +210,6 @@ public:
 
 	/** Orders the Zerg Queen to do an Ensnare at the specified area. */
 	static bool doEnsnare(BWAPI::TilePosition pos);
-
-	///** Assigns this agent to the squad with the specified id. */
-	//void _deprecated_setSquadID(int id);
-
-	///** Returns the squad this agent belongs to, or -1 if it doesnt
-	// * belong to any squad. */
-	//int _deprecated_getSquadID();
-
 };
 
 #endif
