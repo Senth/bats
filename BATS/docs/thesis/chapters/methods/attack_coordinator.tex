@@ -1,0 +1,33 @@
+% !TEX root = ../../main.tex
+
+\section{Attack coordinator}
+The attack coordinator has one feature, that is to coordinate attacks. Squads can request attacks from the attack coordinator and it will search for a good location to attack. Before describing the algorithms, you need to know that attacks can be grouped into two categories: frontal attacks, and distracting attacks.
+
+Frontal attacks are big attacks that generally use the majority of the army and attacks head on, distracting attacks are minor attacks either used to distract the enemy from one position to where the attack is (hence the name), or they can be used to try to deal some damage to the enemy, with heavy emphasis on try. These distracting attacks can be drops, harassment, counter-attacks—BATS has, in time of this writing, only implemented the drop functionality. It shall be noted that most of the distracting attacks are not suicide attacks, and some does not even have to deal any damage to be successful as the goal is to draw away the enemy forces from a well-defended area, our expansion, etc.
+
+\paragraph{Where to attack?}
+The attack coordinator uses two to three weight multiplied together to get the near optimal attack location—it shall be noted that it is not the optimal attack location and that the weights have not been extensively balanced. The attacking positions are derived from seen enemy structures and expansions that have not been scouted for some time.
+
+The first weight, \emph{distance}, is the distance from other attacks, including allied attacks. The second weight, \emph{type}, determines how important a structure or location is to attack, and the third weight, \emph{defended}, is how well defended an area is—while the third weight has not been implemented yet, distracting attacks would use it to get a location that can be attack in at least a short amount of time.
+
+In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will get an attack position near the allied squads target instead of using the weights.
+
+\paragraph{Idea behind weights}
+The reason of choosing these weight was that if we have multiple attacks it is generally a good idea to spread them as wide as possible. But we do not want to attack random structures, but important structures—how the structure priority is calculated is described later in this section. As mentioned the defended weight has not been implemented, this is due to lack of time and the squads works OK without it.
+
+Enemy armies are not included in the calculation, because one rarely gain anything on attack an army, one should find gaps in the defense instead\cite{day9}. While it would be good to engage and attack an enemy army if its a lot weaker than our BATS will still do that if the squad is close by, but it will not search for those small armies. Armies are also more mobile meaning it would be a lot harder to keep a track on them.
+
+\paragraph{Calculation of distance weight}
+Distance weight is a simple calculation: if no other attacking squads (including allied) are present it defaults to 1. Otherwise the average from all other attacking squads are calculated as described in the equation below.
+\[
+\label{eq:distance_weight}
+weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of squads}\right.
+\]
+Here \emph{weight} is the average distance from all other attacking squads. The weight is then normalized to [0.0, 1.0] with the formula below—dividing the weight with the maximum map distance. As with most distance calculations, they use the squared version because of faster calculation since no root calculations are needed.
+\[
+normalized\ weight = \frac{weight}{MAP\_WIDTH^2 + MAP\_HEIGHT^2}
+\]
+
+\paragraph{Type weight}
+
+\subsection{Wait Goals}
