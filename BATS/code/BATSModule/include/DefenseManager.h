@@ -81,10 +81,19 @@ private:
 
 	/**
 	 * Checks if a region is occupied by either our structures or our allied structures.
+	 * Can be overridden to only check allied or our structures.
 	 * @param pRegion the region to check if it's occupied by our team
+	 * @param includeOurStructures if our structures shall be included in the search,
+	 * defaults to true
+	 * @param includeAlliedStructures if allied structures shall be included in the search,
+	 * defaults to true.
 	 * @return true if the region is occupied by either any team structure.
 	 */
-	static bool isRegionOccupiedByOurTeam(BWTA::Region* pRegion);
+	static bool isRegionOccupiedByOurTeam(
+		BWTA::Region* pRegion,
+		bool includeOurStructures = true,
+		bool includeAlliedStructures = true
+	);
 
 	/**
 	 * Checks if the choke point is an edge choke point. To be an edge choke point it
@@ -113,16 +122,9 @@ private:
 	static BWAPI::TilePosition getDefendPosition(BWTA::Chokepoint* pChokepoint);
 
 	/**
-	 * Returns the center of all defending choke points
-	 * @return center of all defending positions, TilePositions::Invalid df we don't have any
-	 * position to defend.
-	 */
-	BWAPI::TilePosition getCenterDefendPosition() const;
-
-	/**
 	 * Updates the move squad. I.e. adds units and a new wait position.
 	 */
-	void updateMoveSquad();
+	void updatePatrolSquad();
 
 	/**
 	 * Checks if some defend positions are under attack. This includes enemies just being
@@ -130,15 +132,31 @@ private:
 	 */
 	void updateUnderAttackPositions();
 
+	/**
+	 * Checks if the choke point abuts a region where we have structures. I.e. it shall be
+	 * primary we who defends this area.
+	 * @param pChokepoint the choke point to check
+	 * @param testOur set to true to check if the choke point abuts to our region, false to check if the
+	 * choke point abuts to an allied region.
+	 * @return true if it's our choke point, else false and thus it's the allies's choke point.
+	 * @note When returning true it does not mean it is only our or an allied choke point, it can be
+	 * both our and our allied. To test this two calls needs to be made, one with testOur set to
+	 * true and the other set to false.
+	 */
+	static bool isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool testOur);
+
 	struct DefendPosition {
 		BWAPI::TilePosition position;
-		bool underAttack;
+		bool underAttack; /**< The region is under attack */
+		bool isOur; /**< If the choke point is abut to a region with our structures */
+		bool isAllied; /**< If the choke point is abut to a region with allied structures */
 
 		/**
 		 * Default constructor
+		 * @param position the position of the defended area, defaults to TilePositions::Invalid.
 		 */
 		DefendPosition(const BWAPI::TilePosition position = BWAPI::TilePositions::Invalid) :
-		position(position), underAttack(false) {}
+		position(position), underAttack(false), isOur(false), isAllied(false) {}
 	};
 
 	UnitManager* mpUnitManager;

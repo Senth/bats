@@ -1,7 +1,7 @@
 #include "DefenseManager.h"
 #include "UnitManager.h"
 #include "SquadManager.h"
-#include "DefenseMoveSquad.h"
+#include "PatrolSquad.h"
 #include "Helper.h"
 #include "Config.h"
 #include "ExplorationManager.h"
@@ -48,7 +48,7 @@ void DefenseManager::update() {
 
 	updateDefendPositions();
 	updateUnderAttackPositions();
-	updateMoveSquad();
+	updatePatrolSquad();
 
 	/// @todo Remove any DefenseHoldSquad in position that shall not be defended any longer.
 
@@ -78,7 +78,23 @@ void DefenseManager::updateDefendPositions() {
 			mDefendPositions.find(newDefendChokepoints[i]);
 
 		if (foundIt == mDefendPositions.end()) {
-			mDefendPositions[newDefendChokepoints[i]] = getDefendPosition(newDefendChokepoints[i]);
+			DefendPosition& newDefendPosition = mDefendPositions[newDefendChokepoints[i]];
+
+			newDefendPosition.position = getDefendPosition(newDefendChokepoints[i]);
+
+			// Check if the defend position belongs to us
+			if (isOurOrAlliedChokepoint(newDefendChokepoints[i], true)) {
+				newDefendPosition.isOur = true;
+			} else {
+				newDefendPosition.isOur = false;
+			}
+
+			// Check if defend position belongs to allied
+			if (isOurOrAlliedChokepoint(newDefendChokepoints[i], false)) {
+				newDefendPosition.isAllied = true;
+			} else {
+				newDefendPosition.isAllied = false;
+			}
 		}
 	}
 
@@ -95,7 +111,7 @@ void DefenseManager::updateDefendPositions() {
 			++i;
 		}
 
-		// Did the existing defend pos in the new set
+		// Didn't find the existing position in the new set of positions -> remove it.
 		if (!defendExists) {
 			oldDefendIt = mDefendPositions.erase(oldDefendIt);
 		} else {
@@ -104,13 +120,19 @@ void DefenseManager::updateDefendPositions() {
 	}
 }
 
-bool DefenseManager::isRegionOccupiedByOurTeam(BWTA::Region* pRegion) {
+bool DefenseManager::isRegionOccupiedByOurTeam(BWTA::Region* pRegion, bool includeOurStructures, bool includeAlliedStructures) {
+	assert(NULL != pRegion);
 	if (NULL == pRegion) {
 		return false;
 	}
 
-	set<Player*> teamPlayers = Broodwar->allies();
-	teamPlayers.insert(Broodwar->self());
+	set<Player*> teamPlayers;
+	if (includeAlliedStructures) {
+		teamPlayers = Broodwar->allies();
+	}
+	if (includeOurStructures) {
+		teamPlayers.insert(Broodwar->self());
+	}
 
 	const Position regionToCheckPos = pRegion->getCenter();
 
@@ -135,6 +157,8 @@ bool DefenseManager::isRegionOccupiedByOurTeam(BWTA::Region* pRegion) {
 }
 
 bool DefenseManager::isChokepointEdge(BWTA::Chokepoint* pChokepoint) {
+	assert(NULL != pChokepoint);
+
 	const pair<BWTA::Region*, BWTA::Region*>& abutRegions = pChokepoint->getRegions();
 	BWTA::Region* pOccupiedRegion = NULL;
 	BWTA::Region* pEmptyRegion = NULL;
@@ -206,26 +230,10 @@ vector<BWTA::Chokepoint*> DefenseManager::getDefendChokepoints() {
 	return defendChokepoints;
 }
 
-TilePosition DefenseManager::getCenterDefendPosition() const {
-	TilePosition center(0,0);
-	DefendMap::const_iterator defendPosIt;
-	for (defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
-		center += defendPosIt->second.position;
-	}
-
-	if (!mDefendPositions.empty()) {
-		center.x() /= mDefendPositions.size();
-		center.y() /= mDefendPositions.size();
-		return center;
-	} else {
-		return TilePositions::Invalid;
-	}
-}
-
 TilePosition DefenseManager::getDefendPosition(BWTA::Chokepoint* pChokepoint) {
 	const TilePosition chokePos(pChokepoint->getCenter());
 
-	// Closest our closest structure. Used for calculating in which direction of the chokepoint
+	// Closest our closest structure. Used for calculating in which direction of the choke point
 	// we shall be.
 	const std::pair<Unit*, int>& closestStructure = getClosestAlliedStructure(chokePos);
 	const TilePosition& structurePos = closestStructure.first->getTilePosition();
@@ -260,7 +268,7 @@ TilePosition DefenseManager::getDefendPosition(BWTA::Chokepoint* pChokepoint) {
 	return defendPos;
 }
 
-void DefenseManager::updateMoveSquad() {
+void DefenseManager::updatePatrolSquad() {
 	// Get all free units, to be added to the defense move squads.
 	/// @todo Remove all overlords
 	vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
@@ -277,37 +285,45 @@ void DefenseManager::updateMoveSquad() {
 
 
 	// Get active move squad
-	DefenseMoveSquadPtr activeMoveSquad;
-	const vector<DefenseMoveSquadPtr>& moveSquads = mpSquadManager->getSquads<DefenseMoveSquad>();
+	PatrolSquadPtr activePatrolSquad;
+	const vector<PatrolSquadPtr>& moveSquads = mpSquadManager->getSquads<PatrolSquad>();
 
 	if (!moveSquads.empty()) {
 		// We will always have only one DefenseMoveSquad (for now)
-		activeMoveSquad = moveSquads[0];
+		activePatrolSquad = moveSquads[0];
 	}
 
 
 	// Add free units to the defense move squads, except transportations
 	if (!freeUnits.empty()) {
-		if (NULL == activeMoveSquad) {
-			DefenseMoveSquad* pMoveSquad = new DefenseMoveSquad(freeUnits);
-			activeMoveSquad = pMoveSquad->getThis();
-			activeMoveSquad->activate();
+		if (NULL == activePatrolSquad) {
+			PatrolSquad* pMoveSquad = new PatrolSquad(freeUnits);
+			activePatrolSquad = pMoveSquad->getThis();
+			activePatrolSquad->activate();
 		} else {
-			activeMoveSquad->addUnits(freeUnits);
+			activePatrolSquad->addUnits(freeUnits);
 		}
 	}
 
 
-	// Update wait position and set defend position
-	if (NULL != activeMoveSquad) {
-		activeMoveSquad->setWaitPosition(getCenterDefendPosition());
+	// Set patrol position and defend position
+	if (NULL != activePatrolSquad) {
+		// Patrol
+		// Get all our defended positions
+		set<TilePosition> patrolPositions;
+		for (DefendMap::const_iterator defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
+			if (defendPosIt->second.isOur) {
+				patrolPositions.insert(defendPosIt->second.position);
+			}
+		}
+		activePatrolSquad->setPatrolPositions(patrolPositions);
 
-		// Set a defend position if a position needs defending and the squad isn't defending an area
-		if (!activeMoveSquad->isDefending() && mUnderAttack) {
+		// Defend - if a position needs defending and the squad isn't defending an area
+		if (!activePatrolSquad->isDefending() && mUnderAttack) {
 			DefendMap::iterator defendIt = mDefendPositions.begin();
-			while (defendIt != mDefendPositions.end() && !activeMoveSquad->isDefending()) {
+			while (defendIt != mDefendPositions.end() && !activePatrolSquad->isDefending()) {
 				if (defendIt->second.underAttack) {
-					activeMoveSquad->defendPosition(defendIt->second.position);
+					activePatrolSquad->defendPosition(defendIt->second.position);
 				}
 				++defendIt;
 			}
@@ -355,21 +371,6 @@ void DefenseManager::printGraphicDebugInfo() const {
 			);
 		}
 	}
-
-	// High
-	// Show center of the defend positions
-	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
-		// Center defend position
-		Position centerPos(getCenterDefendPosition());
-
-		Broodwar->drawCircleMap(
-			centerPos.x(),
-			centerPos.y(),
-			2,
-			BWAPI::Colors::Orange,
-			true
-		);
-	}
 }
 
 void DefenseManager::updateUnderAttackPositions() {
@@ -381,5 +382,19 @@ void DefenseManager::updateUnderAttackPositions() {
 			mUnderAttack = true;
 			defendPosIt->second.underAttack = true;
 		}
+	}
+}
+
+bool DefenseManager::isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool testOur) {
+	assert(NULL != pChokepoint);
+
+	const pair<BWTA::Region*, BWTA::Region*> regions = pChokepoint->getRegions();
+
+	if (isRegionOccupiedByOurTeam(regions.first, testOur, !testOur)) {
+		return true;
+	} else if (isRegionOccupiedByOurTeam(regions.second, testOur, !testOur)) {
+		return true;
+	} else {
+		return false;
 	}
 }

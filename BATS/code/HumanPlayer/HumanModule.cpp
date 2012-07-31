@@ -17,9 +17,7 @@ void HumanModule::onFrame() {
 	}
 }
 void HumanModule::onSendText(std::string text) {
-	if (text == "test") {
-		Broodwar->printf("It's working!");
-	} else if (startsWith(text, "speed")) {
+	if (startsWith(text, "speed")) {
 		int speed = -1;
 
 		std::string speedValueStr = text.substr(5);
@@ -32,7 +30,19 @@ void HumanModule::onSendText(std::string text) {
 		Broodwar->sendText(text.c_str());
 	}
 }
-void HumanModule::onReceiveText(BWAPI::Player* player, std::string text) {}
+void HumanModule::onReceiveText(BWAPI::Player* player, std::string text) {
+	if (startsWith(text, "speed")) {
+		int speed = -1;
+
+		std::string speedValueStr = text.substr(5);
+		std::stringstream ss;
+		ss << speedValueStr;
+		ss >> speed;
+
+		Broodwar->setLocalSpeed(speed);
+		Broodwar->printf("Speed set to: %i", speed);
+	}
+}
 void HumanModule::onPlayerLeft(BWAPI::Player* player) {}
 void HumanModule::onNukeDetect(BWAPI::Position target) {}
 void HumanModule::onUnitDiscover(BWAPI::Unit* unit) {}

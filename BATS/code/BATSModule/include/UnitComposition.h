@@ -17,6 +17,7 @@ enum UnitCompositions {
 	UnitComposition_Drop = UnitComposition_First,
 	UnitComposition_Scout,
 	UnitComposition_Harass,
+	UnitComposition_Defend,
 	UnitComposition_All,
 	UnitComposition_Lim
 };

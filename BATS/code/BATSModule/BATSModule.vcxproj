@@ -98,12 +98,12 @@
     <ClCompile Include="src\AlliedSquad.cpp" />
     <ClCompile Include="src\AttackCoordinator.cpp" />
     <ClCompile Include="src\DefenseManager.cpp" />
-    <ClCompile Include="src\DefenseMoveSquad.cpp" />
     <ClCompile Include="src\DropSquad.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\ExploreData.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\Helper.cpp" />
+    <ClCompile Include="src\PatrolSquad.cpp" />
     <ClCompile Include="src\Resource.cpp" />
     <ClCompile Include="src\ResourceCounter.cpp" />
     <ClCompile Include="src\ResourceGroup.cpp" />
@@ -125,12 +125,12 @@
     <ClInclude Include="include\Commander.h" />
     <ClInclude Include="include\Config.h" />
     <ClInclude Include="include\DefenseManager.h" />
-    <ClInclude Include="include\DefenseMoveSquad.h" />
     <ClInclude Include="include\DropSquad.h" />
     <ClInclude Include="include\ExplorationManager.h" />
     <ClInclude Include="include\ExploreData.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
+    <ClInclude Include="include\PatrolSquad.h" />
     <ClInclude Include="include\SelfClassifier.h" />
     <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Resource.h" />

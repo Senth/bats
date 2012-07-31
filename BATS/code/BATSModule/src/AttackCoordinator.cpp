@@ -84,7 +84,7 @@ AttackCoordinator* AttackCoordinator::getInstance() {
 
 void AttackCoordinator::requestAttack(AttackSquadRef squad) {
 	// Special case when squad is frontal attack and player squad has attacking big
-	if (!squad->isDistracting() && squad->isFollowingAlliedSquad()) {
+	if (squad->isFrontalAttack() && squad->isFollowingAlliedSquad()) {
 		AlliedSquadCstPtr alliedSquad = squad->getAlliedSquad();
 		const TilePosition& alliedCenter = alliedSquad->getCenter();
 		if (TilePositions::Invalid != alliedCenter) {

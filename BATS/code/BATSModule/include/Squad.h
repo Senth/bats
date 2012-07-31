@@ -24,7 +24,9 @@ class GameTime;
  * Base class for all BATS squads. Represents a squad of units with a shared goal.
  * The squad is composed of different unit types. The squad must always be activated using
  * activate() function, else it won't do anything.
- * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+ * @todo improve unit movement when going to a certain location. Make units move to make way
+ * for units in the back so the position can be reached.
+ * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
 class Squad
 {
@@ -546,6 +548,12 @@ protected:
 	 */
 	virtual std::string getDebugInfo() const;
 
+	/**
+	 * Returns true if a unit is standing still and not attacking.
+	 * @return true if a unit stands still and not attacks 
+	 */
+	bool isAUnitStill() const;
+
 #pragma warning(push)
 #pragma warning(disable:4100)
 	/**
@@ -647,12 +655,6 @@ private:
 	 * @see updateUnitMovement() to update the position of all units in the squad. 
 	 */
 	BWAPI::TilePosition getPriorityMoveToPosition() const;
-
-	/**
-	 * Returns true if a unit is standing still and not attacking.
-	 * @return true if a unit stands still and not attacks 
-	 */
-	bool isAUnitStill() const;
 
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;

@@ -6,22 +6,27 @@
 namespace bats {
 
 /**
- * A defensive squad that can move around. If it doesn't have a target it will
- * automatically go to position it shall wait in. Once it gets a target position to
+ * A defensive patrol squad that can move around. If it's not defending any area it will
+ * automatically patrol the selected areas. Currently it patrols the areas in no specific
+ * order, but not random. \n
+ * \n
+ * Once it gets a target position to
  * defend the squad will enter its defending state, only when the enemy retreats from
- * the defending area or when all enemies are defeated it will re-enter its waiting state
- * and move back to the waiting position.
- * This squad will never succeed or fail.
+ * the defending area or when all enemies are defeated it will re-enter its patrol state
+ * and continue patrolling. \n
+ * \n
+ * This squad will neither succeed nor fail.
+ * @todo Create the most efficient path for patrolling through the patrolling positions.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
-class DefenseMoveSquad : public Squad {
+class PatrolSquad : public Squad {
 public:
 	/**
 	 * Constructs the squad with the specified initial units.
 	 * @param units initial units to add
 	 * @param waitPosition the position for the squad to wait in, defaults to TilePositions::Invalid
 	 */
-	DefenseMoveSquad(
+	PatrolSquad(
 		const std::vector<UnitAgent*>& units,
 		const BWAPI::TilePosition& waitPosition = BWAPI::TilePositions::Invalid
 	);
@@ -29,13 +34,15 @@ public:
 	/**
 	 * Destructor
 	 */
-	virtual ~DefenseMoveSquad();
+	virtual ~PatrolSquad();
 
 	/**
-	 * Sets a new wait position for the squad.
-	 * @param waitPosition new wait position.
+	 * Set the patrolling positions.
+	 * @param patrolPositions new position to patrol between
+	 * @note It will not reset the positions and make the squad begin to move to the first
+	 * position again.
 	 */
-	void setWaitPosition(const BWAPI::TilePosition& waitPosition);
+	void setPatrolPositions(const std::set<BWAPI::TilePosition>& patrolPositions);
 
 	/**
 	 * Tells the squad to go and defend the specified position.
@@ -55,7 +62,7 @@ public:
 	 * right pointer for an attackSquad.
 	 * @return shared_ptr to this AttackSquad
 	 */
-	DefenseMoveSquadPtr getThis() const;
+	PatrolSquadPtr getThis() const;
 
 	virtual std::string getName() const;
 
@@ -85,6 +92,24 @@ private:
 	 */
 	BWAPI::TilePosition findEnemyPositionWithinDefendPerimeter() const;
 
+	/**
+	 * Goes to the next patrol position. If none exist it will do nothing.
+	 */
+	void goToNextPatrolPosition();
+
+	/**
+	 * Handles patrolling, going to the next position when close to the current one.
+	 */
+	void handlePatrol();
+
+	/**
+	 * Handles defending an areas, checks when the defending has been successfully completed.
+	 * Assigns where the squad shall attack if enemies move close enough.
+	 */
+	void handleDefend();
+
 	BWAPI::TilePosition mDefendPosition;
+	std::set<BWAPI::TilePosition>::iterator mPatrolPositionCurrentIt;
+	std::set<BWAPI::TilePosition> mPatrolPositions;
 };
 }

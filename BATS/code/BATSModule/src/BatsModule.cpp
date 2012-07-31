@@ -207,6 +207,8 @@ void BatsModule::onSendText(std::string text) {
 		ss >> speed;
 
 		Broodwar->setLocalSpeed(speed);
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Global speed set to: " << speed);
+		Broodwar->sendText(text.c_str());
 	} else {
 		// Default behavior
 		BTHAIModule::onSendText(text);

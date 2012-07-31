@@ -181,7 +181,7 @@ void AttackSquad::updateDerived() {
 
 bool AttackSquad::createGoal() {
 	// Check if allied big frontal attack is out of home
-	if (NULL == mpAlliedSquadFollow && !isDistracting()) {
+	if (NULL == mpAlliedSquadFollow && isFrontalAttack()) {
 		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getBigSquad();
 
 		// Check if squad is outside of home

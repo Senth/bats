@@ -123,9 +123,6 @@
     <ClInclude Include="include\SelfClassifier.h">
       <Filter>Classification</Filter>
     </ClInclude>
-    <ClInclude Include="include\DefenseMoveSquad.h">
-      <Filter>Squads\Types</Filter>
-    </ClInclude>
     <ClInclude Include="include\DefenseManager.h">
       <Filter>Commander</Filter>
     </ClInclude>
@@ -137,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="include\ResourceCounter.h">
       <Filter>ExplorationAndMap\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PatrolSquad.h">
+      <Filter>Squads\Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -227,9 +227,6 @@
     <ClCompile Include="src\UnitManager.cpp">
       <Filter>Commander</Filter>
     </ClCompile>
-    <ClCompile Include="src\DefenseMoveSquad.cpp">
-      <Filter>Squads\Types</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resource.cpp">
       <Filter>ExplorationAndMap\Resources</Filter>
     </ClCompile>
@@ -238,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="src\ResourceGroup.cpp">
       <Filter>ExplorationAndMap\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatrolSquad.cpp">
+      <Filter>Squads\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
