@@ -85,14 +85,6 @@ private:
 	bool isEnemyWithinOffensivePerimeter() const;
 
 	/**
-	 * Checks if there are any enemies alive close to the defended position.
-	 * Returns the position to the first enemy found close to the position.
-	 * @return position of the first enemy found close to the defended position,
-	 * TilePositions::Invalid if no enemies are found.
-	 */
-	BWAPI::TilePosition findEnemyPositionWithinDefendPerimeter() const;
-
-	/**
 	 * Goes to the next patrol position. If none exist it will do nothing.
 	 */
 	void goToNextPatrolPosition();

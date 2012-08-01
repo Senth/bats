@@ -237,10 +237,10 @@ bool AttackSquad::isInPosition() const {
 }
 
 bool AttackSquad::isAttacking() const {
-	const std::vector<UnitAgent*> units = getUnits();
+	const std::vector<const UnitAgent*> units = getUnits();
 
 	for (size_t i = 0; i < units.size(); ++i) {
-		BWAPI::Unit* currentUnit = units[i]->getUnit();
+		const BWAPI::Unit* currentUnit = units[i]->getUnit();
 		if (currentUnit->isAttacking() || currentUnit->isUnderAttack()) {
 			return true;
 		}
@@ -332,12 +332,12 @@ string AttackSquad::getDebugInfo() const {
 }
 
 bool AttackSquad::isTargetingEnemyStructure() const {
-	const vector<UnitAgent*>& units = getUnits();
+	const vector<const UnitAgent*>& units = getUnits();
 
 	for (size_t i = 0; i < units.size(); ++i) {
-		Unit* pUnit = units[i]->getUnit();
-		Unit* pTarget = pUnit->getTarget();
-		Unit* pOrderTarget = pUnit->getOrderTarget();
+		const Unit* pUnit = units[i]->getUnit();
+		const Unit* pTarget = pUnit->getTarget();
+		const Unit* pOrderTarget = pUnit->getOrderTarget();
 
 		// Target
 		if (NULL != pTarget &&

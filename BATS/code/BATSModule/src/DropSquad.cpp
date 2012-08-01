@@ -129,7 +129,7 @@ Squad::GoalStates DropSquad::checkGoalState() const {
 }
 
 void DropSquad::loadUnits() {
-	vector<UnitAgent*>& units = getUnits();
+	const vector<UnitAgent*>& units = getUnits();
 	vector<UnitAgent*> unitsToLoad;
 
 	// Get units that can be loaded

@@ -20,7 +20,6 @@ PFManager* UnitAgent::mpsPfManager = NULL;
 
 UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 {
-	dropped = 0;
 	agentType = "UnitAgent";
 
 	if (mpsSquadManager == NULL) {
@@ -712,4 +711,8 @@ bool UnitAgent::chargeShields()
 		}
 	}
 	return false;
+}
+
+void UnitAgent::resetToDefaultBehavior() {
+	/// @todo
 }

@@ -46,8 +46,8 @@ bool bats::isGasStructure(BWAPI::Unit* pUnit) {
 	return false;
 }
 
-bool bats::isEnemyWithinRadius(const BWAPI::TilePosition& position, int radius) {
-	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(position), radius * TILE_SIZE);
+bool bats::isEnemyWithinRadius(const BWAPI::TilePosition& center, int radius) {
+	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(center), radius * TILE_SIZE);
 	std::set<Unit*>::const_iterator unitIt;
 	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
 		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self())) {
@@ -56,6 +56,18 @@ bool bats::isEnemyWithinRadius(const BWAPI::TilePosition& position, int radius) 
 	}
 
 	return false;
+}
+
+BWAPI::TilePosition bats::findEnemyPositionWithinRadius(const BWAPI::TilePosition& center, int radius) {
+	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(center), radius * TILE_SIZE);
+	std::set<Unit*>::const_iterator unitIt;
+	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self()) && (*unitIt)->getTilePosition().isValid()) {
+			return (*unitIt)->getTilePosition();
+		}
+	}
+
+	return TilePositions::Invalid;
 }
 
 std::pair<Unit*,int> bats::getClosestAlliedStructure(const BWAPI::TilePosition& position) {

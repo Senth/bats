@@ -32,10 +32,10 @@ public:
 	 */
 	virtual ~HoldSquad();
 
+	virtual std::string getName() const;
+
 protected:
 	virtual void updateDerived();
-	virtual void onUnitAdded(UnitAgent* pAddedUnit);
-	virtual void onUnitRemoved(UnitAgent* pRemovedUnit);
 
 private:
 

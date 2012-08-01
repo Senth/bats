@@ -132,7 +132,7 @@ void UnitCompositionFactory::reloadConfigs() {
 }
 
 std::vector<UnitComposition> UnitCompositionFactory::getUnitCompositionsByType(
-	std::vector<UnitAgent*> availableUnits,
+	const std::vector<UnitAgent*>& availableUnits,
 	UnitCompositions type) const
 {
 	assert(type >= UnitComposition_First);

@@ -47,7 +47,7 @@ public:
 	 * vector if no available unit compositions were found.
 	 */
 	std::vector<UnitComposition> getUnitCompositionsByType(
-		std::vector<UnitAgent*> availableUnits,
+		const std::vector<UnitAgent*>& availableUnits,
 		UnitCompositions type
 	) const;
 

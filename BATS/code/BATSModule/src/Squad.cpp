@@ -64,6 +64,7 @@ Squad::Squad(
 	}
 
 	mId = mpsKeyHandler->allocateKey();
+	mInitialized = false;
 
 	// Add all units
 	addUnits(units);
@@ -72,8 +73,6 @@ Squad::Squad(
 		DEBUG_MESSAGE(utilities::LogLevel_Warning, "Squad::Squad() | Created a Squad with a " <<
 			"UnitComposition, but not enough units were supplied for the squad");
 	}
-
-	mInitialized = false;
 
 	// Add to squad manager
 	SquadPtr strongPtr(this);
@@ -335,9 +334,6 @@ bool Squad::travelsByAir() const {
 }
 
 void Squad::addUnit(UnitAgent* pUnit) {
-	// Check so that the unit agent doesn't have a squad already.
-	assert(pUnit->getSquadId() == SquadId::INVALID_KEY);
-
 	bool bAddUnit = false;
 
 	// Only add units if we have place for them in the unit composition
@@ -350,6 +346,16 @@ void Squad::addUnit(UnitAgent* pUnit) {
 	}
 
 	if (bAddUnit) {	
+		// Remove unit from existing squad if it belongs to another squad.
+		if (pUnit->getSquadId() != SquadId::INVALID_KEY) {
+			SquadPtr pOldSquad = mpsSquadManager->getSquad(pUnit->getSquadId());
+			assert(pOldSquad != NULL);
+
+			pOldSquad->removeUnit(pUnit);
+		}
+
+
+		// Add unit
 		mUnits.push_back(pUnit);
 		pUnit->setSquadId(mId);
 	
@@ -362,7 +368,10 @@ void Squad::addUnit(UnitAgent* pUnit) {
 			mHasGroundUnits = true;
 		}
 
-		onUnitAdded(pUnit);
+		// Send event only if the class has been initialized (otherwise derived classes doesn't exist)
+		if (mInitialized) {
+			onUnitAdded(pUnit);
+		}
 	}
 }
 
@@ -408,9 +417,10 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 				++i;
 			}
 		}
-		pUnit->setSquadId(bats::SquadId::INVALID_KEY);
 
+		pUnit->setSquadId(bats::SquadId::INVALID_KEY);
 		onUnitRemoved(pUnit);
+		pUnit->resetToDefaultBehavior();
 
 	} else {
 		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
@@ -523,6 +533,8 @@ void Squad::forceDisband() {
 		// Free all the units from a squad.
 		for (size_t i = 0; i < mUnits.size(); ++i) {
 			mUnits[i]->setSquadId(SquadId::INVALID_KEY);
+			onUnitRemoved(mUnits[i]);
+			mUnits[i]->resetToDefaultBehavior();
 		}
 
 		mUnits.clear();
@@ -559,11 +571,11 @@ Squad::States Squad::getState() const {
 	return mState;
 }
 
-const vector<UnitAgent*>& Squad::getUnits() const {
-	return mUnits;
+const vector<const UnitAgent*>& Squad::getUnits() const {
+	return *reinterpret_cast<const vector<const UnitAgent*>*>(&mUnits);
 }
 
-vector<UnitAgent*>& Squad::getUnits() {
+const vector<UnitAgent*>& Squad::getUnits() {
 	return mUnits;
 }
 
@@ -849,9 +861,8 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 
 int Squad::getSightDistance() const {
 	int maxSight = 0;
-	const std::vector<UnitAgent*> squadUnits = getUnits();
-	for (size_t i = 0; i < squadUnits.size(); ++i) {
-		int unitSightCurrent = squadUnits[i]->getUnitType().sightRange();
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		int unitSightCurrent = mUnits[i]->getUnitType().sightRange();
 		if (unitSightCurrent > maxSight) {
 			maxSight = unitSightCurrent;
 		}

@@ -2,10 +2,13 @@
 #include "UnitManager.h"
 #include "SquadManager.h"
 #include "PatrolSquad.h"
+#include "HoldSquad.h"
 #include "Helper.h"
 #include "Config.h"
 #include "ExplorationManager.h"
 #include "GameTime.h"
+#include "TypeDefs.h"
+#include "UnitCompositionFactory.h"
 #include <BWAPI/Unit.h>
 #include <BWTA/Region.h>
 #include <BWTA/Chokepoint.h>
@@ -21,11 +24,13 @@ DefenseManager::DefenseManager() {
 	mpUnitManager = NULL;
 	mpSquadManager = NULL;
 	mpGameTime = NULL;
+	mpUnitCompositionFactory = NULL;
 
 	mFrameCallLast = 0;
 	mpUnitManager = UnitManager::getInstance();
 	mpSquadManager = SquadManager::getInstance();
 	mpGameTime = GameTime::getInstance();
+	mpUnitCompositionFactory = UnitCompositionFactory::getInstance();
 }
 
 DefenseManager::~DefenseManager() {
@@ -49,14 +54,57 @@ void DefenseManager::update() {
 	updateDefendPositions();
 	updateUnderAttackPositions();
 	updatePatrolSquad();
+	//updateHoldSquads();
+}
 
-	/// @todo Remove any DefenseHoldSquad in position that shall not be defended any longer.
+void DefenseManager::updateHoldSquads() {
+	const std::vector<HoldSquadPtr>& holdSquads = mpSquadManager->getSquads<HoldSquad>();
 
-	/// @todo is any defense point undefended, create DefenseHoldSquad for that position
+	// Remove any DefenseHoldSquad in position that shall not be defended any longer.
+	for (size_t i = 0; i < holdSquads.size(); ++i) {
+		if (!isInDefendingList(holdSquads[i]->getGoalPosition())) {
+			holdSquads[i]->tryDisband();
+		}
+	}
+
+
+	// Tasks that need free units from the patrol squad.
+	std::vector<PatrolSquadPtr> patrolSquads = mpSquadManager->getSquads<PatrolSquad>();
+	if (!patrolSquads.empty()) {
+		PatrolSquadPtr pPatrolSquad = patrolSquads.front();
+
+
+		// Is any defense point undefended, create DefenseHoldSquad for that position
+		DefendMap::const_iterator defendIt;
+		for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
+			bool defended = false;
+			size_t squadIndex = 0;
+			while (!defended && squadIndex <= holdSquads.size()) {
+				if (holdSquads[squadIndex]->getGoalPosition() == defendIt->second.position) {
+					defended = true;
+				}
+				++squadIndex;
+			}
+
+			if (!defended) {
+				const std::vector<UnitAgent*>& patrolUnits = pPatrolSquad->getUnits();
+				const std::vector<UnitComposition>& unitCompositions =
+					mpUnitCompositionFactory->getUnitCompositionsByType(patrolUnits, UnitComposition_Defend);
+
+				// Create a new defense squad
+				if (!unitCompositions.empty()) {
+					new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->second.position);
+				}
+			}
+		}
 	
-	/// @todo Does any DefenseHoldSquad need more units, i.e. not full.
 
-	/// @todo Can we create higher priority composition for any defended area?
+
+		/// @todo Does any DefenseHoldSquad need more units, i.e. not full.
+
+
+		/// @todo Can we create higher priority composition for any defended area?
+	}
 }
 
 vector<Unit*> DefenseManager::getAllFreeUnits() {
@@ -65,8 +113,7 @@ vector<Unit*> DefenseManager::getAllFreeUnits() {
 }
 
 bool DefenseManager::isUnderAttack() const {
-	/// @todo stub
-	return false;
+	return mUnderAttack;
 }
 
 void DefenseManager::updateDefendPositions() {
@@ -397,4 +444,15 @@ bool DefenseManager::isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool
 	} else {
 		return false;
 	}
+}
+
+bool DefenseManager::isInDefendingList(const BWAPI::TilePosition& position) const {
+	DefendMap::const_iterator it;
+	for (it = mDefendPositions.begin(); it != mDefendPositions.end(); ++it) {
+		if (it->second.position == position) {
+			return true;
+		}
+	}
+
+	return false;
 }

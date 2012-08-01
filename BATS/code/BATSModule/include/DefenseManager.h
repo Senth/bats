@@ -21,6 +21,7 @@ namespace bats {
 class UnitManager;
 class SquadManager;
 class GameTime;
+class UnitCompositionFactory;
 
 /**
  * Manages the defense for the team. Creates DefensiveHoldSquad and DefensivePatrolSquad
@@ -127,6 +128,11 @@ private:
 	void updatePatrolSquad();
 
 	/**
+	 * Updates all the hold squads. I.e. adds, deletes and improve existing.
+	 */
+	void updateHoldSquads();
+
+	/**
 	 * Checks if some defend positions are under attack. This includes enemies just being
 	 * in the offensive perimeter.
 	 */
@@ -145,6 +151,13 @@ private:
 	 */
 	static bool isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool testOur);
 
+	/**
+	 * Checks the specified position is in our defending position list.
+	 * @param position the position to check if it's in the defending list.
+	 * @return true if the position is in the defending list, otherwise false.
+	 */
+	bool isInDefendingList(const BWAPI::TilePosition& position) const;
+
 	struct DefendPosition {
 		BWAPI::TilePosition position;
 		bool underAttack; /**< The region is under attack */
@@ -162,8 +175,9 @@ private:
 	UnitManager* mpUnitManager;
 	SquadManager* mpSquadManager;
 	GameTime* mpGameTime;
-	bool mUnderAttack;
+	UnitCompositionFactory* mpUnitCompositionFactory;
 
+	bool mUnderAttack;
 	typedef std::map<BWTA::Chokepoint*, DefendPosition> DefendMap;
 	DefendMap mDefendPositions;
 

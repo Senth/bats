@@ -5,7 +5,7 @@
 using namespace bats;
 using namespace BWAPI;
 
-const std::string DEFENSE_MOVE_SQUAD_NAME = "DefenseMoveSquad";
+const std::string PATROL_SQUAD_NAME = "PatrolSquad";
 
 PatrolSquad::PatrolSquad(
 	const std::vector<UnitAgent*>& units,
@@ -95,7 +95,8 @@ void PatrolSquad::handleDefend() {
 	// Else - Squad is within defend perimeter
 	else {
 		// Find enemy positions to go to
-		const BWAPI::TilePosition& attackPosition = findEnemyPositionWithinDefendPerimeter();
+		const BWAPI::TilePosition& attackPosition =
+			findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::PERIMETER);
 
 		// No enemy position found with defend perimeter
 		if (!attackPosition.isValid()) {
@@ -119,7 +120,7 @@ PatrolSquadPtr PatrolSquad::getThis() const {
 }
 
 std::string PatrolSquad::getName() const {
-	return DEFENSE_MOVE_SQUAD_NAME;
+	return PATROL_SQUAD_NAME;
 }
 
 bool PatrolSquad::isDefending() const {
@@ -132,18 +133,6 @@ bool PatrolSquad::isWithinDefendPerimeter() const {
 
 bool PatrolSquad::isEnemyWithinOffensivePerimeter() const {
 	return isEnemyWithinRadius(mDefendPosition, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER);
-}
-
-BWAPI::TilePosition PatrolSquad::findEnemyPositionWithinDefendPerimeter() const {
-	const std::set<Unit*>& units = Broodwar->getUnitsInRadius(Position(mDefendPosition), config::squad::defend::PERIMETER * TILE_SIZE);
-	std::set<Unit*>::const_iterator unitIt;
-	for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
-		if ((*unitIt)->getPlayer()->isEnemy(Broodwar->self()) && (*unitIt)->getTilePosition().isValid()) {
-			return (*unitIt)->getTilePosition();
-		}
-	}
-
-	return TilePositions::Invalid;
 }
 
 void PatrolSquad::goToNextPatrolPosition() {

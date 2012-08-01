@@ -21,12 +21,11 @@ namespace bats {
  * @author Matteus Magnusson (mattues.magnusso@gmail.com)
  * Implemented retreat functionality
  * and moved some common calculations from the units to UnitAgent.
+ * Implemented reset to default behavior.
  */
 class UnitAgent : public BaseAgent {	
 public:
 	UnitAgent(BWAPI::Unit* mUnit);
-
-	int dropped;
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -150,6 +149,12 @@ public:
 
 	/** Orders a Protoss unit to recharge shields. */
 	bool chargeShields();
+
+	/**
+	 * Resets the unit to its default behavior. This does not alter the goal of the agent, just
+	 * how it behaves, like avoiding enemies, tanks auto-siege etc.
+	 */
+	virtual void resetToDefaultBehavior();
 
 protected:
 	static bats::SquadManager* mpsSquadManager;

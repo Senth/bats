@@ -219,7 +219,13 @@ public:
 	 * Returns all the squad's units
 	 * @return all squad's units
 	 */
-	const std::vector<UnitAgent*>& getUnits() const;
+	const std::vector<UnitAgent*>& getUnits();
+
+	/**
+	 * Returns all the squad's units
+	 * @return all squad's units
+	 */
+	const std::vector<const UnitAgent*>& getUnits() const;
 
 	/**
 	 * Returns this pointer to the squad as an shared_ptr instead of just this
@@ -372,12 +378,6 @@ protected:
 	 * @see addViaPath(BWAPI::TilePosition) to add one via position to the back of the queue.
 	 */
 	void addViaPath(const std::list<BWAPI::TilePosition>& positions);
-
-	/**
-	 * Returns all the squad's units
-	 * @return all squad's units
-	 */
-	std::vector<UnitAgent*>& getUnits();
 
 	/**
 	 * Virtual compute actions function. This function is called by update().

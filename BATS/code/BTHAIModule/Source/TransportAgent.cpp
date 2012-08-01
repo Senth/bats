@@ -35,7 +35,7 @@ int TransportAgent::getFreeLoadSpace(bool includeQueuedUnits) const {
 		std::tr1::shared_ptr<const bats::Squad> squad = bats::SquadManager::getInstance()->getSquad(getSquadId());
 
 		if (NULL != squad) {	
-			const vector<UnitAgent*>& units = squad->getUnits();
+			const vector<const UnitAgent*>& units = squad->getUnits();
 			for (size_t i = 0; i < units.size(); ++i) {
 				const UnitAgent* pUnitCurrent = units[i];
 

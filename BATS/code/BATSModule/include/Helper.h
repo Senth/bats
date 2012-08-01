@@ -70,11 +70,20 @@ inline bool isEnemy(BWAPI::Unit* pUnit) {
 
 /**
  * Returns true if an enemy is within the specified radius from the position.
- * @param position the position to check from.
- * @param radius maximum range from the position the enemy can be. Should be in tile size.
+ * @param center the position to check from.
+ * @param radius maximum range from the position the enemy can be, in tile size.
  * @return true if an enemy is found within the radius.
  */
-bool isEnemyWithinRadius(const BWAPI::TilePosition& position, int radius);
+bool isEnemyWithinRadius(const BWAPI::TilePosition& center, int radius);
+
+/**
+ * Searches for an enemy position within the specified radius. This version returns
+ * the first available position and the enemies are not sorted in any way.
+ * @param center the position to check from.
+ * @param radius maximum range from the center the enemy shall be, in tile size.
+ * @return position of an enemy within the radius, TilePositions::Invalid if none was found.
+ */
+BWAPI::TilePosition findEnemyPositionWithinRadius(const BWAPI::TilePosition& center, int radius);
 
 /**
 * Returns the closest allied structure (including our structures).
@@ -98,6 +107,19 @@ inline int getSquaredDistance(const T& a, const T& b) {
 	diffDistance.x() = a.x() - b.x();
 	diffDistance.y() = a.y() - b.y();
 	return diffDistance.x() * diffDistance.x() + diffDistance.y() * diffDistance.y();
+}
+
+/**
+ * Checks if the two positions is within the specified range.
+ * @pre type T needs to have a function x() and y()
+ * @param a the first point
+ * @param b the second point
+ * @param range the maximum distance between point a and b. Rang shall not be squared.
+ * @return true if a and b is withing range, false otherwise.
+ */
+template<typename T>
+inline bool isWithinRange(const T& a, const T& b, int range) {
+	return getSquaredDistance(a, b) <= range * range;
 }
 
 /**
