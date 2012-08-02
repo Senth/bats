@@ -8,11 +8,14 @@ Frontal attacks are big attacks that generally use the majority of the army and 
 \paragraph{Where to attack?}
 The attack coordinator uses two to three weight multiplied together to get the near optimal attack location—it shall be noted that it is not the optimal attack location and that the weights have not been extensively balanced. The attacking positions are derived from seen enemy structures and expansions that have not been scouted for some time.
 
-The first weight, \emph{distance}, prioritizes structures (and location) far away from other existing attacks, including allied; it is a good idea to spread out multiple attack to split up the enemy army. The second weight, \emph{type}, determines how important a structure or location is to attack, and the third weight, \emph{defended}, is how well defended an area is—the defended weight is not implemented, but distracting attacks would use it to get a location that can be attacked without itself being attack, or not reaching the location because of well defended areas.
+The first weight, \emph{distance}, prioritizes structures (and location) far away from other existing attacks, including allied; it is a good idea to spread out multiple attack to split up the enemy army. The second weight, \emph{type}, determines how important a structure or location is to attack, and the third weight, \emph{defended}, is how well defended an area is—the defended weight is not implemented, but distracting attacks would use it to get a location that can be attacked without taking the risk to die (such as drops dying to anti-air).
 
 In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will get an attack position near the allied squads target instead of using the weights.
 
 Enemy armies are not included in the calculation, because one rarely gain anything on attack an army, one should find gaps in the defense instead\cite{day9}. While it would be good to engage and attack an enemy army if its a lot weaker than our BATS will still do that if the squad is close by, but it will not search for those small armies. Armies are also more mobile meaning it would be a lot harder to keep a track on them.
+
+\paragraph{Coordinated attacks}
+To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_goals} added by the attack coordinator. These are fully described in section \ref{sec:wait_goals} and briefly described here. The wait goal for attack squads is a wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out, current time is 45\conf seconds. Existing squads will get this type of attack and when all attacks are in position, they will start their attack simultaneously.
 
 \subsection{Calculation of distance weight}
 Distance weight is a simple calculation: if no other attacking squads (including allied) are present it defaults to 1. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
@@ -65,8 +68,3 @@ Not much to say, all other structures that have not been covered, such as Terran
 
 \subsubsection{Why this order?}
 Because StarCraft is mostly about managing expansions\cite{day9}, the bot tries to deny and kill fresh expansions as its first priority (the top two priorities). Targeting addons can either stop the production of an important upgrade (siege mode for tanks) or the ability to create tanks, ghosts, etc. Delaying late game units is a big priority if it can be accomplished. Supply depots are almost always good to destroy since it halts all unit production, unless the enemy has stacked up lots of supplies (bad strategy in general) or lost many units in a recent battle. Stopping an upgrade is probably better than killing a unit producing structure, because if the upgrade finishes all existing units will get the upgrade, while if we kill a unit producing structure only 2–4 units will get stopped, but it depends on the type of unit producing structure, what upgrade structure etc; but this priority will do for now.
-
-\subsection{Defended weight}
-
-
-\subsection{Wait Goals}

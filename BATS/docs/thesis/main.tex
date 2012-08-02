@@ -23,6 +23,7 @@
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{float}
+\usepackage[usenames,dvipsnames]{xcolor}
 %\usepackage{a4wide}
 \usepackage{longtable} %table spanning pages
 \usepackage{multirow}
@@ -85,6 +86,10 @@ pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
 \lstset{ %
 language=C++,                % choose the language of the code
 basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+identifierstyle=\color{Bittersweet}\bfseries,
+commentstyle=\color{OliveGreen},
+stringstyle=\color{red},
+keywordstyle=\color{blue},
 %numbers=left,                   % where to put the line-numbers
 numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
 stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
@@ -94,6 +99,8 @@ showspaces=false,               % show spaces adding particular underscores
 showstringspaces=false,         % underline spaces within strings
 showtabs=false,                 % show tabs within strings adding particular underscores
 frame=single,           % adds a frame around the code
+aboveskip=\abovedisplayskip,
+belowskip=\belowdisplayskip,
 tabsize=2,          % sets default tabsize to 2 spaces
 captionpos=b,           % sets the caption-position to bottom
 breaklines=true,        % sets automatic line breaking
