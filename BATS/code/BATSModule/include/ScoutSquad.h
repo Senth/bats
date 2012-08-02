@@ -18,7 +18,7 @@ class ScoutSquad : public Squad{
 		 */
 		ScoutSquad(const std::vector<UnitAgent*> units, 
 			bool avoidEnemy = true, 
-			const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
+			const UnitComposition& unitComposition = UnitCompositionFactory::INVALID);
 		
 		/**
 		 * Destructor

@@ -54,7 +54,7 @@ public:
 	/**
 	 * An invalid unit composition.
 	 */
-	static UnitComposition INVALID_UNIT_COMPOSITION;
+	static UnitComposition INVALID;
 private:
 	/**
 	 * Private constructor to enforce singleton usage.

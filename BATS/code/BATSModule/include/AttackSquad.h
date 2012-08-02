@@ -27,7 +27,7 @@ public:
 	AttackSquad(
 		const std::vector<UnitAgent*>& units,
 		bool distracting = false,
-		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION
+		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID
 	);
 
 	/**

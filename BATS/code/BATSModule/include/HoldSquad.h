@@ -36,6 +36,7 @@ public:
 
 protected:
 	virtual void updateDerived();
+	virtual std::string getDebugInfo() const;
 
 private:
 

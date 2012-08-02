@@ -47,9 +47,10 @@ Squad::Squad(
 	mFurthestUnitAwayDistance(0.0),
 	mFurthestUnitAwayLastTime(-config::squad::CALC_FURTHEST_AWAY_TIME),
 	mGoalState(GoalState_Lim),
-	mState(State_Inactive),
+	mState(State_Initializing),
 	mCanRegroup(true),
-	mFrameLastCall(0)
+	mFrameLastCall(0),
+	mInitialized(false)
 {
 	// Generate new key for the squad
 	if (mcsInstance == 0) {
@@ -64,7 +65,6 @@ Squad::Squad(
 	}
 
 	mId = mpsKeyHandler->allocateKey();
-	mInitialized = false;
 
 	// Add all units
 	addUnits(units);
@@ -905,4 +905,8 @@ int Squad::getSupplyCount() const {
 	}
 
 	return cSupply;
+}
+
+const UnitComposition& Squad::getUnitComposition() const {
+	return mUnitComposition;
 }

@@ -9,7 +9,6 @@ Terran_Supply_Depot
 Terran_Barracks
 Terran_Barracks
 Terran_Refinery
-Terran_Barracks
 Terran_Academy
 Terran_Bunker
 <units>

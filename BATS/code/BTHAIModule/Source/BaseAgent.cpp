@@ -28,6 +28,7 @@ BaseAgent::BaseAgent(Unit* mUnit) : mSquadId(bats::SquadId::INVALID_KEY)
 	lastActionFrame = 0;
 	goal = TilePositions::Invalid;
 	agentType = "BaseAgent";
+	//built = false;
 }
 
 BaseAgent::~BaseAgent()
@@ -49,7 +50,20 @@ const string& BaseAgent::getTypeName() const
 }
 
 bool BaseAgent::isBeingBuilt() const {
-	return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
+	/// @todo only use code below when getRemainingBuildTime() has been fixed for
+	/// tanks. Currently using ugly hack.
+	/// \code
+	/// return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
+	/// \endcode
+
+	return !unit->isCompleted();
+	
+	//if (!built && (unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed())) {
+	//	return true;
+	//} else {
+	//	built = true;
+	//	return false;
+	//}
 }
 
 int BaseAgent::getUnitID() const

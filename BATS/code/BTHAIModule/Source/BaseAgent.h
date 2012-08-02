@@ -31,6 +31,7 @@ protected:
 	int lastActionFrame;
 	bool bBlock;
 	std::string agentType;
+	//mutable bool built; ///< @todo remove when getRemainingBuildTime() has been fixed for tanks
 
 	/**
 	 * Returns true if the unit has any cooldown on either ground or air weapons

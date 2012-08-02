@@ -315,8 +315,6 @@ bool AttackSquad::finishedAlliedRegrouping() const {
 }
 
 string AttackSquad::getDebugInfo() const {
-
-
 	stringstream ss;
 	ss << left << setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Follow: ";
 

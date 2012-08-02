@@ -22,8 +22,8 @@ class GameTime;
 
 /**
  * Base class for all BATS squads. Represents a squad of units with a shared goal.
- * The squad is composed of different unit types. The squad must always be activated using
- * activate() function, else it won't do anything.
+ * The squad is composed of different unit types. The squad is by default activated, but
+ * can be deactivated to add via paths etc (from the player).
  * @todo improve unit movement when going to a certain location. Make units move to make way
  * for units in the back so the position can be reached.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
@@ -39,12 +39,12 @@ public:
 	 * @param disbandable the squad can be destroyed, default is true
 	 * @param unitComposition the composition of units to use, if this is specified
 	 * all units needs to be added directly in this constructor. Defaults to
-	 * INVALID_UNIT_COMPOSITON.
+	 * invalid unit compososition (UnitComposition::INVALID).
 	 */
 	Squad(const std::vector<UnitAgent*>& units,
 		bool avoidEnemyUnits = false,
 		bool disbandable = true,
-		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID_UNIT_COMPOSITION);
+		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID);
 
 	/**
 	 * Destructor, automatically disbands the squad if it hasn't been disbanded.
@@ -249,6 +249,12 @@ public:
 	 * @return current state of the Squad
 	 */
 	States getState() const;
+
+	/**
+	 * Returns the unit composition of the squad
+	 * @return unit composition of the squad, UnitComposition::Invalid
+	 */
+	const UnitComposition& getUnitComposition() const;
 
 	/**
 	 * Returns true if the squad is close to the specified position. Will always

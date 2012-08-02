@@ -8,7 +8,7 @@
 
 using namespace bats;
 
-UnitComposition UnitCompositionFactory::INVALID_UNIT_COMPOSITION = UnitComposition();
+UnitComposition UnitCompositionFactory::INVALID = UnitComposition();
 UnitCompositionFactory* UnitCompositionFactory::mpsInstance = NULL;
 
 UnitCompositions toCompositionType(const std::string& type) {
@@ -18,7 +18,9 @@ UnitCompositions toCompositionType(const std::string& type) {
 		return UnitComposition_Scout;
 	} else if (type == "harass") {
 		return UnitComposition_Harass;
-	} else  {
+	} else if (type == "defend") {
+		return UnitComposition_Defend;
+	} else {
 		return UnitComposition_Lim;
 	}
 }

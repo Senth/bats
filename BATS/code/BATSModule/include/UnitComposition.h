@@ -13,6 +13,7 @@ class UnitCompositionFactory;
  * Enumeration of all UnitComposition types
  */
 enum UnitCompositions {
+	// IMPORTANT! Don't forget to add the composition in UnitCompositionFactory::toCompositionType()
 	UnitComposition_First = 0,
 	UnitComposition_Drop = UnitComposition_First,
 	UnitComposition_Scout,

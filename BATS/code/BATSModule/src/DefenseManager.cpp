@@ -8,6 +8,7 @@
 #include "ExplorationManager.h"
 #include "GameTime.h"
 #include "TypeDefs.h"
+#include "Utilities/Logger.h"
 #include "UnitCompositionFactory.h"
 #include <BWAPI/Unit.h>
 #include <BWTA/Region.h>
@@ -54,22 +55,31 @@ void DefenseManager::update() {
 	updateDefendPositions();
 	updateUnderAttackPositions();
 	updatePatrolSquad();
-	//updateHoldSquads();
+	updateHoldSquads();
 }
 
 void DefenseManager::updateHoldSquads() {
-	const std::vector<HoldSquadPtr>& holdSquads = mpSquadManager->getSquads<HoldSquad>();
+	vector<HoldSquadPtr> holdSquads = mpSquadManager->getSquads<HoldSquad>();
 
 	// Remove any DefenseHoldSquad in position that shall not be defended any longer.
-	for (size_t i = 0; i < holdSquads.size(); ++i) {
-		if (!isInDefendingList(holdSquads[i]->getGoalPosition())) {
-			holdSquads[i]->tryDisband();
+	vector<HoldSquadPtr>::iterator holdIt = holdSquads.begin();
+	while (holdIt != holdSquads.end()) {
+		if (!isInDefendingList((*holdIt)->getGoalPosition())) {
+			(*holdIt)->tryDisband();
+			DEBUG_MESSAGE(utilities::LogLevel_Fine,
+				"DefenseManager: Removing hold squad from undefended area. Unit composition: " <<
+				(*holdIt)->getUnitComposition().getName() << ", position: " <<
+				(*holdIt)->getGoalPosition()
+			);
+			holdIt = holdSquads.erase(holdIt);
+		} else {
+			++holdIt;
 		}
 	}
 
 
 	// Tasks that need free units from the patrol squad.
-	std::vector<PatrolSquadPtr> patrolSquads = mpSquadManager->getSquads<PatrolSquad>();
+	vector<PatrolSquadPtr> patrolSquads = mpSquadManager->getSquads<PatrolSquad>();
 	if (!patrolSquads.empty()) {
 		PatrolSquadPtr pPatrolSquad = patrolSquads.front();
 
@@ -79,7 +89,7 @@ void DefenseManager::updateHoldSquads() {
 		for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
 			bool defended = false;
 			size_t squadIndex = 0;
-			while (!defended && squadIndex <= holdSquads.size()) {
+			while (!defended && squadIndex < holdSquads.size()) {
 				if (holdSquads[squadIndex]->getGoalPosition() == defendIt->second.position) {
 					defended = true;
 				}
@@ -87,23 +97,62 @@ void DefenseManager::updateHoldSquads() {
 			}
 
 			if (!defended) {
-				const std::vector<UnitAgent*>& patrolUnits = pPatrolSquad->getUnits();
-				const std::vector<UnitComposition>& unitCompositions =
+				// Copy units, else the vector will be corrupt when adding units
+				const vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
+				const vector<UnitComposition>& unitCompositions =
 					mpUnitCompositionFactory->getUnitCompositionsByType(patrolUnits, UnitComposition_Defend);
 
 				// Create a new defense squad
 				if (!unitCompositions.empty()) {
 					new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->second.position);
+					DEBUG_MESSAGE(utilities::LogLevel_Fine,
+						"DefenseManager: Found an undefended area, created a new Hold Squad, " <<
+						"Composition: " << unitCompositions.front().getName() << ", position: " <<
+						defendIt->second.position
+					);
 				}
 			}
 		}
 	
 
+		// Create higher priority composition for any defended area, if possible
+		holdIt = holdSquads.begin();
+		while (holdIt != holdSquads.end()) {
+			vector<UnitAgent*> units = pPatrolSquad->getUnits();
+			// Add units from the existing hold squad too.
+			units.insert(units.end(), (*holdIt)->getUnits().begin(), (*holdIt)->getUnits().end());
+			const vector<UnitComposition>& unitCompositions =
+				mpUnitCompositionFactory->getUnitCompositionsByType(units, UnitComposition_Defend);
 
-		/// @todo Does any DefenseHoldSquad need more units, i.e. not full.
+			if (!unitCompositions.empty() &&
+				unitCompositions.front().getPriority() > (*holdIt)->getUnitComposition().getPriority())
+			{
+				new HoldSquad(units, unitCompositions.front(), (*holdIt)->getGoalPosition());
+				DEBUG_MESSAGE(utilities::LogLevel_Fine,
+					"DefenseManager: Upgraded hold squad, from composition '" <<
+					(*holdIt)->getUnitComposition().getName() << "' to '" <<
+					unitCompositions.front().getName() << "' in position: " <<
+					(*holdIt)->getGoalPosition()
+				);
+
+				// Disband and delete squad
+				(*holdIt)->tryDisband();
+				holdIt = holdSquads.erase(holdIt);
+			} else {
+				++holdIt;
+			}
+		}
 
 
-		/// @todo Can we create higher priority composition for any defended area?
+		// Add more units to not full Hold Squads
+		for (size_t i = 0; i < holdSquads.size(); ++i) {
+			if (!holdSquads[i]->isFull()) {
+				// Copy units else the vector will be corrupt when adding units
+				vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
+				holdSquads[i]->addUnits(patrolUnits);
+			}
+			
+		}
 	}
 }
 
