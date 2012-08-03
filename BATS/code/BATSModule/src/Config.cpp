@@ -110,16 +110,10 @@ namespace debug {
 		bool TERRAIN = false;
 		bool COVER_MAP = false;
 		bool DEFENSE = false;
+		bool HOLD_SQUAD = false;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
-
-	bool set(const utilities::VariableInfo& variableInfo);
-}
-
-namespace defense {
-	int CHOKEPOINT_DISTANCE_MIN = 0;
-	int CHOKEPOINT_DISTANCE_MAX = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -182,7 +176,10 @@ namespace squad {
 	}
 
 	namespace defend {
-		int PERIMETER = 0;
+		int ROAM_DISTANCE_MIN = 0;
+		int ROAM_DISTANCE_MAX = 0;
+		int ROAM_PERIMETER = 0;
+		int DEFEND_PERIMETER = 0;
 		int ENEMY_OFFENSIVE_PERIMETER = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
@@ -243,8 +240,6 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 		success = classification::set(variableInfo);
 	} else if (variableInfo.section == "debug") {
 		success = debug::set(variableInfo);
-	} else if (variableInfo.section == "defense") {
-		success = defense::set(variableInfo);
 	} else if (variableInfo.section == "frame_distribution") {
 		success = frame_distribution::set(variableInfo);
 	} else if (variableInfo.section == "game") {
@@ -474,22 +469,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(DEFENSE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE));
 		DEFENSE = variableInfo;
-	} else {
-		return false;
-	}
-
-	return true;
-}
-
-bool defense::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "chokepoint_distance_min") {
-		gOldValue = toString(CHOKEPOINT_DISTANCE_MIN);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(CHOKEPOINT_DISTANCE_MIN));
-		CHOKEPOINT_DISTANCE_MIN = variableInfo;
-	} else if (variableInfo.name == "chokepoint_distance_max") {
-		gOldValue = toString(CHOKEPOINT_DISTANCE_MAX);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(CHOKEPOINT_DISTANCE_MAX));
-		CHOKEPOINT_DISTANCE_MAX = variableInfo;
+	} else if (variableInfo.name == "hold_squad") {
+		gOldValue = toString(HOLD_SQUAD);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(HOLD_SQUAD));
+		HOLD_SQUAD = variableInfo;
 	} else {
 		return false;
 	}
@@ -637,10 +620,22 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool squad::defend::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "perimeter") {
-		gOldValue = toString(PERIMETER);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(PERIMETER));
-		PERIMETER = variableInfo;
+	if (variableInfo.name == "roam_distance_min") {
+		gOldValue = toString(ROAM_DISTANCE_MIN);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ROAM_DISTANCE_MIN));
+		ROAM_DISTANCE_MIN = variableInfo;
+	} else if (variableInfo.name == "roam_distance_max") {
+		gOldValue = toString(ROAM_DISTANCE_MAX);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ROAM_DISTANCE_MAX));
+		ROAM_DISTANCE_MAX = variableInfo;
+	} else if (variableInfo.name == "roam_perimeter") {
+		gOldValue = toString(ROAM_PERIMETER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ROAM_PERIMETER));
+		ROAM_PERIMETER = variableInfo;
+	} else if (variableInfo.name == "defend_perimeter") {
+		gOldValue = toString(DEFEND_PERIMETER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFEND_PERIMETER));
+		DEFEND_PERIMETER = variableInfo;
 	} else if (variableInfo.name == "enemy_offensive_perimeter") {
 		gOldValue = toString(ENEMY_OFFENSIVE_PERIMETER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_OFFENSIVE_PERIMETER));

@@ -137,11 +137,15 @@ bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosit
 	int engageDist = unit->getType().groundWeapon().maxRange();
 	if (agent->isOfType(UnitTypes::Terran_Medic))
 	{
-		engageDist = 6 * 32;
+		engageDist = 6 * TILE_SIZE;
 	}
-	if (engageDist <= 64)
+	else if (engageDist <= 64)
 	{
 		engageDist = 64;
+	}
+	else if (engageDist >= 100)
+	{
+		engageDist = 100;
 	}
 	
 	if (distToReach <= engageDist)
@@ -149,10 +153,7 @@ bool PFManager::moveToGoal(BaseAgent* agent,  TilePosition checkpoint, TilePosit
 		if (unit->isMoving()) unit->stop();
 		return true;
 	}
-	
-	//Move
-	//if (!unit->isMoving()) return unit->attack(toReach);
-	//else return true;
+
 	
 	// Don't attack when defensive
 	if (defensive || forceMove) {

@@ -25,7 +25,6 @@ DropSquad::DropSquad(
 	mStartTime = 0.0;
 	mInitialized = false;
 	mState = State_Load;
-	setTravelsByAir(true);
 }
 
 DropSquad::~DropSquad() {

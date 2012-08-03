@@ -1,17 +1,17 @@
 #pragma once
 
 #include <vector>
-#include <map>
+#include <set>
 #include <BWAPI/TilePosition.h>
+#include <BWTA/Chokepoint.h>
 #include "TypeDefs.h"
 
 // Forward declaration
-namespace BWAPI {
-	class Unit;
-}
+class UnitAgent;
+
+// Forward declaration
 namespace BWTA {
 	class Region;
-	class Chokepoint;
 }
 
 // Namespace for the project
@@ -54,7 +54,7 @@ public:
 	 * If we're under attack it will return no units.
 	 * @return returns all free units that aren't occupied with defending. I.e. all or none.
 	 */
-	std::vector<BWAPI::Unit*> getAllFreeUnits();
+	std::vector<UnitAgent*> getFreeUnits();
 
 	/**
 	 * Checks whether either we or the player is under attack.
@@ -116,11 +116,11 @@ private:
 	static std::vector<BWTA::Chokepoint*> getDefendChokepoints();
 
 	/**
-	 * Searches for a good position to defend the choke point from. 
-	 * @param pChokepoint the choke point to defend
-	 * @return a good position to defend the choke point from.
+	 * Searches for a good roaming position from where we can defend the defend position
+	 * @param defendPosition the position to search from
+	 * @return a roaming position for the specified defend position.
 	 */
-	static BWAPI::TilePosition getDefendPosition(BWTA::Chokepoint* pChokepoint);
+	static BWAPI::TilePosition findRoamPosition(const BWAPI::TilePosition& defendPosition);
 
 	/**
 	 * Updates the move squad. I.e. adds units and a new wait position.
@@ -159,7 +159,8 @@ private:
 	bool isInDefendingList(const BWAPI::TilePosition& position) const;
 
 	struct DefendPosition {
-		BWAPI::TilePosition position;
+		const BWTA::Chokepoint* pChokepoint;
+		const BWAPI::TilePosition position;
 		bool underAttack; /**< The region is under attack */
 		bool isOur; /**< If the choke point is abut to a region with our structures */
 		bool isAllied; /**< If the choke point is abut to a region with allied structures */
@@ -168,8 +169,43 @@ private:
 		 * Default constructor
 		 * @param position the position of the defended area, defaults to TilePositions::Invalid.
 		 */
-		DefendPosition(const BWAPI::TilePosition position = BWAPI::TilePositions::Invalid) :
-		position(position), underAttack(false), isOur(false), isAllied(false) {}
+		DefendPosition(const BWTA::Chokepoint* pChokepoint = NULL) :
+			pChokepoint(pChokepoint),
+			position(pChokepoint != NULL ? BWAPI::TilePosition(pChokepoint->getCenter()) : BWAPI::TilePositions::Invalid),
+			underAttack(false),
+			isOur(false),
+			isAllied(false)
+		{}
+
+		/**
+		 * Assignment operator
+		 * @param rhs the defend position to copy from
+		 */
+		DefendPosition& operator=(const DefendPosition& rhs) {
+			pChokepoint = rhs.pChokepoint;
+			*const_cast<BWAPI::TilePosition*>(&position) = rhs.position;
+			underAttack = rhs.underAttack;
+			isOur = rhs.isOur;
+			isAllied = rhs.isAllied;
+		}
+
+		/**
+		 * Less than operator (for sorting in sets, maps, etc)
+		 * @param rhs the other defend position to check with
+		 * @return true if this choke point pointer is less than the right hand side defend position
+		 */
+		bool operator<(const DefendPosition& rhs) const {
+			return pChokepoint < rhs.pChokepoint;
+		}
+
+		/**
+		 * Checks if this defend position is equal to another defend position
+		 * @param rhs the other defend position to check with
+		 * @return true if it's the same defend position
+		 */
+		bool operator==(const DefendPosition& rhs) const {
+			return pChokepoint == rhs.pChokepoint;
+		}
 	};
 
 	UnitManager* mpUnitManager;
@@ -178,8 +214,8 @@ private:
 	UnitCompositionFactory* mpUnitCompositionFactory;
 
 	bool mUnderAttack;
-	typedef std::map<BWTA::Chokepoint*, DefendPosition> DefendMap;
-	DefendMap mDefendPositions;
+	typedef std::set<DefendPosition> DefendSet;
+	DefendSet mDefendPositions;
 
 	int mFrameCallLast;
 	static DefenseManager* mpsInstance;

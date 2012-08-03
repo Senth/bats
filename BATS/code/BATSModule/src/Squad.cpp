@@ -37,7 +37,6 @@ Squad::Squad(
 	mUnitComposition(unitComposition),
 	mDisbandable(disbandable),
 	mDisbanded(false),
-	mTravelsByAir(false),
 	mAvoidEnemyUnits(avoidEnemyUnits),
 	mId(SquadId::INVALID_KEY),
 	mTempGoalPosition(TilePositions::Invalid),
@@ -308,11 +307,6 @@ bool Squad::travelsByGround() const {
 }
 
 bool Squad::travelsByAir() const {
-	// Skip if it never shall travel by air
-	if (!mTravelsByAir) {
-		return false;
-	}
-
 	// Calculate if it can travel by air.
 	int groundSlotsRequired = 0;
 	int transportationSlots = 0;
@@ -488,10 +482,6 @@ bool Squad::isAvoidingEnemies() const {
 
 void Squad::updateDerived() {
 	// Does nothing
-}
-
-void Squad::setTravelsByAir(bool usesAir) {
-	mTravelsByAir = usesAir;
 }
 
 void Squad::onGoalFailed() {

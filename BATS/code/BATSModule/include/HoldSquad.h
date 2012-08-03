@@ -18,13 +18,15 @@ public:
 	 * Constructs the squad with specified unit composition.
 	 * @param units list of possible units to add
 	 * @param unitComposition the unit composition the squad uses
-	 * @param holdPosition the position to hold, this cannot be changed later. Disband
+	 * @param defendPosition the position to hold and defend, this cannot be changed later. Disband
 	 * the squad and then create a new one.
+	 * @param roamPosition the position the squad will roam until enemies enter the defend position
 	 */
 	HoldSquad(
 		const std::vector<UnitAgent*>& units,
 		const UnitComposition& unitComposition,
-		const BWAPI::TilePosition& holdPosition
+		const BWAPI::TilePosition& defendPosition,
+		const BWAPI::TilePosition& roamPosition
 	);
 
 	/**
@@ -32,13 +34,26 @@ public:
 	 */
 	virtual ~HoldSquad();
 
+	/**
+	 * Returns the defend position of the squad
+	 * @return defend position of the squad
+	 */
+	 const BWAPI::TilePosition& getDefendPosition() const;
+
+	/**
+	 * Returns the roaming position of the squad
+	 * @return roam position of the squad
+	 */
+	const BWAPI::TilePosition& getRoamPosition() const;
+
 	virtual std::string getName() const;
+	virtual void printGraphicDebugInfo() const;
 
 protected:
 	virtual void updateDerived();
 	virtual std::string getDebugInfo() const;
 
 private:
-
+	BWAPI::TilePosition mDefendPosition;
 };
 }

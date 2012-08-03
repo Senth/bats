@@ -96,7 +96,7 @@ void PatrolSquad::handleDefend() {
 	else {
 		// Find enemy positions to go to
 		const BWAPI::TilePosition& attackPosition =
-			findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::PERIMETER);
+			findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
 
 		// No enemy position found with defend perimeter
 		if (!attackPosition.isValid()) {
@@ -128,7 +128,7 @@ bool PatrolSquad::isDefending() const {
 }
 
 bool PatrolSquad::isWithinDefendPerimeter() const {
-	return isCloseTo(mDefendPosition, config::squad::defend::PERIMETER);
+	return isCloseTo(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
 }
 
 bool PatrolSquad::isEnemyWithinOffensivePerimeter() const {

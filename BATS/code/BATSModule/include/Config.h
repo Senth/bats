@@ -206,22 +206,8 @@ namespace bats {
 				extern bool TERRAIN;
 				extern bool COVER_MAP;
 				extern bool DEFENSE;
+				extern bool HOLD_SQUAD;
 			}
-		}
-
-		/**
-		 * Defending attributes
-		 * @note some defending attributes are in squad::defend.
-		 */
-		namespace defense {
-			/** Minimum distance from the choke point units need to be to find a defend
-			 * position
-			 * @see CHOKEPOINT_DISTANCE_MAX */
-			extern int CHOKEPOINT_DISTANCE_MIN;
-			/** Maximum distance from the choke point unist need to be to find a defend
-			 * position
-			 * @see CHOKEPOINT_DISTANCE_MAX */
-			extern int CHOKEPOINT_DISTANCE_MAX;
 		}
 
 		/**
@@ -339,15 +325,27 @@ namespace bats {
 			 * Variables for various Defend squads
 			 */
 			namespace defend {
+				/** Minimum distance from the choke point the roaming area shall be
+				 * @see ROAM_DISTANCE_MAX
+				 * @see ROAM_PERIMETER */
+				extern int ROAM_DISTANCE_MIN;
+				/** Maximum distance from the choke point the roaming area shall be
+				 * @see ROAM_DISTANCE_MAX
+				 * @see ROAM_PERIMETER */
+				extern int ROAM_DISTANCE_MAX;
+				/** The area of the roam perimeter, HoldSquads are located here when no
+				 * units within the defend perimeter exist
+				 * @see ROAM_DISTANCE_MIN
+				 * @see ROAM_DISTANCE_MAX */
+				extern int ROAM_PERIMETER;
 				/** Everything within this distance is treated as within the defended
 				 * perimeter. DefenseMoveSquad uses this for finding enemies within this
 				 * perimeter to attack. */
-				extern int PERIMETER;
+				extern int DEFEND_PERIMETER;
 				/** Enemies within this distance are treated as offensive move towards that
 				 * defended position. This distance is used for alerting DefenseMoveSquad
 				 * about a possible position the enemy will attack. While enemies are within
-				 * this distance, the squad will not move out of the way.
-				 */
+				 * this distance, the squad will not move out of the way. */
 				extern int ENEMY_OFFENSIVE_PERIMETER;
 			}
 

@@ -1,6 +1,7 @@
 #include "UnitManager.h"
 #include "SquadManager.h"
 #include "Squad.h"
+#include "DefenseManager.h"
 #include "BTHAIModule/Source/WorkerAgent.h"
 #include <cassert>
 #include <memory.h>
@@ -70,7 +71,7 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 			}
 			// Non-worker units
 			else {
-				if (filter & UnitFilter_HasNoSquad) {
+				if (filter & UnitFilter_HasNoSquad | UnitFilter_Free) {
 					if (pUnitAgent->getSquadId().isInvalid()) {
 						addUnit = true;
 					}
@@ -78,9 +79,12 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 
 				if (filter & UnitFilter_InDisbandableSquad) {
 					SquadId squadId = pUnitAgent->getSquadId();
+					if (squadId.isValid()) {
+						SquadPtr pSquad = mpSquadManager->getSquad(squadId);
 
-					if (mpSquadManager->getSquad(squadId)->isDisbandable()) {
-						addUnit = true;
+						if (NULL != pSquad && pSquad->isDisbandable()) {
+							addUnit = true;
+						}
 					}
 				}
 
@@ -97,6 +101,12 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 				foundUnits.push_back(pUnitAgent);
 			}
 		}
+	}
+
+	// Add free units from defense manager
+	if (filter & UnitFilter_Free) {
+		const std::vector<UnitAgent*>& defenseUnits = DefenseManager::getInstance()->getFreeUnits();
+		foundUnits.insert(foundUnits.end(), defenseUnits.begin(), defenseUnits.end());
 	}
 
 	return foundUnits;

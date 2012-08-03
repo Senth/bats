@@ -71,6 +71,14 @@ void AttackSquad::clearAlliedRegrouping() {
 }
 
 void AttackSquad::updateDerived() {
+	// Never regroup if attacking
+	if (isAttacking()) {
+		setCanRegroup(false);
+	} else {
+		setCanRegroup(true);
+	}
+
+
 	// Not following any allied squad
 	if (NULL == mpAlliedSquadFollow) {
 		// Check if we're attacking an enemy structure.

@@ -17,7 +17,9 @@ enum UnitFilters {
 	UnitFilter_NoFilter				= 0x0000,
 	UnitFilter_HasNoSquad			= 0x0001,	/**< Non-workers that aren't in a squad */
 	UnitFilter_InDisbandableSquad	= 0x0002,	/**< Non-workers that are in a disbandable squad */
-	UnitFilter_UnitsAll				= 0x0004,	/**< All non-workers */
+	/** Non-workers that are either not in a squad, or all defensive squad units when not under attack */
+	UnitFilter_Free					= 0x0004,
+	UnitFilter_UnitsAll				= 0x0008,	/**< All non-workers */
 	UnitFilter_WorkersAll			= 0x0010,	/**< All workers */
 	UnitFilter_WorkersFree			= 0x0020	/**< Workers in no squads */
 };

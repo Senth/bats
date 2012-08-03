@@ -184,7 +184,7 @@ void Commander::createAttack() {
 
 
 	// Get free units
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free);
 
 	// Only add if we have free units
 	if (!freeUnits.empty()) {
@@ -219,7 +219,7 @@ void Commander::createDrop() {
 
 
 	// Get available unit compositions
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
 	std::vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
 
@@ -248,19 +248,19 @@ void Commander::createScout() {
 	if (NULL != mSquadWaiting) {
 		finishWaitingSquad();
 	}
+
+	/// @todo what about existing scout, remove it?
 	
 	// Get available unit compositions
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad);
-	if(freeUnits.size() <= 0)
-		freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_WorkersAll);
-	UnitAgent* unit = freeUnits.at(0);
-	freeUnits.clear();
-	freeUnits.push_back(unit);
-	ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
-	mSquadWaiting = pScoutSuad->getThis();
-	/*
-		// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersFree);
+	//std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_WorkersFree);
+	//UnitAgent* unit = freeUnits.at(0);
+	//freeUnits.clear();
+	//freeUnits.push_back(unit);
+	//ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
+	//mSquadWaiting = pScoutSuad->getThis();
+	
+	// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
+	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
 
 	// Get all unit compositions that can be created from the specified units.
 	// I.e. it will try to fill up all the slots in the unit compositions, those that can be fully
@@ -277,7 +277,7 @@ void Commander::createScout() {
 	if (!availableUnitCompositions.empty()) {
 		ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
 		mSquadWaiting = pScoutSquad->getThis();
-	}*/
+	}
 }
 
 #pragma warning(push)	// Disabled until the squad is actually used.

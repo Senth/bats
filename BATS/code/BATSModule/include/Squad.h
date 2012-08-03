@@ -409,17 +409,6 @@ protected:
 	virtual bool createGoal() {return false;}
 
 	/**
-	 * Sets whether the squad shall mainly be used for air transportation.
-	 * @param usesAir set this to true if the squad shall mainly be used for air transportation.
-	 * False if it not only uses air transportation.
-	 * @note This does not assure that the squad always will use air transportation. It is merely
-	 * used for calculating if it can travel by air or not. If it is set to false, it will never
-	 * try to check if it can travel by air or not.
-	 * @see travelsByAir() for how it is calculated if it travelsy by air or not.
-	 */
-	void setTravelsByAir(bool usesAir);
-
-	/**
 	 * Called when a goal fails. Disbands the squad, derive this function if you want to
 	 * create a new repeating goal.
 	 * @deprecated Will be removed in future versions.
@@ -676,7 +665,6 @@ private:
 
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
-	bool mTravelsByAir;
 	bool mHasAirUnits;
 	bool mHasGroundUnits;
 	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */

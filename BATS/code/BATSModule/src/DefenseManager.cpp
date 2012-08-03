@@ -64,12 +64,12 @@ void DefenseManager::updateHoldSquads() {
 	// Remove any DefenseHoldSquad in position that shall not be defended any longer.
 	vector<HoldSquadPtr>::iterator holdIt = holdSquads.begin();
 	while (holdIt != holdSquads.end()) {
-		if (!isInDefendingList((*holdIt)->getGoalPosition())) {
+		if (!isInDefendingList((*holdIt)->getDefendPosition())) {
 			(*holdIt)->tryDisband();
-			DEBUG_MESSAGE(utilities::LogLevel_Fine,
+			DEBUG_MESSAGE(utilities::LogLevel_Finer,
 				"DefenseManager: Removing hold squad from undefended area. Unit composition: " <<
-				(*holdIt)->getUnitComposition().getName() << ", position: " <<
-				(*holdIt)->getGoalPosition()
+				(*holdIt)->getUnitComposition().getName() << ", defend: " <<
+				(*holdIt)->getDefendPosition() << ", roam: " << (*holdIt)->getRoamPosition()
 			);
 			holdIt = holdSquads.erase(holdIt);
 		} else {
@@ -78,19 +78,19 @@ void DefenseManager::updateHoldSquads() {
 	}
 
 
-	// Tasks that need free units from the patrol squad.
+	// Need free units from the patrol squad.
 	vector<PatrolSquadPtr> patrolSquads = mpSquadManager->getSquads<PatrolSquad>();
 	if (!patrolSquads.empty()) {
 		PatrolSquadPtr pPatrolSquad = patrolSquads.front();
 
 
 		// Is any defense point undefended, create DefenseHoldSquad for that position
-		DefendMap::const_iterator defendIt;
+		DefendSet::const_iterator defendIt;
 		for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
 			bool defended = false;
 			size_t squadIndex = 0;
 			while (!defended && squadIndex < holdSquads.size()) {
-				if (holdSquads[squadIndex]->getGoalPosition() == defendIt->second.position) {
+				if (holdSquads[squadIndex]->getDefendPosition() == defendIt->position) {
 					defended = true;
 				}
 				++squadIndex;
@@ -104,11 +104,12 @@ void DefenseManager::updateHoldSquads() {
 
 				// Create a new defense squad
 				if (!unitCompositions.empty()) {
-					new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->second.position);
-					DEBUG_MESSAGE(utilities::LogLevel_Fine,
+					const TilePosition& roamPosition = findRoamPosition(defendIt->position);
+					new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->position, roamPosition);
+					DEBUG_MESSAGE(utilities::LogLevel_Finer,
 						"DefenseManager: Found an undefended area, created a new Hold Squad, " <<
-						"Composition: " << unitCompositions.front().getName() << ", position: " <<
-						defendIt->second.position
+						"Composition: " << unitCompositions.front().getName() << ", defend: " <<
+						defendIt->position << ", roam: " << roamPosition
 					);
 				}
 			}
@@ -127,12 +128,14 @@ void DefenseManager::updateHoldSquads() {
 			if (!unitCompositions.empty() &&
 				unitCompositions.front().getPriority() > (*holdIt)->getUnitComposition().getPriority())
 			{
-				new HoldSquad(units, unitCompositions.front(), (*holdIt)->getGoalPosition());
-				DEBUG_MESSAGE(utilities::LogLevel_Fine,
+				// Create new roam position, maybe a better one exist now?
+				const BWAPI::TilePosition& roamPosition = findRoamPosition((*holdIt)->getDefendPosition());
+				new HoldSquad(units, unitCompositions.front(), (*holdIt)->getDefendPosition(), roamPosition);
+				DEBUG_MESSAGE(utilities::LogLevel_Finer,
 					"DefenseManager: Upgraded hold squad, from composition '" <<
 					(*holdIt)->getUnitComposition().getName() << "' to '" <<
-					unitCompositions.front().getName() << "' in position: " <<
-					(*holdIt)->getGoalPosition()
+					unitCompositions.front().getName() << "' in defend: " <<
+					(*holdIt)->getDefendPosition()
 				);
 
 				// Disband and delete squad
@@ -156,9 +159,30 @@ void DefenseManager::updateHoldSquads() {
 	}
 }
 
-vector<Unit*> DefenseManager::getAllFreeUnits() {
-	/// @todo stub
-	return vector<Unit*>();
+vector<UnitAgent*> DefenseManager::getFreeUnits() {
+	// Never return units when under attack
+	if (isUnderAttack()) {
+		return vector<UnitAgent*>();
+	}
+
+
+	vector<UnitAgent*> freeUnits;
+
+	// Get units from the patrol squad
+	vector<PatrolSquadPtr> patrolSquads = mpSquadManager->getSquads<PatrolSquad>();
+	for (size_t i = 0; i < patrolSquads.size(); ++i) {
+		const vector<UnitAgent*>& squadUnits = patrolSquads[i]->getUnits();
+		freeUnits.insert(freeUnits.end(), squadUnits.begin(), squadUnits.end());
+	}
+
+	// Get units from hold squads
+	vector<HoldSquadPtr> holdSquads = mpSquadManager->getSquads<HoldSquad>();
+	for (size_t i = 0; i < holdSquads.size(); ++i) {
+		const vector<UnitAgent*>& squadUnits = holdSquads[i]->getUnits();
+		freeUnits.insert(freeUnits.end(), squadUnits.begin(), squadUnits.end());
+	}
+
+	return freeUnits;
 }
 
 bool DefenseManager::isUnderAttack() const {
@@ -168,15 +192,12 @@ bool DefenseManager::isUnderAttack() const {
 void DefenseManager::updateDefendPositions() {
 	vector<BWTA::Chokepoint*> newDefendChokepoints = getDefendChokepoints();
 	
-	// Find good defend positions for all new defend choke points
+	// Set defend positions for all new defend choke points
 	for (size_t i = 0; i < newDefendChokepoints.size(); ++i) {
-		DefendMap::const_iterator foundIt =
-			mDefendPositions.find(newDefendChokepoints[i]);
+		DefendSet::const_iterator foundIt = mDefendPositions.find(newDefendChokepoints[i]);
 
 		if (foundIt == mDefendPositions.end()) {
-			DefendPosition& newDefendPosition = mDefendPositions[newDefendChokepoints[i]];
-
-			newDefendPosition.position = getDefendPosition(newDefendChokepoints[i]);
+			DefendPosition newDefendPosition(newDefendChokepoints[i]);
 
 			// Check if the defend position belongs to us
 			if (isOurOrAlliedChokepoint(newDefendChokepoints[i], true)) {
@@ -191,17 +212,19 @@ void DefenseManager::updateDefendPositions() {
 			} else {
 				newDefendPosition.isAllied = false;
 			}
+
+			mDefendPositions.insert(newDefendPosition);
 		}
 	}
 
 
 	// Remove choke points that doesn't need to be defended
-	DefendMap::iterator oldDefendIt = mDefendPositions.begin();
+	DefendSet::iterator oldDefendIt = mDefendPositions.begin();
 	while (oldDefendIt != mDefendPositions.end()) {
 		bool defendExists = false;
 		size_t i = 0;
 		while (i < newDefendChokepoints.size() && !defendExists) {
-			if (oldDefendIt->first == newDefendChokepoints[i]) {
+			if (oldDefendIt->pChokepoint == newDefendChokepoints[i]) {
 				defendExists = true;
 			}
 			++i;
@@ -326,42 +349,42 @@ vector<BWTA::Chokepoint*> DefenseManager::getDefendChokepoints() {
 	return defendChokepoints;
 }
 
-TilePosition DefenseManager::getDefendPosition(BWTA::Chokepoint* pChokepoint) {
-	const TilePosition chokePos(pChokepoint->getCenter());
+TilePosition DefenseManager::findRoamPosition(const BWAPI::TilePosition& defendPosition) {
 
 	// Closest our closest structure. Used for calculating in which direction of the choke point
 	// we shall be.
-	const std::pair<Unit*, int>& closestStructure = getClosestAlliedStructure(chokePos);
+	const std::pair<Unit*, int>& closestStructure = getClosestAlliedStructure(defendPosition);
 	const TilePosition& structurePos = closestStructure.first->getTilePosition();
 
 	int bestDist = INT_MAX;
-	TilePosition defendPos = TilePositions::Invalid;
-	int maxDist = config::defense::CHOKEPOINT_DISTANCE_MAX;
+	TilePosition roamPosition = TilePositions::Invalid;
+	int maxDist = config::squad::defend::ROAM_DISTANCE_MAX;
 
 	int maxDistSquared = maxDist * maxDist;
-	int minDistSquared = config::defense::CHOKEPOINT_DISTANCE_MIN * config::defense::CHOKEPOINT_DISTANCE_MIN;
+	int minDistSquared = config::squad::defend::ROAM_DISTANCE_MIN * config::squad::defend::ROAM_DISTANCE_MIN;
 
 	// Search for a good position to defend the choke point from
-	for (int x = chokePos.x() - maxDist; x <= chokePos.x() + maxDist; x++) {
-		for (int y = chokePos.y() - maxDist; y <= chokePos.y() + maxDist; y++) {
+	for (int x = defendPosition.x() - maxDist; x <= defendPosition.x() + maxDist; x++) {
+		for (int y = defendPosition.y() - maxDist; y <= defendPosition.y() + maxDist; y++) {
 			TilePosition currentPos(x, y);
 
+			/// @todo make sure it's the right region
 			if (ExplorationManager::canReach(currentPos, structurePos)) {
-				int chokeDist = getSquaredDistance(chokePos, currentPos);
+				int roamDistance = getSquaredDistance(defendPosition, currentPos);
 
-				if (chokeDist >= minDistSquared && chokeDist <= maxDistSquared) {
+				if (roamDistance >= minDistSquared && roamDistance <= maxDistSquared) {
 					int structureDist = getSquaredDistance(structurePos, currentPos);
 
 					if (structureDist < bestDist) {
 						bestDist = structureDist;
-						defendPos = currentPos;
+						roamPosition = currentPos;
 					}
 				}
 			}
 		}
 	}
 
-	return defendPos;
+	return roamPosition;
 }
 
 void DefenseManager::updatePatrolSquad() {
@@ -407,19 +430,19 @@ void DefenseManager::updatePatrolSquad() {
 		// Patrol
 		// Get all our defended positions
 		set<TilePosition> patrolPositions;
-		for (DefendMap::const_iterator defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
-			if (defendPosIt->second.isOur) {
-				patrolPositions.insert(defendPosIt->second.position);
+		for (DefendSet::const_iterator defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
+			if (defendPosIt->isOur) {
+				patrolPositions.insert(defendPosIt->position);
 			}
 		}
 		activePatrolSquad->setPatrolPositions(patrolPositions);
 
 		// Defend - if a position needs defending and the squad isn't defending an area
 		if (!activePatrolSquad->isDefending() && mUnderAttack) {
-			DefendMap::iterator defendIt = mDefendPositions.begin();
+			DefendSet::iterator defendIt = mDefendPositions.begin();
 			while (defendIt != mDefendPositions.end() && !activePatrolSquad->isDefending()) {
-				if (defendIt->second.underAttack) {
-					activePatrolSquad->defendPosition(defendIt->second.position);
+				if (defendIt->underAttack) {
+					activePatrolSquad->defendPosition(defendIt->position);
 				}
 				++defendIt;
 			}
@@ -436,25 +459,18 @@ void DefenseManager::printGraphicDebugInfo() const {
 
 
 	// Medium
-	// Show defensive and offensive perimeter
+	// Show roaming, defensive and offensive perimeter
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Medium) {
 		// Defensive & offensive
-		DefendMap::const_iterator defendPosIt;
+		DefendSet::const_iterator defendPosIt;
 		for (defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
-			Position defendPos(defendPosIt->second.position);
-
-			// Defend point
-			Broodwar->drawDotMap(
-				defendPos.x(),
-				defendPos.y(),
-				BWAPI::Colors::White
-			);
+			Position defendPos(defendPosIt->position);
 
 			// Defend perimeter
 			Broodwar->drawCircleMap(
 				defendPos.x(),
 				defendPos.y(),
-				config::squad::defend::PERIMETER * TILE_SIZE,
+				config::squad::defend::DEFEND_PERIMETER * TILE_SIZE,
 				BWAPI::Colors::Brown
 			);
 
@@ -472,11 +488,13 @@ void DefenseManager::printGraphicDebugInfo() const {
 void DefenseManager::updateUnderAttackPositions() {
 	mUnderAttack = false;
 
-	DefendMap::iterator defendPosIt;
+	DefendSet::iterator defendPosIt;
 	for (defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
-		if (isEnemyWithinRadius(defendPosIt->second.position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
+		if (isEnemyWithinRadius(defendPosIt->position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
 			mUnderAttack = true;
-			defendPosIt->second.underAttack = true;
+			defendPosIt->underAttack = true;
+		} else {
+			defendPosIt->underAttack = false;
 		}
 	}
 }
@@ -496,9 +514,9 @@ bool DefenseManager::isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool
 }
 
 bool DefenseManager::isInDefendingList(const BWAPI::TilePosition& position) const {
-	DefendMap::const_iterator it;
+	DefendSet::const_iterator it;
 	for (it = mDefendPositions.begin(); it != mDefendPositions.end(); ++it) {
-		if (it->second.position == position) {
+		if (it->position == position) {
 			return true;
 		}
 	}
