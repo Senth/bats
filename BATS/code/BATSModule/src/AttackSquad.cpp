@@ -3,7 +3,7 @@
 #include "Config.h"
 #include "ExplorationManager.h"
 #include "AlliedSquad.h"
-#include "AlliedArmyManager.h"
+#include "PlayerArmyManager.h"
 #include "Helper.h"
 #include <sstream>
 #include <iomanip>
@@ -15,7 +15,7 @@ using namespace std;
 
 AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
 ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
-AlliedArmyManager* AttackSquad::mpsAlliedArmyManager = NULL;
+PlayerArmyManager* AttackSquad::mpsAlliedArmyManager = NULL;
 
 const std::string ATTACK_SQUAD_NAME = "AttackSquad";
 
@@ -33,7 +33,7 @@ AttackSquad::AttackSquad(
 	if (mpsAttackCoordinator == NULL) {
 		mpsAttackCoordinator = AttackCoordinator::getInstance();
 		mpsExplorationManager = ExplorationManager::getInstance();
-		mpsAlliedArmyManager = AlliedArmyManager::getInstance();
+		mpsAlliedArmyManager = PlayerArmyManager::getInstance();
 	}
 }
 
@@ -107,8 +107,8 @@ void AttackSquad::updateDerived() {
 		if(mpAlliedSquadFollow->isEmpty()) {
 			mpAlliedSquadFollow.reset();
 
-			vector<pair<AlliedSquadCstPtr, int>> foundSquads;
-			foundSquads = mpsAlliedArmyManager->getSquadsWithin(
+			vector<pair<AlliedSquadCstPtr, int>> foundSquads =
+				mpsAlliedArmyManager->getSquadsWithin<AlliedSquad>(
 				getCenter(),
 				config::squad::attack::FIND_ALLIED_SQUAD_DISTANCE,
 				true
@@ -190,7 +190,7 @@ void AttackSquad::updateDerived() {
 bool AttackSquad::createGoal() {
 	// Check if allied big frontal attack is out of home
 	if (NULL == mpAlliedSquadFollow && isFrontalAttack()) {
-		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getBigSquad();
+		AlliedSquadCstPtr pBigAlliedSquad = mpsAlliedArmyManager->getAlliedFrontalSquad();
 
 		// Check if squad is outside of home
 		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {

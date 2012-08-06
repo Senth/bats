@@ -13,7 +13,7 @@ namespace bats {
 class SquadManager;
 class UnitCompositionFactory;
 class UnitManager;
-class AlliedArmyManager;
+class PlayerArmyManager;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -111,7 +111,7 @@ private:
 	SquadManager* mpSquadManager;
 	UnitManager* mpUnitManager;
 	UnitCompositionFactory* mpUnitCompositionFactory;
-	AlliedArmyManager* mpAlliedArmyManager;
+	PlayerArmyManager* mpAlliedArmyManager;
 
 	std::set<const std::string> mAvailableCommands;
 

@@ -5,14 +5,12 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <BWAPI/Unit.h>
 #include <BWAPI/Position.h>
 
 // Namespace for the project
 namespace bats {
-
-// Forward declarations
-class AlliedSquad;
 
 /**
  * Manages allies virtual squads. It created, splits, and merges units that are within the squads
@@ -21,18 +19,18 @@ class AlliedSquad;
  * if they are close to each other even if they belong to two different allies.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
-class AlliedArmyManager : public config::OnConstantChangedListener {
+class PlayerArmyManager : public config::OnConstantChangedListener {
 public:
 	/**
 	 * Destructor
 	 */
-	virtual ~AlliedArmyManager();
+	virtual ~PlayerArmyManager();
 
 	/**
 	 * Returns the instance of AlliedArmyManager.
 	 * @return instance of AlliedArmyManager.
 	 */
-	static AlliedArmyManager* getInstance();
+	static PlayerArmyManager* getInstance();
 
 	/**
 	 * Updates the squads. Splits squads, moves units from one squad to another, and disbands
@@ -72,13 +70,15 @@ public:
 	 * Returns the biggest squad if one exists.
 	 * @return biggest squad, if no squad exist it will return NULL instead
 	 */
-	AlliedSquadCstPtr getBigSquad() const;
+	AlliedSquadCstPtr getAlliedFrontalSquad() const;
 
 	/**
-	 * Returns all allied squads
-	 * @return all allied squads.
+	 * Returns all allied squads of the specified type
+	 * @tparam SquadType the type of squads to return. Probably AlliedSquad or EnemySquad
+	 * @return all squads of the specified type.
 	 */
-	std::vector<AlliedSquadCstPtr> getSquads() const;
+	template<typename SquadType>
+	std::vector<std::tr1::shared_ptr<const SquadType>> getSquads() const;
 
 	/**
 	 * Finds the closest squad to the specified position. An optional distance parameter
@@ -88,7 +88,8 @@ public:
 	 * @return a pair where first is the squad (NULL if no squad was found) and second is the
 	 * squared distance (INT_MAX if no squad was found).
 	 */
-	std::pair<AlliedSquadCstPtr, int> getClosestSquad(
+	template <typename SquadType>
+	std::pair<std::tr1::shared_ptr<const SquadType>, int> getClosestSquad(
 		const BWAPI::TilePosition& position,
 		int distanceMax = INT_MAX
 	) const;
@@ -97,12 +98,13 @@ public:
 	 * Returns a vector with all squads within the specified distance from the position.
 	 * @param position from where to search for the squads
 	 * @param distanceMax maximum distance away the squad can be
-	 * @param bSort if we want to sort the vector, shorters distance will be first in the
+	 * @param bSort if we want to sort the vector, shorter distance will be first in the
 	 * vector, defaults to false.
 	 * @return vector with a pair where first is the squad and second is the squared distance
 	 * to the squad. If no squads are found within the distance an empty vector is returned.
 	 */
-	std::vector<std::pair<AlliedSquadCstPtr, int>> getSquadsWithin(
+	template <typename SquadType>
+	std::vector<std::pair<std::tr1::shared_ptr<const SquadType>, int>> getSquadsWithin(
 		const BWAPI::TilePosition& position,
 		int distanceMax,
 		bool bSort = false
@@ -112,14 +114,16 @@ private:
 	/**
 	 * Singleton constructor to enforce singleton usage.
 	 */
-	AlliedArmyManager();
+	PlayerArmyManager();
 
 	/**
 	 * Rearranges the squads so that all limitations are met. Meaning it will split squads,
 	 * move units from one squad to another squad if squads are within include_distance or
-	 * outside exclude_distance
+	 * outside exclude_distance. This has to be called twice to update both allied squads
+	 * and enemy squads.
+	 * @param updateAllied set to true to update allied squads, false to update enemy squads.
 	 */
-	void rearrangeSquads();
+	void rearrangeSquads(bool updateAllied);
 
 	/**
 	 * Checks if the two units are within exclude_distance
@@ -208,15 +212,15 @@ private:
 	void disbandEmptySquads();
 
 	/**
-	 * Updates the current "big" squad, to actually be the biggest one.
+	 * Updates the current allied frontal squad, to actually be the biggest one.
 	 */
-	void setBigSquad();
+	void setAlliedFrontalSquad();
 
 	/**
 	 * Add a newly created AlliedSquad to the squad list.
 	 * @param pSquad pointer to the newly created squad
 	 */
-	void addSquad(AlliedSquad* pSquad);
+	void addSquad(PlayerSquadPtr pSquad);
 
 	/**
 	 * Removes an AlliedSquad from the squad list and deletes it
@@ -232,7 +236,7 @@ private:
 	void addUnitToGrid(BWAPI::Unit* pUnit);
 
 	int mLastFrameUpdate;
-	std::vector<AlliedSquadPtr> mSquads;
+	std::vector<PlayerSquadPtr> mSquads;
 	std::map<BWAPI::Unit*, PlayerSquadId> mUnitSquad; /**< A unit bound to a squad id */
 
 	/** Look-up table for where the unit is located. */
@@ -244,6 +248,80 @@ private:
 	std::map<BWAPI::Unit*, PlayerSquadId> mUnitsToCheck;
 	
 
-	static AlliedArmyManager* mpsInstance;
+	static PlayerArmyManager* mpsInstance;
 };
+
+
+//////////////////////////////////////////////////////////////////////////
+//////					TEMPLATE IMPLEMENTATION						//////
+//////////////////////////////////////////////////////////////////////////
+template<typename SquadType>
+std::vector<std::tr1::shared_ptr<const SquadType>> PlayerArmyManager::getSquads() const {
+	std::vector<std::tr1::shared_ptr<const SquadType>> squads;
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		std::tr1::shared_ptr<const SquadType> pSquad = std::tr1::dynamic_pointer_cast<const SquadType>(mSquads[i]);
+		if (NULL != pSquad) {
+			squads.push_back(pSquad);
+		}
+	}
+
+	return squads;
+}
+
+template<typename SquadType>
+std::pair<std::tr1::shared_ptr<const SquadType>, int> PlayerArmyManager::getClosestSquad(
+	const BWAPI::TilePosition& position,
+	int distanceMax) const
+{
+	/// @todo add parameter to check if returning allied or enemy squad
+	std::pair<std::tr1::shared_ptr<const SquadType>, int> closestSquad;
+	if (distanceMax == INT_MAX) {
+		closestSquad.second = distanceMax;
+	} else {
+		closestSquad.second = distanceMax * distanceMax;
+	}
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
+			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
+
+			if (distanceSquared < closestSquad.second) {
+				closestSquad.second = distanceSquared;
+				closestSquad.first = mSquads[i];
+			}
+		}
+	}
+
+	return closestSquad;
+}
+
+template<typename SquadType>
+std::vector<std::pair<std::tr1::shared_ptr<const SquadType>, int>> PlayerArmyManager::getSquadsWithin(
+	const BWAPI::TilePosition& position,
+	int distanceMax,
+	bool bSort) const
+{
+	typedef std::tr1::shared_ptr<const SquadType> SquadTypeCstPtr;
+	/// @todo add parameter to check if returning allied or enemy squad
+	int distanceMaxSquared = distanceMax * distanceMax;
+	std::vector<std::pair<SquadTypeCstPtr, int>> foundSquads;
+
+	for (size_t i = 0; i < mSquads.size(); ++i) {
+		SquadTypeCstPtr pSquad = std::tr1::dynamic_pointer_cast<const SquadType>(mSquads[i]);
+		if (NULL != pSquad && pSquad->getCenter() != TilePositions::Invalid) {
+			int distanceSquared = getSquaredDistance(position, pSquad->getCenter());
+
+			if (distanceSquared <= distanceMaxSquared) {
+				foundSquads.push_back(make_pair(pSquad, distanceSquared));
+			}
+		}
+	}
+
+	if (bSort) {
+		std::sort(foundSquads.begin(), foundSquads.end(), PairCompareSecond<SquadTypeCstPtr, int>());
+	}
+
+	return foundSquads;
+}
 }

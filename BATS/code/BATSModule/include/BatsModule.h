@@ -15,7 +15,7 @@ class ExplorationManager;
 class WaitGoalManager;
 class SquadManager;
 class GameTime;
-class AlliedArmyManager;
+class PlayerArmyManager;
 class DefenseManager;
 
 /**
@@ -65,33 +65,90 @@ public:
 
 	/**
 	 * Called when a player leaves the game
-	 * @param player the player that left the game
+	 * @param pPlayer the player that left the game
 	 */
-	virtual void onPlayerLeft(BWAPI::Player* player);
+	virtual void onPlayerLeft(BWAPI::Player* pPlayer);
 
 	/**
-	 * Called when a new unit can be seen
+	 * Called when a nuke is launched by a player
+	 * @param target the position of the nuke. If complete map information is disabled and the
+	 * target position is not visible, target will be set to Positions::Unknown
+	 */
+	virtual void onNukeDetect(BWAPI::Position target);
+
+	/**
+	 * Called when a unit becomes accessible. If complete map information is enabled, this
+	 * will be called at the same time as onUnitCreate(), otherwise it will be called at the
+	 * same time as onUnitShow()
+	 * @param pUnit the unit that was discovered
+	 */
+	virtual void onUnitDiscover(BWAPI::Unit* pUnit);
+
+	/**
+	 * Called right before a unit becomes inaccessible. If complete map information is enabled,
+	 * this will be called at the same time as onUnitDestroy(), otherwise it will be called at the
+	 * same time as onUnitHide()
+	 * @param pUnit the unit that evaded
+	 */
+	virtual void onUnitEvade(BWAPI::Unit* pUnit);
+
+	/**
+	 * Called when a unit becomes visible. If complete map information is disabled, this also
+	 * means that the unit has just become accessible (onUnitDiscover())
 	 * @param pUnit the unit that has now become visible, includes our units
 	 */
 	virtual void onUnitShow(BWAPI::Unit* pUnit);
 
 	/**
-	 * Called when a unit has been created
-	 * @param pUnit the newly created unit
+	 * Called right before a unit becomes invisible. If complete map information is disabled,
+	 * this also means that the unit is about to become inaccessible (onUnitEvade())
+	 * @param pUnit the unit that just was hidden
+	 */
+	virtual void onUnitHide(BWAPI::Unit* pUnit);
+
+	/**
+	 * Called when an accessible unit is created. If the unit is not accessible at the time of
+	 * creation (i.e. if the unit is invisible and complete information is disabled), then this
+	 * callback will NOT be called. If the unit is visible at the time of creation, onUnitShow()
+	 * will also be called.
+	 * @note This is NOT called when a unit changes type (such as larva into egg, or egg into
+	 * drone). Building a Refinery/Assimilator/Extractor will not produce an onUnitCreate call
+	 * because the Vespene Geyser changes to the unit type of Refinery/Assimilator/Extractor
+	 * @param pUnit the newly created unit.
 	 */
 	virtual void onUnitCreate(BWAPI::Unit* pUnit);
 
 	/**
-	 * Called when a unit has been destroyed
+	 * Called when a unit dies or otherwise removed from the game (i.e. a mined out mineral patch).
+	 * If the unit is not accessible at the time of destruction, (i.e. if the unit is invisible and
+	 * complete map information is disabled), then this callback will NOT be called. If the unit was
+	 * visible at the time of destruction, onUnitHide() will also be called.
+	 * @note When a Zerg drone becomes an extractor, the Vespene geyser changes to the Zerg
+	 * Extractor type and the drone is destroyed.
 	 * @param pUnit the destroyed unit
 	 */
 	virtual void onUnitDestroy(BWAPI::Unit* pUnit);
 
 	/**
-	 * Called when a unit has morphed
+	 * Called when an accessible unit changes type, such as from a Zerg Drone to a Zerg Hatchery,
+	 * or from a Terran Siege Tank Tank Mode to Terran Siege Tank Siege Mode. This is not called
+	 * when the type changes to or from UnitTypes::Unknown (which happens when a unit is
+	 * transitioning to or from inaccessibility)
 	 * @param pUnit the morphed unit
 	 */
 	virtual void onUnitMorph(BWAPI::Unit* pUnit);
+
+	/**
+	 * Called when an accessible unit changes ownership, e.g. using a Dark Archon.
+	 * @param pUnit the unit that changed ownership
+	 */
+	virtual void onUnitRenegade(BWAPI::Unit* pUnit);
+
+	/**
+	 * Called when the user saves the match. 
+	 * @param gameName name the player entered in the save game screen.
+	 */
+	virtual void onSaveGame(std::string gameName);
 
 protected:
 	/**
@@ -116,7 +173,7 @@ protected:
 	WaitGoalManager* mpWaitGoalManager;
 	SquadManager* mpSquadManager;
 	GameTime* mpGameTime;
-	AlliedArmyManager* mpAlliedArmyManager;
+	PlayerArmyManager* mpPlayerArmyManager;
 	DefenseManager* mpDefenseManager;
 
 private:

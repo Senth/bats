@@ -114,9 +114,6 @@
     <ClInclude Include="include\AlliedSquad.h">
       <Filter>Classification</Filter>
     </ClInclude>
-    <ClInclude Include="include\AlliedArmyManager.h">
-      <Filter>Classification</Filter>
-    </ClInclude>
     <ClInclude Include="include\TypeDefs.h">
       <Filter>Helpers</Filter>
     </ClInclude>
@@ -142,6 +139,12 @@
       <Filter>Squads\Types</Filter>
     </ClInclude>
     <ClInclude Include="include\PlayerSquad.h">
+      <Filter>Classification</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerArmyManager.h">
+      <Filter>Classification</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EnemySquad.h">
       <Filter>Classification</Filter>
     </ClInclude>
   </ItemGroup>
@@ -221,9 +224,6 @@
     <ClCompile Include="src\AlliedSquad.cpp">
       <Filter>Classification</Filter>
     </ClCompile>
-    <ClCompile Include="src\AlliedArmyManager.cpp">
-      <Filter>Classification</Filter>
-    </ClCompile>
     <ClCompile Include="src\SelfClassifier.cpp">
       <Filter>Classification</Filter>
     </ClCompile>
@@ -249,6 +249,12 @@
       <Filter>Squads\Types</Filter>
     </ClCompile>
     <ClCompile Include="src\PlayerSquad.cpp">
+      <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerArmyManager.cpp">
+      <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EnemySquad.cpp">
       <Filter>Classification</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,7 +10,7 @@
 #include "ResourceCounter.h"
 #include "AttackCoordinator.h"
 #include "WaitGoalManager.h"
-#include "AlliedArmyManager.h"
+#include "PlayerArmyManager.h"
 #include "DefenseManager.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
@@ -29,7 +29,7 @@ using namespace bats;
 using namespace BWAPI;
 
 const int WORKER_MINERAL_PRICE = 50;
-const int GAME_STARTED_FRAME = 1;
+const int GAME_STARTED_FRAME = -1;
 
 #define TEST_SELF() if (Broodwar->self() == NULL) {\
 	ERROR_MESSAGE(false, "self() is NULL!"); \
@@ -45,7 +45,7 @@ BatsModule::BatsModule() : BTHAIModule() {
 	mpWaitGoalManager = NULL;
 	mpSquadManager = NULL;
 	mpGameTime = NULL;
-	mpAlliedArmyManager = NULL;
+	mpPlayerArmyManager = NULL;
 	mpDefenseManager = NULL;
 
 	// Initialize logger
@@ -99,13 +99,13 @@ void BatsModule::onStart() {
 	}
 	//Add the units we have from start to agent manager
 	else {
-		std::set<Unit*>::const_iterator unitIt;
-		for(unitIt = Broodwar->self()->getUnits().begin();
-			unitIt != Broodwar->self()->getUnits().end();
-			++unitIt)
-		{
-			mpUnitManager->addAgent(*unitIt);
-		}
+		//std::set<Unit*>::const_iterator unitIt;
+		//for(unitIt = Broodwar->self()->getUnits().begin();
+		//	unitIt != Broodwar->self()->getUnits().end();
+		//	++unitIt)
+		//{
+		//	mpUnitManager->addAgent(*unitIt);
+		//}
 	}
 
 	DEBUG_MESSAGE(utilities::LogLevel_Info, "BATS bot running!");
@@ -211,7 +211,7 @@ void BatsModule::onSendText(std::string text) {
 		Broodwar->sendText(text.c_str());
 	} else {
 		// Default behavior
-		BTHAIModule::onSendText(text);
+		Broodwar->sendText(text.c_str());
 	}
 }
 
@@ -266,21 +266,14 @@ void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 	}
 }
 
-void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
-	TEST_SELF();
-
-	// Only add enemy units to exploration manager
-	if (isEnemy(pUnit)) {
-		mpExplorationManager->addSpottedUnit(pUnit);
-	} else if (isAllied(pUnit)) {
-		mpAlliedArmyManager->addUnit(pUnit);
-
-		DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
-			pUnit->getType().getName());
-	}
+#pragma warning(push)
+#pragma warning(disable:4100)
+void BatsModule::onNukeDetect(BWAPI::Position target) {
+	/// @todo implement nuke detection, and ping the minimap
 }
+#pragma warning(pop)
 
-void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitDiscover(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
@@ -292,11 +285,19 @@ void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			}
+		} else if (isEnemy(pUnit)) {
+			mpExplorationManager->addSpottedUnit(pUnit);
+			mpPlayerArmyManager->addUnit(pUnit);
+		} else if (isAllied(pUnit)) {
+			mpPlayerArmyManager->addUnit(pUnit);
+
+			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
+				pUnit->getType().getName());
 		}
 	}
 }
 
-void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitEvade(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
@@ -317,15 +318,38 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 		}
 		// Enemies
 		else if (isEnemy(pUnit)) {
-			mpExplorationManager->unitDestroyed(pUnit);
+			mpPlayerArmyManager->removeUnit(pUnit);
 		}
 		// Allied
 		else if (isAllied(pUnit)) {
-			mpAlliedArmyManager->removeUnit(pUnit);
+			mpPlayerArmyManager->removeUnit(pUnit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
 				pUnit->getType().getName());
 		}
+	}
+}
+
+#pragma warning(push)
+#pragma warning(disable:4100)
+void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
+	// Does nothing, handled in onUnitDiscover()
+}
+
+void BatsModule::onUnitHide(BWAPI::Unit* pUnit) {
+	// Does nothing, handled in onUnitEvade()
+}
+
+void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
+	// Does nothing, handled in onUnitDiscover()
+}
+#pragma warning(pop)
+
+void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
+	TEST_SELF();
+
+	if (isEnemy(pUnit)) {
+		mpExplorationManager->unitDestroyed(pUnit);
 	}
 }
 
@@ -342,6 +366,17 @@ void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 			}
 		}
 	}
+}
+
+#pragma warning(push)
+#pragma warning(disable:4100)
+void BatsModule::onUnitRenegade(BWAPI::Unit* pUnit) {
+	// Does nothing
+}
+#pragma warning(pop)
+
+void BatsModule::onSaveGame(std::string gameName) {
+	DEBUG_MESSAGE(utilities::LogLevel_Info, "Saved game " << gameName);
 }
 
 bool BatsModule::isGameLost() const {
@@ -385,7 +420,7 @@ void BatsModule::updateGame() {
 	mpGameTime->update();
 	mpResourceCounter->update();
 	mpWaitGoalManager->update();
-	mpAlliedArmyManager->update();
+	mpPlayerArmyManager->update();
 
 	mpUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
@@ -411,13 +446,13 @@ void BatsModule::initGameClasses() {
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
 	mpExplorationManager = ExplorationManager::getInstance();
-	mpAlliedArmyManager = AlliedArmyManager::getInstance();
+	mpPlayerArmyManager = PlayerArmyManager::getInstance();
 	mpDefenseManager = DefenseManager::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mpDefenseManager);
-	SAFE_DELETE(mpAlliedArmyManager);
+	SAFE_DELETE(mpPlayerArmyManager);
 	SAFE_DELETE(mpExplorationManager);
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
@@ -439,7 +474,7 @@ void BatsModule::showDebug() const {
 		mpProfiler->start("printGraphicDebugInfo()");
 
 
-		mpAlliedArmyManager->printGraphicDebugInfo();
+		mpPlayerArmyManager->printGraphicDebugInfo();
 		mpSquadManager->printGraphicDebugInfo();
 		mpUnitManager->printGraphicDebugInfo();
 		mpDefenseManager->printGraphicDebugInfo();

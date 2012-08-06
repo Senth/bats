@@ -10,9 +10,15 @@ namespace bats {
 	struct _PlayerSquadType{};
 	typedef utilities::KeyType<bats::_PlayerSquadType> PlayerSquadId;
 
+	class PlayerSquad;
+	typedef std::tr1::shared_ptr<PlayerSquad> PlayerSquadPtr;
+	typedef std::tr1::shared_ptr<const PlayerSquad> PlayerSquadCstPtr;
+	typedef const std::tr1::shared_ptr<PlayerSquad>& PlayeSquadRef;
+
 	class AlliedSquad;
 	typedef std::tr1::shared_ptr<AlliedSquad> AlliedSquadPtr;
 	typedef std::tr1::shared_ptr<const AlliedSquad> AlliedSquadCstPtr;
+	typedef const std::tr1::shared_ptr<AlliedSquad>& AlliedSquadRef;
 
 	class Squad;
 	typedef std::tr1::shared_ptr<Squad> SquadPtr;

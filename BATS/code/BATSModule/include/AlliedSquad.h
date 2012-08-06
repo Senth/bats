@@ -15,9 +15,6 @@ class GameTime;
 
 /**
  * Squad for allied units, such as the player playing with the bot.
- * This is a collection of units close to each other and where they are going.
- * The squad keeps track of the direction and how far it has traveled the last X seconds,
- * X is defined in the config file as measure_time under [classification.squad].
  * The squad itself can defer if it's moving to attack or is retreating and if it's a big
  * squad.
  * 
@@ -165,7 +162,6 @@ private:
 	 */
 	std::string getStateString() const;
 
-	
 
 	bool mFrontattack;
 	std::list<int> mAlliedDistances;

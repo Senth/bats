@@ -4,7 +4,7 @@
 #include "UnitManager.h"
 #include "Squad.h"
 #include "SquadManager.h"
-#include "AlliedArmyManager.h"
+#include "PlayerArmyManager.h"
 #include "AlliedSquad.h"
 #include "UnitManager.h"
 #include "UnitCompositionFactory.h"
@@ -30,7 +30,7 @@ Commander::Commander() {
 	mpSquadManager = NULL;
 	mpAlliedArmyManager = NULL;
 
-	mpAlliedArmyManager = AlliedArmyManager::getInstance();
+	mpAlliedArmyManager = PlayerArmyManager::getInstance();
 	mpSquadManager = SquadManager::getInstance();
 	mpUnitManager = UnitManager::getInstance();
 	mpUnitCompositionFactory = UnitCompositionFactory::getInstance();
@@ -78,7 +78,7 @@ void Commander::computeReactions() {
 	}
 
 	// Check for active allied squads
-	vector<AlliedSquadCstPtr> squads = mpAlliedArmyManager->getSquads();
+	vector<AlliedSquadCstPtr> squads = mpAlliedArmyManager->getSquads<AlliedSquad>();
 	bool bigActive = false;
 	bool smallActive = false;
 	for (size_t i = 0; i < squads.size(); ++i) {

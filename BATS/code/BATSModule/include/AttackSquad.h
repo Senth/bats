@@ -9,7 +9,7 @@ namespace bats {
 
 class AttackCoordinator;
 class ExplorationManager;
-class AlliedArmyManager;
+class PlayerArmyManager;
 
 /**
  * Attacks a point on the map. The squad will intercept all enemy units on the way to
@@ -113,7 +113,7 @@ protected:
 
 	static AttackCoordinator* mpsAttackCoordinator;
 	static ExplorationManager* mpsExplorationManager;
-	static AlliedArmyManager* mpsAlliedArmyManager;
+	static PlayerArmyManager* mpsAlliedArmyManager;
 private:
 	/**
 	 * Check if the squad needs to regroup with the allied forces.

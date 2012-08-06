@@ -22,6 +22,10 @@ class GameTime;
 
 /**
  * Common base class for virtual allied and enemy squads used for classifying those players.
+ * This is a collection of units close to each other and where they are going.
+ * The squad keeps track of the direction and how far it has traveled the last X seconds,
+ * X is derived from measure_size and measure_interval_time under [classification.squad] from
+ * the config file.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
 class PlayerSquad : public config::OnConstantChangedListener {

@@ -1,6 +1,7 @@
-#include "AlliedArmyManager.h"
+#include "PlayerArmyManager.h"
 #include "Utilities/Logger.h"
 #include "AlliedSquad.h"
+#include "EnemySquad.h"
 #include "Helper.h"
 #include "Utilities/KeyHandler.h"
 #include "BTHAIModule/Source/Profiler.h"
@@ -17,34 +18,34 @@ using namespace BWAPI;
 using namespace std;
 using std::tr1::shared_ptr;
 
-AlliedArmyManager* AlliedArmyManager::mpsInstance = NULL;
+PlayerArmyManager* PlayerArmyManager::mpsInstance = NULL;
 
 const int GRID_RANGE_EXCLUDE_MAX = 2;
 const int GRID_RANGE_EXCLUDE_CERTAIN = 1;
 
-AlliedArmyManager::AlliedArmyManager() {
+PlayerArmyManager::PlayerArmyManager() {
 	recalculateLookupTable();
 
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::GRID_SQUARE_DISTANCE), this);
 
 	mLastFrameUpdate = 0;
 
-	mSquads.resize(AlliedSquad::getMaxKeys());
+	mSquads.resize(PlayerSquad::getMaxKeys());
 }
 
-AlliedArmyManager::~AlliedArmyManager() {
+PlayerArmyManager::~PlayerArmyManager() {
 	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::GRID_SQUARE_DISTANCE), this);
 	mpsInstance = NULL;
 }
 
-AlliedArmyManager* AlliedArmyManager::getInstance() {
+PlayerArmyManager* PlayerArmyManager::getInstance() {
 	if (NULL == mpsInstance) {
-		mpsInstance = new AlliedArmyManager();
+		mpsInstance = new PlayerArmyManager();
 	}
 	return mpsInstance;
 }
 
-void AlliedArmyManager::update() {
+void PlayerArmyManager::update() {
 	
 
 	// Computational heavy, don't call every frame.
@@ -54,34 +55,33 @@ void AlliedArmyManager::update() {
 
 		Profiler::getInstance()->start("AlliedArmyManager::update()");
 
-		rearrangeSquads();
+		rearrangeSquads(true);
+		rearrangeSquads(false);
 
 		disbandEmptySquads();
 
-		setBigSquad();
+		setAlliedFrontalSquad();
 
 		Profiler::getInstance()->end("AlliedArmyManager::update()");
 	}
 
 
-	Profiler::getInstance()->start("AlliedSquads::update()");
+	Profiler::getInstance()->start("PlayerSquads::update()");
 	// Update all squads "every frame". Squads limit their update themselves
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i]) {
 			mSquads[i]->update();
 		}
 	}
-	Profiler::getInstance()->end("AlliedSquads::update()");
+	Profiler::getInstance()->end("PlayerSquads::update()");
 }
 
-void AlliedArmyManager::rearrangeSquads() {
+void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
 	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads()");
 
 
 	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Initialization");
-	mUnitsToCheck = mUnitSquad;
-
-	
+		
 	// Remove all existing units from the grid
 	for (size_t x = 0; x < mGridUnits.size(); ++x) {
 		for (size_t y = 0; y < mGridUnits[x].size(); ++y) {
@@ -89,10 +89,16 @@ void AlliedArmyManager::rearrangeSquads() {
 		}
 	}
 
-	// Add all units to the grid
+	// Add all units to check and to the grid
+	mUnitsToCheck.clear();
 	std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator unitIt;
-	for (unitIt = mUnitsToCheck.begin(); unitIt != mUnitsToCheck.end(); ++unitIt) {
-		addUnitToGrid(unitIt->first);
+	for (unitIt = mUnitSquad.begin(); unitIt != mUnitSquad.end(); ++unitIt) {
+		if ((updateAllied && Broodwar->self()->isAlly(unitIt->first->getPlayer())) ||
+			(!updateAllied && Broodwar->self()->isEnemy(unitIt->first->getPlayer())))
+		{
+			mUnitsToCheck[unitIt->first] = unitIt->second;
+			addUnitToGrid(unitIt->first);
+		}
 	}
 
 	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Initialization");
@@ -142,9 +148,14 @@ void AlliedArmyManager::rearrangeSquads() {
 	// Create squads for the rest of the units that went out of the squad's bounds
 	while (!mUnitsToCheck.empty()) {
 		// Create new squad
-		AlliedSquad* pNewSquad = new AlliedSquad();
+		PlayerSquadPtr pNewSquad;
+		if (updateAllied) {
+			pNewSquad = PlayerSquadPtr(new AlliedSquad());
+		} else {
+			pNewSquad = PlayerSquadPtr(new EnemySquad());
+		}
 		addSquad(pNewSquad);
-		// Note: addCloseUnitsToSquad, adds the unit to the squad automatically.
+		// Note: addCloseUnitsToSquad(), adds the unit to the squad automatically.
 
 		BWAPI::Unit* currentUnit = mUnitsToCheck.begin()->first;
 		setUnitAsChecked(mUnitsToCheck.begin());
@@ -156,13 +167,13 @@ void AlliedArmyManager::rearrangeSquads() {
 	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads()");
 }
 
-void AlliedArmyManager::onConstantChanged(config::ConstantName constantName) {
+void PlayerArmyManager::onConstantChanged(config::ConstantName constantName) {
 	if (constantName == TO_CONSTANT_NAME(config::classification::squad::GRID_SQUARE_DISTANCE)) {
 		recalculateLookupTable();
 	}
 }
 
-void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::addUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply add the unit to this class,
 	// meaning in the next update phase the squads might be altered.
 	
@@ -175,7 +186,7 @@ void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
 	}
 }
 
-void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::removeUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply removes the unit from the squad
 	// and this class, meaning in the next update phase the squads might be altered.
 	std::map<Unit*, PlayerSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
@@ -185,7 +196,7 @@ void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
 	}
 }
 
-void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId) {
+void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId) {
 	// Change squad if needed
 	PlayerSquadId oldSquadId = mUnitSquad[pUnit];
 	if (oldSquadId != squadId) {
@@ -278,7 +289,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId s
 	}
 }
 
-void AlliedArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
 	const Position& gridPos = getGridPosition(pUnit);
 	if (gridPos != Positions::Invalid) {
 		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = true;
@@ -286,7 +297,7 @@ void AlliedArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
 	mUnitsToCheck.erase(pUnit);
 }
 
-std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator AlliedArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator& unitIt) {
+std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator PlayerArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator& unitIt) {
 	const Position& gridPos = getGridPosition(unitIt->first);
 	if (gridPos != Positions::Invalid) {
 		mGridUnits[gridPos.x()][gridPos.y()][unitIt->first] = true;
@@ -294,17 +305,17 @@ std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator AlliedArmyManager::setUnit
 	return mUnitsToCheck.erase(unitIt);
 }
 
-bool AlliedArmyManager::withinExcludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
+bool PlayerArmyManager::withinExcludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
 	return getSquaredDistance(pUnitA->getTilePosition(), pUnitB->getTilePosition()) <=
 		config::classification::squad::EXCLUDE_DISTANCE_SQUARED;
 }
 
-bool AlliedArmyManager::withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
+bool PlayerArmyManager::withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
 	return getSquaredDistance(pUnitA->getTilePosition(), pUnitB->getTilePosition()) <=
 		config::classification::squad::INCLUDE_DISTANCE_SQUARED;
 }
 
-BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
+BWAPI::Position PlayerArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
 	TilePosition unitPos = BWAPI::TilePositions::Invalid;
 
 	// Loaded
@@ -336,7 +347,7 @@ BWAPI::Position AlliedArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
 	return gridPos;
 }
 
-bool AlliedArmyManager::isSameOrBorderGridPosition(const BWAPI::Position& centerPosition, const BWAPI::Position& checkPosition) const {
+bool PlayerArmyManager::isSameOrBorderGridPosition(const BWAPI::Position& centerPosition, const BWAPI::Position& checkPosition) const {
 	// Only same or border if maximum one coordinate is from the center,
 	// i.e. 0,0 center, 0,1, 1,0, -1,0, 0,-1 returns true
 	int xDiff = abs(centerPosition.x() - checkPosition.x());
@@ -345,7 +356,7 @@ bool AlliedArmyManager::isSameOrBorderGridPosition(const BWAPI::Position& center
 	return ((xDiff <= 1 && yDiff == 0) || (yDiff <= 1 && xDiff == 0));
 }
 
-std::pair<Position, Position> AlliedArmyManager::getValidGridRange(const BWAPI::Position centerPosition, int range) const {
+std::pair<Position, Position> PlayerArmyManager::getValidGridRange(const BWAPI::Position centerPosition, int range) const {
 	Position min(centerPosition.x() - range, centerPosition.y() - range);
 	if (min.x() < 0) {
 		min.x() = 0;
@@ -365,7 +376,7 @@ std::pair<Position, Position> AlliedArmyManager::getValidGridRange(const BWAPI::
 	return std::make_pair(min, max);
 }
 
-void AlliedArmyManager::recalculateLookupTable() {
+void PlayerArmyManager::recalculateLookupTable() {
 	int gridSquareDistance = config::classification::squad::GRID_SQUARE_DISTANCE;
 
 	mLookupTableGridPosition.clear();
@@ -386,7 +397,7 @@ void AlliedArmyManager::recalculateLookupTable() {
 	}
 }
 
-void AlliedArmyManager::disbandEmptySquads() {
+void PlayerArmyManager::disbandEmptySquads() {
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i]) {
 			if (mSquads[i]->isEmpty()) {
@@ -396,17 +407,18 @@ void AlliedArmyManager::disbandEmptySquads() {
 	}
 }
 
-void AlliedArmyManager::setBigSquad() {
+void PlayerArmyManager::setAlliedFrontalSquad() {
 	// Save biggest squad and set all squads as small
-	shared_ptr<AlliedSquad> biggestSquad;
+	AlliedSquadPtr biggestSquad;
 	int cBiggestSize = 0;
 	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i]) {
-			mSquads[i]->setFrontalAttack(false);
+		AlliedSquadPtr pAlliedSquad = std::tr1::dynamic_pointer_cast<AlliedSquad>(mSquads[i]);
+		if (NULL != pAlliedSquad) {
+			pAlliedSquad->setFrontalAttack(false);
 
-			int currentSupplyCount = mSquads[i]->getSupplyCount();
+			int currentSupplyCount = pAlliedSquad->getSupplyCount();
 			if (currentSupplyCount > cBiggestSize) {
-				biggestSquad = mSquads[i];
+				biggestSquad = pAlliedSquad;
 				cBiggestSize = currentSupplyCount;
 			}
 		}
@@ -418,15 +430,15 @@ void AlliedArmyManager::setBigSquad() {
 	}
 }
 
-void AlliedArmyManager::addSquad(AlliedSquad* pSquad) {
-	mSquads[pSquad->getId()] = AlliedSquadPtr(pSquad);
+void PlayerArmyManager::addSquad(PlayerSquadPtr pSquad) {
+	mSquads[pSquad->getId()] = pSquad;
 }
 
-void AlliedArmyManager::removeSquad(PlayerSquadId squadId) {
+void PlayerArmyManager::removeSquad(PlayerSquadId squadId) {
 	mSquads[squadId].reset();
 }
 
-void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
 	Position gridPos = getGridPosition(pUnit);
 
 	if (gridPos != Positions::Invalid) {
@@ -434,66 +446,19 @@ void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
 	}
 }
 
-AlliedSquadCstPtr AlliedArmyManager::getBigSquad() const {
+AlliedSquadCstPtr PlayerArmyManager::getAlliedFrontalSquad() const {
 	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i] && mSquads[i]->isFrontalAttack()) {
-			return mSquads[i];
+		AlliedSquadPtr pAlliedSquad = std::tr1::dynamic_pointer_cast<AlliedSquad>(mSquads[i]);
+		if (NULL != pAlliedSquad && pAlliedSquad->isFrontalAttack()) {
+			return pAlliedSquad;
 		}
 	}
 	return AlliedSquadCstPtr();
 }
 
-std::pair<AlliedSquadCstPtr, int> AlliedArmyManager::getClosestSquad(
-	const BWAPI::TilePosition& position,
-	int distanceMax) const
-{
-	std::pair<AlliedSquadCstPtr, int> closestSquad;
-	if (distanceMax == INT_MAX) {
-		closestSquad.second = distanceMax;
-	} else {
-		closestSquad.second = distanceMax * distanceMax;
-	}
 
-	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
-			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
 
-			if (distanceSquared < closestSquad.second) {
-				closestSquad.second = distanceSquared;
-				closestSquad.first = mSquads[i];
-			}
-		}
-	}
-
-	return closestSquad;
-}
-
-vector<pair<AlliedSquadCstPtr, int>> AlliedArmyManager::getSquadsWithin(
-	const BWAPI::TilePosition& position,
-	int distanceMax,
-	bool bSort) const
-{
-	int distanceMaxSquared = distanceMax * distanceMax;
-	vector<pair<AlliedSquadCstPtr, int>> foundSquads;
-
-	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
-			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
-
-			if (distanceSquared <= distanceMaxSquared) {
-				foundSquads.push_back(make_pair(mSquads[i], distanceSquared));
-			}
-		}
-	}
-
-	if (bSort) {
-		sort(foundSquads.begin(), foundSquads.end(), PairCompareSecond<AlliedSquadCstPtr, int>());
-	}
-
-	return foundSquads;
-}
-
-void AlliedArmyManager::printGraphicDebugInfo() const {
+void PlayerArmyManager::printGraphicDebugInfo() const {
 	// Skip if not turned on
 	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off) {
 		return;
@@ -546,16 +511,4 @@ void AlliedArmyManager::printGraphicDebugInfo() const {
 			mSquads[i]->printGraphicDebugInfo();
 		}
 	}	
-}
-
-vector<AlliedSquadCstPtr> AlliedArmyManager::getSquads() const {
-	vector<AlliedSquadCstPtr> squads;
-
-	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i]) {
-			squads.push_back(mSquads[i]);
-		}
-	}
-
-	return squads;
 }

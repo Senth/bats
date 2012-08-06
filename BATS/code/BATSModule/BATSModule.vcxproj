@@ -94,17 +94,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\AlliedArmyManager.cpp" />
     <ClCompile Include="src\AlliedSquad.cpp" />
     <ClCompile Include="src\AttackCoordinator.cpp" />
     <ClCompile Include="src\DefenseManager.cpp" />
     <ClCompile Include="src\DropSquad.cpp" />
+    <ClCompile Include="src\EnemySquad.cpp" />
     <ClCompile Include="src\ExplorationManager.cpp" />
     <ClCompile Include="src\ExploreData.cpp" />
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\Helper.cpp" />
     <ClCompile Include="src\HoldSquad.cpp" />
     <ClCompile Include="src\PatrolSquad.cpp" />
+    <ClCompile Include="src\PlayerArmyManager.cpp" />
     <ClCompile Include="src\PlayerSquad.cpp" />
     <ClCompile Include="src\Resource.cpp" />
     <ClCompile Include="src\ResourceCounter.cpp" />
@@ -117,7 +118,6 @@
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitGoalManager.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
-    <ClInclude Include="include\AlliedArmyManager.h" />
     <ClInclude Include="include\AlliedSquad.h" />
     <ClInclude Include="include\AttackCoordinator.h" />
     <ClInclude Include="include\AttackSquad.h" />
@@ -128,12 +128,14 @@
     <ClInclude Include="include\Config.h" />
     <ClInclude Include="include\DefenseManager.h" />
     <ClInclude Include="include\DropSquad.h" />
+    <ClInclude Include="include\EnemySquad.h" />
     <ClInclude Include="include\ExplorationManager.h" />
     <ClInclude Include="include\ExploreData.h" />
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\HoldSquad.h" />
     <ClInclude Include="include\PatrolSquad.h" />
+    <ClInclude Include="include\PlayerArmyManager.h" />
     <ClInclude Include="include\PlayerSquad.h" />
     <ClInclude Include="include\SelfClassifier.h" />
     <ClInclude Include="include\TypeDefs.h" />
