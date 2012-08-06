@@ -75,7 +75,8 @@ namespace attack_coordinator {
 
 namespace classification {
 	namespace squad {
-		size_t MEASURE_TIME = 5;
+		double MEASURE_INTERVAL_TIME = 0.0;
+		size_t MEASURE_SIZE = 5;
 		double ATTACK_TIMEOUT = 0.0;
 		double RETREAT_TIMEOUT = 0.0;
 		double RETREAT_TIME_WHEN_SAFE = 0.0;
@@ -102,8 +103,9 @@ namespace debug {
 	int GRAPHICS_COLUMN_WIDTH = 0;
 
 	namespace modules {
-		bool ALLIED_ARMY_MANAGER = false;
+		bool ENEMY_SQUAD = false;
 		bool ALLIED_SQUAD = false;
+		bool ALLIED_ARMY_MANAGER = false;
 		bool AGENT_UNIT = false;
 		bool AGENT_STRUCTURE = false;
 		bool AGENT_WORKER = false;
@@ -356,10 +358,14 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "measure_time") {
-		gOldValue = toString(MEASURE_TIME);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(MEASURE_TIME));
-		MEASURE_TIME = variableInfo;
+	if (variableInfo.name == "measure_interval_time") {
+		gOldValue = toString(MEASURE_INTERVAL_TIME);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(MEASURE_INTERVAL_TIME));
+		MEASURE_INTERVAL_TIME = variableInfo;
+	} else if (variableInfo.name == "measure_size") {
+		gOldValue = toString(MEASURE_SIZE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(MEASURE_SIZE));
+		MEASURE_SIZE = variableInfo;
 	} else if (variableInfo.name == "attack_timeout") {
 		gOldValue = toString(ATTACK_TIMEOUT);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ATTACK_TIMEOUT));
@@ -437,7 +443,11 @@ bool debug::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "allied_squad") {
+	if (variableInfo.name == "enemy_squad") {
+		gOldValue = toString(ENEMY_SQUAD);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_SQUAD));
+		ENEMY_SQUAD = variableInfo;
+	} else if (variableInfo.name == "allied_squad") {
 		gOldValue = toString(ALLIED_SQUAD);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_SQUAD));
 		ALLIED_SQUAD = variableInfo;

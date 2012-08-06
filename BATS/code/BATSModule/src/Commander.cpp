@@ -84,7 +84,7 @@ void Commander::computeReactions() {
 	for (size_t i = 0; i < squads.size(); ++i) {
 		if (squads[i]->isActive()) {
 			// Big
-			if (squads[i]->isBig()) {
+			if (squads[i]->isFrontalAttack()) {
 				bigActive = true;
 			} else {
 				smallActive = true;

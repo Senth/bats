@@ -108,8 +108,10 @@ namespace bats {
 			 * Rules for how to group squads and what they are doing
 			 */
 			namespace squad {
-				/** Time to measure distance traveled and the direction of the squad */
-				extern size_t MEASURE_TIME;
+				/** How long each interval is, in seconds */
+				extern double MEASURE_INTERVAL_TIME;
+				/** Number of intervals to measure distance traveled and the direction of the squad */
+				extern size_t MEASURE_SIZE;
 				/** How long time must have passed since the squad has attacked or been attacked
 				 * before it is actually treated as non-attacking or non-attacked. In
 				 * seconds.
@@ -198,6 +200,7 @@ namespace bats {
 			 * @note Some classes only print out debugging information for medium or high.
 			 */
 			namespace modules {
+				extern bool ENEMY_SQUAD;
 				extern bool ALLIED_SQUAD;
 				extern bool ALLIED_ARMY_MANAGER;
 				extern bool AGENT_UNIT;

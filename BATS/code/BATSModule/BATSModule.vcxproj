@@ -105,6 +105,7 @@
     <ClCompile Include="src\Helper.cpp" />
     <ClCompile Include="src\HoldSquad.cpp" />
     <ClCompile Include="src\PatrolSquad.cpp" />
+    <ClCompile Include="src\PlayerSquad.cpp" />
     <ClCompile Include="src\Resource.cpp" />
     <ClCompile Include="src\ResourceCounter.cpp" />
     <ClCompile Include="src\ResourceGroup.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\HoldSquad.h" />
     <ClInclude Include="include\PatrolSquad.h" />
+    <ClInclude Include="include\PlayerSquad.h" />
     <ClInclude Include="include\SelfClassifier.h" />
     <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Resource.h" />

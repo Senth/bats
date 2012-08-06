@@ -90,7 +90,7 @@ void AlliedArmyManager::rearrangeSquads() {
 	}
 
 	// Add all units to the grid
-	std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator unitIt;
+	std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator unitIt;
 	for (unitIt = mUnitsToCheck.begin(); unitIt != mUnitsToCheck.end(); ++unitIt) {
 		addUnitToGrid(unitIt->first);
 	}
@@ -101,19 +101,19 @@ void AlliedArmyManager::rearrangeSquads() {
 	// Find a non-checked unit in a non-checked squad, i.e. iterate through all existing squads
 	// first. This will avoid creating and then merging unnecessary squads. I.e. all units that
 	// couldn't fit withing squads will then create new squads.
-	std::set<AlliedSquadId> checkedSquads;
+	std::set<PlayerSquadId> checkedSquads;
 
 	bool foundUnit = false;
 	// Iterate through all squads taking one unit each turn
 	do {
 		foundUnit = false;
-		std::pair<BWAPI::Unit*, AlliedSquadId> currentUnit;
+		std::pair<BWAPI::Unit*, PlayerSquadId> currentUnit;
 		currentUnit.first = NULL;
 
 		// Is there a not checked unit with a not checked squad?
-		std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator unitIt = mUnitsToCheck.begin();
+		std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator unitIt = mUnitsToCheck.begin();
 		while (unitIt != mUnitsToCheck.end() && !foundUnit) {
-			if (unitIt->second != AlliedSquadId::INVALID_KEY &&
+			if (unitIt->second != PlayerSquadId::INVALID_KEY &&
 				checkedSquads.count(unitIt->second) == 0)
 			{
 				foundUnit = true;
@@ -178,16 +178,16 @@ void AlliedArmyManager::addUnit(BWAPI::Unit* pUnit) {
 void AlliedArmyManager::removeUnit(BWAPI::Unit* pUnit) {
 	// Note, this function does not update the squads, it simply removes the unit from the squad
 	// and this class, meaning in the next update phase the squads might be altered.
-	std::map<Unit*, AlliedSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
+	std::map<Unit*, PlayerSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
 	if (unitIt != mUnitSquad.end() && unitIt->second.isValid()) {
 		mSquads[unitIt->second]->removeUnit(pUnit);
 		mUnitSquad.erase(unitIt);
 	}
 }
 
-void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId squadId) {
+void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId) {
 	// Change squad if needed
-	AlliedSquadId oldSquadId = mUnitSquad[pUnit];
+	PlayerSquadId oldSquadId = mUnitSquad[pUnit];
 	if (oldSquadId != squadId) {
 		if (oldSquadId.isValid()) {
 			mSquads[oldSquadId]->removeUnit(pUnit);
@@ -217,7 +217,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 					if (unitIt->second == false) {
 						// Only check same squads, these are 100% certain within exclude_distance
 						// If the unit is part of the old (valid) squad, include those too
-						AlliedSquadId unitSquadId = mUnitSquad[unitIt->first];
+						PlayerSquadId unitSquadId = mUnitSquad[unitIt->first];
 						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
 							queuedUnits.push_back(unitIt->first);
 							setUnitAsChecked(unitIt->first);
@@ -255,7 +255,7 @@ void AlliedArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId s
 					// Only parse not checked units
 					if (unitIt->second == false) {
 						
-						AlliedSquadId unitSquadId = mUnitSquad[unitIt->first];
+						PlayerSquadId unitSquadId = mUnitSquad[unitIt->first];
 
 						// Same squad or old (if valid), check exclude_distance
 						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
@@ -286,7 +286,7 @@ void AlliedArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
 	mUnitsToCheck.erase(pUnit);
 }
 
-std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator AlliedArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator& unitIt) {
+std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator AlliedArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator& unitIt) {
 	const Position& gridPos = getGridPosition(unitIt->first);
 	if (gridPos != Positions::Invalid) {
 		mGridUnits[gridPos.x()][gridPos.y()][unitIt->first] = true;
@@ -402,7 +402,7 @@ void AlliedArmyManager::setBigSquad() {
 	int cBiggestSize = 0;
 	for (size_t i = 0; i < mSquads.size(); ++i) {
 		if (NULL != mSquads[i]) {
-			mSquads[i]->setBig(false);
+			mSquads[i]->setFrontalAttack(false);
 
 			int currentSupplyCount = mSquads[i]->getSupplyCount();
 			if (currentSupplyCount > cBiggestSize) {
@@ -414,7 +414,7 @@ void AlliedArmyManager::setBigSquad() {
 
 
 	if (NULL != biggestSquad) {
-		biggestSquad->setBig(true);
+		biggestSquad->setFrontalAttack(true);
 	}
 }
 
@@ -422,7 +422,7 @@ void AlliedArmyManager::addSquad(AlliedSquad* pSquad) {
 	mSquads[pSquad->getId()] = AlliedSquadPtr(pSquad);
 }
 
-void AlliedArmyManager::removeSquad(AlliedSquadId squadId) {
+void AlliedArmyManager::removeSquad(PlayerSquadId squadId) {
 	mSquads[squadId].reset();
 }
 
@@ -436,7 +436,7 @@ void AlliedArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
 
 AlliedSquadCstPtr AlliedArmyManager::getBigSquad() const {
 	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i] && mSquads[i]->isBig()) {
+		if (NULL != mSquads[i] && mSquads[i]->isFrontalAttack()) {
 			return mSquads[i];
 		}
 	}
@@ -510,7 +510,7 @@ void AlliedArmyManager::printGraphicDebugInfo() const {
 			int includeDistance = config::classification::squad::INCLUDE_DISTANCE * TILE_SIZE >> 1;
 			int excludeDistance = config::classification::squad::EXCLUDE_DISTANCE * TILE_SIZE >> 1;
 
-			std::map<Unit*, AlliedSquadId>::const_iterator unitIt;
+			std::map<Unit*, PlayerSquadId>::const_iterator unitIt;
 			for (unitIt = mUnitSquad.begin(); unitIt != mUnitSquad.end(); ++unitIt) {
 				// Include distance
 				Broodwar->drawCircleMap(

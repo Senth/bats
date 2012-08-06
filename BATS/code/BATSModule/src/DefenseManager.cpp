@@ -85,6 +85,7 @@ void DefenseManager::updateHoldSquads() {
 
 
 		// Is any defense point undefended, create DefenseHoldSquad for that position
+		// @todo Prioritize bot's defense points.
 		DefendSet::const_iterator defendIt;
 		for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
 			bool defended = false;

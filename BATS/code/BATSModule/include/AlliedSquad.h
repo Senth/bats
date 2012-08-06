@@ -1,13 +1,10 @@
 #pragma once
 
-#include "TypeDefs.h"
-#include "Config.h"
+#include "PlayerSquad.h"
 #include <vector>
 #include <list>
 #include <BWAPI/Unit.h>
 #include <BWAPI/TilePosition.h>
-#include "Utilities/KeyHandler.h"
-#include "Utilities/KeyType.h"
 
 // Namespace for the project
 namespace bats {
@@ -26,13 +23,13 @@ class GameTime;
  * 
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
-class AlliedSquad : public config::OnConstantChangedListener {
+class AlliedSquad : public PlayerSquad {
 public:
 	/**
 	 * Default constructor
-	 * @param big if this squad is the main army, defaults to false.
+	 * @param frontalAttack if this squad is the main army, defaults to false.
 	 */
-	AlliedSquad(bool big = false);
+	AlliedSquad(bool frontalAttack = false);
 
 	/**
 	 * Destructor
@@ -54,68 +51,13 @@ public:
 	 * Checks whether the squad is big or not. Only one squad can be big, i.e. the main attack.
 	 * @return true if this squad is the main army.
 	 */
-	bool isBig() const;
+	bool isFrontalAttack() const;
 
 	/**
-	 * Change the big status of the squad. Shall only be called by PlayerArmy.
-	 * @param big if this squad is the main army.
+	 * Change the big status of the squad. Shall only be called by AlliedArmyManager.
+	 * @param frontalAttack if this squad is the main army.
 	 */
-	void setBig(bool big);
-
-	/**
-	 * Returns all units in the squad.
-	 * @return all units in the squad.
-	 */
-	const std::vector<BWAPI::Unit*> getUnits() const;
-
-	/**
-	 * Returns the amount of supply the squad occupies.
-	 * @note this is the double amount of supply since BWAPI uses this supply count
-	 * because Zerglings take up 0.5 supply.
-	 * @return amount of supply the squad occupies.
-	 */
-	int getSupplyCount() const;
-
-	/**
-	 * Returns the number of units in the squad
-	 * @return number of units in the squad
-	 */
-	size_t getUnitCount() const;
-
-	/**
-	 * Returns true if the squad is empty.
-	 * @see getNrOfUnits()
-	 * @return true if the squad is empty.
-	 */
-	bool isEmpty() const;
-
-	/**
-	 * Adds a unit to the squad.
-	 * @param pUnit the unit that shall be added to the squad.
-	 */
-	void addUnit(BWAPI::Unit* pUnit);
-
-	/**
-	 * Removes a unit from the squad.
-	 * @param pUnit the unit that shall be removed.
-	 */
-	void removeUnit(BWAPI::Unit* pUnit);
-
-	/**
-	 * Returns the id of the squad.
-	 * @return id of the squad
-	 */
-	AlliedSquadId getId() const;
-
-	/**
-	 * Called when a constant has been updated (that this class listens to).
-	 * Currently it only listens these variables:
-	 * \code
-	 * [classification.squad]
-	 * measure_time
-	 * \endcode
-	 */
-	void onConstantChanged (config::ConstantName constantName);
+	void setFrontalAttack(bool frontalAttack);
 
 	/**
 	 * Returns the current state of the AlliedSquad.
@@ -134,56 +76,19 @@ public:
 	bool isActive() const;
 
 	/**
-	 * Updates the center of the squad for isMoving() and isRetreaning() calculations
-	 */
-	void update();
-
-	/**
-	 * Prints graphical debug information, id of squad, number of units and
-	 * number of supply in the center of the squad.
-	 */
-	void printGraphicDebugInfo() const;
-
-	/**
-	 * Returns the maximum amount of AlliedSquads that are allowed to be created.
-	 * @return maximum amount of AlliedSquads that are allowed to be created.
-	 */
-	static int getMaxKeys();
-
-	/**
-	 * Returns the current center position of the squad.
-	 * @return current center position of the squad.
-	 */
-	const BWAPI::TilePosition& getCenter() const;
-
-	/**
-	 * Returns the target position of the squad, e.g. where the units are moving to
-	 * @return squads target position, TilePositions::Invalid if no target was found.
-	 */
-	BWAPI::TilePosition getTargetPosition() const;
-
-	/**
 	 * Checks whether the squad is under attack or not
 	 * @return true if the squad is under attack
 	 */
 	bool isUnderAttack() const;
 
+	virtual void onConstantChanged (config::ConstantName constantName);
+
+protected:
+	virtual void updateDerived();
+	virtual bool isDebugOff() const;
+	virtual std::string getDebugString() const;
+
 private:
-	/**
-	 * Returns the direction of the squad, the direction is measured by the current center
-	 * position and center position for measure_time seconds ago.
-	 * @note the direction is not normalized.
-	 * @return direction of the squad. TilePositions::Invalid if the squad doesn't have
-	 * enough readings.
-	 */
-	BWAPI::TilePosition getDirection() const;
-
-	/**
-	 * Returns the squared distance traveled since measure_time seconds ago.
-	 * @return squared distance traveled since measure_time seconds ago.
-	 */
-	double getDistanceTraveledSquared() const;
-
 	/**
 	 * Calculate whether the squad is moving to attack or not.
 	 * @return true when
@@ -250,11 +155,6 @@ private:
 	bool hasAttackHalted() const;
 
 	/**
-	 * Updates the center position
-	 */
-	void updateCenter();
-
-	/**
 	 * Updates the closest distances from allied and enemy structures
 	 */
 	void updateClosestDistances();
@@ -265,30 +165,18 @@ private:
 	 */
 	std::string getStateString() const;
 
-	/**
-	 * Checks if the specified unit belongs to this squad
-	 * @param pUnit unit to check if it belongs to this squad
-	 * @return true if the unit belongs to this squad
-	 */
-	bool belongsToThisSquad(BWAPI::Unit* pUnit) const;
+	
 
-	bool mBig;
-	std::vector<BWAPI::Unit*> mUnits;
-	std::list<BWAPI::TilePosition> mCenter;
+	bool mFrontattack;
 	std::list<int> mAlliedDistances;
 	std::list<int> mEnemyDistances;
-	AlliedSquadId mId;
 	States mState;
-	double mUpdateLast;
 	mutable double mAttackLast;
 	double mUnderAttackLast;
 	mutable double mRetreatStartedTime;
 	mutable double mRetreatStartTestTime;
 	mutable bool mRetreatedLastCall;
 
-	static utilities::KeyHandler<_AlliedSquadType>* mpsKeyHandler;
-	static int mcsInstances;
 	static bats::ExplorationManager* mpsExplorationManager;
-	static GameTime* mpsGameTime;
 };
 }

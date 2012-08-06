@@ -141,6 +141,9 @@
     <ClInclude Include="include\HoldSquad.h">
       <Filter>Squads\Types</Filter>
     </ClInclude>
+    <ClInclude Include="include\PlayerSquad.h">
+      <Filter>Classification</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="src\HoldSquad.cpp">
       <Filter>Squads\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerSquad.cpp">
+      <Filter>Classification</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -179,7 +179,7 @@ private:
 	 * if the unit already belongs to this squad, nothing is changed, if the squad does not
 	 * belong to this squad, it is removed from the old squad and added to this.
 	 */
-	void addCloseUnitsToSquad(BWAPI::Unit* pUnit, AlliedSquadId squadId);
+	void addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId);
 
 	/**
 	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
@@ -194,7 +194,7 @@ private:
 	 * @param unitIt the unit to be set as checked.
 	 * @return iterator returned by mUnitsToBeChecked.erase(unitIt);
 	 */
-	std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator setUnitAsChecked(const std::map<BWAPI::Unit*, AlliedSquadId>::const_iterator& unitIt);
+	std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator setUnitAsChecked(const std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator& unitIt);
 
 	/**
 	 * Recalculate the lookup table. Shall be called whenever grid_square_distance is
@@ -222,7 +222,7 @@ private:
 	 * Removes an AlliedSquad from the squad list and deletes it
 	 * @param squadId the squad id of the squad
 	 */
-	void removeSquad(AlliedSquadId squadId);
+	void removeSquad(PlayerSquadId squadId);
 
 	/**
 	 * Adds a unit to the grid with the correct position. I.e. if it's in a transportation
@@ -233,7 +233,7 @@ private:
 
 	int mLastFrameUpdate;
 	std::vector<AlliedSquadPtr> mSquads;
-	std::map<BWAPI::Unit*, AlliedSquadId> mUnitSquad; /**< A unit bound to a squad id */
+	std::map<BWAPI::Unit*, PlayerSquadId> mUnitSquad; /**< A unit bound to a squad id */
 
 	/** Look-up table for where the unit is located. */
 	std::vector<std::vector<BWAPI::Position>> mLookupTableGridPosition;
@@ -241,7 +241,7 @@ private:
 	// Only temporary variables, placed here to avoid sending them as parameters
 	// over various functions
 	std::vector<std::vector<std::map<BWAPI::Unit*, bool>>> mGridUnits;
-	std::map<BWAPI::Unit*, AlliedSquadId> mUnitsToCheck;
+	std::map<BWAPI::Unit*, PlayerSquadId> mUnitsToCheck;
 	
 
 	static AlliedArmyManager* mpsInstance;
