@@ -1,6 +1,7 @@
 % !TEX root = ../../main.tex
 
 \section{Attack coordinator}
+\label{sec:attack_coordinator}
 The attack coordinator has one feature, that is to coordinate attacks. Squads can request attacks from the attack coordinator and it will search for a good location to attack. Before describing the algorithms, you need to know that attacks can be grouped into two categories: frontal attacks, and distracting attacks.
 
 Frontal attacks are big attacks that generally use the majority of the army and attacks head on, distracting attacks are minor attacks either used to distract the enemy from one position to where the attack is (hence the name), or they can be used to try to deal some damage to the enemy, with heavy emphasis on try. These distracting attacks can be drops, harassment, counter-attacks—BATS has, in time of this writing, only implemented the drop functionality. It shall be noted that most of the distracting attacks are not suicide attacks, and some does not even have to deal any damage to be successful as the goal is to draw away the enemy forces from a well-defended area, our expansion, etc.

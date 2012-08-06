@@ -12,10 +12,10 @@ vector<shared_ptr<T>> SquadManager::getSquads();
 \end{lstlisting}
 
 \subsection{The squad base class}
-There are many features in the squad class, only the most important once. First the movement and different locations the squad can move to, then we will cover the squad's basic behaviors and which can be overridden by derived classes. Finally how  the \texttt{update()} and \texttt{updateDerived()} functions work.
+There are many features in the squad class, where most of them are helper functions, but only core features are explained in the text. If the reader wants more information, s/he can look in Appendix \ref{sec:doxygen}. First squad movement will be covered, then the squad's basic behaviors, which can be overridden by derived classes. Finally how the \texttt{update()} and \texttt{updateDerived()} functions work.
 
 \paragraph{Squad movement}
-This is not how the squad moves, but where the squad's units move to. The potential field manager takes care of how units move and was already implemented in BTHAI. The squad has five prioritized locations it can move to. Starting from the lowest priority is
+This is not how the squad moves, but where the squad's units move to. The potential field manager takes care of how units move and was already implemented in BTHAI—although some changes have been made to the potential field manager to accept some general squad behavior. The squad has five prioritized locations it can move to. Starting from the lowest priority is
 \begin{enumerate}
 	\item the goal location where the squad want to go to do their main task (e.g. scout, attack, defend position);
 	\item while it's good to go there we always want to be able to retreat from an attack or anything else, this is where the retreat position comes into play, only derived squads can set this and \texttt{onRetreatCompleted()} is called when the retreat has succeeded or failed;
@@ -25,8 +25,13 @@ This is not how the squad moves, but where the squad's units move to. The potent
 \end{enumerate}
 
 \paragraph{Behaviors}
-There 
-The regroup behavior has already been covered above. 
+The squad has four elements that can change the behavior of the squad.
+\begin{itemize}
+	\item \emph{Regrouping}, which has been fully described above in squad movement.
+	\item A squad can contain a \emph{unit composition}, this limits the squad to only contain units of the specific type, useful when creating special type of squads. Section \ref{sec:unit_composition} describes unit composition in more detail.
+	\item Some squads usually don't want to get close to enemies, in this case \emph{avoid enemies} can be turned on. This causes attacking units to move to a specific position without attacking (even if they walk straight through enemies); this is due to potential field manager in BTHAI did not support this behavior entirely, thus a simpler version that just uses regular path finding is used due to lack of time to change the potential field algorithm in the manager.
+	\item \emph{Wait goals} has been briefly described before in \nameref{sec:attack_coordinator} and is fully described in section \ref{sec:wait_goals}, \nameref{sec:wait_goals}. While adding these does not give the basic squad any specific behavior (yet), they can be used in the derived classes for certain behaviors.
+\end{itemize}
 
 \subsection{Attack squad}
 \label{sec:attack_squad}
@@ -41,6 +46,7 @@ The regroup behavior has already been covered above.
 \subsection{Scout squad}
 
 \subsection{Unit composition}
+\label{sec:unit_composition}
 
 \subsection{Wait goals}
 \label{sec:wait_goals}
