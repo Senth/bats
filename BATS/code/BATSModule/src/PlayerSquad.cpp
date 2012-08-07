@@ -28,10 +28,16 @@ PlayerSquad::PlayerSquad() {
 
 	mId = mpsKeyHandler->allocateKey();
 
+	// Add listener
+	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
+
 	mUpdateLast = 0.0;
 }
 
 PlayerSquad::~PlayerSquad() {
+	// Remove listener
+	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
+
 	mpsKeyHandler->freeKey(mId);
 
 	// Delete KeyHandler if no squads are available
@@ -53,6 +59,7 @@ void PlayerSquad::update() {
 	}
 	mUpdateLast = mpsGameTime->getElapsedTime();
 
+	updateSupply();
 	updateCenter();
 	updateDerived();
 }
@@ -64,6 +71,14 @@ int PlayerSquad::getSupplyCount() const {
 	}
 
 	return cSupply;
+}
+
+int PlayerSquad::getDeltaSupplyCount() const {
+	if (mSupplies.size() == config::classification::squad::MEASURE_SIZE) {
+		return mSupplies.front() - mSupplies.back();
+	} else {
+		return 0;
+	}
 }
 
 size_t PlayerSquad::getUnitCount() const {
@@ -251,9 +266,20 @@ void PlayerSquad::onConstantChanged(config::ConstantName constanName) {
 		if (config::classification::squad::MEASURE_SIZE < mCenter.size()) {
 			mCenter.resize(config::classification::squad::MEASURE_SIZE);
 		}
+		if (config::classification::squad::MEASURE_SIZE < mSupplies.size()) {
+			mSupplies.resize(config::classification::squad::MEASURE_SIZE);
+		}
 	}
 }
 
 bool PlayerSquad::isMeasureFull() const {
 	return config::classification::squad::MEASURE_SIZE == mCenter.size();
+}
+
+void PlayerSquad::updateSupply() {
+	mSupplies.push_front(getSupplyCount());
+
+	if (mSupplies.size() > config::classification::squad::MEASURE_SIZE) {
+		mSupplies.pop_back();
+	}
 }

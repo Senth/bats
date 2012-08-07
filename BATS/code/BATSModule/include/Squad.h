@@ -10,6 +10,7 @@
 #include "UnitComposition.h"
 #include "UnitCompositionFactory.h"
 #include "WaitGoal.h"
+#include "Config.h"
 
 // Forward declarations
 class UnitAgent;
@@ -28,7 +29,7 @@ class GameTime;
  * for units in the back so the position can be reached.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
-class Squad
+class Squad : public config::OnConstantChangedListener
 {
 public:
 	/**
@@ -329,8 +330,20 @@ public:
 	 * @note this is actually the double amount of supplies, since that's BWAPI standard
 	 * (because Zerglings take up 0.5 supplies)
 	 * @return how many supplies the squad occupies.
+	 * @see getDeltaSupplyCount()
 	 */
 	int getSupplyCount() const;
+
+	/**
+	 * Returns the delta supply count over the measure_size * measure_interval_time period.
+	 * @note this is the double amount of supply since BWAPI uses this supply count
+	 * because Zerglings take up 0.5 supply.
+	 * @return delta supply count (doubled), if not enough measures it will return 0.
+	 * @see getSupplyCount()
+	 */
+	int getDeltaSupplyCount() const;
+
+	virtual void onConstantChanged(config::ConstantName constantName);
 	
 protected:
 	/**
@@ -440,9 +453,9 @@ protected:
 
 	/**
 	 * Called when the squad has arrived at the retreat position, use this in derived
-	 * classes if those use the retreat functionality.
+	 * classes if those use the retreat functionality. Default behavior disbands the squad
 	 */
-	virtual void onRetreatCompleted() {}
+	virtual void onRetreatCompleted();
 
 	/**
 	 * Called when a new WaitGoal has been added. Does nothing in the base class Squad.
@@ -652,9 +665,15 @@ private:
 	 */
 	BWAPI::TilePosition getPriorityMoveToPosition() const;
 
+	/**
+	 * Updates the supply count
+	 */
+	void updateSupply();
+
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mViaPath;
+	std::list<int> mSupplies;
 	BWAPI::TilePosition mGoalPosition;
 	BWAPI::TilePosition mTempGoalPosition;
 	BWAPI::TilePosition mRegroupPosition;
@@ -662,19 +681,17 @@ private:
 	UnitComposition mUnitComposition;
 	double mRegroupStartTime;
 	bool mCanRegroup;
-
 	bool mDisbandable; /**< If the squad is allowed to be destroyed */
 	bool mDisbanded;
 	bool mHasAirUnits;
 	bool mHasGroundUnits;
-	bool mAvoidEnemyUnits; /**< If the squad shall avoid enemy units at all costs */
+	bool mAvoidEnemyUnits;
 	bool mInitialized;
 	States mState;
 	SquadId mId;
 	std::tr1::weak_ptr<Squad> mThis;
 	GoalStates mGoalState;
-
-	int mFrameLastCall;
+	double mUpdateLast;
 
 	// Calculating furthest unit away distance
 	mutable double mFurthestUnitAwayDistance;

@@ -10,6 +10,7 @@ namespace bats {
 class AttackCoordinator;
 class ExplorationManager;
 class PlayerArmyManager;
+class DefenseManager;
 
 /**
  * Attacks a point on the map. The squad will intercept all enemy units on the way to
@@ -113,7 +114,8 @@ protected:
 
 	static AttackCoordinator* mpsAttackCoordinator;
 	static ExplorationManager* mpsExplorationManager;
-	static PlayerArmyManager* mpsAlliedArmyManager;
+	static PlayerArmyManager* mpsPlayerArmyManager;
+	static DefenseManager* mpsDefenseManager;
 private:
 	/**
 	 * Check if the squad needs to regroup with the allied forces.
@@ -150,6 +152,29 @@ private:
 	 * @return true if any unit targets a enemy structure.
 	 */
 	bool isTargetingEnemyStructure() const;
+
+	/**
+	 * Handles the logic of the attack squad when following an allied squad.
+	 * Retreat functionality is handled in handleRetreat().
+	 * This function only executes if we're actually following an allied squad.
+	 * @see handleNormalBehavior()
+	 */
+	void handleFollowAllied();
+
+	/**
+	 * Handles the logic of the attack squad when we're NOT following an allied squad.
+	 * Retreat functionality is handled in handleRetreat().
+	 * This function only executes if we're NOT following an allied squad.
+	 * @see handleFollowAllied()
+	 */
+	void handleNormalBehavior();
+
+	/**
+	 * Checks if the enemy is too strong to attack, and might order a disband of
+	 * the squad—depends on if it follows an allied squad or if attacked alone.
+	 * @note this shall not be confused with the Squad::handleRetreat() command.
+	 */
+	void handleRetreat();
 
 	friend AttackCoordinator; // For setting goal position.
 

@@ -362,7 +362,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 				mpUnitManager->morphDrone(pUnit);
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			} else {
-				onUnitCreate(pUnit);
+				onUnitDiscover(pUnit);
 			}
 		}
 	}

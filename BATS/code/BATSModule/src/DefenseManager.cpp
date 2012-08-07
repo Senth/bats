@@ -524,3 +524,23 @@ bool DefenseManager::isInDefendingList(const BWAPI::TilePosition& position) cons
 
 	return false;
 }
+
+TilePosition DefenseManager::findRetreatPosition() const {
+	TilePosition retreatPos = TilePositions::Invalid;
+
+	// Search for our defend positions first
+	set<DefendPosition>::const_iterator defendIt = mDefendPositions.begin();
+	while (retreatPos == TilePositions::Invalid && defendIt != mDefendPositions.end()) {
+		if (defendIt->isOur) {
+			retreatPos = defendIt->position;
+		}
+		++defendIt;
+	}
+	
+	// Did not find any defend position, use our start location
+	if (retreatPos == TilePositions::Invalid) {
+		retreatPos = Broodwar->self()->getStartLocation();
+	}
+
+	return retreatPos;
+}

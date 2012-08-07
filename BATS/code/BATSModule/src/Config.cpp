@@ -74,6 +74,13 @@ namespace attack_coordinator {
 }
 
 namespace classification {
+	namespace retreat {
+		int ENEMY_CLOSE_DISTANCE = 0;
+		double ENEMY_LARGER_THAN_US = 0.0;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
+
 	namespace squad {
 		double MEASURE_INTERVAL_TIME = 0.0;
 		size_t MEASURE_SIZE = 5;
@@ -128,7 +135,6 @@ namespace frame_distribution {
 	int EXPLORATION_MANAGER = 0;
 	int RESOURCE_COUNTER = 0;
 	int ALLIED_ARMY_REARRANGE_SQUADS = 0;
-	int SQUAD = 0;
 	int DEFENSE_MANAGER = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
@@ -157,9 +163,7 @@ namespace squad {
 	double PING_WAIT_TIME_FIRST = 0.0;
 	double PING_WAIT_TIME_AFTER_FIRST = 0.0;
 	int REGROUP_DISTANCE_BEGIN = 0;
-	int REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 	int REGROUP_DISTANCE_END = 0;
-	int REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 	double REGROUP_NEW_POSITION_TIME = 0.0;
 	double CALC_FURTHEST_AWAY_TIME = 1.0;
 	int CLOSE_DISTANCE = 0;
@@ -170,9 +174,7 @@ namespace squad {
 		int STRUCTURES_DESTROYED_GOAL_DISTANCE = 0;
 		int FIND_ALLIED_SQUAD_DISTANCE = 0;
 		int ALLIED_REGROUP_BEGIN = 0;
-		int ALLIED_REGROUP_BEGIN_SQUARED = ALLIED_REGROUP_BEGIN * ALLIED_REGROUP_BEGIN;
 		int ALLIED_REGROUP_END = 0;
-		int ALLIED_REGROUP_END_SQUARED = ALLIED_REGROUP_END * ALLIED_REGROUP_END;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -345,13 +347,31 @@ bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInf
 }
 
 bool classification::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.subsection == "squad") {
+	if (variableInfo.subsection == "retreat") {
+		return retreat::set(variableInfo);
+	} else if (variableInfo.subsection == "squad") {
 		return squad::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
 		return false;
 	} else {
 		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
 			"' in " <<variableInfo.file << ".ini");
+	}
+
+	return true;
+}
+
+bool classification::retreat::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "enemy_close_distance") {
+		gOldValue = toString(ENEMY_CLOSE_DISTANCE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_CLOSE_DISTANCE));
+		ENEMY_CLOSE_DISTANCE = variableInfo;
+	} else if (variableInfo.name == "enemy_larger_than_us") {
+		gOldValue = toString(ENEMY_LARGER_THAN_US);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_LARGER_THAN_US));
+		ENEMY_LARGER_THAN_US = variableInfo;
+	} else {
+		return false;
 	}
 
 	return true;
@@ -503,10 +523,6 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_ARMY_REARRANGE_SQUADS);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_ARMY_REARRANGE_SQUADS));
 		ALLIED_ARMY_REARRANGE_SQUADS = variableInfo;
-	} else if (variableInfo.name == "squad") {
-		gOldValue = toString(SQUAD);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(SQUAD));
-		SQUAD = variableInfo;
 	} else if (variableInfo.name == "defense_manager") {
 		gOldValue = toString(DEFENSE_MANAGER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE_MANAGER));
@@ -566,12 +582,10 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 			gOldValue = toString(REGROUP_DISTANCE_BEGIN);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_BEGIN));
 			REGROUP_DISTANCE_BEGIN = variableInfo;
-			REGROUP_DISTANCE_BEGIN_SQUARED = REGROUP_DISTANCE_BEGIN * REGROUP_DISTANCE_BEGIN;
 		} else if (variableInfo.name == "regroup_distance_end") {
 			gOldValue = toString(REGROUP_DISTANCE_END);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_END));
 			REGROUP_DISTANCE_END = variableInfo;
-			REGROUP_DISTANCE_END_SQUARED = REGROUP_DISTANCE_END * REGROUP_DISTANCE_END;
 		} else if (variableInfo.name == "regroup_new_position_time") {
 			gOldValue = toString(REGROUP_NEW_POSITION_TIME);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_NEW_POSITION_TIME));
@@ -616,12 +630,10 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_REGROUP_BEGIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_BEGIN));
 		ALLIED_REGROUP_BEGIN = variableInfo;
-		ALLIED_REGROUP_BEGIN_SQUARED = ALLIED_REGROUP_BEGIN * ALLIED_REGROUP_BEGIN;
 	} else  if (variableInfo.name == "allied_regroup_end") {
 		gOldValue = toString(ALLIED_REGROUP_END);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_END));
 		ALLIED_REGROUP_END = variableInfo;
-		ALLIED_REGROUP_END_SQUARED = ALLIED_REGROUP_END * ALLIED_REGROUP_END;
 	} else {
 		return false;
 	}

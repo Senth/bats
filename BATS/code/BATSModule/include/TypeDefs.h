@@ -20,6 +20,11 @@ namespace bats {
 	typedef std::tr1::shared_ptr<const AlliedSquad> AlliedSquadCstPtr;
 	typedef const std::tr1::shared_ptr<AlliedSquad>& AlliedSquadRef;
 
+	class EnemySquad;
+	typedef std::tr1::shared_ptr<EnemySquad> EnemySquadPtr;
+	typedef std::tr1::shared_ptr<const EnemySquad> EnemySquadCstPtr;
+	typedef const std::tr1::shared_ptr<EnemySquad>& EnemySquadRef;
+
 	class Squad;
 	typedef std::tr1::shared_ptr<Squad> SquadPtr;
 	typedef std::tr1::shared_ptr<const Squad> SquadCstPtr;

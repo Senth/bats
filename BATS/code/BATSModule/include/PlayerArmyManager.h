@@ -274,8 +274,8 @@ std::pair<std::tr1::shared_ptr<const SquadType>, int> PlayerArmyManager::getClos
 	const BWAPI::TilePosition& position,
 	int distanceMax) const
 {
-	/// @todo add parameter to check if returning allied or enemy squad
-	std::pair<std::tr1::shared_ptr<const SquadType>, int> closestSquad;
+	typedef std::tr1::shared_ptr<const SquadType> SquadTypeCstPtr;
+	std::pair<SquadTypeCstPtr, int> closestSquad;
 	if (distanceMax == INT_MAX) {
 		closestSquad.second = distanceMax;
 	} else {
@@ -283,12 +283,13 @@ std::pair<std::tr1::shared_ptr<const SquadType>, int> PlayerArmyManager::getClos
 	}
 
 	for (size_t i = 0; i < mSquads.size(); ++i) {
-		if (NULL != mSquads[i] && mSquads[i]->getCenter() != TilePositions::Invalid) {
-			int distanceSquared = getSquaredDistance(position, mSquads[i]->getCenter());
+		SquadTypeCstPtr pSquad = std::tr1::dynamic_pointer_cast<const SquadType>(mSquads[i]);
+		if (NULL != pSquad && pSquad->getCenter() != TilePositions::Invalid) {
+			int distanceSquared = getSquaredDistance(position, pSquad->getCenter());
 
 			if (distanceSquared < closestSquad.second) {
 				closestSquad.second = distanceSquared;
-				closestSquad.first = mSquads[i];
+				closestSquad.first = pSquad;
 			}
 		}
 	}

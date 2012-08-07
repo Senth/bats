@@ -21,10 +21,6 @@ AlliedSquad::AlliedSquad(bool frontalAttack) {
 		mpsExplorationManager = bats::ExplorationManager::getInstance();
 	}
 
-	// Add listener
-	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
-
-	
 	mAttackLast = mpsGameTime->getElapsedTime() - config::classification::squad::ATTACK_TIMEOUT;
 	mUnderAttackLast = mpsGameTime->getElapsedTime() - config::classification::squad::ATTACK_TIMEOUT;
 	mRetreatStartedTime = 0.0;
@@ -33,8 +29,7 @@ AlliedSquad::AlliedSquad(bool frontalAttack) {
 }
 
 AlliedSquad::~AlliedSquad() {
-	// Remove listener
-	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
+	// Does nothing
 }
 
 bool AlliedSquad::isFrontalAttack() const {

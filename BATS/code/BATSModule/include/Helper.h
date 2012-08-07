@@ -114,7 +114,7 @@ inline int getSquaredDistance(const T& a, const T& b) {
  * @pre type T needs to have a function x() and y()
  * @param a the first point
  * @param b the second point
- * @param range the maximum distance between point a and b. Rang shall not be squared.
+ * @param range the maximum distance between point a and b. Range shall not be squared.
  * @return true if a and b is withing range, false otherwise.
  */
 template<typename T>

@@ -48,7 +48,7 @@ Squad::Squad(
 	mGoalState(GoalState_Lim),
 	mState(State_Initializing),
 	mCanRegroup(true),
-	mFrameLastCall(0),
+	mUpdateLast(0.0),
 	mInitialized(false)
 {
 	// Generate new key for the squad
@@ -77,9 +77,15 @@ Squad::Squad(
 	SquadPtr strongPtr(this);
 	mThis = weak_ptr<Squad>(strongPtr);
 	mpsSquadManager->addSquad(strongPtr);
+
+	// Add listener
+	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
 }
 
 Squad::~Squad() {
+	// Remove listener
+	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
+
 	mcsInstance--;
 
 	// Free key
@@ -127,10 +133,10 @@ bool Squad::tryDisband() {
 
 void Squad::update() {
 	// Don't call to often
-	if (mFrameLastCall + config::frame_distribution::SQUAD > mpsGameTime->getFrameCount()) {
+	if (mpsGameTime->getElapsedTime() - mUpdateLast < config::classification::squad::MEASURE_INTERVAL_TIME) {
 		return;
 	}
-	mFrameLastCall = mpsGameTime->getFrameCount();
+	mUpdateLast = mpsGameTime->getElapsedTime();
 
 
 	// Check if this is the first time calling, then add all the initial units
@@ -461,12 +467,9 @@ bool Squad::isCloseTo(const BWAPI::TilePosition& position, int range) const {
 		return false;
 	}
 
-	bool bClose = false;
-
 	// To be more effective, use squared distance. If we're in range check for ground distance
 	// if the squad travels by ground. Ground distance is very computational heavy
-	int squaredDistance = getSquaredDistance(position, getCenter());
-	bClose = squaredDistance <= range * range;
+	bool bClose = isWithinRange(position, getCenter(), range);
 
 	if (bClose && travelsByGround()) {
 		int groundDistance = static_cast<int>(BWTA::getGroundDistance(getCenter(), position) * FROM_POSITION_TO_TILE + 0.5);
@@ -502,10 +505,15 @@ void Squad::setRetreatPosition(const BWAPI::TilePosition& retreatPosition) {
 	if (mRetreatPosition != retreatPosition) {
 		mRetreatPosition = retreatPosition;
 		if (mRetreatPosition != TilePositions::Invalid) {
+			setAvoidEnemyUnits(true);
 			mRegroupPosition = TilePositions::Invalid;
 		}
 		updateUnitMovement();
 	}
+}
+
+void Squad::onRetreatCompleted() {
+	forceDisband();
 }
 
 #pragma warning(push)
@@ -621,11 +629,11 @@ bool Squad::needsRegrouping() const {
 		return false;
 	}
 
+	const TilePosition& center = getCenter();
+
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		double squaredDistance = getSquaredDistance(getCenter(), mUnits[i]->getUnit()->getTilePosition());
-
-		if (squaredDistance > config::squad::REGROUP_DISTANCE_BEGIN_SQUARED) {
+		if (!isWithinRange(center, mUnits[i]->getUnit()->getTilePosition(), config::squad::REGROUP_DISTANCE_BEGIN)) {
 			return true;
 		}
 	}
@@ -639,11 +647,11 @@ bool Squad::finishedRegrouping() const {
 		return true;
 	}
 
+	const TilePosition& center = getCenter();
+
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		double squaredDistance = getSquaredDistance(getCenter(), mUnits[i]->getUnit()->getTilePosition());
-
-		if (squaredDistance > config::squad::REGROUP_DISTANCE_END_SQUARED) {
+		if (!isWithinRange(center, mUnits[i]->getUnit()->getTilePosition(), config::squad::REGROUP_DISTANCE_END)) {
 			return false;
 		}
 	}
@@ -904,6 +912,31 @@ int Squad::getSupplyCount() const {
 	return cSupply;
 }
 
+int Squad::getDeltaSupplyCount() const {
+	if (mSupplies.size() == config::classification::squad::MEASURE_SIZE) {
+		return mSupplies.front() - mSupplies.back();
+	} else {
+		return 0;
+	}
+}
+
 const UnitComposition& Squad::getUnitComposition() const {
 	return mUnitComposition;
+}
+
+void Squad::onConstantChanged(config::ConstantName constantName) {
+	if (constantName == TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE)) {
+		// If less then erase those at the back
+		if (config::classification::squad::MEASURE_SIZE < mSupplies.size()) {
+			mSupplies.resize(config::classification::squad::MEASURE_SIZE);
+		}
+	}
+}
+
+void Squad::updateSupply() {
+	mSupplies.push_front(getSupplyCount());
+
+	if (mSupplies.size() > config::classification::squad::MEASURE_SIZE) {
+		mSupplies.pop_back();
+	}
 }

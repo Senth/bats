@@ -1,6 +1,7 @@
 #include "MedicAgent.h"
 #include "PFManager.h"
 #include "AgentManager.h"
+#include "Utilities/Logger.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -26,6 +27,8 @@ bool MedicAgent::checkUnitsToHeal()
 		double bestDist = -1;
 		Unit* toHeal = NULL;
 
+		/// @todo If assigned to squad, only heal units in the squad, or close units.
+		/// Also heal close allied units if possible
 		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++)
 		{
@@ -36,10 +39,10 @@ bool MedicAgent::checkUnitsToHeal()
 				{
 					Unit* cUnit = agent->getUnit();
 					if (cUnit->exists() && cUnit->getHitPoints() > 0)
-				{
+						{
 						double dist = unit->getDistance(cUnit);
 						if (bestDist < 0 || dist < bestDist)
-				{
+						{
 							bestDist = dist;
 							toHeal = cUnit;
 						}
@@ -48,7 +51,7 @@ bool MedicAgent::checkUnitsToHeal()
 			}
 		}
 
-		if (bestDist >= 0 && toHeal !=NULL)
+		if (bestDist >= 0 && toHeal != NULL)
 		{
 			//Broodwar->printf("[%d] Medic healing", unitID);
 			unit->useTech(TechTypes::Healing, toHeal);
@@ -56,7 +59,7 @@ bool MedicAgent::checkUnitsToHeal()
 	}
 	catch(exception)
 	{
-		Broodwar->printf("[%d] checkUnitToHeal() error", unit->getID());
+		ERROR_MESSAGE(false, "[" << unit->getID() << "] checkUnitToHeal() error");
 	}
 
 	return false;

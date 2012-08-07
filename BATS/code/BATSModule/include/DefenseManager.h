@@ -69,6 +69,12 @@ public:
 	 */
 	void printGraphicDebugInfo() const;
 
+	/**
+	 * Finds a good position to retreat to.
+	 * @return a position to retreat to
+	 */
+	BWAPI::TilePosition findRetreatPosition() const;
+
 private:
 	/**
 	 * Private constructor to enforce singleton usage.

@@ -45,8 +45,18 @@ public:
 	 * @note this is the double amount of supply since BWAPI uses this supply count
 	 * because Zerglings take up 0.5 supply.
 	 * @return amount of supply the squad occupies.
+	 * @see getDeltaSupplyCount()
 	 */
 	int getSupplyCount() const;
+
+	/**
+	 * Returns the delta supply count over the measure_size * measure_interval_time period.
+	 * @note this is the double amount of supply since BWAPI uses this supply count
+	 * because Zerglings take up 0.5 supply.
+	 * @return delta supply count (doubled), if not enough measures it will return 0.
+	 * @see getSupplyCount()
+	 */
+	int getDeltaSupplyCount() const;
 
 	/**
 	 * Returns the number of units in the squad
@@ -185,8 +195,14 @@ private:
 	 */
 	void updateCenter();
 
+	/**
+	 * Updates the supply count
+	 */
+	void updateSupply();
+
 	std::vector<const BWAPI::Unit*> mUnits;
 	std::list<BWAPI::TilePosition> mCenter;
+	std::list<int> mSupplies;
 	PlayerSquadId mId;
 	double mUpdateLast;
 

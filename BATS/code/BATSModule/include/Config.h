@@ -105,6 +105,20 @@ namespace bats {
 		 */
 		namespace classification {
 			/**
+			 * Rules for calculating when it's a good idea to retreat from an enemy squad
+			 */
+			namespace retreat {
+				/** How far away an enemy squad shall be before it is counted as close to the squad.
+				 * Used for AttackSquad when searching for an enemy squad that it might want to
+				 * retreat from. */
+				extern int ENEMY_CLOSE_DISTANCE;
+				/** How much more supplies the enemy has than us. When this amount is reached the
+				 * bot will retreat from the battle. This is the multiplied amount—e.g. a value of
+				 * 2.0 will mean we retreat when enemy force is double our amount. */
+				extern double ENEMY_LARGER_THAN_US;
+			}
+
+			/**
 			 * Rules for how to group squads and what they are doing
 			 */
 			namespace squad {
@@ -220,7 +234,6 @@ namespace bats {
 			extern int EXPLORATION_MANAGER;
 			extern int RESOURCE_COUNTER;
 			extern int ALLIED_ARMY_REARRANGE_SQUADS;
-			extern int SQUAD;
 			extern int DEFENSE_MANAGER;
 		}
 
@@ -268,19 +281,11 @@ namespace bats {
 			 * should not have the same value since this can cause threshold errors.
 			 */
 			extern int REGROUP_DISTANCE_BEGIN;
-			/** Cannot be set through the config file, will set automatically,
-			 * used for faster calculation. Does not send an event.
-			 * @see REGROUP_DISTANCE_BEGIN */
-			extern int REGROUP_DISTANCE_BEGIN_SQUARED;
 			/** Decides the distance away from the center all units has to be until a regroup
 			 * is considered to be done.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
 			 */
 			extern int REGROUP_DISTANCE_END;
-			/** Cannot be set through the config file, will set automatically,
-			 * used for faster calculation. Does not send an event.
-			 * @see REGROUP_DISTANCE_END */
-			extern int REGROUP_DISTANCE_END_SQUARED;
 			/** Time before trying with a new regroup position when a unit is still */
 			extern double REGROUP_NEW_POSITION_TIME;
 			/** How long time before recalculating the distance to the unit furthest away
@@ -312,16 +317,8 @@ namespace bats {
 				extern int FIND_ALLIED_SQUAD_DISTANCE;
 				/** Distance away from allied squad when regrouping with allied squad begins. */
 				extern int ALLIED_REGROUP_BEGIN;
-				/** Cannot be set through the config file, will set automatically,
-				 * used for faster calculation. Does not send an event.
-				 * @see ALLIED_REGROUP_BEGIN */
-				extern int ALLIED_REGROUP_BEGIN_SQUARED;
 				/** Distance away from allied squad when regrouping is finished. */
 				extern int ALLIED_REGROUP_END;
-				/** Cannot be set through the config file, will set automatically,
-				 * used for faster calculation. Does not send an event.
-				 * ALLIED_REGOURP_END_SQUARED */
-				extern int ALLIED_REGROUP_END_SQUARED;
 			}
 
 			/**
