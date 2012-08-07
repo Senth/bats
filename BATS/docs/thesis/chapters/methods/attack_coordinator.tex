@@ -15,6 +15,34 @@ In addition to these weights, if the squad is a frontal attack and follows an al
 
 Enemy armies are not included in the calculation, because one rarely gain anything on attack an army, one should find gaps in the defense instead\cite{day9}. While it would be good to engage and attack an enemy army if its a lot weaker than our BATS will still do that if the squad is close by, but it will not search for those small armies. Armies are also more mobile meaning it would be a lot harder to keep a track on them.
 
+The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows how an attack squad can request an attack and either if it join forces with the allied player or calculates a good position to attack.
+\begin{figure}[htbp]
+\centering
+	\begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=3.8cm]
+		\node [block] (init) {Request attack};
+		\node [decision, below of=init] (player_frontal) {Player has frontal};
+		\node [block, right of=player_frontal] (find_places) {Find places to attack};
+		\node [decision, right of=find_places] (bot_frontal) {Squad is frontal attack};
+		\node [block, right of=bot_frontal] (defend) {Calculate defended weights};
+		\node [block, below of=player_frontal] (join_forces) {Join forces with player};
+		\node [block, below of=bot_frontal] (distance) {Calculate distance weights};
+		\node [block, below of=distance] (type) {Calculate type weights};
+		\node [block, right of=type] (select) {Select position with highest weight};
+		
+		\path [line] (init) -- (player_frontal);
+		\path [line] (player_frontal) -- node [near start] {no} (find_places);
+		\path [line] (player_frontal) -- node [near start] {yes} (join_forces);
+		\path [line] (find_places) -- (bot_frontal);
+		\path [line] (bot_frontal) -- node [near start] {no} (defend);
+		\path [line] (bot_frontal) -- node [near start] {yes} (distance);
+		\path [line] (defend) |- (distance);
+		\path [line] (distance) -- (type);
+		\path [line] (type) -- (select);
+	\end{tikzpicture}
+	\caption{Flowchart of Attack Coordinator’s requestAttack() function.}
+	\label{fig:AttackCoordinator::requestAttack()}
+\end{figure}
+
 \paragraph{Coordinated attacks}
 To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_goals} added by the attack coordinator. These are fully described in section \ref{sec:wait_goals} and briefly described here. The wait goal for attack squads is a wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out, current time is 45\conf seconds. Existing squads will get this type of attack and when all attacks are in position, they will start their attack simultaneously.
 

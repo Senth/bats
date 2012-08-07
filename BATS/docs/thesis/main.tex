@@ -28,6 +28,7 @@
 \usepackage{longtable} %table spanning pages
 \usepackage{multirow}
 \usepackage{pifont}
+\usepackage{tikz}
 \usepackage{changepage}
 \usepackage[font=small,labelfont=it,bf]{caption} %for customizable figure and table captions
 
@@ -66,6 +67,7 @@
 % and their extensions so you won't have to specify these with
 % every instance of \includegraphics
 \DeclareGraphicsExtensions{.pdf,.png}
+\usetikzlibrary{automata,shapes,arrows,chains,positioning,calc,backgrounds}
 
 \definecolor{GoldMetallic}{HTML}{D4AF37}
 \definecolor{GoldenBrown}{HTML}{996515}
@@ -111,6 +113,24 @@ breakatwhitespace=false,    % sets if automatic breaks should only happen at whi
 escapeinside={\%*}{*)}          % if you want to add a comment within your code
 }
 
+% TIKZ %
+\usetikzlibrary{positioning,shapes,arrows}
+\tikzset{%
+	semithick,
+	>=stealth',
+	text centered,
+	% Flowchart
+	decision/.style={%
+		diamond, very thick, draw, top color=white,bottom color=red!50!black!20, text width=4.5em, inner sep=0pt
+	},
+	block/.style={%
+		rectangle, very thick, draw, top color=white,bottom color=red!50!black!20,text width=5.5em,%
+		rounded corners, minimum height=4em
+	},
+	line/.style={%
+		->,draw, -latex', very thick%
+	}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%and then my shortcuts
 

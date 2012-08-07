@@ -30,7 +30,7 @@ The squad has four elements that can change the behavior of the squad.
 	\item \emph{Regrouping}, which has been fully described above in squad movement.
 	\item A squad can contain a \emph{unit composition}, this limits the squad to only contain units of the specific type, useful when creating special type of squads. Section \ref{sec:unit_composition} describes unit composition in more detail.
 	\item Some squads usually don't want to get close to enemies, in this case \emph{avoid enemies} can be turned on. This causes attacking units to move to a specific position without attacking (even if they walk straight through enemies); this is due to potential field manager in BTHAI did not support this behavior entirely, thus a simpler version that just uses regular path finding is used due to lack of time to change the potential field algorithm in the manager.
-	\item \emph{Wait goals} has been briefly described before in \nameref{sec:attack_coordinator} and is fully described in section \ref{sec:wait_goals}, \nameref{sec:wait_goals}. While adding these does not give the basic squad any specific behavior (yet), they can be used in the derived classes for certain behaviors.
+	\item \emph{Wait goals} has been briefly described before in section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} and is fully described in section \ref{sec:wait_goals} \nameref{sec:wait_goals}. While adding these does not give the basic squad any specific behavior (yet), they can be used in the derived classes for certain behaviors.
 \end{itemize}
 
 \subsection{Attack squad}
