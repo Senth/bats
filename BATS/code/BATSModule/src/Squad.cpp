@@ -499,12 +499,13 @@ bool Squad::isRetreating() const {
 }
 
 void Squad::setRetreatPosition(const BWAPI::TilePosition& retreatPosition) {
-	mRetreatPosition = retreatPosition;
-	if (mRetreatPosition != TilePositions::Invalid) {
-		mRegroupPosition = TilePositions::Invalid;
-		mTempGoalPosition = TilePositions::Invalid;
+	if (mRetreatPosition != retreatPosition) {
+		mRetreatPosition = retreatPosition;
+		if (mRetreatPosition != TilePositions::Invalid) {
+			mRegroupPosition = TilePositions::Invalid;
+		}
+		updateUnitMovement();
 	}
-	updateUnitMovement();
 }
 
 #pragma warning(push)
@@ -534,8 +535,10 @@ void Squad::forceDisband() {
 }
 
 void Squad::setGoalPosition(const TilePosition& position) {
-	mGoalPosition = position;
-	updateUnitMovement();
+	if (mGoalPosition != position) {
+		mGoalPosition = position;
+		updateUnitMovement();
+	}
 }
 
 const TilePosition& Squad::getRetreatPosition() const {
@@ -570,8 +573,10 @@ const vector<UnitAgent*>& Squad::getUnits() {
 }
 
 void Squad::setTemporaryGoalPosition(const TilePosition& temporaryPosition) {
-	mTempGoalPosition = temporaryPosition;
-	updateUnitMovement();
+	if (mTempGoalPosition != temporaryPosition) {
+		mTempGoalPosition = temporaryPosition;
+		updateUnitMovement();
+	}
 }
 
 const TilePosition& Squad::getTemporaryGoalPosition() const {
@@ -647,9 +652,11 @@ bool Squad::finishedRegrouping() const {
 }
 
 void Squad::setRegroupPosition(const BWAPI::TilePosition& regroupPosition) {
-	mRegroupPosition = regroupPosition;
-	mRegroupStartTime = mpsGameTime->getElapsedTime();
-	updateUnitMovement();
+	if (mRegroupPosition != regroupPosition) {
+		mRegroupPosition = regroupPosition;
+		mRegroupStartTime = mpsGameTime->getElapsedTime();
+		updateUnitMovement();
+	}
 }
 
 void Squad::clearRegroupPosition() {
@@ -726,7 +733,7 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 	}
 
 	// Retreat
-	if (movePosition == TilePositions::Invalid && mRetreatPosition != TilePositions::Invalid) {
+	if (movePosition == TilePositions::Invalid) {
 		movePosition = mRetreatPosition;
 
 		DEBUG_MESSAGE_CONDITION(

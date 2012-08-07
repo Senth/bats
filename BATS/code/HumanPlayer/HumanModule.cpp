@@ -1,5 +1,6 @@
 #include "HumanModule.h"
 #include <sstream>
+#include <windows.h>
 
 using namespace human;
 using namespace BWAPI;
@@ -8,7 +9,12 @@ using namespace BWAPI;
 #pragma warning(disable:4100)
 HumanModule::HumanModule() {}
 HumanModule::~HumanModule() {}
-void HumanModule::onStart() {}
+void HumanModule::onStart() {
+	// Sleep, necessary for not crashing BATS bot
+#ifdef _DEBUG
+	Sleep(1000);
+#endif
+}
 void HumanModule::onEnd(bool isWinner) {}
 void HumanModule::onFrame() {
 	if (!Broodwar->isFlagEnabled(Flag::UserInput)) {

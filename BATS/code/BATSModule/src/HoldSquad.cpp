@@ -43,13 +43,9 @@ void HoldSquad::updateDerived() {
 	}
 
 	// Find enemies within perimeter -> Set attack position
-	if (getTemporaryGoalPosition() != TilePositions::Invalid) {
-		const TilePosition& enemyPos =
-			findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
-		if (enemyPos != TilePositions::Invalid) {
-			setTemporaryGoalPosition(enemyPos);
-		}
-	}
+	const TilePosition& enemyPos =
+		findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
+	setTemporaryGoalPosition(enemyPos);
 
 	/// @todo Check if a unit is outside perimeter -> make it retreat.
 	/// How when we have two perimeters, roam and defend?
