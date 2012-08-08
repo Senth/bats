@@ -47,8 +47,11 @@ public:
 	/**
 	 * Tells the squad to go and defend the specified position.
 	 * @param defendPosition the position to stay and fend off all enemy units.
+	 * @param defendEnemyOffensivePerimeter set this to true if you want the squad to defend the 
+	 * area within enemy_offensive_perimeter. Useful when defending inside our base,
+	 * then we don't want to hold back where we're going. Defaults to false.
 	 */
-	void defendPosition(const BWAPI::TilePosition& defendPosition);
+	void defendPosition(const BWAPI::TilePosition& defendPosition, bool defendEnemyOffensivePerimeter = false);
 
 	/**
 	 * Returns true if the squad defends a position
@@ -101,6 +104,7 @@ private:
 	void handleDefend();
 
 	BWAPI::TilePosition mDefendPosition;
+	bool mDefendEnemyOffensivePerimeter;
 	std::set<BWAPI::TilePosition>::iterator mPatrolPositionCurrentIt;
 	std::set<BWAPI::TilePosition> mPatrolPositions;
 };

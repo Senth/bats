@@ -15,16 +15,16 @@ using namespace BWAPI;
 using namespace std;
 using bats::operator<<;
 
-bats::SquadManager* UnitAgent::mpsSquadManager = NULL;
-PFManager* UnitAgent::mpsPfManager = NULL;
+bats::SquadManager* UnitAgent::msSquadManager = NULL;
+PFManager* UnitAgent::msPfManager = NULL;
 
 UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 {
 	agentType = "UnitAgent";
 
-	if (mpsSquadManager == NULL) {
-		mpsSquadManager = bats::SquadManager::getInstance();
-		mpsPfManager = PFManager::getInstance();
+	if (msSquadManager == NULL) {
+		msSquadManager = bats::SquadManager::getInstance();
+		msPfManager = PFManager::getInstance();
 	}
 }
 
@@ -151,7 +151,7 @@ void UnitAgent::computeKitingActions()
 	}
 	else
 	{
-		mpsPfManager->computeAttackingUnitActions(this, goal, false, false);
+		msPfManager->computeAttackingUnitActions(this, goal, false, false);
 	}
 }
 
@@ -161,7 +161,7 @@ void UnitAgent::findAndTryAttack()
 
 	// Check unit's squad state
 	if (getSquadId().isValid()) {
-		bats::SquadPtr squad = mpsSquadManager->getSquad(getSquadId());
+		bats::SquadPtr squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad && squad->isAvoidingEnemies()) {
 			avoidingEnemies = true;
 		}
@@ -182,7 +182,7 @@ void UnitAgent::computeMoveAction()
 
 	// Check unit's squad state
 	if (getSquadId().isValid()) {
-		bats::SquadPtr squad = mpsSquadManager->getSquad(getSquadId());
+		bats::SquadPtr squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad && squad->isAvoidingEnemies()) {
 			defensive = true;
 			forceMove = true;
@@ -194,7 +194,7 @@ void UnitAgent::computeMoveAction()
 
 void UnitAgent::computeMoveAction(bool defensive, bool forceMove)
 {
-	mpsPfManager->computeAttackingUnitActions(this, goal, defensive, forceMove);
+	msPfManager->computeAttackingUnitActions(this, goal, defensive, forceMove);
 }
 
 int UnitAgent::enemyUnitsWithinRange(int maxRange) const

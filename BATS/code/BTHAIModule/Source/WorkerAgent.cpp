@@ -7,6 +7,7 @@
 #include "BatsModule/include/SquadManager.h"
 #include "BatsModule/include/Squad.h"
 #include "BatsModule/include/Config.h"
+#include "BatsModule/include/DefenseManager.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
@@ -194,7 +195,7 @@ void WorkerAgent::computeActions()
 	{
 		//Worker is in a squad
 
-		shared_ptr<bats::Squad> squad = mpsSquadManager->getSquad(getSquadId());
+		shared_ptr<bats::Squad> squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad) {
 			bool defensive = squad->isAvoidingEnemies();
 			computeMoveAction(defensive, defensive);
@@ -204,6 +205,11 @@ void WorkerAgent::computeActions()
 			ERROR_MESSAGE(false, "Squad is null for WorkerAgent, why is it this?");
 		}
 	} else {
+		// Check if under attack, report to Defense Manager
+		if (unit->isUnderAttack()) {
+			msDefenseManager->onWorkerUnderAttack(this);
+		}
+
 		//Check if workers are too far away from a base when attacking
 		if (currentState == ATTACKING)
 		{

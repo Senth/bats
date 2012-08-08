@@ -3,6 +3,7 @@
 #include "StructureAgent.h"
 #include "UnitAgent.h"
 #include "TransportAgent.h"
+#include "BATSModule/include/TypeDefs.h"
 
 /** Terran agents */
 #include "CommandCenterAgent.h"
@@ -78,31 +79,38 @@ AgentFactory* AgentFactory::getInstance()
 
 BaseAgent* AgentFactory::createAgent(Unit* unit)
 {
-	if (Broodwar->self()->getRace().getID() == Races::Terran.getID())
+	BaseAgent* pNewAgent = NULL;
+
+	if (Broodwar->self()->getRace() == Races::Terran)
 	{
-		return createTerranAgent(unit);
+		pNewAgent = createTerranAgent(unit);
 	}
-	if (Broodwar->self()->getRace().getID() == Races::Protoss.getID())
+	else if (Broodwar->self()->getRace() == Races::Protoss)
 	{
-		return createProtossAgent(unit);
+		pNewAgent = createProtossAgent(unit);
 	}
-	if (Broodwar->self()->getRace().getID() == Races::Zerg.getID())
+	else if (Broodwar->self()->getRace() == Races::Zerg)
 	{
-		return createZergAgent(unit);
+		pNewAgent = createZergAgent(unit);
 	}
 
 	//Default agents
-	if (unit->getType().isWorker())
-	{
-		return new WorkerAgent(unit);
+	if (NULL == pNewAgent) {
+		if (unit->getType().isWorker())
+		{
+			pNewAgent = new WorkerAgent(unit);
+		}
+		else if (unit->getType().isBuilding()){		
+			pNewAgent = new StructureAgent(unit);
+		}
+		else 
+		{
+			pNewAgent = new UnitAgent(unit);
+		}
 	}
-	else if (unit->getType().isBuilding()){		
-		return new StructureAgent(unit);
-	}
-	else
-	{
-		return new UnitAgent(unit);
-	}
+	
+
+	return pNewAgent;
 }
 
 BaseAgent* AgentFactory::createZergAgent(Unit* unit)
@@ -116,19 +124,19 @@ BaseAgent* AgentFactory::createZergAgent(Unit* unit)
 	else if (type.isBuilding())
 	{
 		//Add agents for special buildings here
-		if (type.getID() == UnitTypes::Zerg_Hatchery.getID())
+		if (type == UnitTypes::Zerg_Hatchery)
 		{
 			return new HatcheryAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Lair.getID())
+		else if (type == UnitTypes::Zerg_Lair)
 		{
 			return new HatcheryAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Hive.getID())
+		else if (type == UnitTypes::Zerg_Hive)
 		{
 			return new HatcheryAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Extractor.getID())
+		else if (type == UnitTypes::Zerg_Extractor)
 		{
 			return new RefineryAgent(unit);
 		}
@@ -141,51 +149,51 @@ BaseAgent* AgentFactory::createZergAgent(Unit* unit)
 	else
 	{
 #if DISABLE_UNIT_AI == 0 && !defined(DISABLE_ZERG_UNITS)
-		if (type.getID() == UnitTypes::Zerg_Overlord.getID())
+		if (type == UnitTypes::Zerg_Overlord)
 		{
 			return new OverlordAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Zergling.getID())
+		else if (type == UnitTypes::Zerg_Zergling)
 		{
 			return new ZerglingAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Hydralisk.getID())
+		else if (type == UnitTypes::Zerg_Hydralisk)
 		{
 			return new HydraliskAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Mutalisk.getID())
+		else if (type == UnitTypes::Zerg_Mutalisk)
 		{
 			return new MutaliskAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Lurker.getID())
+		else if (type == UnitTypes::Zerg_Lurker)
 		{
 			return new LurkerAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Queen.getID())
+		else if (type == UnitTypes::Zerg_Queen)
 		{
 			return new QueenAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Ultralisk.getID())
+		else if (type == UnitTypes::Zerg_Ultralisk)
 		{
 			return new UltraliskAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Guardian.getID())
+		else if (type == UnitTypes::Zerg_Guardian)
 		{
 			return new GuardianAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Devourer.getID())
+		else if (type == UnitTypes::Zerg_Devourer)
 		{
 			return new DevourerAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Defiler.getID())
+		else if (type == UnitTypes::Zerg_Defiler)
 		{
 			return new DefilerAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Scourge.getID())
+		else if (type == UnitTypes::Zerg_Scourge)
 		{
 			return new ScourgeAgent(unit);
 		}
-		else if (type.getID() == UnitTypes::Zerg_Infested_Terran.getID())
+		else if (type == UnitTypes::Zerg_Infested_Terran)
 		{
 			return new InfestedTerranAgent(unit);
 		}
@@ -392,7 +400,7 @@ BaseAgent* AgentFactory::createProtossAgent(Unit* unit)
 
 bool AgentFactory::isOfType(Unit* unit, UnitType type)
 {
-	if (unit->getType().getID() == type.getID())
+	if (unit->getType() == type)
 	{
 		return true;
 	}

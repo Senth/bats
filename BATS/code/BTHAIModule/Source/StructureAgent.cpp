@@ -3,6 +3,7 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ExplorationManager.h"
 #include "BatsModule/include/Config.h"
+#include "BatsModule/include/DefenseManager.h"
 #include "UpgradesPlanner.h"
 #include "WorkerAgent.h"
 #include "ResourceManager.h"
@@ -124,6 +125,7 @@ void StructureAgent::computeActions()
 {
 	if (isAlive())
 	{
+		handleUnderAttack();
 
 		if (!unit->isIdle())
 		{
@@ -159,39 +161,22 @@ void StructureAgent::computeActions()
 					unit->buildAddon(UnitTypes::Terran_Machine_Shop);
 				}
 			}
-
-			//If Comsat Station, check if we need to scan for enemy bases
-			if (isOfType(UnitTypes::Terran_Comsat_Station))
-			{
-				TilePosition p = getNextScanLocation();
-				if (p!= TilePositions::Invalid)
-				{
-					if (unit->getEnergy() >= 50)
-				{
-						//Broodwar->printf("Scanning (%d,%d)", p.x(), p.y());
-						if (unit->useTech(TechTypes::Scanner_Sweep, Position(p)))
-				{
-							hasScanned.push_back(p);
-							return;
-						}
-					}
-				}
-			}
 		}
 
-		if (!unit->isBeingConstructed() && unit->isIdle() && getUnit()->getType().canProduce())
-		{
-			//Iterate through all unit types
-			for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
-			{
-				//Check if we can (and need) to build the unit
-				if (canBuildUnit(*i))
-				{
-					//Build it!
-					unit->train(*i);
-				}
-			}
-		}
+		// This should not be here, UnitCreator handles building units!
+		//if (!unit->isBeingConstructed() && unit->isIdle() && getUnit()->getType().canProduce())
+		//{
+		//	//Iterate through all unit types
+		//	for(set<UnitType>::const_iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
+		//	{
+		//		//Check if we can (and need) to build the unit
+		//		if (canBuildUnit(*i))
+		//		{
+		//			//Build it!
+		//			unit->train(*i);
+		//		}
+		//	}
+		//}
 	}
 }
 
@@ -309,63 +294,9 @@ bool StructureAgent::canEvolveUnit(UnitType type) const
 	return true;
 }
 
-TilePosition StructureAgent::getNextScanLocation() const
-{
-	TilePosition ePos = bats::ExplorationManager::getInstance()->getClosestSpottedBuilding(Broodwar->self()->getStartLocation()).first;
-	if (ePos != TilePositions::Invalid)
-	{
-		//Already found enemy base
-		return TilePositions::Invalid;
+void StructureAgent::handleUnderAttack() {
+	// Report to defense manager
+	if (unit->isUnderAttack()) {
+		msDefenseManager->onStructureUnderAttack(this);
 	}
-
-	for(set<BaseLocation*>::const_iterator i=getStartLocations().begin();i!=getStartLocations().end();i++)
-	{
-		TilePosition basePos = (*i)->getTilePosition();
-
-		bool needScan = true;
-
-		//1. Check previous scans
-		for (int i = 0; i < (int)hasScanned.size(); i++)
-		{
-			if (hasScanned.at(i).x() == basePos.x() && hasScanned.at(i).y() == basePos.y())
-			{
-				needScan = false;
-			}
-		}
-
-		//2. Check if we have this base
-		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (int i = 0; i < (int)agents.size(); i++)
-		{
-			if (agents.at(i)->isAlive())
-			{
-				double dist = basePos.getDistance(agents.at(i)->getUnit()->getTilePosition());
-				if (dist <= 10)
-				{
-					needScan = false;
-					break;
-				}
-			}
-		}
-
-		//3. Check if enemy units are near
-		for(set<Unit*>::const_iterator j=Broodwar->enemy()->getUnits().begin();j!=Broodwar->enemy()->getUnits().end();j++)
-		{
-			if ((*j)->exists())
-			{
-				double dist = basePos.getDistance((*j)->getTilePosition());
-				if (dist <= 10)
-				{
-					needScan = false;
-					break;
-				}
-			}
-		}
-
-		if (needScan)
-		{
-			return basePos;
-		}
-	}
-	return TilePositions::Invalid;
 }

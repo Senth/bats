@@ -12,7 +12,9 @@ RefineryAgent::RefineryAgent(Unit* mUnit) : StructureAgent(mUnit)
 
 void RefineryAgent::computeActions()
 {
-	for (int i = 0; i < (int)assignedWorkers.size(); i++)
+	handleUnderAttack();
+
+	for (size_t i = 0; i < assignedWorkers.size(); i++)
 	{
 		if (!assignedWorkers.at(i)->isAlive())
 		{
@@ -28,7 +30,7 @@ void RefineryAgent::computeActions()
 
 	if (assignedWorkers.size() <= 3)
 	{
-		if (!unit->isBeingConstructed() && unit->getPlayer()->getID() == Broodwar->self()->getID())
+		if (!unit->isBeingConstructed() && unit->getPlayer() == Broodwar->self())
 		{
 			WorkerAgent* worker = (WorkerAgent*)AgentManager::getInstance()->findClosestFreeWorker(unit->getTilePosition());
 			if (worker != NULL)

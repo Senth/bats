@@ -8,6 +8,8 @@
 
 // Forward declaration
 class UnitAgent;
+class StructureAgent;
+class WorkerAgent;
 
 // Forward declaration
 namespace BWTA {
@@ -75,6 +77,18 @@ public:
 	 */
 	BWAPI::TilePosition findRetreatPosition() const;
 
+	/**
+	 * Called when a structures is under attack
+	 * @param structure the structure that is under attack
+	 */
+	void onStructureUnderAttack(StructureAgent* structure);
+
+	/**
+	 * Called when a worker is under attack, but only if the worker is not in a squad.
+	 * @param worker the worker that is under attack
+	 */
+	void onWorkerUnderAttack(WorkerAgent* worker);
+
 private:
 	/**
 	 * Private constructor to enforce singleton usage.
@@ -89,7 +103,7 @@ private:
 	/**
 	 * Checks if a region is occupied by either our structures or our allied structures.
 	 * Can be overridden to only check allied or our structures.
-	 * @param pRegion the region to check if it's occupied by our team
+	 * @param region the region to check if it's occupied by our team
 	 * @param includeOurStructures if our structures shall be included in the search,
 	 * defaults to true
 	 * @param includeAlliedStructures if allied structures shall be included in the search,
@@ -97,7 +111,7 @@ private:
 	 * @return true if the region is occupied by either any team structure.
 	 */
 	static bool isRegionOccupiedByOurTeam(
-		BWTA::Region* pRegion,
+		BWTA::Region* region,
 		bool includeOurStructures = true,
 		bool includeAlliedStructures = true
 	);
@@ -110,10 +124,10 @@ private:
 	 * region that only our team can walk to—note, the enemy can, however, fly there.
 	 * @note It does not matter if a choke point is occupied by enemy structures, because
 	 * they are not taken into calculations.
-	 * @param pChokepoint the choke point to check if it's an edge
+	 * @param chokepoint the choke point to check if it's an edge
 	 * @return true if the choke point is considered to be an edge.
 	 */
-	static bool isChokepointEdge(BWTA::Chokepoint* pChokepoint);
+	static bool isChokepointEdge(BWTA::Chokepoint* chokepoint);
 
 	/**
 	 * Searches for choke points worth defending.
@@ -147,7 +161,7 @@ private:
 	/**
 	 * Checks if the choke point abuts a region where we have structures. I.e. it shall be
 	 * primary we who defends this area.
-	 * @param pChokepoint the choke point to check
+	 * @param chokepoint the choke point to check
 	 * @param testOur set to true to check if the choke point abuts to our region, false to check if the
 	 * choke point abuts to an allied region.
 	 * @return true if it's our choke point, else false and thus it's the allies's choke point.
@@ -155,7 +169,7 @@ private:
 	 * both our and our allied. To test this two calls needs to be made, one with testOur set to
 	 * true and the other set to false.
 	 */
-	static bool isOurOrAlliedChokepoint(BWTA::Chokepoint* pChokepoint, bool testOur);
+	static bool isOurOrAlliedChokepoint(BWTA::Chokepoint* chokepoint, bool testOur);
 
 	/**
 	 * Checks the specified position is in our defending position list.
@@ -164,8 +178,20 @@ private:
 	 */
 	bool isInDefendingList(const BWAPI::TilePosition& position) const;
 
+	/**
+	 * Finds and returns the current Patrol squad
+	 * @return the current patrol squad, empty (NULL) if not found.
+	 */
+	PatrolSquadPtr getPatrolSquad();
+
+	/**
+	 * Finds and returns a const version of Patrol squad
+	 * @return current patrol squad as const, empty (NULL) if not found.
+	 */
+	PatrolSquadCstPtr getPatrolSquad() const;
+
 	struct DefendPosition {
-		const BWTA::Chokepoint* pChokepoint;
+		BWTA::Chokepoint const * const pChokepoint;
 		const BWAPI::TilePosition position;
 		bool underAttack; /**< The region is under attack */
 		bool isOur; /**< If the choke point is abut to a region with our structures */
@@ -173,7 +199,7 @@ private:
 
 		/**
 		 * Default constructor
-		 * @param position the position of the defended area, defaults to TilePositions::Invalid.
+		 * @param pChokepoint the choke point of the defended area, defaults to NULL.
 		 */
 		DefendPosition(const BWTA::Chokepoint* pChokepoint = NULL) :
 			pChokepoint(pChokepoint),
@@ -188,7 +214,7 @@ private:
 		 * @param rhs the defend position to copy from
 		 */
 		DefendPosition& operator=(const DefendPosition& rhs) {
-			pChokepoint = rhs.pChokepoint;
+			*const_cast<const BWTA::Chokepoint**>(&pChokepoint) = rhs.pChokepoint;
 			*const_cast<BWAPI::TilePosition*>(&position) = rhs.position;
 			underAttack = rhs.underAttack;
 			isOur = rhs.isOur;
@@ -214,16 +240,17 @@ private:
 		}
 	};
 
-	UnitManager* mpUnitManager;
-	SquadManager* mpSquadManager;
-	GameTime* mpGameTime;
-	UnitCompositionFactory* mpUnitCompositionFactory;
+	UnitManager* mUnitManager;
+	SquadManager* mSquadManager;
+	GameTime* mGameTime;
+	UnitCompositionFactory* mUnitCompositionFactory;
+	StructureAgent* mDefensiveStructure;
 
 	bool mUnderAttack;
 	typedef std::set<DefendPosition> DefendSet;
 	DefendSet mDefendPositions;
 
 	int mFrameCallLast;
-	static DefenseManager* mpsInstance;
+	static DefenseManager* msInstance;
 };
 }

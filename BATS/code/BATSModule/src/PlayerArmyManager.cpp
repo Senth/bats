@@ -148,19 +148,19 @@ void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
 	// Create squads for the rest of the units that went out of the squad's bounds
 	while (!mUnitsToCheck.empty()) {
 		// Create new squad
-		PlayerSquadPtr pNewSquad;
+		PlayerSquadPtr newSquad;
 		if (updateAllied) {
-			pNewSquad = PlayerSquadPtr(new AlliedSquad());
+			newSquad = PlayerSquadPtr(new AlliedSquad());
 		} else {
-			pNewSquad = PlayerSquadPtr(new EnemySquad());
+			newSquad = PlayerSquadPtr(new EnemySquad());
 		}
-		addSquad(pNewSquad);
+		addSquad(newSquad);
 		// Note: addCloseUnitsToSquad(), adds the unit to the squad automatically.
 
 		BWAPI::Unit* currentUnit = mUnitsToCheck.begin()->first;
 		setUnitAsChecked(mUnitsToCheck.begin());
 
-		addCloseUnitsToSquad(currentUnit, pNewSquad->getId());
+		addCloseUnitsToSquad(currentUnit, newSquad->getId());
 	}
 
 	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Create squads for rest");
@@ -412,13 +412,13 @@ void PlayerArmyManager::setAlliedFrontalSquad() {
 	AlliedSquadPtr biggestSquad;
 	int cBiggestSize = 0;
 	for (size_t i = 0; i < mSquads.size(); ++i) {
-		AlliedSquadPtr pAlliedSquad = std::tr1::dynamic_pointer_cast<AlliedSquad>(mSquads[i]);
-		if (NULL != pAlliedSquad) {
-			pAlliedSquad->setFrontalAttack(false);
+		AlliedSquadPtr alliedSquad = std::tr1::dynamic_pointer_cast<AlliedSquad>(mSquads[i]);
+		if (NULL != alliedSquad) {
+			alliedSquad->setFrontalAttack(false);
 
-			int currentSupplyCount = pAlliedSquad->getSupplyCount();
+			int currentSupplyCount = alliedSquad->getSupplyCount();
 			if (currentSupplyCount > cBiggestSize) {
-				biggestSquad = pAlliedSquad;
+				biggestSquad = alliedSquad;
 				cBiggestSize = currentSupplyCount;
 			}
 		}

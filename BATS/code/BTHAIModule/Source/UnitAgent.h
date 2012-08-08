@@ -157,10 +157,10 @@ public:
 	virtual void resetToDefaultBehavior();
 
 protected:
-	static bats::SquadManager* mpsSquadManager;
+	static bats::SquadManager* msSquadManager;
 
 private:
-	static PFManager* mpsPfManager;
+	static PFManager* msPfManager;
 };
 
 #endif

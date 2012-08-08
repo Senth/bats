@@ -6,30 +6,27 @@
 #include "Utilities/Logger.h"
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/TypeDefs.h"
+#include "BatsModule/include/DefenseManager.h"
 
 using namespace BWAPI;
 using namespace std;
 
-//BaseAgent::BaseAgent() : mSquadId(bats::SquadId::INVALID_KEY)
-//{
-//	alive = true;
-//	//squadID = -1;
-//	type = UnitTypes::Unknown;
-//	lastActionFrame = 0;
-//	goal = TilePositions::Invalid;
-//}
+bats::DefenseManager* BaseAgent::msDefenseManager = NULL;
 
-BaseAgent::BaseAgent(Unit* mUnit) : mSquadId(bats::SquadId::INVALID_KEY)
+BaseAgent::BaseAgent(Unit* mUnit)
 {
 	unit = mUnit;
 	unitID = unit->getID();
 	type = unit->getType();
 	alive = true;
-	//squadID = -1;
 	lastActionFrame = 0;
 	goal = TilePositions::Invalid;
 	agentType = "BaseAgent";
 	//built = false;
+
+	if (msDefenseManager == NULL) {
+		msDefenseManager = bats::DefenseManager::getInstance();
+	}
 }
 
 BaseAgent::~BaseAgent()
@@ -51,20 +48,7 @@ const string& BaseAgent::getTypeName() const
 }
 
 bool BaseAgent::isBeingBuilt() const {
-	/// @todo only use code below when getRemainingBuildTime() has been fixed for
-	/// tanks. Currently using ugly hack.
-	/// \code
-	/// return unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed();
-	/// \endcode
-
 	return !unit->isCompleted();
-	
-	//if (!built && (unit->getRemainingBuildTime() > 0 || unit->isBeingConstructed())) {
-	//	return true;
-	//} else {
-	//	built = true;
-	//	return false;
-	//}
 }
 
 int BaseAgent::getUnitID() const

@@ -19,7 +19,7 @@ AgentManager::AgentManager()
 
 AgentManager::~AgentManager()
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		delete mAgents.at(i);
 	}
@@ -132,7 +132,7 @@ BaseAgent* AgentManager::getClosestAgent(TilePosition pos, UnitType type)
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
 
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isOfType(type) && mAgents.at(i)->isAlive())
 		{
@@ -149,29 +149,29 @@ BaseAgent* AgentManager::getClosestAgent(TilePosition pos, UnitType type)
 
 void AgentManager::addAgent(Unit* unit)
 {
-	if (unit->getType().getID() == UnitTypes::Zerg_Larva.getID())
+	if (unit->getType() == UnitTypes::Zerg_Larva)
 	{
-		//Special case: Dont add Zerg larva as agents.
+		//Special case: Don't add Zerg larva as agents.
 		return;
 	}
-	if (unit->getType().getID() == UnitTypes::Zerg_Egg.getID())
+	else if (unit->getType() == UnitTypes::Zerg_Egg)
 	{
-		//Special case: Dont add Zerg eggs as agents.
+		//Special case: Don't add Zerg eggs as agents.
 		return;
 	}
-	if (unit->getType().getID() == UnitTypes::Zerg_Cocoon.getID())
+	else if (unit->getType() == UnitTypes::Zerg_Cocoon)
 	{
-		//Special case: Dont add Zerg cocoons as agents.
+		//Special case: Don't add Zerg cocoons as agents.
 		return;
 	}
-	if (unit->getType().getID() == UnitTypes::Zerg_Lurker_Egg.getID())
+	else if (unit->getType() == UnitTypes::Zerg_Lurker_Egg)
 	{
-		//Special case: Dont add Zerg eggs as agents.
+		//Special case: Don't add Zerg eggs as agents.
 		return;
 	}
 
 	bool found = false;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->matches(unit))
 		{
@@ -195,10 +195,6 @@ void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 		CoverMap::getInstance()->addConstructedBuilding(newAgent->getUnit());
 		bats::BuildPlanner::getInstance()->unlock(newAgent->getUnit()->getType());
 		ResourceManager::getInstance()->unlockResources(newAgent->getUnit()->getType());
-	}
-	else
-	{
-		//Commander::getInstance()->unitCreated(newAgent);
 	}
 }
 
@@ -275,22 +271,15 @@ void AgentManager::cleanup()
 
 void AgentManager::computeActions()
 {
-	//Dont call too often
-	int cFrame = Broodwar->getFrameCount();
-	if (cFrame - mFrameLastCall < 10)
-	{
-		//return;
-	}
-	mFrameLastCall = cFrame;
-
 	Profiler::getInstance()->start("AgentManager::update()");
 
 	int st = (int)GetTickCount();
 	int et = 0;
 	int elapsed = 0;
 
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
+		// Don't call too many
 		et = (int)GetTickCount();
 		elapsed = et - st;
 		if (elapsed >= 30)
@@ -304,7 +293,6 @@ void AgentManager::computeActions()
 			if (Broodwar->getFrameCount() - lastAF > 20)
 			{
 				mAgents.at(i)->setActionFrame();
-
 				mAgents.at(i)->computeActions();
 			}
 		}

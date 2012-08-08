@@ -62,8 +62,9 @@ void PatrolSquad::setPatrolPositions(const std::set<BWAPI::TilePosition>& patrol
 	}
 }
 
-void PatrolSquad::defendPosition(const BWAPI::TilePosition& defendPosition) {
+void PatrolSquad::defendPosition(const BWAPI::TilePosition& defendPosition, bool defendEnemyOffensivePerimeter) {
 	mDefendPosition = defendPosition;
+	mDefendEnemyOffensivePerimeter = defendEnemyOffensivePerimeter;
 }
 
 void PatrolSquad::updateDerived() {
@@ -95,16 +96,23 @@ void PatrolSquad::handleDefend() {
 	// Else - Squad is within defend perimeter
 	else {
 		// Find enemy positions to go to
-		const BWAPI::TilePosition& attackPosition =
-			findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
+		int enemyRadius;
+		if (mDefendEnemyOffensivePerimeter) {
+			enemyRadius = config::squad::defend::ENEMY_OFFENSIVE_PERIMETER;
+		} else {
+			enemyRadius = config::squad::defend::DEFEND_PERIMETER;
+		}
 
-		// No enemy position found with defend perimeter
+		const BWAPI::TilePosition& attackPosition =
+				findEnemyPositionWithinRadius(mDefendPosition, enemyRadius);
+
+		// No enemy position found with perimeter
 		if (!attackPosition.isValid()) {
-			// Enemies still within offensive perimeter -> regroup at defend position
-			if (isEnemyWithinOffensivePerimeter()) {
+			// Enemies still within offensive perimeter -> regroup to defend position
+			if (!mDefendEnemyOffensivePerimeter && isEnemyWithinOffensivePerimeter()) {
 				setTemporaryGoalPosition(mDefendPosition);
 			}
-			// Else - Enemies retreated or dead -> Go back to wait position
+			// Else - Enemies retreated or dead -> Start patrolling again
 			else {
 				mDefendPosition = TilePositions::Invalid;
 				setTemporaryGoalPosition(TilePositions::Invalid);
@@ -128,7 +136,11 @@ bool PatrolSquad::isDefending() const {
 }
 
 bool PatrolSquad::isWithinDefendPerimeter() const {
-	return isCloseTo(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
+	if (mDefendEnemyOffensivePerimeter) {
+		return isCloseTo(mDefendPosition, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER);
+	} else {
+		return isCloseTo(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
+	}
 }
 
 bool PatrolSquad::isEnemyWithinOffensivePerimeter() const {

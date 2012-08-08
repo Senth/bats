@@ -35,7 +35,7 @@ private:
 	CoverMap();
 	static CoverMap* instance;
 	static bool instanceFlag;
-	static bats::ExplorationManager* mpsExplorationManager;
+	static bats::ExplorationManager* msExplorationManager;
 
 	int range;
 	int w;

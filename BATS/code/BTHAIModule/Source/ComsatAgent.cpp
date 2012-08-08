@@ -12,6 +12,8 @@ ComsatAgent::ComsatAgent(Unit* mUnit) : StructureAgent(mUnit)
 
 void ComsatAgent::computeActions()
 {
+	handleUnderAttack();
+
 	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
 	{
 		//Enemy seen

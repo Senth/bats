@@ -13,11 +13,11 @@ using namespace std;
 
 bool CoverMap::instanceFlag = false;
 CoverMap* CoverMap::instance = NULL;
-bats::ExplorationManager* CoverMap::mpsExplorationManager = NULL;
+bats::ExplorationManager* CoverMap::msExplorationManager = NULL;
 
 CoverMap::CoverMap()
 {
-	mpsExplorationManager = bats::ExplorationManager::getInstance();
+	msExplorationManager = bats::ExplorationManager::getInstance();
 
 	w = Broodwar->mapWidth();
 	h = Broodwar->mapHeight();
@@ -116,7 +116,7 @@ CoverMap::~CoverMap()
 
 	instanceFlag = false;
 	instance = NULL;
-	mpsExplorationManager = NULL;
+	msExplorationManager = NULL;
 }
 
 CoverMap* CoverMap::getInstance()
@@ -185,7 +185,7 @@ bool CoverMap::canBuild(UnitType toBuild, TilePosition buildSpot)
 	}
 
 	//Step 2: Check if path is available
-	if (!mpsExplorationManager->canReach(Broodwar->self()->getStartLocation(), buildSpot))
+	if (!msExplorationManager->canReach(Broodwar->self()->getStartLocation(), buildSpot))
 	{
 		return false;
 	}
@@ -416,7 +416,7 @@ bool CoverMap::isOccupied(BWTA::Region* region) const
 
 double CoverMap::getChokepointPrio(const TilePosition& center) const
 {
-	TilePosition ePos = mpsExplorationManager->getClosestSpottedBuilding(center).first;
+	TilePosition ePos = msExplorationManager->getClosestSpottedBuilding(center).first;
 
 	if (ePos != TilePositions::Invalid) {
 		double dist = ePos.getDistance(center);
@@ -500,7 +500,7 @@ TilePosition CoverMap::findDefensePos(Chokepoint* choke) const
 			for (int cY = chokePos.y() - maxD; cY <= chokePos.y() + maxD; cY++)
 			{
 				TilePosition cPos = TilePosition(cX, cY);
-				if (mpsExplorationManager->canReach(basePos, cPos))
+				if (msExplorationManager->canReach(basePos, cPos))
 				{
 					double chokeDist = chokePos.getDistance(cPos);
 					double baseDist = basePos.getDistance(cPos);
@@ -825,7 +825,7 @@ TilePosition CoverMap::findClosestGasWithoutRefinery(UnitType toBuild, TilePosit
 				}
 				if (ok)
 				{
-					if (mpsExplorationManager->canReach(home, cPos))
+					if (msExplorationManager->canReach(home, cPos))
 					{
 						BaseAgent* agent = AgentManager::getInstance()->getClosestBase(cPos);
 						double dist = agent->getUnit()->getTilePosition().getDistance(cPos);
@@ -879,7 +879,7 @@ TilePosition CoverMap::searchRefinerySpot()
 
 						if (dist < 15)
 						{
-							if (mpsExplorationManager->canReach(bPos, cPos))
+							if (msExplorationManager->canReach(bPos, cPos))
 							{
 								return cPos;
 							}			
@@ -930,7 +930,7 @@ TilePosition CoverMap::findExpansionSite()
 		}
 
 		//Check if enemy buildings are close
-		int eCnt = mpsExplorationManager->countSpottedBuildingsWithinRange(pos, 20);
+		int eCnt = msExplorationManager->countSpottedBuildingsWithinRange(pos, 20);
 		if (eCnt > 0)
 		{
 			taken = true;
@@ -939,7 +939,7 @@ TilePosition CoverMap::findExpansionSite()
 		//Not taken, calculate ground distance
 		if (!taken)
 		{
-			if (mpsExplorationManager->canReach(Broodwar->self()->getStartLocation(), pos))
+			if (msExplorationManager->canReach(Broodwar->self()->getStartLocation(), pos))
 			{
 				double ourDistance;
 				ourDistance = mapData.getDistance(Broodwar->self()->getStartLocation(), pos);

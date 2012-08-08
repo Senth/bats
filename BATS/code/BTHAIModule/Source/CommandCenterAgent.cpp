@@ -23,25 +23,31 @@ CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 
 void CommandCenterAgent::computeActions()
 {
+	handleUnderAttack();
+
 	if (!hasSentWorkers)
 	{
-		if (!unit->isBeingConstructed())
+		if (isBeingBuilt())
 		{
 			sendWorkers();
 			hasSentWorkers = true;
 
-			bats::BuildPlanner::getInstance()->addRefinery();
+			//bats::BuildPlanner::getInstance()->addRefinery();
 
-			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Barracks) > 0)
-			{
-				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Bunker);
-			}
-			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Engineering_Bay) > 0)
-			{
-				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Missile_Turret);
-			}
+			// Defense manager should handle the adding of bunkers etc.
+			//if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Barracks) > 0)
+			//{
+			//	bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Bunker);
+			//}
+			//if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Engineering_Bay) > 0)
+			//{
+			//	bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Missile_Turret);
+			//}
 		}
 	}
+
+	/// @todo check if refinery should be built, depending on our current gas and if this expansion
+	/// can hold a refinery.
 
 	if (!unit->isIdle())
 	{
@@ -59,6 +65,7 @@ void CommandCenterAgent::computeActions()
 		}
 	}
 
+	/// @todo Unit Creator shall handle this.
 	if (ResourceManager::getInstance()->needWorker())
 	{
 		UnitType worker = Broodwar->self()->getRace().getWorker();

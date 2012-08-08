@@ -8,9 +8,15 @@
 #include "Utilities/KeyType.h"
 #include "BATSModule/include/TypeDefs.h"
 
+// Forward declarations
+namespace bats {
+	class DefenseManager;
+}
+
 /** The BaseAgent is the base agent class all agent classes directly or indirectly must extend. It contains some
  * common logic that is needed for several other agent implementations.
  * @todo move protected variables to private
+ * @todo add doxygen documentation for all functions
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
  * @author Matteus Magnusson (mattues.magnusson@gmail.com)
@@ -31,16 +37,20 @@ protected:
 	int lastActionFrame;
 	bool bBlock;
 	std::string agentType;
-	//mutable bool built; ///< @todo remove when getRemainingBuildTime() has been fixed for tanks
+
+	static bats::DefenseManager* msDefenseManager;
 
 	/**
-	 * Returns true if the unit has any cooldown on either ground or air weapons
+	 * Checks if the unit has any cooldown on either ground or air weapons
 	 * @return true if the unit has cooldown on either ground or air weapons.
 	 */
 	bool isWeaponCooldown() const;
 
 public:
-	/** Constructor. */
+	/**
+	 * Constructor.
+	 * @todo automatically add to AgentManager
+	 */
 	BaseAgent(BWAPI::Unit* mUnit);
 	/** Destructor. */
 	~BaseAgent();

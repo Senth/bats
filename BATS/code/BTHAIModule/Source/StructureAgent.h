@@ -8,7 +8,7 @@
  * agents without logic, for example supply depots. To add logic to a building, for example Terran Academy researching
  * stim packs, an agent implementation for that unit type must be created.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @ Johan Hagelback (johan.hagelback@gmail.com)
  */
 class StructureAgent : public BaseAgent {
 
@@ -20,8 +20,11 @@ protected:
 	bool canBuildUnit(BWAPI::UnitType type) const;
 	bool canEvolveUnit(BWAPI::UnitType type) const;
 
-	BWAPI::TilePosition getNextScanLocation() const;
-	std::vector<BWAPI::TilePosition> hasScanned;
+	/**
+	 * Checks if the structure is under attack and handles that by sending
+	 * an under attack command to the Defense Manager
+	 */
+	void handleUnderAttack();
 
 public:
 	StructureAgent(BWAPI::Unit* mUnit);
