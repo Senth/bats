@@ -15,7 +15,7 @@ bats::ExplorationManager* AlliedSquad::mpsExplorationManager = NULL;
 
 AlliedSquad::AlliedSquad(bool frontalAttack) {
 	mFrontattack = frontalAttack;
-	mState = State_Idle;
+	mState = State_IdleInBase;
 
 	if (mpsExplorationManager == NULL) {
 		mpsExplorationManager = bats::ExplorationManager::getInstance();
@@ -62,11 +62,11 @@ void AlliedSquad::updateDerived() {
 	}
 	// Stopped moving to attack
 	else if (hasAttackHalted()) {
-		mState = State_AttackHalted;
+		mState = State_IdleOutsideBase;
 	}
 	// else - Idle
 	else {
-		mState = State_Idle;
+		mState = State_IdleInBase;
 	}
 }
 
@@ -339,13 +339,13 @@ bool AlliedSquad::isDebugOff() const {
 
 std::string AlliedSquad::getStateString() const {
 	switch (mState) {
-		case State_AttackHalted:
+		case State_IdleOutsideBase:
 			return "Attack halted";
 
 		case State_Attacking:
 			return "Attacking";
 
-		case State_Idle:
+		case State_IdleInBase:
 			return "Idle";
 
 		case State_MovingToAttack:
@@ -360,5 +360,5 @@ std::string AlliedSquad::getStateString() const {
 }
 
 bool AlliedSquad::isActive() const {
-	return mState != State_Idle;
+	return mState != State_IdleInBase;
 }

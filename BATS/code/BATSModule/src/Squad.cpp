@@ -138,6 +138,8 @@ void Squad::update() {
 	}
 	mUpdateLast = mpsGameTime->getElapsedTime();
 
+	updateSupply();
+
 
 	// Check if this is the first time calling, then add all the initial units
 	if (!mInitialized) {

@@ -33,7 +33,7 @@ bool MedicAgent::checkUnitsToHeal()
 		for (int i = 0; i < (int)agents.size(); i++)
 		{
 			BaseAgent* agent = agents.at(i);
-			if (agent->isAlive() && agent->isDamaged())
+			if (agent->isAlive() && agent->isDamaged() && agent->getUnit()->isCompleted())
 			{
 				if (isMedicTarget(agent->getUnit()) && agent->getUnitID() != unit->getID())
 				{

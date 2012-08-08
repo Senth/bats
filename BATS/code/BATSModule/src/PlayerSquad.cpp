@@ -74,6 +74,7 @@ int PlayerSquad::getSupplyCount() const {
 }
 
 int PlayerSquad::getDeltaSupplyCount() const {
+	/// @todo what if squads merges or splits, this will be quite inaccurate.
 	if (mSupplies.size() == config::classification::squad::MEASURE_SIZE) {
 		return mSupplies.front() - mSupplies.back();
 	} else {

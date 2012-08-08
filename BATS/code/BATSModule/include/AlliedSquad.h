@@ -37,11 +37,11 @@ public:
 	 * Allied squad states
 	 */
 	enum States {
-		State_Idle,	/**< Home in base */
+		State_IdleInBase,	/**< Home in base */
 		State_MovingToAttack, /**< Outside home and moving */
 		State_Attacking, /**< Attacking, both at home or at enemy */
 		State_Retreating, /**< Retreating from somewhere to home */
-		State_AttackHalted /**< Outside home and still */
+		State_IdleOutsideBase /**< Outside home and still */
 	};
 
 	/**

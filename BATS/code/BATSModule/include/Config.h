@@ -116,6 +116,10 @@ namespace bats {
 				 * bot will retreat from the battle. This is the multiplied amount—e.g. a value of
 				 * 2.0 will mean we retreat when enemy force is double our amount. */
 				extern double ENEMY_LARGER_THAN_US;
+				/** How many supplies of us should be decreasing in delta time, to be counted as
+				 * decreasing fast. Delta time is measured by MEASURE_SIZE * MEASURE_INTERVAL_TIME
+				 * @note should be the double amount of supply */
+				extern int SUPPLY_DECREASING_FAST;
 			}
 
 			/**

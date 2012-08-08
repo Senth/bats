@@ -54,6 +54,7 @@ void AttackSquad::handleAlliedRegrouping() {
 	// Regroup with allied force if far away
 	if (getTemporaryGoalPosition() == TilePositions::Invalid) {
 		if (needsAlliedRegrouping()) {
+			setAvoidEnemyUnits(true);
 			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
 		}
 	}
@@ -137,7 +138,7 @@ void AttackSquad::handleFollowAllied() {
 		// Chose the closest squad that is outside home (not idle)
 		vector<pair<AlliedSquadCstPtr, int>>::const_iterator squadIt = foundSquads.begin();
 		while (NULL == mpAlliedSquadFollow && squadIt != foundSquads.end()) {
-			if (squadIt->first->getState() != AlliedSquad::State_Idle) {
+			if (squadIt->first->getState() != AlliedSquad::State_IdleInBase) {
 				mpAlliedSquadFollow = squadIt->first;
 			}
 
@@ -149,55 +150,47 @@ void AttackSquad::handleFollowAllied() {
 	if (NULL != mpAlliedSquadFollow) {
 
 		switch (mpAlliedSquadFollow->getState()) {
-			// Allied are still -> do nothing
-		case AlliedSquad::State_AttackHalted:
-			handleAlliedRegrouping();
-			setAvoidEnemyUnits(true);
-			break;
+			// Allied is still -> do nothing
+			case AlliedSquad::State_IdleOutsideBase:
+				handleAlliedRegrouping();
+				setAvoidEnemyUnits(true);
+				break;
 
-		// Allied is retreating -> go to target position, don't attack
-		case AlliedSquad::State_Retreating: {
-			if (isRegroupingWithAllied()) {
-				clearAlliedRegrouping();
-			}
-			TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
-			// Only update position if it changed
-			if (getGoalPosition() != targetPosition) {
+			// Allied is retreating -> go to allied target position, don't attack
+			case AlliedSquad::State_Retreating: {
+				if (isRegroupingWithAllied()) {
+					clearAlliedRegrouping();
+				}
 				setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
+				setAvoidEnemyUnits(true);
+				break;
 			}
-			setAvoidEnemyUnits(true);
-			break;
-											}
 
-		// Allied is moving	-> go to target position, attack if see anything.
-		case AlliedSquad::State_MovingToAttack: {
-			if (isRegroupingWithAllied()) {
-				clearAlliedRegrouping();
-			}
-			TilePosition targetPosition = mpAlliedSquadFollow->getTargetPosition();
-			// Only update position if it changed
-			if (getGoalPosition() != targetPosition) {
+			// Allied is moving	-> go to target position, attack if see anything.
+			case AlliedSquad::State_MovingToAttack: {
+				if (isRegroupingWithAllied()) {
+					clearAlliedRegrouping();
+				}
 				setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
-			}
-			setAvoidEnemyUnits(false);
-			break;
-												}
-
-		// Allied is attacking -> Find something close to attack
-		case AlliedSquad::State_Attacking:
-			/// @todo don't call request attack every frame!
-			handleAlliedRegrouping();
-			if (!isRegroupingWithAllied()) {
 				setAvoidEnemyUnits(false);
-				mpsAttackCoordinator->requestAttack(getThis());
+				break;
 			}
-			break;
 
-		// Allied is safe -> retreat, then merge with Patrol Squad (disband)
-		case AlliedSquad::State_Idle:
-			setRetreatPosition(mpsDefenseManager->findRetreatPosition());
-			mpAlliedSquadFollow.reset();
-			break;
+			// Allied is attacking -> Find something close to attack
+			case AlliedSquad::State_Attacking:
+				/// @todo don't call request attack every frame!
+				handleAlliedRegrouping();
+				if (!isRegroupingWithAllied()) {
+					setAvoidEnemyUnits(false);
+					mpsAttackCoordinator->requestAttack(getThis());
+				}
+				break;
+
+			// Allied is safe -> retreat, then merge with Patrol Squad (disband)
+			case AlliedSquad::State_IdleInBase:
+				setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+				mpAlliedSquadFollow.reset();
+				break;
 		}
 	}
 	// Did not find an allied squad -> retreat, then merge with Patrol Squad (disband)
@@ -225,7 +218,7 @@ void AttackSquad::handleRetreat() {
 
 	bool retreat = false;
 
-	// Check if enemy army is double of our size.
+	// Check if enemy army is larger than our size (probably a lot larger)
 	int cEnemySupplies = pEnemy->getSupplyCount();
 	int cOurSupplies = getSupplyCount();
 	if (NULL != mpAlliedSquadFollow) {
@@ -237,10 +230,26 @@ void AttackSquad::handleRetreat() {
 	}
 
 
-	/// @todo Check if our supplies are decreasing too quickly
+	// Check if our supplies are decreasing too quickly
+	int cEnemyDeltaSupplies = pEnemy->getDeltaSupplyCount();
+	int cOurDeltaSupplies = getDeltaSupplyCount();
+	/// @todo Don't use allied squads for now, if they split this can cause great inaccuracies
+	//if (NULL != mpAlliedSquadFollow) {
+	//	cOurDeltaSupplies += mpAlliedSquadFollow->getDeltaSupplyCount();
+	//}
+
+	// If our supplies decrease very fast and the enemy's is not -> retreat
+	if (cOurDeltaSupplies < -config::classification::retreat::SUPPLY_DECREASING_FAST &&
+		cEnemyDeltaSupplies > -config::classification::retreat::SUPPLY_DECREASING_FAST)
+	{
+		retreat = true;
+	}
 
 
 	/// @todo Check if enemy has choke point, then we shall probably not engage
+	/// For now this is solved when our units decrease very fast, but not the enemy's,
+	/// but we would like to not loose a lot of our units before we can deduct that this
+	/// is a bad engagement.
 
 
 	// Handle retreat
@@ -263,7 +272,7 @@ bool AttackSquad::createGoal() {
 
 		// Check if squad is outside of home
 		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
-			if (pBigAlliedSquad->getState() != AlliedSquad::State_Idle) {
+			if (pBigAlliedSquad->getState() != AlliedSquad::State_IdleInBase) {
 				mpAlliedSquadFollow = pBigAlliedSquad;
 				setCanRegroup(false);
 			}

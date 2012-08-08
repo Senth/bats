@@ -77,6 +77,7 @@ namespace classification {
 	namespace retreat {
 		int ENEMY_CLOSE_DISTANCE = 0;
 		double ENEMY_LARGER_THAN_US = 0.0;
+		int SUPPLY_DECREASING_FAST = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -370,6 +371,10 @@ bool classification::retreat::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ENEMY_LARGER_THAN_US);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ENEMY_LARGER_THAN_US));
 		ENEMY_LARGER_THAN_US = variableInfo;
+	} else if (variableInfo.name == "supply_decreasing_fast") {
+		gOldValue = toString(SUPPLY_DECREASING_FAST);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(SUPPLY_DECREASING_FAST));
+		SUPPLY_DECREASING_FAST = variableInfo;
 	} else {
 		return false;
 	}

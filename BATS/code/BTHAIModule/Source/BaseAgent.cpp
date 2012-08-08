@@ -5,6 +5,7 @@
 #include "BATSModule/include/ExplorationManager.h"
 #include "Utilities/Logger.h"
 #include "BatsModule/include/Config.h"
+#include "BatsModule/include/TypeDefs.h"
 
 using namespace BWAPI;
 using namespace std;

@@ -30,9 +30,6 @@ void StructureAgent::printGraphicDebugInfo() const
 
 	// Low
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
-		int w = unit->getType().tileWidth() * 32 / 2;
-		Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w, unit->getPosition().y() - 10, unit->getType().getName().c_str());
-
 		//Draw "is working" box
 		int total = 0;
 		int done = 0;
@@ -42,6 +39,9 @@ void StructureAgent::printGraphicDebugInfo() const
 
 		if (unit->isBeingConstructed())
 		{
+			int w = unit->getType().tileWidth() * 32 / 2;
+			Broodwar->drawText(CoordinateType::Map, unit->getPosition().x() - w, unit->getPosition().y() - 10, unit->getType().getName().c_str());
+			
 			total = unit->getType().buildTime();
 			done = total - unit->getRemainingBuildTime();
 			txt = "";
