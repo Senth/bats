@@ -28,6 +28,7 @@ This is not how the squad moves, but where the squad's units move to. The potent
 The squad has four elements that can change the behavior of the squad.
 \begin{itemize}
 	\item \emph{Regrouping}, which has been fully described above in squad movement.
+	\item \emph{Retreating}. While the base class squad never uses this directly, derived classes can set a retreat position and the squad will then check when it is close to the retreat position. Once close it will call \texttt{onRetreatCompleted()} which has the default behavior of disbanding the squad, thus merging it with the Patrol squad. By overriding this function another behavior could be accomplished. Most common for all retreat positions it to get if from the \nameref{sec:defense_manager} via the \texttt{findRetreatPosition()}, if a squad uses another location this will be mentioned.
 	\item A squad can contain a \emph{unit composition}, this limits the squad to only contain units of the specific type, useful when creating special type of squads. Section \ref{sec:unit_composition} describes unit composition in more detail.
 	\item Some squads usually don't want to get close to enemies, in this case \emph{avoid enemies} can be turned on. This causes attacking units to move to a specific position without attacking (even if they walk straight through enemies); this is due to potential field manager in BTHAI did not support this behavior entirely, thus a simpler version that just uses regular path finding is used due to lack of time to change the potential field algorithm in the manager.
 	\item \emph{Wait goals} has been briefly described before in section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} and is fully described in section \ref{sec:wait_goals} \nameref{sec:wait_goals}. While adding these does not give the basic squad any specific behavior (yet), they can be used in the derived classes for certain behaviors.
@@ -35,15 +36,77 @@ The squad has four elements that can change the behavior of the squad.
 
 \subsection{Attack squad}
 \label{sec:attack_squad}
+The attack squad is the base class for all offensive squads—in the current version only drops are derived. If not derived, the squad will functions as a regular attack—a regular attack or battle will in this section be synonym for an attack or battle where it is not following an \nameref{sec:allied squad} respectively—if it is not ordered to follow an allied squad. For any attack the squad requests an attack from \nameref{sec:attack_coordinator} to get a position to attack, or if an allied squad is out of home, it will start following it instead.
+
+If it gets a regular attack, it tries to move to the goal position and when it is close to the goal (25\conf tiles) it will stop and wait for its wait goals to finish—i.e. to sync the attack with other attack squads. If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will start to retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation; retreats are covered later in this section. When all squads are in position, or if any of the squads get spotted and are attacking the other squads start to initiate their attack. They will now continue to move to the goal location. To complete their mission they need to kill all structures near (15\conf tiles) the goal position. After it has finished its goal the squad will retreat and then disband the squad, merging with the \nameref{sec:patrol_squad}.
+
+\paragraph{Following an allied squad}
+When the squad follows an allied squad it has a slightly different behavior. Because allied squads can merge (and split) the squad will first check if the allied squad is empty, if it is, it will search for close (30\conf tiles) allied squads to follow instead. If no allied squads were found, it will retreat and then disband.
+
+Depending on the allied squads current state, the squad acts a bit differently, how it acts is described below in listing \ref{lst:attack_follow_allied}.
+
+\begin{lstlisting}[caption={Squad actions depending on the allied squad's state.},label={lst:attack_follow_allied}]
+switch (mpAlliedSquad->getState()) {
+	// Regroup if not close
+	case IdleOutsideBase:
+		handleAlliedRegrouping();
+		setAvoidEnemyUnits(true);
+		break;
+	
+	// Go to allied target position, don't attack
+	case Retreating:
+		if (isRegroupingWithAllied()) {
+			clearAlliedRegrouping();
+		}
+		setGoalPosition(mpAlliedSquad->getTargetPosition());
+		setAvoidEnemyUnits(true);
+		break;
+
+	// Go to target position, attack if see anything
+	case MovingToAttack: 
+		if (isRegroupingWithAllied()) {
+			clearAlliedRegrouping();
+		}
+		setGoalPosition(mpAlliedSquad->getTargetPosition());
+		setAvoidEnemyUnits(false);
+		break;
+
+	// Find something close to attack
+	case Attacking:
+		handleAlliedRegrouping();
+		if (!isRegroupingWithAllied()) {
+			setAvoidEnemies(false);
+			mpsAttackCoordinator->requestAttack(this);
+		}
+		break;
+
+	// Retreat, then merge with Patrol Squad (disband)
+	case IdleInBase:
+		setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+		mpAlliedSquad.reset();
+		break;
+}
+\end{lstlisting}
+While most of the code speaks for itself, some functions need extra clarification. \texttt{handleAlliedRegrouping()} checks if the distance to the allied squad becomes to large (15\conf tiles), it both sets the regrouping position to the allied's center position and the squad to avoid enemy units—the regrouping is considered done when the distance between the squads are less or equal to 10\conf tiles away. \texttt{setGoalPosition(mpAlliedSquad->getTargetPosition())} sets the squad to move to the position where most of the allied squad's units are moving to. When using this in the state MovingToAttack, it will effectively regroup with allied squad and not try to chase after it as it would if handleAlliedRegrouping() was used instead. This also allows the allied player to control where the bot shall attack as it will attack where the player decides to attack.
+
+\texttt{mpsAttackCoordinator->requestAttack(this)} uses \nameref{sec:attack_coordinator} to find a place to attack; as mentioned in section \ref{sec:attack_coordinator} it will find an attack position close to the allied squad's target. Why not use the target as with MovingToAttack and have the AttackSquad create the attack position? Because
+\begin{inparaenum}[1\upshape)]
+	\item we want all attack request to be in the same location, if the attacks needs to be fixed or better coordinated we only need to change it in one place;
+	\item in the future the squad could get a location of a prioritized building to attack; and
+	\item using allied target directly it will cause our units to fight exactly where the player is, which might crowd the place not making all units able to fight, but would be better if squads are smaller.
+\end{inparaenum}
 
 \subsection{Drop squad}
+\label{sec:drop_squad}
 
 \subsection{Hold squad}
 \label{sec:hold_squad}
 
 \subsection{Patrol squad}
+\label{sec:patrol_squad}
 
 \subsection{Scout squad}
+\label{sec:scout_squad}
 
 \subsection{Unit composition}
 \label{sec:unit_composition}

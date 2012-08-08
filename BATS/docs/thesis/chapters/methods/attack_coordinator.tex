@@ -11,7 +11,7 @@ The attack coordinator uses two to three weight multiplied together to get the n
 
 The first weight, \emph{distance}, prioritizes structures (and location) far away from other existing attacks, including allied; it is a good idea to spread out multiple attack to split up the enemy army. The second weight, \emph{type}, determines how important a structure or location is to attack, and the third weight, \emph{defended}, is how well defended an area is—the defended weight is not implemented, but distracting attacks would use it to get a location that can be attacked without taking the risk to die (such as drops dying to anti-air).
 
-In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will get an attack position near the allied squads target instead of using the weights.
+In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will get an attack position near the allied squads target instead of using the weights. The attack position is still the same positions used for the regular algorithm.
 
 Enemy armies are not included in the calculation, because one rarely gain anything on attack an army, one should find gaps in the defense instead\cite{day9}. While it would be good to engage and attack an enemy army if its a lot weaker than our BATS will still do that if the squad is close by, but it will not search for those small armies. Armies are also more mobile meaning it would be a lot harder to keep a track on them.
 
@@ -59,7 +59,7 @@ normalized\ weight = \frac{weight}{MAP\_WIDTH^2 + MAP\_HEIGHT^2}
 \end{equation}
 
 
-\subsection{Type weight}
+\subsection{Calculation of type weight}
 This weight prioritizes different structures and locations. Most of the values here are fixed or calculated between fixed values (expansions). The structures and locations are presented in priority order below with the current values assign to them. These values are rough estimates what might be good, thus one shall not think these are \emph{the} values. Because of multiplying these values with other weights the difference between 0.1 and 0.2 is greater than 0.2 and 0.3 (0.2 is the double of 0.1).
 
 \paragraph{Not scouted expansions 1.0\conf}
