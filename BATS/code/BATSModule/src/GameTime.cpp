@@ -28,8 +28,8 @@ void GameTime::update() {
 	mElapsedTime = static_cast<double>(currentFrame - mStartFrame) * SECONDS_PER_FRAME_FASTEST;
 }
 
-double GameTime::getElapsedTime() const {
-	return mElapsedTime;
+double GameTime::getElapsedTime(double seconds) const {
+	return mElapsedTime - seconds;
 }
 
 double GameTime::getElapsedTime(int sinceFrame) const {

@@ -155,6 +155,7 @@ namespace log {
 namespace module {
 	bool PLAYER_REACT = true;
 	bool OWN_INITIATIVE = true;
+	bool WRITE_INTENTION = true;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -226,8 +227,8 @@ void readConfig(const std::string& configFile) {
 			<< configFile);
 	}
 
-	while (configReader.isGood()) {
-		utilities::VariableInfo variableInfo;
+	utilities::VariableInfo variableInfo;
+	while (configReader.isGood()) {	
 		configReader.readNext(variableInfo);
 
 		handleVariable(variableInfo);
@@ -560,6 +561,10 @@ bool module::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(OWN_INITIATIVE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(OWN_INITIATIVE));
 		OWN_INITIATIVE = variableInfo;
+	} else if (variableInfo.name == "write_intention") {
+		gOldValue = toString(WRITE_INTENTION);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(WRITE_INTENTION));
+		WRITE_INTENTION = variableInfo;
 	} else {
 		return false;
 	}

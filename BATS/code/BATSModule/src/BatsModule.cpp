@@ -12,6 +12,7 @@
 #include "WaitGoalManager.h"
 #include "PlayerArmyManager.h"
 #include "DefenseManager.h"
+#include "IntentionWriter.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
@@ -37,16 +38,17 @@ const int GAME_STARTED_FRAME = -1;
 }
 
 BatsModule::BatsModule() : BTHAIModule() {
-	mpProfiler = NULL;
-	mpUnitManager = NULL;
-	mpCommander = NULL;
-	mpResourceCounter = NULL;
-	mpExplorationManager = NULL;
-	mpWaitGoalManager = NULL;
-	mpSquadManager = NULL;
-	mpGameTime = NULL;
-	mpPlayerArmyManager = NULL;
-	mpDefenseManager = NULL;
+	mProfiler = NULL;
+	mUnitManager = NULL;
+	mCommander = NULL;
+	mResourceCounter = NULL;
+	mExplorationManager = NULL;
+	mWaitGoalManager = NULL;
+	mSquadManager = NULL;
+	mGameTime = NULL;
+	mPlayerArmyManager = NULL;
+	mDefenseManager = NULL;
+	mIntentionWriter = NULL;
 
 	// Initialize logger
 	utilities::setOutputDirectory(config::log::OUTPUT_DIR);
@@ -54,12 +56,12 @@ BatsModule::BatsModule() : BTHAIModule() {
 	config::loadConfig();
 
 	// Initialize singletons that stays throughout multiple games
-	mpProfiler = Profiler::getInstance();
+	mProfiler = Profiler::getInstance();
 }
 
 BatsModule::~BatsModule() {
-	mpProfiler->dumpToFile();
-	SAFE_DELETE(mpProfiler);
+	mProfiler->dumpToFile();
+	SAFE_DELETE(mProfiler);
 
 	// Release game classes, if the game was ended abruptly onEnd() might not have been called.
 	releaseGameClasses();
@@ -70,7 +72,7 @@ BatsModule::~BatsModule() {
 void BatsModule::onStart() {
 	TEST_SELF();
 
-	mpProfiler->start("OnInit");
+	mProfiler->start("OnInit");
 
 	Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	// Set default speed
@@ -97,27 +99,17 @@ void BatsModule::onStart() {
 			}
 		}
 	}
-	//Add the units we have from start to agent manager
-	else {
-		//std::set<Unit*>::const_iterator unitIt;
-		//for(unitIt = Broodwar->self()->getUnits().begin();
-		//	unitIt != Broodwar->self()->getUnits().end();
-		//	++unitIt)
-		//{
-		//	mpUnitManager->addAgent(*unitIt);
-		//}
-	}
 
 	DEBUG_MESSAGE(utilities::LogLevel_Info, "BATS bot running!");
 
 	running = true;
 
-	mpProfiler->end("OnInit");
+	mProfiler->end("OnInit");
 }
 
 void BatsModule::onEnd() {
 	Pathfinder::getInstance()->stop();
-	mpProfiler->dumpToFile();
+	mProfiler->dumpToFile();
 
 	releaseGameClasses();
 
@@ -127,25 +119,25 @@ void BatsModule::onEnd() {
 void BatsModule::onFrame() {
 	TEST_SELF();
 
-	mpProfiler->start("OnFrame");
+	mProfiler->start("OnFrame");
 
 	// Some states to skip further processing
 	if (!running || // Game over
 		!Broodwar->isInGame() ||
 		Broodwar->isReplay()) {
 
-		mpProfiler->end("OnFrame");
+		mProfiler->end("OnFrame");
 		return;
 	}
 
 	updateGame();
 	showDebug();
 
-	mpProfiler->end("OnFrame");
+	mProfiler->end("OnFrame");
 
 	// Show profiler information if profiling is on
 	if (profile) {
-		mpProfiler->showAll();
+		mProfiler->showAll();
 	}
 }
 
@@ -193,8 +185,8 @@ void BatsModule::onSendText(std::string text) {
 		BuildPlanner::getInstance()->switchToPhase("");
 	} else if (startsWith(text,"/transition")) {				
 		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
-	} else if (mpCommander->isCommandAvailable(text)) {
-		mpCommander->issueCommand(text);
+	} else if (mCommander->isCommandAvailable(text)) {
+		mCommander->issueCommand(text);
 	} else if (text == "/reload config") {
 		config::loadConfig();
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Configuration reloaded");
@@ -279,17 +271,17 @@ void BatsModule::onUnitDiscover(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 
 		if (isOurs(pUnit)) {
-			mpUnitManager->addAgent(pUnit);
+			mUnitManager->addAgent(pUnit);
 
 			// Remove from build order if it's a building
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			}
 		} else if (isEnemy(pUnit)) {
-			mpExplorationManager->addSpottedUnit(pUnit);
-			mpPlayerArmyManager->addUnit(pUnit);
+			mExplorationManager->addSpottedUnit(pUnit);
+			mPlayerArmyManager->addUnit(pUnit);
 		} else if (isAllied(pUnit)) {
-			mpPlayerArmyManager->addUnit(pUnit);
+			mPlayerArmyManager->addUnit(pUnit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
 				pUnit->getType().getName());
@@ -303,7 +295,7 @@ void BatsModule::onUnitEvade(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 
 		if (isOurs(pUnit)) {
-			mpUnitManager->removeAgent(pUnit);			
+			mUnitManager->removeAgent(pUnit);			
 			if (pUnit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(pUnit);
 			}
@@ -314,15 +306,15 @@ void BatsModule::onUnitEvade(BWAPI::Unit* pUnit) {
 				/// Commander::getInstance()->assistWorker(mpAgentManager->getAgent(pUnit->getID()));
 			}
 
-			mpUnitManager->cleanup();
+			mUnitManager->cleanup();
 		}
 		// Enemies
 		else if (isEnemy(pUnit)) {
-			mpPlayerArmyManager->removeUnit(pUnit);
+			mPlayerArmyManager->removeUnit(pUnit);
 		}
 		// Allied
 		else if (isAllied(pUnit)) {
-			mpPlayerArmyManager->removeUnit(pUnit);
+			mPlayerArmyManager->removeUnit(pUnit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
 				pUnit->getType().getName());
@@ -349,7 +341,7 @@ void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
 	TEST_SELF();
 
 	if (isEnemy(pUnit)) {
-		mpExplorationManager->unitDestroyed(pUnit);
+		mExplorationManager->unitDestroyed(pUnit);
 	}
 }
 
@@ -359,7 +351,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 	if (areWePlaying()) {
 		if (isOurs(pUnit)) {
 			if (BuildPlanner::isZerg()) {
-				mpUnitManager->morphDrone(pUnit);
+				mUnitManager->morphDrone(pUnit);
 				BuildPlanner::getInstance()->unlock(pUnit->getType());
 			} else {
 				onUnitDiscover(pUnit);
@@ -381,7 +373,7 @@ void BatsModule::onSaveGame(std::string gameName) {
 
 bool BatsModule::isGameLost() const {
 	// Check if we have at least one attacking unit
-	const std::vector<BaseAgent*>& agents = mpUnitManager->getAgents();
+	const std::vector<BaseAgent*>& agents = mUnitManager->getAgents();
 	std::vector<BaseAgent*>::const_iterator agentIt = agents.begin();
 	bool attackingUnitExist = false;
 	while(!attackingUnitExist && agentIt != agents.end()) {
@@ -392,7 +384,7 @@ bool BatsModule::isGameLost() const {
 		++agentIt;
 	}
 
-	if (mpUnitManager->getNoWorkers() == 0 &&
+	if (mUnitManager->getNoWorkers() == 0 &&
 		Broodwar->self()->minerals() <= WORKER_MINERAL_PRICE &&
 		!attackingUnitExist)
 	{
@@ -407,7 +399,7 @@ bool BatsModule::areWePlaying() const {
 }
 
 void BatsModule::updateGame() {
-	mpProfiler->start("updateGame");
+	mProfiler->start("updateGame");
 
 	// Quit the game if the game is lost
 	if (isGameLost()) {
@@ -417,67 +409,69 @@ void BatsModule::updateGame() {
 		return;
 	}
 
-	mpGameTime->update();
-	mpResourceCounter->update();
-	mpWaitGoalManager->update();
-	mpPlayerArmyManager->update();
+	mGameTime->update();
+	mResourceCounter->update();
+	mWaitGoalManager->update();
+	mPlayerArmyManager->update();
 
-	mpUnitManager->computeActions();
+	mUnitManager->computeActions();
 	BuildPlanner::getInstance()->computeActions();
-	mpCommander->computeActions();
-	mpDefenseManager->update();
-	mpExplorationManager->update();
+	mCommander->computeActions();
+	mDefenseManager->update();
+	mExplorationManager->update();
 
-	mpProfiler->end("updateGame");
+	mProfiler->end("updateGame");
 }
 
 void BatsModule::initGameClasses() {
-	mpGameTime = GameTime::getInstance();
-	mpWaitGoalManager = WaitGoalManager::getInstance();
-	mpSquadManager = SquadManager::getInstance();
+	mGameTime = GameTime::getInstance();
+	mWaitGoalManager = WaitGoalManager::getInstance();
+	mSquadManager = SquadManager::getInstance();
 	AttackCoordinator::getInstance();
-	mpResourceCounter = ResourceCounter::getInstance();
-	mpUnitManager = UnitManager::getInstance();
-	mpCommander = Commander::getInstance();
+	mResourceCounter = ResourceCounter::getInstance();
+	mUnitManager = UnitManager::getInstance();
+	mCommander = Commander::getInstance();
 	CoverMap::getInstance();
 	BuildPlanner::getInstance();
 	UnitCreator::getInstance();
 	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
-	mpExplorationManager = ExplorationManager::getInstance();
-	mpPlayerArmyManager = PlayerArmyManager::getInstance();
-	mpDefenseManager = DefenseManager::getInstance();
+	mExplorationManager = ExplorationManager::getInstance();
+	mPlayerArmyManager = PlayerArmyManager::getInstance();
+	mDefenseManager = DefenseManager::getInstance();
+	mIntentionWriter = IntentionWriter::getInstance();
 }
 
 void BatsModule::releaseGameClasses() {
-	SAFE_DELETE(mpDefenseManager);
-	SAFE_DELETE(mpPlayerArmyManager);
-	SAFE_DELETE(mpExplorationManager);
+	SAFE_DELETE(mIntentionWriter);
+	SAFE_DELETE(mDefenseManager);
+	SAFE_DELETE(mPlayerArmyManager);
+	SAFE_DELETE(mExplorationManager);
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
 	delete UpgradesPlanner::getInstance();
 	delete BuildPlanner::getInstance();
 	delete CoverMap::getInstance();
-	SAFE_DELETE(mpCommander);
-	SAFE_DELETE(mpUnitManager);
-	SAFE_DELETE(mpResourceCounter);
+	SAFE_DELETE(mCommander);
+	SAFE_DELETE(mUnitManager);
+	SAFE_DELETE(mResourceCounter);
 	delete AttackCoordinator::getInstance();
-	SAFE_DELETE(mpSquadManager);
-	SAFE_DELETE(mpWaitGoalManager);
-	SAFE_DELETE(mpGameTime);
+	SAFE_DELETE(mSquadManager);
+	SAFE_DELETE(mWaitGoalManager);
+	SAFE_DELETE(mGameTime);
 }
 
 void BatsModule::showDebug() const {
 	BuildPlanner::getInstance()->printInfo();
 	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
-		mpProfiler->start("printGraphicDebugInfo()");
+		mProfiler->start("printGraphicDebugInfo()");
 
 
-		mpPlayerArmyManager->printGraphicDebugInfo();
-		mpSquadManager->printGraphicDebugInfo();
-		mpUnitManager->printGraphicDebugInfo();
-		mpDefenseManager->printGraphicDebugInfo();
+		mPlayerArmyManager->printGraphicDebugInfo();
+		mSquadManager->printGraphicDebugInfo();
+		mUnitManager->printGraphicDebugInfo();
+		mDefenseManager->printGraphicDebugInfo();
 		UnitCreator::getInstance()->printGraphicDebugInfo();
 		drawTerrainData();
 		CoverMap::getInstance()->printGraphicDebugInfo();
@@ -490,7 +484,7 @@ void BatsModule::showDebug() const {
 			ResourceManager::getInstance()->printInfo();
 		}
 
-		mpProfiler->end("printGraphicDebugInfo()");
+		mProfiler->end("printGraphicDebugInfo()");
 	}
 }
 

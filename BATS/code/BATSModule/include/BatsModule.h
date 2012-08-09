@@ -17,6 +17,7 @@ class SquadManager;
 class GameTime;
 class PlayerArmyManager;
 class DefenseManager;
+class IntentionWriter;
 
 /**
  * Main module for BATS
@@ -165,16 +166,17 @@ protected:
 	 */
 	virtual bool areWePlaying() const;
 
-	Profiler* mpProfiler;
-	UnitManager* mpUnitManager;
-	Commander* mpCommander;
-	ResourceCounter* mpResourceCounter;
-	ExplorationManager* mpExplorationManager;
-	WaitGoalManager* mpWaitGoalManager;
-	SquadManager* mpSquadManager;
-	GameTime* mpGameTime;
-	PlayerArmyManager* mpPlayerArmyManager;
-	DefenseManager* mpDefenseManager;
+	Profiler* mProfiler;
+	UnitManager* mUnitManager;
+	Commander* mCommander;
+	ResourceCounter* mResourceCounter;
+	ExplorationManager* mExplorationManager;
+	WaitGoalManager* mWaitGoalManager;
+	SquadManager* mSquadManager;
+	GameTime* mGameTime;
+	PlayerArmyManager* mPlayerArmyManager;
+	DefenseManager* mDefenseManager;
+	IntentionWriter* mIntentionWriter;
 
 private:
 	/**

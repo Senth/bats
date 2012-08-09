@@ -267,6 +267,8 @@ namespace bats {
 			/** It's own initiative, i.e. not reacting, but creating commands when it feels
 			 * it's a good time to do so */
 			extern bool OWN_INITIATIVE;
+			/** If the bot shall write out the intention and reason behind its actions */
+			extern bool WRITE_INTENTION;
 		}
 
 		/**

@@ -27,12 +27,14 @@ public:
 	void update();
 
 	/**
-	 * Returns the number of seconds elapsed since the game started. One second corresponds
-	 * to one game second with the fastest game speed in StarCraft. Note fastest as in specifying
-	 * speed with /speed -1 and then setting the fastest game speed in the options.
-	 * @return elapsed game seconds since start of game.
+	 * Returns the number of seconds since the specified game time. One second corresponds
+	 * to one game second with the fastest game speed in StarCraft.
+	 * @note Fastest as in specifying speed with /speed -1 and then setting the fastest game speed
+	 * in the options.
+	 * @param seconds from what game time to calculate the elapsed seconds, defaults to 0.0.
+	 * @return elapsed game seconds since the specified game time.
 	 */
-	double getElapsedTime() const;
+	double getElapsedTime(double seconds = 0.0) const;
 
 	/**
 	 * Returns the number of seconds since the specified frame. One second corresponds to one

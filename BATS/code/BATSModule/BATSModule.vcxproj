@@ -104,6 +104,9 @@
     <ClCompile Include="src\GameTime.cpp" />
     <ClCompile Include="src\Helper.cpp" />
     <ClCompile Include="src\HoldSquad.cpp" />
+    <ClCompile Include="src\IntentionMessage.cpp" />
+    <ClCompile Include="src\IntentionWriter.cpp" />
+    <ClCompile Include="src\Message.cpp" />
     <ClCompile Include="src\PatrolSquad.cpp" />
     <ClCompile Include="src\PlayerArmyManager.cpp" />
     <ClCompile Include="src\PlayerSquad.cpp" />
@@ -134,6 +137,9 @@
     <ClInclude Include="include\GameTime.h" />
     <ClInclude Include="include\Helper.h" />
     <ClInclude Include="include\HoldSquad.h" />
+    <ClInclude Include="include\IntentionMessage.h" />
+    <ClInclude Include="include\IntentionWriter.h" />
+    <ClInclude Include="include\Message.h" />
     <ClInclude Include="include\PatrolSquad.h" />
     <ClInclude Include="include\PlayerArmyManager.h" />
     <ClInclude Include="include\PlayerSquad.h" />

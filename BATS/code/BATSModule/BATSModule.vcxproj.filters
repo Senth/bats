@@ -37,6 +37,12 @@
     <Filter Include="ExplorationAndMap\Resources">
       <UniqueIdentifier>{00609cc1-9f3c-47e8-af76-38f5cd320038}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Intention">
+      <UniqueIdentifier>{cf6ffb07-8034-440e-a9f1-cb0005fde4c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Intention\Message">
+      <UniqueIdentifier>{025b830c-2951-4284-b6d2-567a502190a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -147,6 +153,15 @@
     <ClInclude Include="include\EnemySquad.h">
       <Filter>Classification</Filter>
     </ClInclude>
+    <ClInclude Include="include\IntentionWriter.h">
+      <Filter>Intention</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Message.h">
+      <Filter>Intention\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntentionMessage.h">
+      <Filter>Intention\Message</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BatsDll.cpp">
@@ -256,6 +271,15 @@
     </ClCompile>
     <ClCompile Include="src\EnemySquad.cpp">
       <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntentionWriter.cpp">
+      <Filter>Intention</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Message.cpp">
+      <Filter>Intention\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IntentionMessage.cpp">
+      <Filter>Intention\Message</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
