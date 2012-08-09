@@ -10,8 +10,6 @@
 #include "TypeDefs.h"
 #include "Utilities/Logger.h"
 #include "UnitCompositionFactory.h"
-#include "BTHAIModule/Source/StructureAgent.h"
-#include "BTHAIModule/Source/WorkerAgent.h"
 #include <BWAPI/Unit.h>
 #include <BWTA/Region.h>
 #include <BWTA/Chokepoint.h>
@@ -28,7 +26,7 @@ DefenseManager::DefenseManager() {
 	mSquadManager = NULL;
 	mGameTime = NULL;
 	mUnitCompositionFactory = NULL;
-	mDefensiveStructure = NULL;
+	mDefendUnit = NULL;
 
 	mUnitManager = UnitManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
@@ -486,11 +484,11 @@ void DefenseManager::updateUnderAttackPositions() {
 	mUnderAttack = false;
 
 	// Defend structure
-	if (NULL != mDefensiveStructure) {
-		if (mDefensiveStructure->getUnit()->isUnderAttack()) {
+	if (NULL != mDefendUnit) {
+		if (mDefendUnit->getUnit()->isUnderAttack()) {
 			mUnderAttack = true;
 		} else {
-			mDefensiveStructure = NULL;
+			mDefendUnit = NULL;
 		}
 	}
 
@@ -551,24 +549,30 @@ TilePosition DefenseManager::findRetreatPosition() const {
 	return retreatPos;
 }
 
-void DefenseManager::onStructureUnderAttack(StructureAgent* structure) {
-	if (NULL == mDefensiveStructure && !isUnderAttack()) {
-		PatrolSquadPtr patrolSquad = getPatrolSquad();
-		
-		if (NULL != patrolSquad && !patrolSquad->isDefending()) {
-			mDefensiveStructure = structure;
-			mUnderAttack = true;
-			patrolSquad->defendPosition(structure->getUnit()->getTilePosition(), true);
-		}
-	}
+void DefenseManager::onStructureUnderAttack(BaseAgent* structure) {
+	defendUnit(structure);
 }
 
 #pragma warning(push)
 #pragma warning(disable:4100)
-void DefenseManager::onWorkerUnderAttack(WorkerAgent* worker) {
-	/// @todo
+void DefenseManager::onWorkerUnderAttack(BaseAgent* worker) {
+	defendUnit(worker);
+
+	/// @todo Make the worker and close by workers retreat to a location in the meanwhile.
 }
 #pragma warning(pop)
+
+void DefenseManager::defendUnit(BaseAgent* unit) {
+	if (NULL == mDefendUnit && !isUnderAttack()) {
+		PatrolSquadPtr patrolSquad = getPatrolSquad();
+
+		if (NULL != patrolSquad && !patrolSquad->isDefending()) {
+			mDefendUnit = unit;
+			mUnderAttack = true;
+			patrolSquad->defendPosition(mDefendUnit->getUnit()->getTilePosition(), true);
+		}
+	}
+}
 
 PatrolSquadPtr DefenseManager::getPatrolSquad() {
 	PatrolSquadPtr activePatrolSquad;

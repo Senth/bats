@@ -8,8 +8,7 @@
 
 // Forward declaration
 class UnitAgent;
-class StructureAgent;
-class WorkerAgent;
+class BaseAgent;
 
 // Forward declaration
 namespace BWTA {
@@ -81,13 +80,13 @@ public:
 	 * Called when a structures is under attack
 	 * @param structure the structure that is under attack
 	 */
-	void onStructureUnderAttack(StructureAgent* structure);
+	void onStructureUnderAttack(BaseAgent* structure);
 
 	/**
 	 * Called when a worker is under attack, but only if the worker is not in a squad.
 	 * @param worker the worker that is under attack
 	 */
-	void onWorkerUnderAttack(WorkerAgent* worker);
+	void onWorkerUnderAttack(BaseAgent* worker);
 
 private:
 	/**
@@ -190,6 +189,13 @@ private:
 	 */
 	PatrolSquadCstPtr getPatrolSquad() const;
 
+	/**
+	 * Defend unit, sends the patrol squad (if it's not defending anything else)
+	 * to the specified location.
+	 * @param unit the unit to defend
+	 */
+	void defendUnit(BaseAgent* unit);
+
 	struct DefendPosition {
 		BWTA::Chokepoint const * const pChokepoint;
 		const BWAPI::TilePosition position;
@@ -244,7 +250,7 @@ private:
 	SquadManager* mSquadManager;
 	GameTime* mGameTime;
 	UnitCompositionFactory* mUnitCompositionFactory;
-	StructureAgent* mDefensiveStructure;
+	BaseAgent* mDefendUnit;
 
 	bool mUnderAttack;
 	typedef std::set<DefendPosition> DefendSet;
