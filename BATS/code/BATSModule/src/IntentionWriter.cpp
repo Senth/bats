@@ -155,13 +155,15 @@ void IntentionWriter::handleReasonVariable(const utilities::VariableInfo& variab
 
 void IntentionWriter::initStringToEnumWrappers() {
 	// Intentions
+	mIntentionStringToEnums["AlliedAttackFollow"] = Intention_AlliedAttackFollow;
 	mIntentionStringToEnums["BotAttack"] = Intention_BotAttack;
+	mIntentionStringToEnums["BotAttackNot"] = Intention_BotAttackNot;
+	mIntentionStringToEnums["BotComingToAid"] = Intention_BotComingToAid;
+	mIntentionStringToEnums["BotComingToAidNot"] = Intention_BotComingToAidNot;
 	mIntentionStringToEnums["BotDrop"] = Intention_BotDrop;
 	mIntentionStringToEnums["BotRetreat"] = Intention_BotRetreat;
 	mIntentionStringToEnums["BotExpand"] = Intention_BotExpand;
-	mIntentionStringToEnums["BotComingToAid"] = Intention_BotComingToAid;
-
-
+	
 	ERROR_MESSAGE_CONDITION(mIntentionStringToEnums.size() != Intention_Lim,
 		false,
 		"IntentionWriter: Intentions enum does not have same size as mIntentionStringToEnums!"
@@ -170,6 +172,10 @@ void IntentionWriter::initStringToEnumWrappers() {
 
 	// Reasons
 	mReasonStringToEnums["AlliedExpanding"] = Reason_AlliedExpanding;
+	mReasonStringToEnums["AlliedMovingToAttack"] = Reason_AlliedMovingToAttack;
+	mReasonStringToEnums["BotNotEnoughUnits"] = Reason_BotNotEnoughUnits;
+	mReasonStringToEnums["BotTooManyAttacks"] = Reason_BotTooManyAttacks;
+	mReasonStringToEnums["BotIsUnderAttack"] = Reason_BotIsUnderAttack;
 
 	ERROR_MESSAGE_CONDITION(mReasonStringToEnums.size() != Reason_Lim,
 		false,

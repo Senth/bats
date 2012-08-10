@@ -18,11 +18,14 @@ namespace bats {
  * All the different types of intentions
  */
 enum Intentions {
+	Intention_AlliedAttackFollow, /**< Will follow the allied attacking squad */
 	Intention_BotAttack, /**< A regular attack by the enemy */
+	Intention_BotAttackNot, /**< It's not possible to create another attack */
+	Intention_BotComingToAid, /**< The bot is coming to aid the player in defending */
+	Intention_BotComingToAidNot, /**< Bot will not help the allied with defending */
 	Intention_BotDrop, /**< Does a drop */
 	Intention_BotRetreat, /**< The bot retreats from a battle */
 	Intention_BotExpand, /**< The bot is about to expand */
-	Intention_BotComingToAid, /**< The bot is coming to aid the player in defending */
 
 	Intention_Lim /**< Invalid intention */
 };
@@ -32,6 +35,10 @@ enum Intentions {
  */
 enum Reasons {
 	Reason_AlliedExpanding, /**< The allied started to build an expansion */
+	Reason_AlliedMovingToAttack, /**< Allied squad is moving out to attack */
+	Reason_BotNotEnoughUnits, /**< Bot does not have enough units for the action */
+	Reason_BotTooManyAttacks, /**< The bot has too many attacks for the action */
+	Reason_BotIsUnderAttack, /**< Bot is under attack */
 
 	Reason_Lim /**< Invalid reason */
 };
