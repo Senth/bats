@@ -56,7 +56,6 @@
 
 %\usepackage[top=3cm, bottom=2.8cm, left=2.7cm, right=2.7cm]{geometry} % to make nice page margins to squezze more or less text on a page
 
-\newcommand{\conf}{\textsuperscript{*}}
 \newcommand{\rbracket}{]}
 
 % *** GRAPHICS RELATED PACKAGES ***
@@ -149,6 +148,40 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 %\makeindex
 
 %\typeout{bth CS Dissertation Example File `guide.tex' <June 23, 2007>.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%				CONFIG VARIABLES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\conf}{\textsuperscript{*}}
+% attack coordinator
+\newcommand{\attackCoordinatorExpansionNotCheckedTime}{150\conf seconds}
+\newcommand{\attackCoordinatorWaitGoalTimeout}{30\conf seconds}
+% attack coordinator - weights
+\newcommand{\attackCoordinatorWeightsExpansionNotChecked}{1.0\conf}
+\newcommand{\attackCoordinatorWeightsExpansionMinMax}{[0.0, 1.0]\conf}
+\newcommand{\attackCoordinatorWeightsExpansionCeil}{on\conf}
+\newcommand{\attackCoordinatorWeightsAddonStructure}{0.4\conf}
+\newcommand{\attackCoordinatorWeightsSupplyStructure}{0.35\conf}
+\newcommand{\attackCoordinatorWeightsUpgradeStructure}{0.3\conf}
+\newcommand{\attackCoordinatorWeightsUnitProducingStructure}{0.2\conf}
+\newcommand{\attackCoordinatorWeightsOtherStructure}{0.1\conf}
+% squad
+\newcommand{\squadRegroupDistanceBegin}{12\conf tiles}
+\newcommand{\squadRegroupDistanceEnd}{10\conf tiles}
+% squad - attack
+\newcommand{\squadAttackWaitingPositionDistanceFromGoal}{25\conf tiles}
+\newcommand{\squadAttackStructuresDestroyedGoalDistance}{15\conf tiles}
+\newcommand{\squadAttackFindAlliedSquadDistance}{30\conf tiles}
+\newcommand{\squadAttackAlliedRegroupBegin}{15\conf tiles}
+\newcommand{\squadAttackAlliedRegroupEnd}{10\conf tiles}
+% squad - drop
+\newcommand{\squadDropAttackTimeout}{90\conf seconds}
+% squad - defend
+\newcommand{\squadDefendRoamDistanceMinMax}{[5, 8]\conf tiles}
+\newcommand{\squadDefendRoamPerimeter}{4\conf tiles}
+\newcommand{\squadDefendDefendPerimeter}{7\conf tiles}
+\newcommand{\squadDefendEnemyOffensivePerimeter}{12\conf tiles}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

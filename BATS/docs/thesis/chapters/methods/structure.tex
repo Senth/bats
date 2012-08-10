@@ -6,3 +6,15 @@ After the overview we will give a detailed description of all the important feat
 
 \paragraph{Configurable variables}
 Many fixed variables in BATS are configurable from a config.ini file. This design choice was made to easily tweak these variables in-game, instead of having to recompile, start the game, wait until the game state is present (necessary buildings have been built). The configuration file could be reloaded anytime in-game using \emph{/reload config} command. Throughout the method section these will be presented with their current value, variables that are configurable will have a superscript of \conf attached to it, e.g. 150\conf seconds. If a range has a superscript, e.g. [0.0, 1.0]\conf both 0.0 and 1.0 is configurable.
+
+\paragraph{Words you should now TODO}
+There are a couple of words that needs explaining before digging into the details.
+
+\begin{description}
+	\item[Region \& choke point] A typical map from StarCraft contains many regions, the regions are (often) big open spaces divided by choke points—narrow paths, e.g. paths moving up or down a cliff. A region could be fully isolated, this means it can only be reached by air—BATS does not work on these kind of maps, all regions must be connected in one way or the other. Regions and chokepoints are illustrated in 
+	\begin{figure}
+		%: Add picture of regions and choke points
+		\caption[Regions and choke points]{Regions and choke points. Regions are surrounded by blue lines and choke points are denoted by a red line.}
+		\label{fig:region_and_choke_points}
+	\end{figure}
+\end{description}
