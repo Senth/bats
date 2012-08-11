@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <set>
+#include <map>
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
 #include "TypeDefs.h"
@@ -58,7 +58,7 @@ public:
 	 * BATS-data\config.ini, if a ping has been assigned it will then wait for a second ping
 	 * for y seconds. If a new command is specified it will complete the current command.
 	 */
-	virtual bool issueCommand(const std::string& command);
+	virtual void issueCommand(const std::string& command);
 
 	/**
 	 * Checks whether the command is an available command that the Commander should handle.
@@ -66,14 +66,6 @@ public:
 	 * @return true if the command is available, else false.
 	 */
 	virtual bool isCommandAvailable(const std::string& command) const;
-
-	/**
-	 * Returns a location where the specified squad shall retreat to
-	 * @param squad the squad that asks for a retreat
-	 * @return position the squad shall retreat to, TilePositions::Invalid if the squad
-	 * shall not retreat anywhere but stay and fight!
-	 */
-	virtual BWAPI::TilePosition getRetreatPosition(SquadRef squad) const;
 	
 private:
 	/**
@@ -82,39 +74,72 @@ private:
 	Commander();
 
 	/**
+	 * All command that can be ordered to the commander, both from allied and the bot itself
+	 */
+	enum Commands {
+		Command_Attack,
+		Command_Drop,
+		Command_Expand,
+		Command_Scout,
+
+		Command_Lim
+	};
+
+	/**
+	 * Tries to issue an command
+	 * @param command the command to issue
+	 * @param alliedOrdered true if it was the allied player that ordered the command
+	 */
+	virtual void issueCommand(Commands command, bool alliedOrdered);
+
+	/**
 	 * Computes reactive player behavior, i.e. if it shall attack when an allied moves
 	 * out to attack etc.
 	 */
 	void computeReactions();
 
 	/**
-	 * Finishes and executes the squad command.
+	 * Finishes and executes the squad command ordered by the player.
 	 */
-	void finishWaitingSquad();
+	void finishAlliedCreatingCommand();
 
 	/**
 	 * Initiates an attack
+	 * @param alliedOrdered if it was the allied who ordered the attack
 	 */
-	void createAttack();
+	void orderAttack(bool alliedOrdered);
 
 	/**
 	 * Initiates a drop
+	 * @param alliedOrdered if it was the allied who ordered the drop
 	 */
-	void createDrop();
+	void orderDrop(bool alliedOrdered);
 
 	/**
 	 * Initiates a scout
+	 * @param alliedOrdered if it was the allied who ordered the scout
 	 */
-	void createScout();
+	void orderScout(bool alliedOrdered);
 
-	SquadPtr mSquadWaiting;
-	SquadManager* mpSquadManager;
-	UnitManager* mpUnitManager;
-	UnitCompositionFactory* mpUnitCompositionFactory;
-	PlayerArmyManager* mpAlliedArmyManager;
+	/**
+	 * Initialize string to enumerations for the commands
+	 */
+	void initStringToEnums();
 
-	std::set<const std::string> mAvailableCommands;
+	/**
+	 * Checks if the allied has an active ordered command being created.
+	 * @return true if the allied has an active command that is currently being created
+	 */
+	bool isAlliedCreatingCommand() const;
 
-	static Commander* mpsInstance;
+	SquadPtr mAlliedSquadCommand;
+	SquadManager* mSquadManager;
+	UnitManager* mUnitManager;
+	UnitCompositionFactory* mUnitCompositionFactory;
+	PlayerArmyManager* mAlliedArmyManager;
+
+	std::map<std::string, Commands> mCommandStringToEnums;
+
+	static Commander* msInstance;
 };
 }

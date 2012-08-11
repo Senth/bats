@@ -112,10 +112,10 @@ protected:
 	virtual bool createGoal();
 	virtual GoalStates checkGoalState() const;
 
-	static AttackCoordinator* mpsAttackCoordinator;
-	static ExplorationManager* mpsExplorationManager;
-	static PlayerArmyManager* mpsPlayerArmyManager;
-	static DefenseManager* mpsDefenseManager;
+	static AttackCoordinator* msAttackCoordinator;
+	static ExplorationManager* msExplorationManager;
+	static PlayerArmyManager* msPlayerArmyManager;
+	static DefenseManager* msDefenseManager;
 private:
 	/**
 	 * Check if the squad needs to regroup with the allied forces.

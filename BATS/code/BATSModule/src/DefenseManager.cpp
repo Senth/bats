@@ -1,5 +1,6 @@
 #include "DefenseManager.h"
 #include "UnitManager.h"
+#include "IntentionWriter.h"
 #include "SquadManager.h"
 #include "PatrolSquad.h"
 #include "HoldSquad.h"
@@ -27,11 +28,18 @@ DefenseManager::DefenseManager() {
 	mGameTime = NULL;
 	mUnitCompositionFactory = NULL;
 	mDefendUnit = NULL;
+	mDefendAlliedUnit = NULL;
+	mIntentionWriter = NULL;
 
 	mUnitManager = UnitManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
 	mGameTime = GameTime::getInstance();
 	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
+	mIntentionWriter = IntentionWriter::getInstance();
+
+	mUnderAttack = false;
+	mAlliedUnderAttack = false;
+	mDefendingAllied = false;
 
 	mFrameCallLast = 0;
 }
@@ -408,7 +416,7 @@ void DefenseManager::updatePatrolSquad() {
 
 	PatrolSquadPtr activePatrolSquad = getPatrolSquad();
 
-	// Add free units to the defense move squads, except transportations
+	// Add remaining units
 	if (!freeUnits.empty()) {
 		if (NULL == activePatrolSquad) {
 			PatrolSquad* pNewSquad = new PatrolSquad(freeUnits);
@@ -422,6 +430,11 @@ void DefenseManager::updatePatrolSquad() {
 
 	// Set patrol position and defend position
 	if (NULL != activePatrolSquad) {
+		// If patrol squad is not defending anything, that means we're not defending an allied either
+		if (!activePatrolSquad->isDefending()) {
+			mDefendingAllied = false;
+		}
+
 		// Patrol
 		// Get all our defended positions
 		set<TilePosition> patrolPositions;
@@ -438,9 +451,32 @@ void DefenseManager::updatePatrolSquad() {
 			while (defendIt != mDefendPositions.end() && !activePatrolSquad->isDefending()) {
 				if (defendIt->underAttack) {
 					activePatrolSquad->defendPosition(defendIt->position);
+
+					// Defending player? Tell him that
+					if (defendIt->isAllied && !defendIt->isOur) {
+						mIntentionWriter->writeIntention(Intention_BotComingToAid);
+						mDefendingAllied = true;
+					}
 				}
 				++defendIt;
 			}
+		}
+
+		// Still not defending anything, check if allied need defending help with a structure?
+		if (!activePatrolSquad->isDefending() && NULL != mDefendAlliedUnit) {
+			mDefendingAllied = true;
+			mIntentionWriter->writeIntention(Intention_BotComingToAid);
+			defendUnit(mDefendAlliedUnit);
+		}
+
+		if (!mDefendingAllied && mAlliedUnderAttack) {
+			mIntentionWriter->writeIntention(Intention_BotComingToAidNot, Reason_BotIsUnderAttack);
+		}
+	} else {
+		mDefendingAllied = false;
+
+		if (mAlliedUnderAttack) {
+			mIntentionWriter->writeIntention(Intention_BotComingToAidNot, Reason_BotNotEnoughUnits);
 		}
 	}
 }
@@ -482,15 +518,26 @@ void DefenseManager::printGraphicDebugInfo() const {
 
 void DefenseManager::updateUnderAttackPositions() {
 	mUnderAttack = false;
+	mAlliedUnderAttack = false;
 
-	// Defend structure
+	// Defend unit
 	if (NULL != mDefendUnit) {
-		if (mDefendUnit->getUnit()->isUnderAttack()) {
+		if (mDefendUnit->isUnderAttack()) {
 			mUnderAttack = true;
 		} else {
 			mDefendUnit = NULL;
 		}
 	}
+	// Allied defend unit
+	if (NULL != mDefendAlliedUnit) {
+		if (mDefendAlliedUnit->isUnderAttack()) {
+			mUnderAttack = true;
+			mAlliedUnderAttack = true;
+		} else {
+			mDefendAlliedUnit = NULL;
+		}
+	}
+
 
 	// Hold choke points
 	DefendSet::iterator defendPosIt;
@@ -498,8 +545,37 @@ void DefenseManager::updateUnderAttackPositions() {
 		if (isEnemyWithinRadius(defendPosIt->position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
 			mUnderAttack = true;
 			defendPosIt->underAttack = true;
+
+			if (defendPosIt->isAllied && !defendPosIt->isOur) {
+				mAlliedUnderAttack = true;
+			}
+
 		} else {
 			defendPosIt->underAttack = false;
+		}
+	}
+
+
+	// If patrol squad is defending somewhere, we're under attack
+	PatrolSquadPtr patrolSquad = getPatrolSquad();
+	if (NULL != patrolSquad && patrolSquad->isDefending()) {
+		mUnderAttack = true;
+	}
+
+
+	// Check if allied is under attack, break when is under attack
+	if (!mAlliedUnderAttack) {
+		const set<Player*>& allies = Broodwar->allies();
+		set<Player*>::const_iterator alliedIt = allies.begin();
+		while (!mAlliedUnderAttack && alliedIt != allies.end()) {
+			const set<Unit*>& units = (*alliedIt)->getUnits();
+			set<Unit*>::const_iterator unitIt = units.begin();
+			while (!mAlliedUnderAttack && unitIt != units.end()) {
+				if ((*unitIt)->getType().isBuilding() && (*unitIt)->isUnderAttack()) {
+					mAlliedUnderAttack = true;
+					mDefendAlliedUnit = (*unitIt);
+				}
+			}
 		}
 	}
 }
@@ -550,26 +626,26 @@ TilePosition DefenseManager::findRetreatPosition() const {
 }
 
 void DefenseManager::onStructureUnderAttack(BaseAgent* structure) {
-	defendUnit(structure);
+	defendUnit(structure->getUnit());
 }
 
 #pragma warning(push)
 #pragma warning(disable:4100)
 void DefenseManager::onWorkerUnderAttack(BaseAgent* worker) {
-	defendUnit(worker);
+	defendUnit(worker->getUnit());
 
 	/// @todo Make the worker and close by workers retreat to a location in the meanwhile.
 }
 #pragma warning(pop)
 
-void DefenseManager::defendUnit(BaseAgent* unit) {
+void DefenseManager::defendUnit(Unit* unit) {
 	if (NULL == mDefendUnit && !isUnderAttack()) {
 		PatrolSquadPtr patrolSquad = getPatrolSquad();
 
 		if (NULL != patrolSquad && !patrolSquad->isDefending()) {
 			mDefendUnit = unit;
 			mUnderAttack = true;
-			patrolSquad->defendPosition(mDefendUnit->getUnit()->getTilePosition(), true);
+			patrolSquad->defendPosition(mDefendUnit->getTilePosition(), true);
 		}
 	}
 }

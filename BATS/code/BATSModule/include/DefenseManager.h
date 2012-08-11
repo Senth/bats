@@ -14,6 +14,9 @@ class BaseAgent;
 namespace BWTA {
 	class Region;
 }
+namespace BWAPI {
+	class Unit;
+}
 
 // Namespace for the project
 namespace bats {
@@ -23,6 +26,7 @@ class UnitManager;
 class SquadManager;
 class GameTime;
 class UnitCompositionFactory;
+class IntentionWriter;
 
 /**
  * Manages the defense for the team. Creates DefensiveHoldSquad and DefensivePatrolSquad
@@ -194,7 +198,7 @@ private:
 	 * to the specified location.
 	 * @param unit the unit to defend
 	 */
-	void defendUnit(BaseAgent* unit);
+	void defendUnit(BWAPI::Unit* unit);
 
 	struct DefendPosition {
 		BWTA::Chokepoint const * const pChokepoint;
@@ -250,9 +254,13 @@ private:
 	SquadManager* mSquadManager;
 	GameTime* mGameTime;
 	UnitCompositionFactory* mUnitCompositionFactory;
-	BaseAgent* mDefendUnit;
+	BWAPI::Unit* mDefendUnit;
+	BWAPI::Unit* mDefendAlliedUnit;
+	IntentionWriter* mIntentionWriter;
 
 	bool mUnderAttack;
+	bool mAlliedUnderAttack;
+	bool mDefendingAllied;
 	typedef std::set<DefendPosition> DefendSet;
 	DefendSet mDefendPositions;
 

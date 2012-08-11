@@ -1,7 +1,7 @@
 #include "DropSquad.h"
 #include "GameTime.h"
 #include "Config.h"
-#include "Commander.h"
+#include "DefenseManager.h"
 #include "Helper.h"
 #include "BTHAIModule/Source/TransportAgent.h"
 #include <vector>
@@ -431,7 +431,7 @@ void DropSquad::onGoalFailed() {
 	if (hasAttackTimedOut()) {
 
 		// Retreat then disband
-		TilePosition retreatPos = Commander::getInstance()->getRetreatPosition(getThis());
+		TilePosition retreatPos = msDefenseManager->findRetreatPosition();
 
 		if (retreatPos != TilePositions::Invalid) {
 			setRetreatPosition(retreatPos);

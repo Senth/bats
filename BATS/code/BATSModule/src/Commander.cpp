@@ -22,43 +22,37 @@ using namespace std::tr1;
 using namespace std;
 using namespace BWAPI;
 
-Commander* Commander::mpsInstance = NULL;
+Commander* Commander::msInstance = NULL;
 
 Commander::Commander() {
-	mpUnitCompositionFactory = NULL;
-	mpUnitManager = NULL;
-	mpSquadManager = NULL;
-	mpAlliedArmyManager = NULL;
+	mUnitCompositionFactory = NULL;
+	mUnitManager = NULL;
+	mSquadManager = NULL;
+	mAlliedArmyManager = NULL;
 
-	mpAlliedArmyManager = PlayerArmyManager::getInstance();
-	mpSquadManager = SquadManager::getInstance();
-	mpUnitManager = UnitManager::getInstance();
-	mpUnitCompositionFactory = UnitCompositionFactory::getInstance();
+	mAlliedArmyManager = PlayerArmyManager::getInstance();
+	mSquadManager = SquadManager::getInstance();
+	mUnitManager = UnitManager::getInstance();
+	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
 
-	mAvailableCommands.insert("abort");
-	mAvailableCommands.insert("attack");
-	//mAvailableCommands.insert("counter-attack");
-	mAvailableCommands.insert("drop");
-	mAvailableCommands.insert("expand");
-	//mAvailableCommands.insert("move");
-	mAvailableCommands.insert("scout");
+	initStringToEnums();
 }
 
 Commander::~Commander() {
-	SAFE_DELETE(mpUnitCompositionFactory);
+	SAFE_DELETE(mUnitCompositionFactory);
 
-	mpSquadManager = NULL;
-	mpUnitManager = NULL;
-	mpAlliedArmyManager = NULL;
+	mSquadManager = NULL;
+	mUnitManager = NULL;
+	mAlliedArmyManager = NULL;
 
-	mpsInstance = NULL;
+	msInstance = NULL;
 }
 
 Commander* Commander::getInstance() {
-	if (mpsInstance == NULL) {
-		mpsInstance = new Commander();
+	if (msInstance == NULL) {
+		msInstance = new Commander();
 	}
-	return mpsInstance;
+	return msInstance;
 }
 
 void Commander::computeActions() {
@@ -67,7 +61,7 @@ void Commander::computeActions() {
 	/// @todo Commander computer actions more complex actions
 
 	computeReactions();
-	mpSquadManager->update();
+	mSquadManager->update();
 
 	Profiler::getInstance()->end("Commander::update()");
 }
@@ -78,7 +72,7 @@ void Commander::computeReactions() {
 	}
 
 	// Check for active allied squads
-	vector<AlliedSquadCstPtr> squads = mpAlliedArmyManager->getSquads<AlliedSquad>();
+	vector<AlliedSquadCstPtr> squads = mAlliedArmyManager->getSquads<AlliedSquad>();
 	bool bigActive = false;
 	bool smallActive = false;
 	for (size_t i = 0; i < squads.size(); ++i) {
@@ -95,19 +89,19 @@ void Commander::computeReactions() {
 	
 	// Big is active -> we don't have any frontal attack, create frontal attack
 	if (bigActive) {
-		const AttackSquadPtr& frontalSquad = mpSquadManager->getFrontalAttack();
+		const AttackSquadPtr& frontalSquad = mSquadManager->getFrontalAttack();
 
 		if (NULL == frontalSquad) {
-			issueCommand("attack");
+			issueCommand(Command_Attack, false);
 		}
 	}
 
 	// Small is active -> Create distraction if we don't have a distraction out
 	if (smallActive) {
-		const vector<AttackSquadPtr>& distractingAttacks = mpSquadManager->getDistractingAttacks();
+		const vector<AttackSquadPtr>& distractingAttacks = mSquadManager->getDistractingAttacks();
 
 		if (distractingAttacks.empty()) {
-			issueCommand("drop");
+			issueCommand(Command_Drop, false);
 		}
 	}
 
@@ -115,45 +109,61 @@ void Commander::computeReactions() {
 	// @todo check for player expanding
 }
 
-bool Commander::issueCommand(const std::string& command) {
-	/// @todo implement when we have onMinimapPing event.
-	//if (mpSquadWaiting != NULL) {
-	//	finishWaitingSquad();
-	//}
+void Commander::issueCommand(const std::string& command) {
+	if (isCommandAvailable(command)) {
+		issueCommand(mCommandStringToEnums[command], true);
+	}
+}
 
-	if (command == "attack") {
-		createAttack();
-	} else if (command == "drop") {
-		createDrop();
-	} else if (command == "harass") {
-		/// @todo harass command
-	} else if (command == "counter-attack") {
-		/// @todo counter-attack command
-	} else if (command == "expand") {
+void Commander::issueCommand(Commands command, bool alliedOrdered) {
+	if (isAlliedCreatingCommand()) {
+		// Allied ordered a new command, finish the old one.
+		if (alliedOrdered) {
+			finishAlliedCreatingCommand();
+		}
+		// Don't let command override the allied player already creating an command.
+		else {
+			return;
+		}
+	}
+
+
+	switch(command) {
+	case Command_Attack:
+		orderAttack(alliedOrdered);
+		break;
+
+	case Command_Drop:
+		orderDrop(alliedOrdered);
+		break;
+
+	case Command_Expand:
 		if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter()))
 			BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
 		else
-			BWAPI::Broodwar->printf("Expansion not available yet");
-	} else if (command == "move") {
-		/// @todo move command
-	} else if (command == "scout") {
-		createScout();
+			DEBUG_MESSAGE(utilities::LogLevel_Info, "Expansion not available yet");
+		break;
+
+	case Command_Scout:
+		orderScout(alliedOrdered);
+		break;
+
+		/// @todo abort command
+
+	default:
+		ERROR_MESSAGE(false, "Commander: Unknown Command type!");
+		break;
 	}
-	/// @todo abort
-
-	/// @todo don't remove activating squad directly 
-	finishWaitingSquad();
-
-	return true;
+	
 }
 
 bool Commander::isCommandAvailable(const std::string& command) const {
-	size_t cCommand = mAvailableCommands.count(command);
-	return cCommand == 1;
+	size_t cCommands = mCommandStringToEnums.count(command);
+	return cCommands == 1;
 }
 
-void Commander::finishWaitingSquad() {
-	if (mSquadWaiting == NULL) {
+void Commander::finishAlliedCreatingCommand() {
+	if (mAlliedSquadCommand == NULL) {
 		return;
 	}
 
@@ -165,33 +175,28 @@ void Commander::finishWaitingSquad() {
 	
 	// No path, do we create a path or do we let the squad create the path?
 
-	mSquadWaiting->activate();
-	mSquadWaiting.reset();
+	mAlliedSquadCommand->activate();
+	mAlliedSquadCommand.reset();
 }
 
-void Commander::createAttack() {
-	// Handle already existing waiting squad.
-	if (NULL != mSquadWaiting) {
-		finishWaitingSquad();
-	}
-
-
+#pragma warning(push)
+#pragma warning(disable:4100)
+void Commander::orderAttack(bool alliedOrdered) {
 	/// @todo If we have a frontal attack and allied has a big attack and frontal attack
 	/// isn't following any attack. Follow frontal attack now.
-
 
 	/// @todo Never do a frontal attack if we're under attack (defending)
 
 
 	// Get free units
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free);
+	std::vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
 	// Only add if we have free units
 	if (!freeUnits.empty()) {
 		// Add the units to the old attack squad if it exists
 		shared_ptr<AttackSquad> oldSquad;
-		std::map<SquadId, shared_ptr<Squad>>::iterator squadIt = mpSquadManager->begin();
-		while (oldSquad == NULL && squadIt != mpSquadManager->end()) {
+		map<SquadId, shared_ptr<Squad>>::iterator squadIt = mSquadManager->begin();
+		while (oldSquad == NULL && squadIt != mSquadManager->end()) {
 			if (squadIt->second->getName() == "AttackSquad") {
 				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
 			}
@@ -201,27 +206,20 @@ void Commander::createAttack() {
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
 		} else {
-			AttackSquad* attackSquad = new AttackSquad(freeUnits);
-			mSquadWaiting = attackSquad->getThis();
+			new AttackSquad(freeUnits);
 		}
 	}
 }
 
-void Commander::createDrop() {
-	/// @todo handle already existing waiting squad
-	if (NULL != mSquadWaiting) {
-		finishWaitingSquad();
-	}
-
-
+void Commander::orderDrop(bool alliedOrdered) {
 	/// @todo Check how many attacks we have (frontal, distracting)
 	/// Can we create a distracting attack?
 
 
 	// Get available unit compositions
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
-	std::vector<UnitComposition> availableUnitCompositions;
-	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
+	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
+	vector<UnitComposition> availableUnitCompositions;
+	availableUnitCompositions = mUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
 
 
 	// Create drop
@@ -230,8 +228,7 @@ void Commander::createDrop() {
 		unsigned int randomId = rand() % availableUnitCompositions.size();
 		const UnitComposition& chosenComposition = availableUnitCompositions[randomId];
 
-		DropSquad* pDropSquad = new DropSquad(freeUnits, chosenComposition);
-		mSquadWaiting = pDropSquad->getThis();
+		new DropSquad(freeUnits, chosenComposition);
 	}
 	// No drops available
 	else {
@@ -243,12 +240,7 @@ void Commander::createDrop() {
 	}
 }
 
-void Commander::createScout() {
-	/// @todo handle already existing waiting squad
-	if (NULL != mSquadWaiting) {
-		finishWaitingSquad();
-	}
-
+void Commander::orderScout(bool alliedOrdered) {
 	/// @todo what about existing scout, remove it?
 	
 	// Get available unit compositions
@@ -260,7 +252,7 @@ void Commander::createScout() {
 	//mSquadWaiting = pScoutSuad->getThis();
 	
 	// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
-	std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
+	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
 
 	// Get all unit compositions that can be created from the specified units.
 	// I.e. it will try to fill up all the slots in the unit compositions, those that can be fully
@@ -270,23 +262,27 @@ void Commander::createScout() {
 	// all three compositions; these will then be returned sorted by the highest priority.
 	// Meaning if Wraith has priority 3, Vulture priority 2, and SCV priority 1,
 	// element [0] -> Wrait Unit composition, [1] -> Vulture, [2] -> SCV.
-	std::vector<UnitComposition> availableUnitCompositions;
-	availableUnitCompositions = mpUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Scout);
+	vector<UnitComposition> availableUnitCompositions;
+	availableUnitCompositions = mUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Scout);
 
 	// Create a squad with the highest composition.
 	if (!availableUnitCompositions.empty()) {
-		ScoutSquad* pScoutSquad = new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
-		mSquadWaiting = pScoutSquad->getThis();
+		new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
+	}
+}
+#pragma warning(pop)
+
+void Commander::initStringToEnums() {
+	mCommandStringToEnums["attack"] = Command_Attack;
+	mCommandStringToEnums["drop"] = Command_Drop;
+	mCommandStringToEnums["expand"] = Command_Expand;
+	mCommandStringToEnums["scout"] = Command_Scout;
+
+	if (mCommandStringToEnums.size() != Command_Lim) {
+		ERROR_MESSAGE(false, "Commander: Command String to enum does not have same size as enumerations!");
 	}
 }
 
-#pragma warning(push)	// Disabled until the squad is actually used.
-#pragma warning(disable:4100)
-TilePosition Commander::getRetreatPosition(const shared_ptr<Squad>& squad) const {
-	/// @todo check if the squad shall stay and fight instead of retreating
-
-	/// @todo get a better retreat position than a good choke point
-
-	return CoverMap::getInstance()->findChokepoint();
+bool Commander::isAlliedCreatingCommand() const {
+	return NULL != mAlliedSquadCommand;
 }
-#pragma warning(pop)

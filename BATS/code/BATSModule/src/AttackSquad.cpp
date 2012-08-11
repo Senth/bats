@@ -16,10 +16,10 @@ using namespace BWAPI;
 using namespace std::tr1;
 using namespace std;
 
-AttackCoordinator* AttackSquad::mpsAttackCoordinator = NULL;
-ExplorationManager* AttackSquad::mpsExplorationManager = NULL;
-PlayerArmyManager* AttackSquad::mpsPlayerArmyManager = NULL;
-DefenseManager* AttackSquad::mpsDefenseManager = NULL;
+AttackCoordinator* AttackSquad::msAttackCoordinator = NULL;
+ExplorationManager* AttackSquad::msExplorationManager = NULL;
+PlayerArmyManager* AttackSquad::msPlayerArmyManager = NULL;
+DefenseManager* AttackSquad::msDefenseManager = NULL;
 
 const std::string ATTACK_SQUAD_NAME = "AttackSquad";
 
@@ -34,11 +34,11 @@ AttackSquad::AttackSquad(
 	mWaitInPosition = false;
 	mAttackedEnemyStructures = false;
 
-	if (mpsAttackCoordinator == NULL) {
-		mpsAttackCoordinator = AttackCoordinator::getInstance();
-		mpsExplorationManager = ExplorationManager::getInstance();
-		mpsPlayerArmyManager = PlayerArmyManager::getInstance();
-		mpsDefenseManager = DefenseManager::getInstance();
+	if (msAttackCoordinator == NULL) {
+		msAttackCoordinator = AttackCoordinator::getInstance();
+		msExplorationManager = ExplorationManager::getInstance();
+		msPlayerArmyManager = PlayerArmyManager::getInstance();
+		msDefenseManager = DefenseManager::getInstance();
 	}
 }
 
@@ -129,7 +129,7 @@ void AttackSquad::handleFollowAllied() {
 		mpAlliedSquadFollow.reset();
 
 		vector<pair<AlliedSquadCstPtr, int>> foundSquads =
-			mpsPlayerArmyManager->getSquadsWithin<AlliedSquad>(
+			msPlayerArmyManager->getSquadsWithin<AlliedSquad>(
 			getCenter(),
 			config::squad::attack::FIND_ALLIED_SQUAD_DISTANCE,
 			true
@@ -182,20 +182,20 @@ void AttackSquad::handleFollowAllied() {
 				handleAlliedRegrouping();
 				if (!isRegroupingWithAllied()) {
 					setAvoidEnemyUnits(false);
-					mpsAttackCoordinator->requestAttack(getThis());
+					msAttackCoordinator->requestAttack(getThis());
 				}
 				break;
 
 			// Allied is safe -> retreat, then merge with Patrol Squad (disband)
 			case AlliedSquad::State_IdleInBase:
-				setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+				setRetreatPosition(msDefenseManager->findRetreatPosition());
 				mpAlliedSquadFollow.reset();
 				break;
 		}
 	}
 	// Did not find an allied squad -> retreat, then merge with Patrol Squad (disband)
 	else {
-		setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+		setRetreatPosition(msDefenseManager->findRetreatPosition());
 	}
 }
 
@@ -206,7 +206,7 @@ void AttackSquad::handleRetreat() {
 	}
 
 
-	EnemySquadCstPtr pEnemy = mpsPlayerArmyManager->getClosestSquad<EnemySquad>(
+	EnemySquadCstPtr pEnemy = msPlayerArmyManager->getClosestSquad<EnemySquad>(
 		getCenter(),
 		config::classification::retreat::ENEMY_CLOSE_DISTANCE).first;
 
@@ -256,7 +256,7 @@ void AttackSquad::handleRetreat() {
 	if (retreat) {
 		// Not following any allied squad
 		if (NULL == mpAlliedSquadFollow) {
-			setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+			setRetreatPosition(msDefenseManager->findRetreatPosition());
 		}
 		/// @todo Following allied squad, say that it's probably a good idea to retreat
 		else {
@@ -268,7 +268,7 @@ void AttackSquad::handleRetreat() {
 bool AttackSquad::createGoal() {
 	// Check if allied big frontal attack is out of home
 	if (NULL == mpAlliedSquadFollow && isFrontalAttack()) {
-		AlliedSquadCstPtr pBigAlliedSquad = mpsPlayerArmyManager->getAlliedFrontalSquad();
+		AlliedSquadCstPtr pBigAlliedSquad = msPlayerArmyManager->getAlliedFrontalSquad();
 
 		// Check if squad is outside of home
 		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
@@ -282,7 +282,7 @@ bool AttackSquad::createGoal() {
 
 	// Not following allied -> request regular attack
 	if (NULL == mpAlliedSquadFollow) {
-		mpsAttackCoordinator->requestAttack(getThis());
+		msAttackCoordinator->requestAttack(getThis());
 	}
 
 	return true;
@@ -310,7 +310,7 @@ bool AttackSquad::isEnemyStructuresNearGoalDead() const {
 	/// @todo check the whole radius for buildings, some structures might be hidden from the view
 	/// all will therefore not be seen (and thus the goal is completed when it should not be).
 	if (Broodwar->isVisible(getGoalPosition()) &&
-		!mpsExplorationManager->hasSpottedBuildingWithinRange(getGoalPosition(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
+		!msExplorationManager->hasSpottedBuildingWithinRange(getGoalPosition(), config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE))
 	{
 		return true;
 	} else {
@@ -444,6 +444,6 @@ void AttackSquad::onGoalSucceeded() {
 		createGoal();
 	} else {
 		// Retreat
-		setRetreatPosition(mpsDefenseManager->findRetreatPosition());
+		setRetreatPosition(msDefenseManager->findRetreatPosition());
 	}
 }
