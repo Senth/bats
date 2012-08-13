@@ -224,6 +224,9 @@ void BatsModule::onReceiveText(BWAPI::Player* pPlayer, std::string text) {
 
 		Broodwar->setLocalSpeed(speed);
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received speed message, speed set to: " << speed);
+	} else if (mCommander->isCommandAvailable(text)) {
+		DEBUG_MESSAGE(utilities::LogLevel_Fine, "Command mesasge recieved: " << text);
+		mCommander->issueCommand(text);
 	} else {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received message: " << text);
 	}
