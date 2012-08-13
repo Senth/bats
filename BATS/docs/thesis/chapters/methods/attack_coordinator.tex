@@ -50,7 +50,7 @@ To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_
 Distance weight is a simple calculation: if no other attack squads are present it defaults to 1.0. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
 \begin{equation}
 \label{eq:distance_weight}
-weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of squads}\right.
+weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of attack squads}\right.
 \end{equation}
 Here \emph{weight} is the average distance from all other attacking squads. The weight is then normalized to [0.0, 1.0], shown in equation \ref{eq:distance_weight_normalized}—dividing the weight with the maximum map distance. As with most distance calculations, they use the squared version for faster calculation since no root calculations are needed.
 \begin{equation}
