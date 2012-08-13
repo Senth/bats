@@ -282,7 +282,6 @@ void WorkerAgent::computeActions()
 			buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
 			if (buildSpot != TilePositions::Invalid)
 			{
-				//Broodwar->printf("[%d] Build spot for %s found at (%d,%d)", Broodwar->getFrameCount(), toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
 				setState(MOVE_TO_SPOT);
 				startBuildFrame = Broodwar->getFrameCount();
 				if (toBuild.isResourceDepot())
@@ -298,10 +297,7 @@ void WorkerAgent::computeActions()
 			CoverMap::getInstance()->fillTemp(toBuild, buildSpot);
 			if (!buildSpotExplored())
 			{
-				//Broodwar->printf("[%d] moving to spot (%d,%d) dist=%d", unitID, buildSpot.x(), buildSpot.y());
 				unit->rightClick(Position(buildSpot));
-
-				//Broodwar->printf("Move to build %s at (%d,%d)", toBuild.getName().c_str(), buildSpot.x(), buildSpot.y());
 			}
 
 			if (buildSpotExplored() && !unit->isConstructing())
@@ -325,7 +321,6 @@ void WorkerAgent::computeActions()
 
 			if (unit->isConstructing())
 			{
-				//Broodwar->printf("[%d] is building at (%d,%d)", unitID, buildSpot.x(), buildSpot.y());
 				setState(CONSTRUCT);
 				startSpot = TilePositions::Invalid;
 			}
@@ -333,7 +328,7 @@ void WorkerAgent::computeActions()
 
 		if (currentState == CONSTRUCT)
 		{
-			if (isBuilt())
+			if (hasCompletedBuilding())
 			{
 				//Build finished.
 				BaseAgent* agent = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
@@ -347,7 +342,7 @@ void WorkerAgent::computeActions()
 	}
 }
 
-bool WorkerAgent::isBuilt() const
+bool WorkerAgent::hasCompletedBuilding() const
 {
 	/// @author Matteus Magnusson (matteus.magnusson@gmail.com)
 	/// Changed logic to test if the building is actually done, not begun
@@ -356,10 +351,10 @@ bool WorkerAgent::isBuilt() const
 	for (tileUnitIt = tileUnits.begin(); tileUnitIt != tileUnits.end(); ++tileUnitIt)
 	{
 		// Only our own units that exist
-		if ((*tileUnitIt)->exists() && (*tileUnitIt)->getPlayer()->getID() == Broodwar->self()->getID())
+		if ((*tileUnitIt)->exists() && (*tileUnitIt)->getPlayer() == Broodwar->self())
 		{
 			// The building exist and is completed
-			if ((*tileUnitIt)->getType() == toBuild && !(*tileUnitIt)->isBeingConstructed())
+			if ((*tileUnitIt)->getType() == toBuild && (*tileUnitIt)->isCompleted())
 			{
 				return true;
 			}

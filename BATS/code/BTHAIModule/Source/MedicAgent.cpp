@@ -2,158 +2,151 @@
 #include "PFManager.h"
 #include "AgentManager.h"
 #include "Utilities/Logger.h"
+#include "BATSModule/include/Config.h"
+#include "BATSModule/include/SquadManager.h"
+#include "BATSModule/include/Helper.h"
+#include "BATSModule/include/Squad.h"
+#include "BatsModule/include/UnitManager.h"
 
 using namespace BWAPI;
 using namespace std;
 
+bats::UnitManager* MedicAgent::msUnitManager = NULL;
+
 MedicAgent::MedicAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
 	agentType = "MedicAgent";
+
+	if (msUnitManager == NULL) {
+		msUnitManager = bats::UnitManager::getInstance();
+	}
 }
 
 void MedicAgent::computeActions()
 {
-	if (checkUnitsToHeal())
-	{
-		return;
-	}
-
+	checkUnitsToHeal();
 	computeMoveAction(true);
 }
 
-bool MedicAgent::checkUnitsToHeal()
+void MedicAgent::checkUnitsToHeal()
 {
 	try {
-		double bestDist = -1;
-		Unit* toHeal = NULL;
+		int bestDist = INT_MAX;
+		const Unit* toHeal = NULL;
+		TilePosition closeSearchFrom = getUnit()->getTilePosition();
 
 		/// @todo If assigned to squad, only heal units in the squad, or close units.
 		/// Also heal close allied units if possible
-		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (int i = 0; i < (int)agents.size(); i++)
-		{
-			BaseAgent* agent = agents.at(i);
-			if (agent->isAlive() && agent->isDamaged() && agent->getUnit()->isCompleted())
-			{
-				if (isMedicTarget(agent->getUnit()) && agent->getUnitID() != unit->getID())
-				{
-					Unit* cUnit = agent->getUnit();
-					if (cUnit->exists() && cUnit->getHitPoints() > 0)
-						{
-						double dist = unit->getDistance(cUnit);
-						if (bestDist < 0 || dist < bestDist)
-						{
-							bestDist = dist;
-							toHeal = cUnit;
-						}
+		
+		// Search for squad units
+		if (getSquadId().isValid()) {
+			bats::SquadCstPtr squad = msSquadManager->getSquad(getSquadId());
+			closeSearchFrom = squad->getCenter();
+
+			const vector<const UnitAgent*>& units = squad->getUnits();
+			for (size_t i = 0; i < units.size(); ++i) {
+				if (isMedicTarget(units[i]->getUnit())) {
+					int distSquared = bats::getSquaredDistance(units[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition());
+					if (distSquared < bestDist) {
+						bestDist = distSquared;
+						toHeal = units[i]->getUnit();
+					}
+				}
+			}
+		}
+		// Else - Search all our units
+		else {
+			const vector<UnitAgent*>& units = msUnitManager->getUnitsByFilter();
+			for (size_t i = 0; i < units.size(); i++) {
+				if (isMedicTarget(units[i]->getUnit())) {
+					int distSquared = bats::getSquaredDistance(units[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition());
+					if (distSquared < bestDist &&
+						distSquared <= bats::config::unit::medic::HEAL_SEARCH_DISTANCE_SQUARED)
+					{
+						bestDist = distSquared;
+						toHeal = units[i]->getUnit();
+					}	
+				}
+			}
+		}
+
+		// Check allied units too, if in squad it will search from the squad's center when checking
+		// If the unit is close enough to the squad, otherwise it will use the unit's position
+		const set<Player*>& players = Broodwar->allies();
+		set<Player*>::const_iterator playerIt;
+		for (playerIt = players.begin(); playerIt != players.end(); ++playerIt) {
+			const set<Unit*>& units = (*playerIt)->getUnits();
+			set<Unit*>::const_iterator unitIt;
+			for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
+				if (isMedicTarget(*unitIt)) {
+					int distSquared = bats::getSquaredDistance((*unitIt)->getTilePosition(), getUnit()->getTilePosition());
+
+					if (distSquared < bestDist &&
+						bats::isWithinRange(closeSearchFrom, (*unitIt)->getTilePosition(), bats::config::unit::medic::HEAL_SEARCH_DISTANCE))
+					{
+						bestDist = distSquared;
+						toHeal = (*unitIt);
 					}
 				}
 			}
 		}
 
-		if (bestDist >= 0 && toHeal != NULL)
+		if (toHeal != NULL)
 		{
-			//Broodwar->printf("[%d] Medic healing", unitID);
-			unit->useTech(TechTypes::Healing, toHeal);
+			/// @todo remove const cast when fixed in BWAPI
+			unit->useTech(TechTypes::Healing, const_cast<Unit*>(toHeal));
 		}
 	}
 	catch(exception)
 	{
 		ERROR_MESSAGE(false, "[" << unit->getID() << "] checkUnitToHeal() error");
 	}
-
-	return false;
 }
 
-bool MedicAgent::checkUnitsToFollow()
+bool MedicAgent::isMedicTarget(const Unit* unit)  const
 {
-	double bestDist = -1;
-	Unit* toFollow = NULL;
-
-	/*vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
-	{
-		if (agents.at(i)->isAlive())
-		{
-			Unit* cUnit = agents.at(i)->getUnit();
-			if (isMedicTarget(cUnit))
-			{
-				double dist = unit->getDistance(cUnit);
-				if (bestDist < 0 || dist < bestDist)
-				{
-					bestDist = dist;
-					toFollow = cUnit;
-				}
-			}
-		}
-	}*/
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
-	{
-		Unit* cAgent = agents.at(i)->getUnit();
-		if (agents.at(i)->isAlive() && isMedicTarget(cAgent))
-		{
-			double dist = unit->getDistance(cAgent);
-			if (bestDist < 0 || dist < bestDist)
-			{
-				bestDist = dist;
-				toFollow = cAgent;
-			}
-		}
-	}
-
-	if (bestDist >= 128)
-	{
-		unit->follow(toFollow);
-		return true;
-	}
-	else if (bestDist >= 0)
-	{
-		unit->stop();
-		return true;
-	}
-
-	return false;
-}
-
-bool MedicAgent::isMedicTarget(Unit* mUnit)
-{
-	if (!mUnit->getType().isOrganic())
-	{
-		//Can only heal organic units
-		return false;
-	}
-
-	if (mUnit->getType().isWorker())
-	{
-		//We can heal workers, but no point
-		//in following them
-		return false;
-	}
-
-	if (!mUnit->getType().canAttack())
-	{
-		//Dont follow units that cant attack
-		return false;
-	}
-
-	if (isOfType(mUnit, UnitTypes::Terran_Medic))
-	{
-		//Dont follow other medics
-		return false;
-	}
-
-	if (mUnit->isLoaded())
-	{
-		//Dont "follow" bunkered units
-		return false;
-	}
-
-	//Check if the unit is exploring, then dont follow it.
-	BaseAgent* agent = AgentManager::getInstance()->getAgent(mUnit->getID());
-	if (agent->isExploring())
+	// Can only heal organic units
+	if (!unit->getType().isOrganic())
 	{
 		return false;
 	}
+
+	// We can heal workers, but no point in following them
+	if (unit->getType().isWorker())
+	{
+		return false;
+	}
+
+	// Don't heal loaded units, as in bunker or transport
+	if (unit->isLoaded())
+	{
+		return false;
+	}
+
+	// Only heal damaged units
+	if (unit->getHitPoints() == unit->getType().maxHitPoints()) {
+		return false;
+	}
+
+	// Only heal alive units
+	if (unit->getHitPoints() == 0) {
+		return false;
+	}
+
+	// Only heal completed units
+	if (!unit->isCompleted()) {
+		return false;
+	}
+
+	// Unit shall exist
+	if (!unit->exists()) {
+		return false;
+	}
+
+	// Don't heal ourselves
+	if (unit->getID() == getUnitID()) {
+		return false;
+	}
+
 	return true;
 }

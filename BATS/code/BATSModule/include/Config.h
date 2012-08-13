@@ -368,6 +368,23 @@ namespace bats {
 		}
 
 		/**
+		 * Unit attributes
+		 */
+		namespace unit {
+			/**
+			 * Medic specific
+			 */
+			namespace medic {
+				/** How close medics should search for units (not in the squad) to heal */
+				extern int HEAL_SEARCH_DISTANCE;
+				/** Squared version of HEAL_SEARCH_DISTANCE_SQUARED. Cannot be set in the
+				 * configuration file, only used for faster computation and nicer code.
+				 * @see HEAL_SEARCH_DISTANCE_SQUARED */
+				extern int HEAL_SEARCH_DISTANCE_SQUARED;
+			}
+		}
+
+		/**
 		 * Different Wait Goal sets
 		 */
 		namespace wait_goals {

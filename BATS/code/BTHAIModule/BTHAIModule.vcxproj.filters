@@ -236,9 +236,6 @@
     <ClCompile Include="Source\TargetingAgent.cpp">
       <Filter>Source Files\MainAgents</Filter>
     </ClCompile>
-    <ClCompile Include="Source\WorkerAgent.cpp">
-      <Filter>Source Files\MainAgents</Filter>
-    </ClCompile>
     <ClCompile Include="Source\AgentManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -286,6 +283,9 @@
     </ClCompile>
     <ClCompile Include="Source\CoverMap.cpp">
       <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WorkerAgent.cpp">
+      <Filter>Source Files\UnitAgents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

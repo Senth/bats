@@ -77,7 +77,11 @@ private:
 	BWAPI::TilePosition startSpot;
 	bool buildSpotExplored() const;
 	bool areaFree() const;
-	bool isBuilt() const;
+	/**
+	 * If the unit has completed building the assigned building.
+	 * @return true if the worker completed building the assigned building.
+	 */
+	bool hasCompletedBuilding() const;
 	int startBuildFrame;
 
 	void handleKitingWorker();
