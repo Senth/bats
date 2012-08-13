@@ -7,7 +7,9 @@
 #include "PlayerArmyManager.h"
 #include "AlliedSquad.h"
 #include "UnitManager.h"
+#include "IntentionWriter.h"
 #include "UnitCompositionFactory.h"
+#include "DefenseManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/Profiler.h"
 #include <memory.h>
@@ -29,11 +31,15 @@ Commander::Commander() {
 	mUnitManager = NULL;
 	mSquadManager = NULL;
 	mAlliedArmyManager = NULL;
+	mDefenseManager = NULL;
+	mIntentionWriter = NULL;
 
 	mAlliedArmyManager = PlayerArmyManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
 	mUnitManager = UnitManager::getInstance();
 	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
+	mDefenseManager = DefenseManager::getInstance();
+	mIntentionWriter = IntentionWriter::getInstance();
 
 	initStringToEnums();
 }
@@ -92,7 +98,7 @@ void Commander::computeReactions() {
 		const AttackSquadPtr& frontalSquad = mSquadManager->getFrontalAttack();
 
 		if (NULL == frontalSquad) {
-			issueCommand(Command_Attack, false);
+			issueCommand(Command_Attack, false, Reason_AlliedMovingToAttack);
 		}
 	}
 
@@ -101,7 +107,7 @@ void Commander::computeReactions() {
 		const vector<AttackSquadPtr>& distractingAttacks = mSquadManager->getDistractingAttacks();
 
 		if (distractingAttacks.empty()) {
-			issueCommand(Command_Drop, false);
+			issueCommand(Command_Drop, false, Reason_AlliedMovingToAttack);
 		}
 	}
 
@@ -115,7 +121,7 @@ void Commander::issueCommand(const std::string& command) {
 	}
 }
 
-void Commander::issueCommand(Commands command, bool alliedOrdered) {
+void Commander::issueCommand(Commands command, bool alliedOrdered, Reasons reason) {
 	if (isAlliedCreatingCommand()) {
 		// Allied ordered a new command, finish the old one.
 		if (alliedOrdered) {
@@ -130,22 +136,19 @@ void Commander::issueCommand(Commands command, bool alliedOrdered) {
 
 	switch(command) {
 	case Command_Attack:
-		orderAttack(alliedOrdered);
+		orderAttack(alliedOrdered, reason);
 		break;
 
 	case Command_Drop:
-		orderDrop(alliedOrdered);
+		orderDrop(alliedOrdered, reason);
 		break;
 
 	case Command_Expand:
-		if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter()))
-			BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
-		else
-			DEBUG_MESSAGE(utilities::LogLevel_Info, "Expansion not available yet");
+		orderExpand(alliedOrdered, reason);
 		break;
 
 	case Command_Scout:
-		orderScout(alliedOrdered);
+		orderScout(alliedOrdered, reason);
 		break;
 
 		/// @todo abort command
@@ -179,17 +182,18 @@ void Commander::finishAlliedCreatingCommand() {
 	mAlliedSquadCommand.reset();
 }
 
-#pragma warning(push)
-#pragma warning(disable:4100)
-void Commander::orderAttack(bool alliedOrdered) {
-	/// @todo If we have a frontal attack and allied has a big attack and frontal attack
-	/// isn't following any attack. Follow frontal attack now.
-
-	/// @todo Never do a frontal attack if we're under attack (defending)
-
+void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
+	// Never do a frontal attack if we're under attack (defending)
+	if (mDefenseManager->isUnderAttack()) {
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotAttackNot, Reason_BotIsUnderAttack);
+		}
+		return;
+	}
 
 	// Get free units
 	std::vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+
 
 	// Only add if we have free units
 	if (!freeUnits.empty()) {
@@ -205,16 +209,32 @@ void Commander::orderAttack(bool alliedOrdered) {
 
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
+			if (alliedOrdered) {
+				mIntentionWriter->writeIntention(Intention_BotAttackMerged);
+			}
 		} else {
-			new AttackSquad(freeUnits);
+			AttackSquad* attackSquad = new AttackSquad(freeUnits);
+
+			if (attackSquad->isFollowingAlliedSquad()) {
+				mIntentionWriter->writeIntention(Intention_AlliedAttackFollow, reason);
+			} else {
+				const TilePosition attackPos = attackSquad->getGoalPosition();
+				mIntentionWriter->writeIntention(Intention_BotAttack, reason, attackPos);
+			}
+
+		}
+	} else {
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotAttackNot, Reason_BotNotEnoughUnits);
 		}
 	}
 }
 
-void Commander::orderDrop(bool alliedOrdered) {
+void Commander::orderDrop(bool alliedOrdered, Reasons reason) {
 	/// @todo Check how many attacks we have (frontal, distracting)
 	/// Can we create a distracting attack?
 
+	/// @todo get defensive squad units for a counter-attack drop.
 
 	// Get available unit compositions
 	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
@@ -228,19 +248,21 @@ void Commander::orderDrop(bool alliedOrdered) {
 		unsigned int randomId = rand() % availableUnitCompositions.size();
 		const UnitComposition& chosenComposition = availableUnitCompositions[randomId];
 
-		new DropSquad(freeUnits, chosenComposition);
+		DropSquad* dropSquad = new DropSquad(freeUnits, chosenComposition);
+
+		mIntentionWriter->writeIntention(Intention_BotDrop, reason, dropSquad->getGoalPosition());
 	}
 	// No drops available
 	else {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Commander::createDrop() | No drops available");
 
-		/// @todo print a message to the other player that no drops are available
-		/// But only if the player issued the command. Probably if the commander issued
-		/// the command a drop shall always be available?
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotDropNot, Reason_BotNotEnoughUnits);
+		}
 	}
 }
 
-void Commander::orderScout(bool alliedOrdered) {
+void Commander::orderScout(bool alliedOrdered, Reasons reason) {
 	/// @todo what about existing scout, remove it?
 	
 	// Get available unit compositions
@@ -251,7 +273,7 @@ void Commander::orderScout(bool alliedOrdered) {
 	//ScoutSquad* pScoutSuad = new ScoutSquad(freeUnits);
 	//mSquadWaiting = pScoutSuad->getThis();
 	
-	// This will return all regular units that is in no squad and all workers that are free (is neither building nor in a squad)
+	// Return all free units (including from defensive squads) and all workers that are free (is neither building nor in a squad)
 	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
 
 	// Get all unit compositions that can be created from the specified units.
@@ -268,9 +290,26 @@ void Commander::orderScout(bool alliedOrdered) {
 	// Create a squad with the highest composition.
 	if (!availableUnitCompositions.empty()) {
 		new ScoutSquad(freeUnits, true, availableUnitCompositions[0]);
+		mIntentionWriter->writeIntention(Intention_BotScout, reason);
+	} else {
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotScoutNot, Reason_BotNotEnoughUnits);
+		}
 	}
 }
-#pragma warning(pop)
+
+void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
+	if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter())) {
+		BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
+		mIntentionWriter->writeIntention(Intention_BotExpand, reason);
+	} else {
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Expansion not available yet");
+		/// @todo write the reason why we can't expand
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotExpandNot);
+		}
+	}
+}
 
 void Commander::initStringToEnums() {
 	mCommandStringToEnums["attack"] = Command_Attack;

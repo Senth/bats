@@ -3,6 +3,7 @@
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "UnitComposition.h"
 #include "SquadManager.h"
+#include "IntentionWriter.h"
 #include "GameTime.h"
 #include "Config.h"
 #include "Helper.h"
@@ -19,10 +20,11 @@ using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
 using namespace BWAPI;
 
-int bats::Squad::mcsInstance = 0;
-utilities::KeyHandler<_SquadType>* bats::Squad::mpsKeyHandler = NULL;
-SquadManager* bats::Squad::mpsSquadManager = NULL;
-GameTime* bats::Squad::mpsGameTime = NULL;
+int bats::Squad::mscInstances = 0;
+utilities::KeyHandler<_SquadType>* bats::Squad::msKeyHandler = NULL;
+SquadManager* bats::Squad::msSquadManager = NULL;
+GameTime* bats::Squad::msGameTime = NULL;
+IntentionWriter* bats::Squad::msIntentionWriter = NULL;
 
 const int MAX_KEYS = 100;
 const double FROM_TILE_TO_POSITION = 32.0;
@@ -52,18 +54,19 @@ Squad::Squad(
 	mInitialized(false)
 {
 	// Generate new key for the squad
-	if (mcsInstance == 0) {
+	if (mscInstances == 0) {
 		utilities::KeyHandler<_SquadType>::init(MAX_KEYS);
-		mpsKeyHandler = utilities::KeyHandler<_SquadType>::getInstance();
+		msKeyHandler = utilities::KeyHandler<_SquadType>::getInstance();
 	}
-	mcsInstance++;
+	mscInstances++;
 
-	if (NULL == mpsSquadManager) {
-		mpsSquadManager = SquadManager::getInstance();
-		mpsGameTime = GameTime::getInstance();
+	if (NULL == msSquadManager) {
+		msSquadManager = SquadManager::getInstance();
+		msGameTime = GameTime::getInstance();
+		msIntentionWriter = IntentionWriter::getInstance();
 	}
 
-	mId = mpsKeyHandler->allocateKey();
+	mId = msKeyHandler->allocateKey();
 
 	// Add all units
 	addUnits(units);
@@ -76,7 +79,9 @@ Squad::Squad(
 	// Add to squad manager
 	SquadPtr strongPtr(this);
 	mThis = weak_ptr<Squad>(strongPtr);
-	mpsSquadManager->addSquad(strongPtr);
+	msSquadManager->addSquad(strongPtr);
+
+	createGoal();
 
 	// Add listener
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
@@ -86,15 +91,17 @@ Squad::~Squad() {
 	// Remove listener
 	config::removeOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
 
-	mcsInstance--;
+	mscInstances--;
 
 	// Free key
-	mpsKeyHandler->freeKey(mId);
+	msKeyHandler->freeKey(mId);
 
-	if (mcsInstance == 0) {
-		SAFE_DELETE(mpsKeyHandler);
-		mpsGameTime = NULL;
-		mpsSquadManager = NULL;
+	if (mscInstances == 0) {
+		msIntentionWriter = NULL;
+		msGameTime = NULL;
+		msSquadManager = NULL;
+
+		SAFE_DELETE(msKeyHandler);
 	}
 }
 
@@ -133,10 +140,10 @@ bool Squad::tryDisband() {
 
 void Squad::update() {
 	// Don't call to often
-	if (mpsGameTime->getElapsedTime() - mUpdateLast < config::classification::squad::MEASURE_INTERVAL_TIME) {
+	if (msGameTime->getElapsedTime() - mUpdateLast < config::classification::squad::MEASURE_INTERVAL_TIME) {
 		return;
 	}
-	mUpdateLast = mpsGameTime->getElapsedTime();
+	mUpdateLast = msGameTime->getElapsedTime();
 
 	updateSupply();
 
@@ -350,7 +357,7 @@ void Squad::addUnit(UnitAgent* pUnit) {
 	if (bAddUnit) {	
 		// Remove unit from existing squad if it belongs to another squad.
 		if (pUnit->getSquadId() != SquadId::INVALID_KEY) {
-			SquadPtr pOldSquad = mpsSquadManager->getSquad(pUnit->getSquadId());
+			SquadPtr pOldSquad = msSquadManager->getSquad(pUnit->getSquadId());
 			assert(pOldSquad != NULL);
 
 			pOldSquad->removeUnit(pUnit);
@@ -612,7 +619,7 @@ void Squad::handleRegroup() {
 	else {
 		if (finishedRegrouping()) {
 			clearRegroupPosition();
-		} else if (mpsGameTime->getElapsedTime() >= mRegroupStartTime + config::squad::REGROUP_NEW_POSITION_TIME &&
+		} else if (msGameTime->getElapsedTime() >= mRegroupStartTime + config::squad::REGROUP_NEW_POSITION_TIME &&
 			isAUnitStill())
 		{
 			TilePosition newRegroupPosition = getCenter();
@@ -664,7 +671,7 @@ bool Squad::finishedRegrouping() const {
 void Squad::setRegroupPosition(const BWAPI::TilePosition& regroupPosition) {
 	if (mRegroupPosition != regroupPosition) {
 		mRegroupPosition = regroupPosition;
-		mRegroupStartTime = mpsGameTime->getElapsedTime();
+		mRegroupStartTime = msGameTime->getElapsedTime();
 		updateUnitMovement();
 	}
 }

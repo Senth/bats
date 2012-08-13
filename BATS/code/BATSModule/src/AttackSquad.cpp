@@ -8,6 +8,7 @@
 #include "Helper.h"
 #include "TypeDefs.h"
 #include "DefenseManager.h"
+#include "IntentionWriter.h"
 #include <sstream>
 #include <iomanip>
 
@@ -254,13 +255,13 @@ void AttackSquad::handleRetreat() {
 
 	// Handle retreat
 	if (retreat) {
-		// Not following any allied squad
-		if (NULL == mpAlliedSquadFollow) {
-			setRetreatPosition(msDefenseManager->findRetreatPosition());
+		if (isFollowingAlliedSquad()) {
+			msIntentionWriter->writeIntention(Intention_WeShouldRetreat, Reason_EnemyTooStrong);
 		}
-		/// @todo Following allied squad, say that it's probably a good idea to retreat
 		else {
-
+			setRetreatPosition(msDefenseManager->findRetreatPosition());
+			msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_EnemyTooStrong);
+			
 		}
 	}
 }
@@ -442,8 +443,10 @@ void AttackSquad::onGoalSucceeded() {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "AttackSquad never attacked, finding another goal...");
 		clearMovement();
 		createGoal();
+		msIntentionWriter->writeIntention(Intention_BotAttackNewPosition, Reason_BotDidNotAttack, getGoalPosition());
 	} else {
 		// Retreat
+		msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_BotAttackSuccess);
 		setRetreatPosition(msDefenseManager->findRetreatPosition());
 	}
 }

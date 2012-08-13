@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "DefenseManager.h"
 #include "Helper.h"
+#include "IntentionWriter.h"
 #include "BTHAIModule/Source/TransportAgent.h"
 #include <vector>
 #include <algorithm>
@@ -89,7 +90,7 @@ void DropSquad::updateDerived() {
 			if (!isEnemyFasterThanTransport()) {
 				setState(State_Load);
 			}
-			/// @todo check if the only ground is faster and where close to an edge
+			/// @todo check if the only ground is faster and we're close to an edge
 			/// then we can retreat
 		}
 		// No enemies within sight, load if we aren't within the goal region
@@ -431,30 +432,27 @@ void DropSquad::onGoalFailed() {
 	if (hasAttackTimedOut()) {
 
 		// Retreat then disband
-		TilePosition retreatPos = msDefenseManager->findRetreatPosition();
+		setRetreatPosition(msDefenseManager->findRetreatPosition());
+		createViaPath();
+		setState(State_Load);
 
-		if (retreatPos != TilePositions::Invalid) {
-			setRetreatPosition(retreatPos);
-			createViaPath();
-			setState(State_Load);
-		} else {
-			/// @todo stay and fight
-		}
-	
+		msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_BotDropTimedOut);
 	} 
 	// No timeout, try another goal
 	else {
 		createGoal();
+		msIntentionWriter->writeIntention(Intention_BotDropNewPosition);
 	}
 }
 
 void DropSquad::onGoalSucceeded() {
-	// Same functionality as on Goal Failed for now
-	onGoalFailed();
+	// Retreat then disband
+	setRetreatPosition(msDefenseManager->findRetreatPosition());
+	msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_BotAttackSuccess);
 }
 
 bool DropSquad::hasAttackTimedOut() const {
-	return mpsGameTime->getElapsedTime() >= mStartTime + config::squad::drop::ATTACK_TIMEOUT;
+	return msGameTime->getElapsedTime() >= mStartTime + config::squad::drop::ATTACK_TIMEOUT;
 }
 
 void DropSquad::onRetreatCompleted() {

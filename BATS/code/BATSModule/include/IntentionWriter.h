@@ -20,12 +20,20 @@ namespace bats {
 enum Intentions {
 	Intention_AlliedAttackFollow, /**< Will follow the allied attacking squad */
 	Intention_BotAttack, /**< A regular attack by the enemy */
+	Intention_BotAttackMerged, /**< Merged new units with the old squad */
+	Intention_BotAttackNewPosition, /**< Finding a new position to attack */
 	Intention_BotAttackNot, /**< It's not possible to create another attack */
 	Intention_BotComingToAid, /**< The bot is coming to aid the player in defending */
 	Intention_BotComingToAidNot, /**< Bot will not help the allied with defending */
 	Intention_BotDrop, /**< Does a drop */
-	Intention_BotRetreat, /**< The bot retreats from a battle */
+	Intention_BotDropNewPosition, /**< Finding a new position to drop */
+	Intention_BotDropNot, /**< Can't create a drop */
 	Intention_BotExpand, /**< The bot is about to expand */
+	Intention_BotExpandNot, /**< Can't create an expansion */
+	Intention_BotRetreat, /**< The bot retreats from a battle */
+	Intention_BotScout, /**< Creates a scout */
+	Intention_BotScoutNot, /**< Could not create a scout */
+	Intention_WeShouldRetreat, /**< Good if we retreat */
 
 	Intention_Lim /**< Invalid intention */
 };
@@ -36,9 +44,13 @@ enum Intentions {
 enum Reasons {
 	Reason_AlliedExpanding, /**< The allied started to build an expansion */
 	Reason_AlliedMovingToAttack, /**< Allied squad is moving out to attack */
+	Reason_BotAttackSuccess, /**< The attack finished successfully */
+	Reason_BotDidNotAttack, /**< Did not attack anything */
+	Reason_BotDropTimedOut, /**< Drop timed out */
+	Reason_BotIsUnderAttack, /**< Bot is under attack */
 	Reason_BotNotEnoughUnits, /**< Bot does not have enough units for the action */
 	Reason_BotTooManyAttacks, /**< The bot has too many attacks for the action */
-	Reason_BotIsUnderAttack, /**< Bot is under attack */
+	Reason_EnemyTooStrong, /**< Enemy force is too strong */
 
 	Reason_Lim /**< Invalid reason */
 };

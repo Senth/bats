@@ -149,7 +149,7 @@ void IntentionWriter::handleReasonVariable(const utilities::VariableInfo& variab
 				);
 		}
 	} else {
-		ERROR_MESSAGE(false, "IntentionWriter: Unknown intention type (subsection): " << variableInfo.subsection);
+		ERROR_MESSAGE(false, "IntentionWriter: Unknown reason type (subsection): " << variableInfo.subsection);
 	}
 }
 
@@ -157,12 +157,21 @@ void IntentionWriter::initStringToEnumWrappers() {
 	// Intentions
 	mIntentionStringToEnums["AlliedAttackFollow"] = Intention_AlliedAttackFollow;
 	mIntentionStringToEnums["BotAttack"] = Intention_BotAttack;
+	mIntentionStringToEnums["BotAttackMerged"] = Intention_BotAttackMerged;
+	mIntentionStringToEnums["BotAttackNewPosition"] = Intention_BotAttackNewPosition;
 	mIntentionStringToEnums["BotAttackNot"] = Intention_BotAttackNot;
 	mIntentionStringToEnums["BotComingToAid"] = Intention_BotComingToAid;
 	mIntentionStringToEnums["BotComingToAidNot"] = Intention_BotComingToAidNot;
 	mIntentionStringToEnums["BotDrop"] = Intention_BotDrop;
-	mIntentionStringToEnums["BotRetreat"] = Intention_BotRetreat;
+	mIntentionStringToEnums["BotDropNewPosition"] = Intention_BotDropNewPosition;
+	mIntentionStringToEnums["BotDropNot"] = Intention_BotDropNot;
 	mIntentionStringToEnums["BotExpand"] = Intention_BotExpand;
+	mIntentionStringToEnums["BotExpandNot"] = Intention_BotExpandNot;
+	mIntentionStringToEnums["BotRetreat"] = Intention_BotRetreat;
+	mIntentionStringToEnums["BotScout"] = Intention_BotScout;
+	mIntentionStringToEnums["BotScoutNot"] = Intention_BotScoutNot;
+	mIntentionStringToEnums["WeShouldRetreat"] = Intention_WeShouldRetreat;
+	
 	
 	ERROR_MESSAGE_CONDITION(mIntentionStringToEnums.size() != Intention_Lim,
 		false,
@@ -173,9 +182,13 @@ void IntentionWriter::initStringToEnumWrappers() {
 	// Reasons
 	mReasonStringToEnums["AlliedExpanding"] = Reason_AlliedExpanding;
 	mReasonStringToEnums["AlliedMovingToAttack"] = Reason_AlliedMovingToAttack;
+	mReasonStringToEnums["BotAttackSuccess"] = Reason_BotAttackSuccess;
+	mReasonStringToEnums["BotDidNotAttack"] = Reason_BotDidNotAttack;
+	mReasonStringToEnums["BotDropTimedOut"] = Reason_BotDropTimedOut;
+	mReasonStringToEnums["BotIsUnderAttack"] = Reason_BotIsUnderAttack;
 	mReasonStringToEnums["BotNotEnoughUnits"] = Reason_BotNotEnoughUnits;
 	mReasonStringToEnums["BotTooManyAttacks"] = Reason_BotTooManyAttacks;
-	mReasonStringToEnums["BotIsUnderAttack"] = Reason_BotIsUnderAttack;
+	mReasonStringToEnums["EnemyTooStrong"] = Reason_EnemyTooStrong;
 
 	ERROR_MESSAGE_CONDITION(mReasonStringToEnums.size() != Reason_Lim,
 		false,

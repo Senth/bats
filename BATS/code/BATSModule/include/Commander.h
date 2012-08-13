@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
 #include "TypeDefs.h"
+#include "IntentionWriter.h"
 
 // Namespace for the project
 namespace bats {
@@ -14,6 +15,7 @@ class SquadManager;
 class UnitCompositionFactory;
 class UnitManager;
 class PlayerArmyManager;
+class DefenseManager;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -89,8 +91,11 @@ private:
 	 * Tries to issue an command
 	 * @param command the command to issue
 	 * @param alliedOrdered true if it was the allied player that ordered the command
+	 * @param reason optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim which will
+	 * not write any reason.
 	 */
-	virtual void issueCommand(Commands command, bool alliedOrdered);
+	virtual void issueCommand(Commands command, bool alliedOrdered, Reasons reason = Reason_Lim);
 
 	/**
 	 * Computes reactive player behavior, i.e. if it shall attack when an allied moves
@@ -106,20 +111,35 @@ private:
 	/**
 	 * Initiates an attack
 	 * @param alliedOrdered if it was the allied who ordered the attack
+	 * @param reason a reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim which will
+	 * not write any reason.
 	 */
-	void orderAttack(bool alliedOrdered);
+	void orderAttack(bool alliedOrdered, Reasons reason);
 
 	/**
 	 * Initiates a drop
 	 * @param alliedOrdered if it was the allied who ordered the drop
+	 * @param reason a reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued.
 	 */
-	void orderDrop(bool alliedOrdered);
+	void orderDrop(bool alliedOrdered, Reasons reason);
 
 	/**
 	 * Initiates a scout
 	 * @param alliedOrdered if it was the allied who ordered the scout
+	 * @param reason a reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. 
 	 */
-	void orderScout(bool alliedOrdered);
+	void orderScout(bool alliedOrdered, Reasons reason);
+
+	/**
+	 * Initiates the expand command
+	 * @param alliedOrdered if it was the allied who ordered the scout
+	 * @param reason a reason for the command, used when the command is successful
+	 * and a reason should be specified why the cammand was issued.
+	 */
+	void orderExpand(bool alliedOrdered, Reasons reason);
 
 	/**
 	 * Initialize string to enumerations for the commands
@@ -137,6 +157,8 @@ private:
 	UnitManager* mUnitManager;
 	UnitCompositionFactory* mUnitCompositionFactory;
 	PlayerArmyManager* mAlliedArmyManager;
+	DefenseManager* mDefenseManager;
+	IntentionWriter* mIntentionWriter;
 
 	std::map<std::string, Commands> mCommandStringToEnums;
 

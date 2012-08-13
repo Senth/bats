@@ -20,6 +20,7 @@ namespace bats {
 
 class SquadManager;
 class GameTime;
+class IntentionWriter;
 
 /**
  * Base class for all BATS squads. Represents a squad of units with a shared goal.
@@ -578,7 +579,8 @@ protected:
 	virtual void onUnitRemoved(UnitAgent* pRemovedUnit) {}
 #pragma warning(pop)
 
-	static GameTime* mpsGameTime;
+	static GameTime* msGameTime;
+	static IntentionWriter* msIntentionWriter;
 
 private:
 	/**
@@ -697,8 +699,8 @@ private:
 	mutable double mFurthestUnitAwayDistance;
 	mutable double mFurthestUnitAwayLastTime;
 
-	static int mcsInstance; /**< Number of instances, used for init and release of KeyHandler. */
-	static utilities::KeyHandler<_SquadType>* mpsKeyHandler;
-	static SquadManager* mpsSquadManager;
+	static int mscInstances; /**< Number of instances, used for init and release of KeyHandler. */
+	static utilities::KeyHandler<_SquadType>* msKeyHandler;
+	static SquadManager* msSquadManager;
 };
 }
