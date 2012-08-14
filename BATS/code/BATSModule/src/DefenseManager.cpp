@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "ExplorationManager.h"
 #include "GameTime.h"
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "Utilities/Logger.h"
 #include "UnitCompositionFactory.h"
 #include <BWAPI/Unit.h>
@@ -271,10 +271,10 @@ bool DefenseManager::isRegionOccupiedByOurTeam(BWTA::Region* region, bool includ
 		const set<Unit*>& units = (*playerIt)->getUnits();
 		set<Unit*>::const_iterator unitIt;
 		for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
-			Unit* pUnit = (*unitIt);
-			if (pUnit->getType().isBuilding()) {
-				BWTA::Region* pUnitRegion = BWTA::getRegion(pUnit->getPosition());
-				const Position& unitRegionPos = pUnitRegion->getCenter();
+			Unit* unit = (*unitIt);
+			if (unit->getType().isBuilding()) {
+				BWTA::Region* unitRegion = BWTA::getRegion(unit->getPosition());
+				const Position& unitRegionPos = unitRegion->getCenter();
 				
 				if (unitRegionPos == regionToCheckPos) {
 					return true;

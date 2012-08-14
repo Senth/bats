@@ -143,13 +143,14 @@
     <ClInclude Include="include\PatrolSquad.h" />
     <ClInclude Include="include\PlayerArmyManager.h" />
     <ClInclude Include="include\PlayerSquad.h" />
+    <ClInclude Include="include\ResourceDefs.h" />
     <ClInclude Include="include\SelfClassifier.h" />
-    <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceCounter.h" />
     <ClInclude Include="include\ResourceGroup.h" />
     <ClInclude Include="include\ScoutSquad.h" />
     <ClInclude Include="include\Squad.h" />
+    <ClInclude Include="include\SquadDefs.h" />
     <ClInclude Include="include\SquadManager.h" />
     <ClInclude Include="include\TerranProductionBuilding.h" />
     <ClInclude Include="include\UnitComposition.h" />

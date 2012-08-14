@@ -35,10 +35,10 @@ public:
 	/**
 	 * Adds a resource unit to the resource group. This resource does not need to be
 	 * removed or updated. It will get updated once update() is called.
-	 * @pre pUnit is not NULL.
-	 * @param pUnit pointer to the 
+	 * @pre unit is not NULL.
+	 * @param unit pointer to the 
 	 */
-	void addResource(BWAPI::Unit* pUnit);
+	void addResource(BWAPI::Unit* unit);
 
 	/**
 	 * Checks whether this resource groups has the specified resource.
@@ -55,6 +55,13 @@ public:
 	 * will treat as though no resources have been mined, thus it will return 1.0.
 	 */
 	double getResourcesLeftInFraction() const;
+
+	/**
+	 * Returns the number active mineral patches this group has. By active the resource
+	 * should have more than 0 minerals left.
+	 * @return number of active mineral patches this group has.
+	 */
+	int getActiveMineralPatchCount() const;
 
 	/**
 	 * Tries to update all resources in the resource group. They will only get

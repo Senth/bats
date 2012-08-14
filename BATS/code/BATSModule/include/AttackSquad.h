@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Squad.h"
-#include "Typedefs.h"
+#include "SquadDefs.h"
 #include <vector>
 
 // Namespace for the project

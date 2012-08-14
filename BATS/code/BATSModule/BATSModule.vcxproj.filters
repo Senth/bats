@@ -43,6 +43,9 @@
     <Filter Include="Intention\Message">
       <UniqueIdentifier>{025b830c-2951-4284-b6d2-567a502190a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers\TypeDefinitions">
+      <UniqueIdentifier>{17bbd082-d94e-4d6e-8c13-1dec509f2cb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -120,9 +123,6 @@
     <ClInclude Include="include\AlliedSquad.h">
       <Filter>Classification</Filter>
     </ClInclude>
-    <ClInclude Include="include\TypeDefs.h">
-      <Filter>Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="include\SelfClassifier.h">
       <Filter>Classification</Filter>
     </ClInclude>
@@ -161,6 +161,12 @@
     </ClInclude>
     <ClInclude Include="include\IntentionMessage.h">
       <Filter>Intention\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SquadDefs.h">
+      <Filter>Helpers\TypeDefinitions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceDefs.h">
+      <Filter>Helpers\TypeDefinitions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -59,9 +59,9 @@ public:
 	 * Returns all units (excluding workers) that is either in no squad or in a squad
 	 * that is disbandable.
 	 * \code
-	 * UnitManager* pUnitMananger = UnitManager::getInstance();
+	 * UnitManager* unitMananger = UnitManager::getInstance();
 	 * std::vector<UnitAgent*> units;
-	 * units = pUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_InDisbandableSquad);
+	 * units = unitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_InDisbandableSquad);
 	 * \endcode
 	 * 
 	 * Returns all units except workers
@@ -73,13 +73,13 @@ public:
 	 * Returns all worker units
 	 * \code
 	 * // ...
-	 * units = pUnitManager->getUnitsByFilter(UnitFilter_WorkersAll);
+	 * units = unitManager->getUnitsByFilter(UnitFilter_WorkersAll);
 	 * \endcode
 	 * 
 	 * Returns all units, including workers, that aren't in a squad.
 	 * \code
 	 * // ...
-	 * units = pUnitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
+	 * units = unitManager->getUnitsByFilter(UnitFilter_HasNoSquad | UnitFilter_WorkersNoSquad);
 	 * \endcode
 	 */
 	std::vector<UnitAgent*> getUnitsByFilter(int filter = UnitFilter_NoFilter);

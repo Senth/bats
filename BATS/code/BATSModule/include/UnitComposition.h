@@ -61,18 +61,18 @@ public:
 
 	/**
 	 * Tries to add a unit to the unit composition.
-	 * @param pUnit the unit we're trying to add.
+	 * @param unit the unit we're trying to add.
 	 * @return true if the unit was successfully added; false if all slots are occupied
 	 * for this unit type.
 	 */
-	bool addUnit(UnitAgent* pUnit);
+	bool addUnit(UnitAgent* unit);
 
 	/**
 	 * Tries to remove a unit from the unit composition.
-	 * @param pUnit the unit we're trying to remove.
+	 * @param unit the unit we're trying to remove.
 	 * @return true if the unit was successfully removed; false if no units of this type exists.
 	 */
-	bool removeUnit(UnitAgent* pUnit);
+	bool removeUnit(UnitAgent* unit);
 
 	/**
 	 * Returns the priority of the UnitComposition. If no priority has been set

@@ -6,7 +6,7 @@
 #include <BWTA.h>
 #include "BWTAExtern.h"
 #include "Utilities/KeyType.h"
-#include "BATSModule/include/TypeDefs.h"
+#include "BATSModule/include/SquadDefs.h"
 
 // Forward declarations
 namespace bats {
@@ -26,6 +26,7 @@ class BaseAgent {
 
 private:
 	bats::SquadId mSquadId;
+	int mCreationFrame;
 
 protected:
 	
@@ -66,6 +67,12 @@ public:
 	 * @return the squad id
 	 */
 	const bats::SquadId& getSquadId() const;
+
+	/**
+	 * Returns when the frame when the agent was created
+	 * @return the frame the agent was created.
+	 */
+	int getCreationFrame() const;
 
 	/** Called each update to issue orders. */
 	virtual void computeActions() = 0;

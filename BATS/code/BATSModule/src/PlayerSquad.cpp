@@ -90,15 +90,15 @@ bool PlayerSquad::isEmpty() const {
 	return mUnits.size() == 0;
 }
 
-void PlayerSquad::addUnit(const BWAPI::Unit* pUnit) {
-	mUnits.push_back(pUnit);
+void PlayerSquad::addUnit(const BWAPI::Unit* unit) {
+	mUnits.push_back(unit);
 }
 
-void PlayerSquad::removeUnit(const BWAPI::Unit* pUnit) {
+void PlayerSquad::removeUnit(const BWAPI::Unit* unit) {
 	std::vector<const BWAPI::Unit*>::iterator it = mUnits.begin();
 	bool found = false;
 	while (it != mUnits.end() && !found) {
-		if (*it == pUnit) {
+		if (*it == unit) {
 			found = true;
 			it = mUnits.erase(it);
 		} else {
@@ -192,9 +192,9 @@ TilePosition PlayerSquad::getTargetPosition() const {
 	return mostTargetedPosition;
 }
 
-bool PlayerSquad::belongsToThisSquad(BWAPI::Unit* pUnit) const {
+bool PlayerSquad::belongsToThisSquad(BWAPI::Unit* unit) const {
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		if (mUnits[i] == pUnit) {
+		if (mUnits[i] == unit) {
 			return true;
 		}
 	}

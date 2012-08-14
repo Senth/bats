@@ -4,7 +4,7 @@
 #include <BWAPI/TilePosition.h>
 #include <BWAPI/UnitType.h>
 #include "BTHAIModule/Source/SpottedObject.h"
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 
 // Namespace for the project
 namespace bats {

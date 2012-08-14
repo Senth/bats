@@ -81,31 +81,31 @@ public:
 	 * Called when a unit becomes accessible. If complete map information is enabled, this
 	 * will be called at the same time as onUnitCreate(), otherwise it will be called at the
 	 * same time as onUnitShow()
-	 * @param pUnit the unit that was discovered
+	 * @param unit the unit that was discovered
 	 */
-	virtual void onUnitDiscover(BWAPI::Unit* pUnit);
+	virtual void onUnitDiscover(BWAPI::Unit* unit);
 
 	/**
 	 * Called right before a unit becomes inaccessible. If complete map information is enabled,
 	 * this will be called at the same time as onUnitDestroy(), otherwise it will be called at the
 	 * same time as onUnitHide()
-	 * @param pUnit the unit that evaded
+	 * @param unit the unit that evaded
 	 */
-	virtual void onUnitEvade(BWAPI::Unit* pUnit);
+	virtual void onUnitEvade(BWAPI::Unit* unit);
 
 	/**
 	 * Called when a unit becomes visible. If complete map information is disabled, this also
 	 * means that the unit has just become accessible (onUnitDiscover())
-	 * @param pUnit the unit that has now become visible, includes our units
+	 * @param unit the unit that has now become visible, includes our units
 	 */
-	virtual void onUnitShow(BWAPI::Unit* pUnit);
+	virtual void onUnitShow(BWAPI::Unit* unit);
 
 	/**
 	 * Called right before a unit becomes invisible. If complete map information is disabled,
 	 * this also means that the unit is about to become inaccessible (onUnitEvade())
-	 * @param pUnit the unit that just was hidden
+	 * @param unit the unit that just was hidden
 	 */
-	virtual void onUnitHide(BWAPI::Unit* pUnit);
+	virtual void onUnitHide(BWAPI::Unit* unit);
 
 	/**
 	 * Called when an accessible unit is created. If the unit is not accessible at the time of
@@ -115,9 +115,9 @@ public:
 	 * @note This is NOT called when a unit changes type (such as larva into egg, or egg into
 	 * drone). Building a Refinery/Assimilator/Extractor will not produce an onUnitCreate call
 	 * because the Vespene Geyser changes to the unit type of Refinery/Assimilator/Extractor
-	 * @param pUnit the newly created unit.
+	 * @param unit the newly created unit.
 	 */
-	virtual void onUnitCreate(BWAPI::Unit* pUnit);
+	virtual void onUnitCreate(BWAPI::Unit* unit);
 
 	/**
 	 * Called when a unit dies or otherwise removed from the game (i.e. a mined out mineral patch).
@@ -126,24 +126,24 @@ public:
 	 * visible at the time of destruction, onUnitHide() will also be called.
 	 * @note When a Zerg drone becomes an extractor, the Vespene geyser changes to the Zerg
 	 * Extractor type and the drone is destroyed.
-	 * @param pUnit the destroyed unit
+	 * @param unit the destroyed unit
 	 */
-	virtual void onUnitDestroy(BWAPI::Unit* pUnit);
+	virtual void onUnitDestroy(BWAPI::Unit* unit);
 
 	/**
 	 * Called when an accessible unit changes type, such as from a Zerg Drone to a Zerg Hatchery,
 	 * or from a Terran Siege Tank Tank Mode to Terran Siege Tank Siege Mode. This is not called
 	 * when the type changes to or from UnitTypes::Unknown (which happens when a unit is
 	 * transitioning to or from inaccessibility)
-	 * @param pUnit the morphed unit
+	 * @param unit the morphed unit
 	 */
-	virtual void onUnitMorph(BWAPI::Unit* pUnit);
+	virtual void onUnitMorph(BWAPI::Unit* unit);
 
 	/**
 	 * Called when an accessible unit changes ownership, e.g. using a Dark Archon.
-	 * @param pUnit the unit that changed ownership
+	 * @param unit the unit that changed ownership
 	 */
-	virtual void onUnitRenegade(BWAPI::Unit* pUnit);
+	virtual void onUnitRenegade(BWAPI::Unit* unit);
 
 	/**
 	 * Called when the user saves the match. 

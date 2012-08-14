@@ -8,7 +8,7 @@ WaitGoal::WaitGoal() {
 	mpGameTime = NULL;
 
 	mpGameTime = GameTime::getInstance();
-	mWaitState = WaitState_Timeout;
+	mWaitState = WaitState_Waiting;
 	mTimeout = 0.0f;
 	mStartTime = 0.0f;
 	mUsesTimeout = false;
@@ -18,7 +18,7 @@ WaitGoal::WaitGoal(double timeout) {
 	mpGameTime = NULL;
 
 	mpGameTime = GameTime::getInstance();
-	mWaitState = WaitState_Timeout;
+	mWaitState = WaitState_Waiting;
 	mTimeout = timeout;
 	mUsesTimeout = true;
 	mStartTime = mpGameTime->getElapsedTime();

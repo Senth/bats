@@ -19,7 +19,7 @@ using namespace std;
 using std::tr1::shared_ptr;
 using namespace bats;
 
-ExplorationManager* ExplorationManager::mpsInstance = NULL;
+ExplorationManager* ExplorationManager::mInstance = NULL;
 
 const double CLOSE_BASE_DISTANCE = 12.0;
 
@@ -47,7 +47,7 @@ ExplorationManager::ExplorationManager() {
 }
 
 ExplorationManager::~ExplorationManager() {
-	mpsInstance = NULL;
+	mInstance = NULL;
 }
 
 void ExplorationManager::setInactive() {
@@ -59,10 +59,10 @@ bool ExplorationManager::isActive() const {
 }
 
 ExplorationManager* ExplorationManager::getInstance() {
-	if (mpsInstance == NULL) {
-		mpsInstance = new ExplorationManager();
+	if (mInstance == NULL) {
+		mInstance = new ExplorationManager();
 	}
-	return mpsInstance;
+	return mInstance;
 }
 
 void ExplorationManager::update() {
@@ -256,7 +256,7 @@ void ExplorationManager::calcEnemyForceData() {
 	}
 }
 
-void ExplorationManager::printInfo() const
+void ExplorationManager::printGraphicDebugInfo() const
 {
 	//Uncomment this if you want to draw a mark at detected enemy buildings.
 	/*for (int i = 0; i < (int)spottedBuildings.size(); i++)

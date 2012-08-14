@@ -1,28 +1,40 @@
-#ifndef __COMMANDCENTERAGENT_H__
-#define __COMMANDCENTERAGENT_H__
+#pragma once
 
-#include <BWAPI.h>
 #include "StructureAgent.h"
+#include "BatsModule/include/ResourceDefs.h"
+
+// forward declarations
+namespace bats {
+	class ResourceCounter;
+}
 
 /** The CommandCenterAgent handles Terran Command Center buildings.
  *
- * Implemented abilities:
+ * @section Implemented abilities:
  * - Trains and keeps the number of SCVs (workers) up. Is implemented in levels
  * where the preferred number of SCVs are higher at higher levels, i.e. later in
  * the game.
  * 
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  */
 class CommandCenterAgent : public StructureAgent {
-
-private:
-	bool hasSentWorkers;
-
 public:
 	CommandCenterAgent(BWAPI::Unit* mUnit);
 
-	/** Called each update to issue orders. */
-	void computeActions();
-};
+	/**
+	 * returns the resource group for the expansion the command center
+	 * @return expansion's resource group
+	 * @todo Move this functionality to StructureMain
+	 */
+	bats::ResourceGroupCstPtr getResourceGroup() const;
 
-#endif
+	virtual void computeActions();
+
+protected:
+	static bats::ResourceCounter* msResourceCounter;
+
+private:
+	bool mHasSentWorkers;
+	bats::ResourceGroupCstPtr mResourceGroup;
+};

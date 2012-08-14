@@ -30,9 +30,9 @@ std::string bats::TextColors::GREY_GREEN = "\x1D";
 std::string bats::TextColors::GREY_BLUE = "\x1E";
 std::string bats::TextColors::CYAN = "\x1F";
 
-bool bats::isGasStructure(BWAPI::Unit* pUnit) {
-	if (pUnit != NULL) {
-		const BWAPI::UnitType& unitType = pUnit->getType();
+bool bats::isGasStructure(BWAPI::Unit* unit) {
+	if (unit != NULL) {
+		const BWAPI::UnitType& unitType = unit->getType();
 
 		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser ||
 			unitType == BWAPI::UnitTypes::Terran_Refinery ||

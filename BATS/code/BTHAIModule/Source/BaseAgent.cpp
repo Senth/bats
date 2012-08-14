@@ -5,7 +5,7 @@
 #include "BATSModule/include/ExplorationManager.h"
 #include "Utilities/Logger.h"
 #include "BatsModule/include/Config.h"
-#include "BatsModule/include/TypeDefs.h"
+#include "BatsModule/include/SquadDefs.h"
 #include "BatsModule/include/DefenseManager.h"
 
 using namespace BWAPI;
@@ -22,7 +22,8 @@ BaseAgent::BaseAgent(Unit* mUnit)
 	lastActionFrame = 0;
 	goal = TilePositions::Invalid;
 	agentType = "BaseAgent";
-	//built = false;
+	
+	mCreationFrame = Broodwar->getFrameCount();
 
 	if (msDefenseManager == NULL) {
 		msDefenseManager = bats::DefenseManager::getInstance();
@@ -40,6 +41,10 @@ void BaseAgent::setSquadId(bats::SquadId squadId) {
 
 const bats::SquadId& BaseAgent::getSquadId() const {
 	return mSquadId;
+}
+
+int BaseAgent::getCreationFrame() const {
+	return mCreationFrame;
 }
 
 const string& BaseAgent::getTypeName() const

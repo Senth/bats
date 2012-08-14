@@ -6,7 +6,7 @@
 using namespace bats;
 using namespace BWAPI;
 
-TerranProductionBuilding::TerranProductionBuilding(BWAPI::Unit* pUnit) : StructureAgent(pUnit) {
+TerranProductionBuilding::TerranProductionBuilding(BWAPI::Unit* unit) : StructureAgent(unit) {
 	agentType = "TerranProductionBuilding";
 	DEBUG_MESSAGE(utilities::LogLevel_Fine, "TerranProductionBuilding Created");
 }

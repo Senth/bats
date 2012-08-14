@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "Utilities/KeyHandler.h"
 #include "Utilities/KeyType.h"
 #include "Config.h"
@@ -81,15 +81,15 @@ public:
 
 	/**
 	 * Adds a unit to the squad.
-	 * @param pUnit the unit that shall be added to the squad.
+	 * @param unit the unit that shall be added to the squad.
 	 */
-	void addUnit(const BWAPI::Unit* pUnit);
+	void addUnit(const BWAPI::Unit* unit);
 
 	/**
 	 * Removes a unit from the squad.
-	 * @param pUnit the unit that shall be removed.
+	 * @param unit the unit that shall be removed.
 	 */
-	void removeUnit(const BWAPI::Unit* pUnit);
+	void removeUnit(const BWAPI::Unit* unit);
 
 	/**
 	 * Returns the id of the squad.
@@ -142,10 +142,10 @@ public:
 
 	/**
 	 * Checks if the specified unit belongs to this squad
-	 * @param pUnit unit to check if it belongs to this squad
+	 * @param unit unit to check if it belongs to this squad
 	 * @return true if the unit belongs to this squad
 	 */
-	bool belongsToThisSquad(BWAPI::Unit* pUnit) const;
+	bool belongsToThisSquad(BWAPI::Unit* unit) const;
 
 protected:
 

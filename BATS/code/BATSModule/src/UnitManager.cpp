@@ -24,12 +24,12 @@ UnitManager* UnitManager::getInstance() {
 	if (mpsInstance == NULL) {
 		mpsInstance = new UnitManager();
 	}
-	UnitManager* pUnitManager = dynamic_cast<UnitManager*>(mpsInstance);
+	UnitManager* unitManager = dynamic_cast<UnitManager*>(mpsInstance);
 	
 	// assert: Forgot to call UnitManager::getInstance() before AgentManager::getInstance().
-	assert(pUnitManager != NULL);
+	assert(unitManager != NULL);
 	
-	return pUnitManager;
+	return unitManager;
 }
 
 std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
@@ -42,17 +42,17 @@ std::vector<const UnitAgent*> UnitManager::getUnitsByFilter(int filter) const {
 std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 	std::vector<UnitAgent*> foundUnits;
 	for (size_t i = 0; i < mAgents.size(); ++i) {
-		UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(mAgents[i]);
-		if (NULL != pUnitAgent) {
+		UnitAgent* unitAgent = dynamic_cast<UnitAgent*>(mAgents[i]);
+		if (NULL != unitAgent) {
 			// Automatically skip constructing and dead units
-			if (pUnitAgent->isBeingBuilt() || !pUnitAgent->isAlive()) {
+			if (unitAgent->isBeingBuilt() || !unitAgent->isAlive()) {
 				continue;
 			}
 
 			bool addUnit = false;
 
 			// Worker units
-			if (pUnitAgent->getUnitType().isWorker()) {
+			if (unitAgent->getUnitType().isWorker()) {
 				// All workers including those that are building
 				if (filter & UnitFilter_WorkersAll) {
 					addUnit = true;
@@ -60,7 +60,7 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 
 				// Only add free workers (in no squad and not building)
 				if (filter & UnitFilter_WorkersFree) {
-					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(pUnitAgent);
+					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(unitAgent);
 					if (NULL != pWorkerAgent &&
 						!pWorkerAgent->isConstructing() &&
 						pWorkerAgent->getSquadId().isInvalid())
@@ -72,13 +72,13 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 			// Non-worker units
 			else {
 				if (filter & UnitFilter_HasNoSquad | UnitFilter_Free) {
-					if (pUnitAgent->getSquadId().isInvalid()) {
+					if (unitAgent->getSquadId().isInvalid()) {
 						addUnit = true;
 					}
 				}
 
 				if (filter & UnitFilter_InDisbandableSquad) {
-					SquadId squadId = pUnitAgent->getSquadId();
+					SquadId squadId = unitAgent->getSquadId();
 					if (squadId.isValid()) {
 						SquadPtr pSquad = mpSquadManager->getSquad(squadId);
 
@@ -98,7 +98,7 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 			}
 
 			if (addUnit) {
-				foundUnits.push_back(pUnitAgent);
+				foundUnits.push_back(unitAgent);
 			}
 		}
 	}
@@ -116,14 +116,14 @@ void UnitManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 	AgentManager::onAgentDestroyed(destroyedAgent);
 
 	// Is it a UnitAgent?
-	UnitAgent* pUnitAgent = dynamic_cast<UnitAgent*>(destroyedAgent);
+	UnitAgent* unitAgent = dynamic_cast<UnitAgent*>(destroyedAgent);
 	
-	if (pUnitAgent != NULL) {
+	if (unitAgent != NULL) {
 		// Delete from squad if the unit had any
-		SquadId unitSquad = pUnitAgent->getSquadId();
+		SquadId unitSquad = unitAgent->getSquadId();
 		if (unitSquad.isValid()) {
 			SquadRef pSquad = mpSquadManager->getSquad(unitSquad);
-			pSquad->removeUnit(pUnitAgent);
+			pSquad->removeUnit(unitAgent);
 		}
 	}
 }

@@ -17,14 +17,14 @@ ResourceGroup::~ResourceGroup() {
 	// Does nothing
 }
 
-void ResourceGroup::addResource(BWAPI::Unit* pUnit) {
-	assert(NULL != pUnit);
+void ResourceGroup::addResource(BWAPI::Unit* unit) {
+	assert(NULL != unit);
 
-	mResources.insert(std::pair<int, Resource>(pUnit->getID(), Resource(pUnit)));
+	mResources.insert(std::pair<int, Resource>(unit->getID(), Resource(unit)));
 }
 
 bool ResourceGroup::hasResource(int id) const {
-	return mResources.count(id) > 1;
+	return mResources.count(id) > 0;
 }
 
 double ResourceGroup::getResourcesLeftInFraction() const {
@@ -43,6 +43,19 @@ double ResourceGroup::getResourcesLeftInFraction() const {
 	}
 
 	return fraction;
+}
+
+int ResourceGroup::getActiveMineralPatchCount() const {
+	int cMineralPatches = 0;
+
+	map<int, Resource>::const_iterator resourceIt;
+	for (resourceIt = mResources.begin(); resourceIt != mResources.end(); ++resourceIt) {
+		if (resourceIt->second.getCurrent() > 0) {
+			++cMineralPatches;
+		}
+	}
+
+	return cMineralPatches;
 }
 
 void ResourceGroup::update() {

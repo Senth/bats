@@ -6,7 +6,7 @@
 #include "EnemySquad.h"
 #include "PlayerArmyManager.h"
 #include "Helper.h"
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "DefenseManager.h"
 #include "IntentionWriter.h"
 #include <sstream>
@@ -414,9 +414,9 @@ bool AttackSquad::isTargetingEnemyStructure() const {
 	const vector<const UnitAgent*>& units = getUnits();
 
 	for (size_t i = 0; i < units.size(); ++i) {
-		const Unit* pUnit = units[i]->getUnit();
-		const Unit* pTarget = pUnit->getTarget();
-		const Unit* pOrderTarget = pUnit->getOrderTarget();
+		const Unit* unit = units[i]->getUnit();
+		const Unit* pTarget = unit->getTarget();
+		const Unit* pOrderTarget = unit->getOrderTarget();
 
 		// Target
 		if (NULL != pTarget &&

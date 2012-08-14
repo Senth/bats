@@ -38,34 +38,34 @@ namespace TextColors {
  * Protoss_Assimilator, Zerg_Extractor
  * @return true if the unit is a gas building.
  */
-bool isGasStructure(BWAPI::Unit* pUnit);
+bool isGasStructure(BWAPI::Unit* unit);
 
 /**
  * A function to check if a unit belongs to us
- * @param pUnit unit to check if it belongs to us
+ * @param unit unit to check if it belongs to us
  * @return true if the unit belongs to us, else false
  */
-inline bool isOurs(BWAPI::Unit* pUnit) {
-	return pUnit->getPlayer() == BWAPI::Broodwar->self();
+inline bool isOurs(BWAPI::Unit* unit) {
+	return unit->getPlayer() == BWAPI::Broodwar->self();
 }
 
 /**
  * Check if a unit belongs to an ally
- * @param pUnit unit to check if it belongs to an ally
+ * @param unit unit to check if it belongs to an ally
  * @return true if the unit belongs to an ally.
  */
-inline bool isAllied(BWAPI::Unit* pUnit) {
-	return BWAPI::Broodwar->self()->isAlly(pUnit->getPlayer()) &&
-		BWAPI::Broodwar->self() != pUnit->getPlayer();
+inline bool isAllied(BWAPI::Unit* unit) {
+	return BWAPI::Broodwar->self()->isAlly(unit->getPlayer()) &&
+		BWAPI::Broodwar->self() != unit->getPlayer();
 }
 
 /**
  * Checks if a unit belongs to an enemy
- * @param pUnit unit to check if it belongs to an enemy
+ * @param unit unit to check if it belongs to an enemy
  * @return true if the unit belongs to an enemy.
  */
-inline bool isEnemy(BWAPI::Unit* pUnit) {
-	return BWAPI::Broodwar->self()->isEnemy(pUnit->getPlayer());
+inline bool isEnemy(BWAPI::Unit* unit) {
+	return BWAPI::Broodwar->self()->isEnemy(unit->getPlayer());
 }
 
 /**

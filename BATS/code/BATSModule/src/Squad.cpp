@@ -342,12 +342,12 @@ bool Squad::travelsByAir() const {
 	}
 }
 
-void Squad::addUnit(UnitAgent* pUnit) {
+void Squad::addUnit(UnitAgent* unit) {
 	bool bAddUnit = false;
 
 	// Only add units if we have place for them in the unit composition
 	if (mUnitComposition.isValid()) {
-		bAddUnit = mUnitComposition.addUnit(pUnit);
+		bAddUnit = mUnitComposition.addUnit(unit);
 	}
 	// No unit composition, all units can be added
 	else {
@@ -356,22 +356,22 @@ void Squad::addUnit(UnitAgent* pUnit) {
 
 	if (bAddUnit) {	
 		// Remove unit from existing squad if it belongs to another squad.
-		if (pUnit->getSquadId() != SquadId::INVALID_KEY) {
-			SquadPtr pOldSquad = msSquadManager->getSquad(pUnit->getSquadId());
+		if (unit->getSquadId() != SquadId::INVALID_KEY) {
+			SquadPtr pOldSquad = msSquadManager->getSquad(unit->getSquadId());
 			assert(pOldSquad != NULL);
 
-			pOldSquad->removeUnit(pUnit);
+			pOldSquad->removeUnit(unit);
 		}
 
 
 		// Add unit
-		mUnits.push_back(pUnit);
-		pUnit->setSquadId(mId);
+		mUnits.push_back(unit);
+		unit->setSquadId(mId);
 	
-		updateUnitMovement(pUnit);
+		updateUnitMovement(unit);
 
 		// Set has ground or has air
-		if (pUnit->isAir()) {
+		if (unit->isAir()) {
 			mHasAirUnits = true;
 		} else {
 			mHasGroundUnits = true;
@@ -379,7 +379,7 @@ void Squad::addUnit(UnitAgent* pUnit) {
 
 		// Send event only if the class has been initialized (otherwise derived classes doesn't exist)
 		if (mInitialized) {
-			onUnitAdded(pUnit);
+			onUnitAdded(unit);
 		}
 	}
 }
@@ -391,9 +391,9 @@ void Squad::addUnits(const vector<UnitAgent*>& units) {
 	}
 }
 
-void Squad::removeUnit(UnitAgent* pUnit) {
+void Squad::removeUnit(UnitAgent* unit) {
 
-	vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), pUnit);
+	vector<UnitAgent*>::iterator foundUnit = std::find(mUnits.begin(), mUnits.end(), unit);
 	if (foundUnit != mUnits.end()) {
 		// Remove from unit composition
 		if (mUnitComposition.isValid()) {
@@ -403,7 +403,7 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 		mUnits.erase(foundUnit);
 
 		// Update has air and has ground
-		if (pUnit->isAir()) {
+		if (unit->isAir()) {
 			mHasAirUnits = false;	// testing
 
 			// Look for air units
@@ -427,12 +427,12 @@ void Squad::removeUnit(UnitAgent* pUnit) {
 			}
 		}
 
-		pUnit->setSquadId(bats::SquadId::INVALID_KEY);
-		onUnitRemoved(pUnit);
-		pUnit->resetToDefaultBehavior();
+		unit->setSquadId(bats::SquadId::INVALID_KEY);
+		onUnitRemoved(unit);
+		unit->resetToDefaultBehavior();
 
 	} else {
-		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << pUnit->getUnitID());
+		ERROR_MESSAGE(false, "Could not find the unit to remove, id: " << unit->getUnitID());
 	}
 }
 
@@ -681,9 +681,9 @@ void Squad::clearRegroupPosition() {
 	updateUnitMovement();
 }
 
-void Squad::updateUnitMovement(UnitAgent* pUnit) {
+void Squad::updateUnitMovement(UnitAgent* unit) {
 	if (State_Active == mState) {
-		pUnit->setGoal(getPriorityMoveToPosition());
+		unit->setGoal(getPriorityMoveToPosition());
 	}
 }
 
@@ -776,9 +776,9 @@ TilePosition Squad::getPriorityMoveToPosition() const {
 
 bool Squad::isAUnitStill() const {
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		Unit* pUnit = mUnits[i]->getUnit();
+		Unit* unit = mUnits[i]->getUnit();
 
-		if (!pUnit->isMoving() && !pUnit->isAttacking()) {
+		if (!unit->isMoving() && !unit->isAttacking()) {
 			return true;
 		}
 	}

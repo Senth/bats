@@ -45,10 +45,13 @@ public:
 	double getElapsedTime(int sinceFrame) const;
 
 	/**
-	 * Returns the current frame count. This is equivalent to Broodwar->getFrameCount().
-	 * @return number of frames since the start of the game
+	 * Returns the current frame count since the specified frame, which default to the first
+	 * game frame (0). 
+	 * @param sinceFrame optional value to calculate how many frames has passed since the specified
+	 * frame, defaults to 0.
+	 * @return number of frames since the the specified frame.
 	 */
-	int getFrameCount() const;
+	int getFrameCount(int sinceFrame = 0) const;
 	
 private:
 	/**

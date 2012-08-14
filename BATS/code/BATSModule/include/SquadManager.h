@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include <vector>
 #include <map>
 #include <memory>

@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "Utilities/KeyType.h"
 #include "Utilities/KeyHandler.h"
 #include "UnitSet.h"
@@ -157,11 +157,11 @@ public:
 
 	/**
 	 * Adds a unit to the squad.
-	 * @param pUnit the unit to add.
+	 * @param unit the unit to add.
 	 * @note if the squad has a unit composition, the unit will only be added if the unit
 	 * composition has a free spot for it.
 	 */
-	void addUnit(UnitAgent* pUnit);
+	void addUnit(UnitAgent* unit);
 
 	/**
 	 * Adds many units to the squad.
@@ -173,9 +173,9 @@ public:
 
 	/**
 	 * Removes a unit from the squad. This should be called when a unit dies too.
-	 * @param pUnit the unit to remove.
+	 * @param unit the unit to remove.
 	 */
-	void removeUnit(UnitAgent* pUnit);
+	void removeUnit(UnitAgent* unit);
 
 	/**
 	 * Adds a WaitGoal to the Squad. While this doesn't do anything in itself the derived
@@ -636,11 +636,11 @@ private:
 	 * Updates the unit's movement to the current active position to move to.
 	 * Call this once a type of goal has been added removed. Or when a unit is added.
 	 * @pre squad state is active
-	 * @param pUnit the unit to update the goal position of
+	 * @param unit the unit to update the goal position of
 	 * @see updateUnitMovement() to update the position of all units in the squad.
 	 * @see getPriorityMoveToPosition() for the move to position with the highest priority
 	 */
-	void updateUnitMovement(UnitAgent* pUnit);
+	void updateUnitMovement(UnitAgent* unit);
 
 	/**
 	 * Updates all unit movements to the current active position. This function is equivalent

@@ -28,8 +28,8 @@ void GameTime::update() {
 	mElapsedTime = static_cast<double>(currentFrame - mStartFrame) * SECONDS_PER_FRAME_FASTEST;
 }
 
-double GameTime::getElapsedTime(double seconds) const {
-	return mElapsedTime - seconds;
+double GameTime::getElapsedTime(double sinceSecond) const {
+	return mElapsedTime - sinceSecond;
 }
 
 double GameTime::getElapsedTime(int sinceFrame) const {
@@ -37,6 +37,6 @@ double GameTime::getElapsedTime(int sinceFrame) const {
 	return static_cast<double>(frameDiff) * SECONDS_PER_FRAME_FASTEST;
 }
 
-int GameTime::getFrameCount() const {
-	return BWAPI::Broodwar->getFrameCount();
+int GameTime::getFrameCount(int sinceFrame) const {
+	return BWAPI::Broodwar->getFrameCount() - sinceFrame;
 }

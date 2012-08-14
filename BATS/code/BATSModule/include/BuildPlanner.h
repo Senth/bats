@@ -49,15 +49,15 @@ public:
 	static BuildPlanner* getInstance();
 
 	/**
-	Used to get the unit list created from the BuildOrderFileReader instance
-	*/
+	 * Used to get the unit list created from the BuildOrderFileReader instance
+	 */
 	std::vector<bats::CoreUnit> getUnitList();
 
 	/** Called on user command to switch phase. */	
 	void switchToPhase(std::string fileName);
 
 	/** Returns the number of units of the specified type currently being produced. */
-	int noInProduction(BWAPI::UnitType type);
+	int countInProduction(BWAPI::UnitType type);
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -66,13 +66,13 @@ public:
 	void buildingDestroyed(BWAPI::Unit* building);
 
 	/** When a request to construct a new building is issued, no construction are
-	 * allowed until the worker has moved to the buildspot and started constructing
+	 * allowed until the worker has moved to the build spot and started constructing
 	 * the building. This is to avoid that the needed resources are not used up by
 	 * other build orders. During this time the BuildPlanner is locked, and new 
 	 * construction can only be done when unlock has been called. */
 	void unlock(BWAPI::UnitType type);
 
-	/** Removes a building from the buildorder. */
+	/** Removes a building from the build order. */
 	void remove(BWAPI::UnitType type);
 
 	/** Called when a worker that is constructing a building is destroyed. */
@@ -82,9 +82,9 @@ public:
 	void commandCenterBuilt();
 
 	/** Shows some debug info on screen. */
-	void printInfo();
+	void printGraphicDebugInfo();
 
-	/** Is called when no buildspot has been found for the specified type. Gives each buildplanner
+	/** Is called when no build spot has been found for the specified type. Gives each build planner
 	 * an opportunity to handle it. */
 	void handleNoBuildspotFound(BWAPI::UnitType toBuild);
 
@@ -94,17 +94,17 @@ public:
 	/** Checks if a supply is under construction. */
 	bool supplyBeingBuilt();
 
-	/** Returns true if next in buildorder is of the specified type. Returns false if
-	 * buildorder is empty. */
+	/** Returns true if next in build order is of the specified type. Returns false if
+	 * build order is empty. */
 	bool nextIsOfType(BWAPI::UnitType type);
 
-	/** Returns true if buildorder contains a unit of the specified type. */
+	/** Returns true if build order contains a unit of the specified type. */
 	bool containsType(BWAPI::UnitType type);
 
-	/** Adds a building to the buildorder queue. */
+	/** Adds a building to the build order queue. */
 	void addBuilding(BWAPI::UnitType type);
 
-	/** Adds a building first in the buildorder queue. */
+	/** Adds a building first in the build order queue. */
 	void addBuildingFirst(BWAPI::UnitType type);
 
 	/** Requests to expand the base. */
@@ -113,7 +113,7 @@ public:
 	/** Check if expansion is available. */
 	bool isExpansionAvailable(BWAPI::UnitType commandCenterUnit);
 
-	/** Adds a refinery to the buildorder list. */
+	/** Adds a refinery to the build order list. */
 	void addRefinery();
 
 	/** Checks if the specified BWAPI::TilePosition is covered by a detector buildings sight radius. */

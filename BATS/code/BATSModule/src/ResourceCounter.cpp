@@ -2,6 +2,7 @@
 #include "ResourceGroup.h"
 #include "Resource.h"
 #include "Config.h"
+#include "Helper.h"
 #include "Utilities/Logger.h"
 #include "BTHAIModule/Source/Profiler.h"
 #include <cstdlib> // For NULL
@@ -12,9 +13,8 @@ using namespace bats;
 using namespace BWAPI;
 using namespace BWTA;
 using namespace std;
-using std::tr1::shared_ptr;
 
-ResourceCounter* ResourceCounter::mpsInstance = NULL;
+ResourceCounter* ResourceCounter::msInstance = NULL;
 
 ResourceCounter::ResourceCounter() {
 	mFrameLastCall = Broodwar->getFrameCount();
@@ -23,42 +23,58 @@ ResourceCounter::ResourceCounter() {
 }
 
 ResourceCounter::~ResourceCounter() {
-	mpsInstance = NULL;
+	msInstance = NULL;
 }
 
 ResourceCounter* ResourceCounter::getInstance() {
-	if (NULL == mpsInstance) {
-		mpsInstance = new ResourceCounter();
+	if (NULL == msInstance) {
+		msInstance = new ResourceCounter();
 	}
-	return mpsInstance;
+	return msInstance;
 }
 
-map<int, shared_ptr<ResourceGroup>>::const_iterator ResourceCounter::begin() const {
+ResourceGroupCstIt ResourceCounter::begin() const {
 	return mGroupsById.begin();
 }
 
-map<int, shared_ptr<ResourceGroup>>::const_iterator ResourceCounter::end() const {
+ResourceGroupCstIt ResourceCounter::end() const {
 	return mGroupsById.end();
 }
 
-shared_ptr<const ResourceGroup> ResourceCounter::getResourceGroup(int groupId) const {
-	const map<int, shared_ptr<ResourceGroup>>::const_iterator& groupIt = mGroupsById.find(groupId);
+ResourceGroupCstPtr ResourceCounter::getResourceGroup(int groupId) const {
+	const ResourceGroupCstIt& groupIt = mGroupsById.find(groupId);
 	if (groupIt != mGroupsById.end()) {
 		return groupIt->second;
 	} else {
-		return shared_ptr<const ResourceGroup>();
+		return ResourceGroupCstPtr();
 	}
 }
 
-shared_ptr<const ResourceGroup> ResourceCounter::getResourceGroup(const BWAPI::TilePosition& expansionPosition) {
-	const map<TilePosition, shared_ptr<ResourceGroup>>::const_iterator& groupIt =
+ResourceGroupCstPtr ResourceCounter::getResourceGroup(const BWAPI::TilePosition& expansionPosition) const {
+	const std::map<TilePosition, ResourceGroupPtr>::const_iterator& groupIt =
 		mGroupsByPosition.find(expansionPosition);
 
 	if (groupIt != mGroupsByPosition.end()) {
 		return groupIt->second;
 	} else {
-		return shared_ptr<const ResourceGroup>();
+		return ResourceGroupCstPtr();
 	}
+}
+
+ResourceGroupCstPtr ResourceCounter::getClosestResourceGroup(const BWAPI::TilePosition& position) const {
+	int bestDist = INT_MAX;
+	ResourceGroupPtr bestResource;
+
+	for (ResourceGroupCstIt resourceIt = mGroupsById.begin(); resourceIt != mGroupsById.end(); ++resourceIt) {
+		const TilePosition& expansionPos = resourceIt->second->getExpansionPosition();
+		int dist = bats::getSquaredDistance(expansionPos, position);
+		if (dist < bestDist) {
+			bestDist = dist;
+			bestResource = resourceIt->second;
+		}
+	}
+
+	return bestResource;
 }
 
 void ResourceCounter::update() {
@@ -72,7 +88,7 @@ void ResourceCounter::update() {
 	Profiler::getInstance()->start("ResourceCounter::update()");
 
 	// Update all existing first
-	map<int, shared_ptr<ResourceGroup>>::iterator groupIt;
+	ResourceGroupIt groupIt;
 	for (groupIt = mGroupsById.begin(); groupIt != mGroupsById.end(); ++groupIt) {
 		groupIt->second->update();
 	}
@@ -85,7 +101,7 @@ void ResourceCounter::update() {
 	std::set<Unit*>::const_iterator mineralIt;
 	for (mineralIt = minerals.begin(); mineralIt != minerals.end(); ++mineralIt) {
 		// Get the resource group
-		map<int, shared_ptr<ResourceGroup>>::iterator groupIt;
+		ResourceGroupIt groupIt;
 		groupIt = mGroupsById.find((*mineralIt)->getResourceGroup());
 
 		if (groupIt != mGroupsById.end()) {
@@ -123,7 +139,7 @@ void ResourceCounter::addResourceGroups() {
 				pCurrentBase->getTilePosition(),
 				resourceGroupId
 			);
-			shared_ptr<ResourceGroup> resourceGroup(pNewResourceGroup);
+			ResourceGroupPtr resourceGroup(pNewResourceGroup);
 
 			// Add to maps
 			mGroupsById.insert(make_pair(resourceGroupId,resourceGroup));
@@ -136,5 +152,8 @@ void ResourceCounter::addResourceGroups() {
 				pCurrentBase->getTilePosition().y() << ")!"
 			);
 		}
+
+
+		/// @todo add vespene geysers?
 	}
 }

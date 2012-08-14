@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "Config.h"
 #include <memory>
 #include <vector>
@@ -50,15 +50,15 @@ public:
 
 	/**
 	 * Add an allied unit to the manager. Do this when a unit is created.
-	 * @param pUnit the new unit 
+	 * @param unit the new unit 
 	 */
-	void addUnit(BWAPI::Unit* pUnit);
+	void addUnit(BWAPI::Unit* unit);
 
 	/**
 	 * Remove an allied unit from the manager. Do this when a unit is killed.
-	 * @param pUnit the killed unit.
+	 * @param unit the killed unit.
 	 */
-	void removeUnit(BWAPI::Unit* pUnit);
+	void removeUnit(BWAPI::Unit* unit);
 
 	/**
 	 * Prints graphical debug information depending on the current
@@ -127,28 +127,28 @@ private:
 
 	/**
 	 * Checks if the two units are within exclude_distance
-	 * @param pUnitA one of the units
-	 * @param pUnitB the other unit
+	 * @param unitA one of the units
+	 * @param unitB the other unit
 	 * @return true if distance between the two units are less or equal to exclude_distance
 	 */
-	bool withinExcludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const;
+	bool withinExcludeDistance(BWAPI::Unit* unitA, BWAPI::Unit* unitB) const;
 
 	/**
 	 * Checks if the two units are within include_distance
-	 * @param pUnitA one of the units
-	 * @param pUnitB the other unit
+	 * @param unitA one of the units
+	 * @param unitB the other unit
 	 * @return true if distance between the two units are less or equal to include_distance
 	 */
-	bool withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const;
+	bool withinIncludeDistance(BWAPI::Unit* unitA, BWAPI::Unit* unitB) const;
 
 	/**
 	 * Returns the grid position of the unit. If the unit is inside a transportation it will
 	 * use the transportation's position instead of the unit's.
-	 * @param pUnit unit that check the corresponding grid placement of
-	 * @pre pUnit is not NULL
+	 * @param unit unit that check the corresponding grid placement of
+	 * @pre unit is not NULL
 	 * @return grid position of the unit.
 	 */
-	BWAPI::Position getGridPosition(BWAPI::Unit* pUnit) const;
+	BWAPI::Position getGridPosition(BWAPI::Unit* unit) const;
 
 	/**
 	 * Returns true if the position is the same or a border grid position, not diagonally border.
@@ -178,19 +178,19 @@ private:
 
 	/**
 	 * Recursively add units, that are close to this unit, to the specified squad.
-	 * @param pUnit position to check close-by units.
+	 * @param unit position to check close-by units.
 	 * @param squadId the squad of the original unit, i.e. the squad that units shall be added to
 	 * if the unit already belongs to this squad, nothing is changed, if the squad does not
 	 * belong to this squad, it is removed from the old squad and added to this.
 	 */
-	void addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId);
+	void addCloseUnitsToSquad(BWAPI::Unit* unit, PlayerSquadId squadId);
 
 	/**
 	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
 	 * it as checked in mGridUnits.
-	 * @param pUnit the unit to be set as checked.
+	 * @param unit the unit to be set as checked.
 	 */
-	void setUnitAsChecked(BWAPI::Unit* pUnit);
+	void setUnitAsChecked(BWAPI::Unit* unit);
 
 	/**
 	 * Helper function, sets the unit as checked. Both erases it from mUnitsToCheck and sets
@@ -231,9 +231,9 @@ private:
 	/**
 	 * Adds a unit to the grid with the correct position. I.e. if it's in a transportation
 	 * it will set the unit's position to where the transportation is.
-	 * @param pUnit the unit to add to the grid
+	 * @param unit the unit to add to the grid
 	 */
-	void addUnitToGrid(BWAPI::Unit* pUnit);
+	void addUnitToGrid(BWAPI::Unit* unit);
 
 	int mLastFrameUpdate;
 	std::vector<PlayerSquadPtr> mSquads;

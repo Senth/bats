@@ -105,6 +105,18 @@ namespace bats {
 		 */
 		namespace classification {
 			/**
+			 * Rules for calculation expansions
+			 */
+			namespace expansion {
+				/** How many workers per mineral patch until all expansions are treated
+				 * as saturated */
+				extern double WORKERS_PER_MINERAL_SATURATION;
+				/** Fraction of the mineral resources that should be left until the
+				 * expansion is treated as low on resources */
+				extern double EXPANSION_MINERALS_LOW;
+			}
+
+			/**
 			 * Rules for calculating when it's a good idea to retreat from an enemy squad
 			 */
 			namespace retreat {
@@ -188,6 +200,15 @@ namespace bats {
 		}
 
 		/**
+		 * Commander configuration variables
+		 */
+		namespace commander {
+			/** Minimum number of seconds that must have passed since building an expansion
+			 * before expanding again, in seconds */
+			extern double EXPANSION_INTERVAL_MIN;
+		}
+
+		/**
 		 * Debugging configuration
 		 */
 		namespace debug {
@@ -239,6 +260,7 @@ namespace bats {
 			extern int RESOURCE_COUNTER;
 			extern int ALLIED_ARMY_REARRANGE_SQUADS;
 			extern int DEFENSE_MANAGER;
+			extern int COMMANDER;
 		}
 
 		/**
@@ -261,12 +283,14 @@ namespace bats {
 		 * Enabled modules
 		 */
 		namespace module {
-			/** Reaction module for the Commander. When enabled it will react to different
-			 * player actions */
-			extern bool PLAYER_REACT;
-			/** It's own initiative, i.e. not reacting, but creating commands when it feels
-			 * it's a good time to do so */
-			extern bool OWN_INITIATIVE;
+			/** Allied reaction module for Commander. When enabled it will react to different
+			 * player actions and create different commands; such as attack, drop, expand.
+			 * @see OWN_REACT */
+			extern bool ALLIED_REACT;
+			/** Own reaction module for Commander. Works as ALLIED_REACT but reacts to own player
+			 * actions instead.
+			 * @see ALLIED_REACT */
+			extern bool OWN_REACT;
 			/** If the bot shall write out the intention and reason behind its actions */
 			extern bool WRITE_INTENTION;
 		}

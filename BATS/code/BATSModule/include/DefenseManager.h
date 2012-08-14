@@ -4,7 +4,7 @@
 #include <set>
 #include <BWAPI/TilePosition.h>
 #include <BWTA/Chokepoint.h>
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 
 // Forward declaration
 class UnitAgent;

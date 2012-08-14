@@ -80,11 +80,11 @@ void BuildPlanner::switchToPhase(std::string fileName){
 }
 
 void BuildPlanner::buildingDestroyed(Unit* building){
-	if (building->getType().getID() == UnitTypes::Protoss_Pylon.getID())
+	if (building->getType() == UnitTypes::Protoss_Pylon)
 	{
 		return;
 	}
-	if (building->getType().getID() == UnitTypes::Terran_Supply_Depot.getID())
+	if (building->getType() == UnitTypes::Terran_Supply_Depot)
 	{
 		return;
 	}
@@ -96,7 +96,7 @@ void BuildPlanner::buildingDestroyed(Unit* building){
 }
 
 void BuildPlanner::computeActions(){
-	//Dont call too often
+	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
 	if (cFrame - lastCallFrame < 30)
 	{
@@ -111,7 +111,7 @@ void BuildPlanner::computeActions(){
 	}
 
 	//Check if we have possible "locked" items in the buildqueue
-	for (int i = 0; i < (int)buildQueue.size(); i++)
+	for (size_t i = 0; i < buildQueue.size(); i++)
 	{
 		int elapsed = cFrame - buildQueue.at(i).assignedFrame;
 		if (elapsed >= 2000)
@@ -129,10 +129,10 @@ void BuildPlanner::computeActions(){
 		}
 	}
 
-	//Check if we can build next building in the buildorder
-	if ((int)buildOrder.size() > 0)
+	//Check if we can build next building in the build order
+	if (buildOrder.size() > 0)
 	{
-		//TODO check with unitcreator ?
+		// @todo check with unitcreator ?
 		executeOrder(buildOrder.at(0));
 	}
 
@@ -155,7 +155,7 @@ bool BuildPlanner::hasResourcesLeft(){
 	int totalMineralsLeft = 0;
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
 		if (agent->getUnitType().isResourceDepot())
@@ -206,17 +206,17 @@ bool BuildPlanner::shallBuildSupply(){
 	{
 		if (buildOrder.size() > 0)
 		{
-			if (buildOrder.at(0).getID() != UnitTypes::Protoss_Pylon.getID())
+			if (buildOrder.at(0) != UnitTypes::Protoss_Pylon)
 			{
 				vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-				for (int i = 0; i < (int)agents.size(); i++)
+				for (size_t i = 0; i < agents.size(); i++)
 				{
 					BaseAgent* agent = agents.at(i);
 					if (agent->isAlive())
-				{
+					{
 						Unit* cUnit = agent->getUnit();
 						if (cUnit->isUnpowered())
-				{
+						{
 							return true;
 						}
 					}
@@ -260,7 +260,7 @@ bool BuildPlanner::supplyBeingBuilt(){
 	//Zerg
 	if (isZerg())
 	{
-		if (noInProduction(UnitTypes::Zerg_Overlord) > 0)
+		if (countInProduction(UnitTypes::Zerg_Overlord) > 0)
 		{
 			return true;
 		}
@@ -275,12 +275,12 @@ bool BuildPlanner::supplyBeingBuilt(){
 
 	//1. Check if we are already building a supply
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
 		if (agent->isAlive())
 		{
-			if (agent->getUnitType().getID() == supply.getID())
+			if (agent->getUnitType() == supply)
 			{
 				if (agent->getUnit()->isBeingConstructed())
 				{
@@ -292,9 +292,9 @@ bool BuildPlanner::supplyBeingBuilt(){
 	}
 
 	//2. Check if we have a supply in build queue
-	for (int i = 0; i < (int)buildQueue.size(); i++)
+	for (size_t i = 0; i < buildQueue.size(); i++)
 	{
-		if (buildQueue.at(i).toBuild.getID() == supply.getID())
+		if (buildQueue.at(i).toBuild == supply)
 		{
 			return true;
 		}
@@ -316,9 +316,9 @@ void BuildPlanner::lock(int buildOrderIndex, int unitId){
 }
 
 void BuildPlanner::remove(UnitType type){
-	for (int i = 0; i < (int)buildOrder.size(); i++)
+	for (size_t i = 0; i < buildOrder.size(); i++)
 	{
-		if (buildOrder.at(i).getID() == type.getID())
+		if (buildOrder.at(i) == type)
 		{
 			buildOrder.erase(buildOrder.begin() + i);
 			return;
@@ -327,9 +327,9 @@ void BuildPlanner::remove(UnitType type){
 }
 
 void BuildPlanner::unlock(UnitType type){
-	for (int i = 0; i < (int)buildQueue.size(); i++)
+	for (size_t i = 0; i < buildQueue.size(); i++)
 	{
-		if (buildQueue.at(i).toBuild.getID() == type.getID())
+		if (buildQueue.at(i).toBuild == type)
 		{
 			buildQueue.erase(buildQueue.begin() + i);
 			return;
@@ -338,7 +338,7 @@ void BuildPlanner::unlock(UnitType type){
 }
 
 void BuildPlanner::handleWorkerDestroyed(UnitType type, int workerID){
-	for (int i = 0; i < (int)buildQueue.size(); i++)
+	for (size_t i = 0; i < buildQueue.size(); i++)
 	{
 		if (buildQueue.at(i).assignedWorkerId == workerID)
 		{
@@ -371,20 +371,20 @@ bool BuildPlanner::executeMorph(UnitType target, UnitType evolved){
 
 bool BuildPlanner::executeOrder(UnitType type){
 	//Max 3 concurrent buildings allowed at the same time
-	if ((int)buildQueue.size() >= 3)
+	if (buildQueue.size() >= 3)
 	{
 		return false;
 	}
 
 	//Hold if we are to build a new base
-	if ((int)buildQueue.size() > 0)
+	if (buildQueue.size() > 0)
 	{
 		if (buildQueue.at(0).toBuild.isResourceDepot())
 		{
 			return false;
 		}
 		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (int i = 0; i < (int)agents.size(); i++)
+		for (size_t i = 0; i < agents.size(); i++)
 		{
 			if (agents.at(i)->getUnitType().isResourceDepot() && agents.at(i)->getUnit()->isBeingConstructed())
 			{
@@ -399,7 +399,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 		if (pos == TilePositions::Invalid)
 		{
 			//No expansion site found.
-			if ((int)buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
+			if (buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
 			return true;
 		}
 	}
@@ -408,15 +408,15 @@ bool BuildPlanner::executeOrder(UnitType type){
 		TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
 		if (rSpot == TilePositions::Invalid)
 		{
-			//No buildspot found
-			if ((int)buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
+			//No build spot found
+			if (buildOrder.size() > 0) buildOrder.erase(buildOrder.begin());
 			return true;
 		}
 	}
 	if (isZerg())
 	{
 		pair<UnitType, int> builder = type.whatBuilds();
-		if (builder.first.getID() != UnitTypes::Zerg_Drone)
+		if (builder.first != UnitTypes::Zerg_Drone)
 		{
 			//Needs to be morphed
 			if (executeMorph(builder.first, type))
@@ -435,7 +435,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 		return false;
 	}	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++){
+	for (size_t i = 0; i < agents.size(); i++){
 		BaseAgent* agent = agents.at(i);
 		if (agent != NULL && agent->isAlive()){
 			if (agent->canBuild(type)){
@@ -444,7 +444,7 @@ bool BuildPlanner::executeOrder(UnitType type){
 					return true;
 				}
 				else{
-					//Unable to find a buildspot. Dont bother checking for all
+					//Unable to find a build spot. Don't bother checking for all
 					//other workers
 					handleNoBuildspotFound(type);
 					return false;
@@ -456,21 +456,21 @@ bool BuildPlanner::executeOrder(UnitType type){
 }
 
 bool BuildPlanner::isTerran(){
-	if (Broodwar->self()->getRace().getID() == Races::Terran.getID()){
+	if (Broodwar->self()->getRace() == Races::Terran){
 		return true;
 	}
 	return false;
 }
 
 bool BuildPlanner::isProtoss(){
-	if (Broodwar->self()->getRace().getID() == Races::Protoss.getID()){
+	if (Broodwar->self()->getRace() == Races::Protoss){
 		return true;
 	}
 	return false;
 }
 
 bool BuildPlanner::isZerg(){
-	if (Broodwar->self()->getRace().getID() == Races::Zerg.getID()){
+	if (Broodwar->self()->getRace() == Races::Zerg){
 		return true;
 	}
 	return false;
@@ -490,35 +490,35 @@ void BuildPlanner::commandCenterBuilt(){
 
 string BuildPlanner::format(UnitType type){
 	string name = type.getName();
-	int i = name.find(" ");
+	size_t i = name.find(" ");
 	string fname = name.substr(i + 1, name.length());
 	return fname;
 }
 
-void BuildPlanner::printInfo(){
-	int max = 4;
-	if ((int)buildOrder.size() < 4)
+void BuildPlanner::printGraphicDebugInfo(){
+	size_t max = 4;
+	if (buildOrder.size() < 4)
 	{
-		max = (int)buildOrder.size();
+		max = buildOrder.size();
 	}
 
 	int line = 1;
 	Broodwar->drawTextScreen(5,0,"Buildorder:");
-	for (int i = 0; i < max; i++)
+	for (size_t i = 0; i < max; i++)
 	{
 		Broodwar->drawTextScreen(5,16*line, format(buildOrder.at(i)).c_str());
 		line++;
 	}
 
-	int qmax = 4;
-	if ((int)buildQueue.size() < 4)
+	size_t qmax = 4;
+	if (buildQueue.size() < 4)
 	{
-		qmax = (int)buildQueue.size();
+		qmax = buildQueue.size();
 	}
 
 	line = 1;
 	Broodwar->drawTextScreen(150,0,"Buildqueue:");
-	for (int i = 0; i < qmax; i++)
+	for (size_t i = 0; i < qmax; i++)
 	{
 		Broodwar->drawTextScreen(150,16*line, format(buildQueue.at(i).toBuild).c_str());
 		line++;
@@ -527,11 +527,11 @@ void BuildPlanner::printInfo(){
 
 void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 	bool removeOrder = false;
-	if (toBuild.getID() == UnitTypes::Protoss_Photon_Cannon) removeOrder = true;
-	if (toBuild.getID() == UnitTypes::Terran_Missile_Turret) removeOrder = true;
+	if (toBuild == UnitTypes::Protoss_Photon_Cannon) removeOrder = true;
+	if (toBuild == UnitTypes::Terran_Missile_Turret) removeOrder = true;
 	if (toBuild.isAddon()) removeOrder = true;
-	if (toBuild.getID() == UnitTypes::Zerg_Spore_Colony) removeOrder = true;
-	if (toBuild.getID() == UnitTypes::Zerg_Sunken_Colony) removeOrder = true;
+	if (toBuild == UnitTypes::Zerg_Spore_Colony) removeOrder = true;
+	if (toBuild == UnitTypes::Zerg_Sunken_Colony) removeOrder = true;
 	if (toBuild.isResourceDepot()) removeOrder = true;
 	if (toBuild.isRefinery()) removeOrder = true;
 
@@ -554,13 +554,13 @@ void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 }
 
 bool BuildPlanner::nextIsOfType(UnitType type){
-	if ((int)buildOrder.size() == 0)
+	if (buildOrder.size() == 0)
 	{
 		return false;
 	}
 	else
 	{
-		if (buildOrder.at(0).getID() == type.getID())
+		if (buildOrder.at(0) == type)
 		{
 			return true;
 		}
@@ -569,9 +569,9 @@ bool BuildPlanner::nextIsOfType(UnitType type){
 }
 
 bool BuildPlanner::containsType(UnitType type){
-	for (int i = 0; i < (int)buildOrder.size(); i++)
+	for (size_t i = 0; i < buildOrder.size(); i++)
 	{
-		if (buildOrder.at(i).getID() == type.getID())
+		if (buildOrder.at(i) == type)
 		{
 			return true;
 		}
@@ -581,7 +581,7 @@ bool BuildPlanner::containsType(UnitType type){
 
 bool BuildPlanner::coveredByDetector(TilePosition pos){
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
 		if (agent->isAlive())
@@ -616,7 +616,7 @@ void BuildPlanner::expand(UnitType commandCenterUnit){
 	}
 
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-	if (pos== TilePositions::Invalid)
+	if (pos == TilePositions::Invalid)
 	{
 		//No expansion site found.
 		return;
@@ -631,18 +631,18 @@ bool BuildPlanner::isExpansionAvailable(UnitType commandCenterUnit){
 	}
 
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-	if (pos== TilePositions::Invalid){
+	if (pos == TilePositions::Invalid){
 		//No expansion site found.
 		return false;
 	}
 	return true;
 }
 
-int BuildPlanner::noInProduction(UnitType type){
-	int no = 0;
+int BuildPlanner::countInProduction(UnitType type){
+	int count = 0;
 	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
 		if (agent->isAlive())
@@ -652,9 +652,9 @@ int BuildPlanner::noInProduction(UnitType type){
 				list<UnitType> queue = agent->getUnit()->getTrainingQueue();
 				for (list<UnitType>::const_iterator i=queue.begin(); i != queue.end(); i++)
 				{
-					if ((*i).getID() == type.getID())
+					if ((*i) == type)
 					{
-						no++;
+						count++;
 					}
 				}
 			}
@@ -667,17 +667,18 @@ int BuildPlanner::noInProduction(UnitType type){
 		{
 			if ((*i)->exists())
 			{
-				if ((*i)->getType().getID() == UnitTypes::Zerg_Egg.getID())
+				if ((*i)->getType() == UnitTypes::Zerg_Egg)
 				{
-					if ((*i)->getBuildType().getID() == type.getID())
-				{
-						no++;
-						if (type.isTwoUnitsInOneEgg()) no++;
+					if ((*i)->getBuildType() == type)
+					{
+						count++;
+						if (type.isTwoUnitsInOneEgg())
+							count++;
 					}
 				}
 			}
 		}
 	}
 
-	return no;
+	return count;
 }

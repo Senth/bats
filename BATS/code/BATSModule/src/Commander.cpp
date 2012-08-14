@@ -1,5 +1,3 @@
-#include "Utilities/Helper.h"
-#include "Utilities/Logger.h"
 #include "Commander.h"
 #include "UnitManager.h"
 #include "Squad.h"
@@ -10,14 +8,19 @@
 #include "IntentionWriter.h"
 #include "UnitCompositionFactory.h"
 #include "DefenseManager.h"
-#include "BTHAIModule/Source/CoverMap.h"
-#include "BTHAIModule/Source/Profiler.h"
-#include <memory.h>
-
+#include "SelfClassifier.h"
 #include "AttackSquad.h"
 #include "DropSquad.h"
 #include "ScoutSquad.h"
 #include "BuildPlanner.h"
+#include "GameTime.h"
+
+#include "BTHAIModule/Source/CoverMap.h"
+#include "BTHAIModule/Source/Profiler.h"
+
+#include "Utilities/Helper.h"
+#include "Utilities/Logger.h"
+
 
 using namespace bats;
 using namespace std::tr1;
@@ -33,6 +36,8 @@ Commander::Commander() {
 	mAlliedArmyManager = NULL;
 	mDefenseManager = NULL;
 	mIntentionWriter = NULL;
+	mSelfClassifier = NULL;
+	mGameTime = NULL;
 
 	mAlliedArmyManager = PlayerArmyManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
@@ -40,16 +45,17 @@ Commander::Commander() {
 	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
 	mDefenseManager = DefenseManager::getInstance();
 	mIntentionWriter = IntentionWriter::getInstance();
+	mSelfClassifier = SelfClassifier::getInstance();
+	mGameTime = GameTime::getInstance();
+
+	mFrameCallLast = INT_MIN;
+	mExpansionTimeLast = 0.0;
 
 	initStringToEnums();
 }
 
 Commander::~Commander() {
 	SAFE_DELETE(mUnitCompositionFactory);
-
-	mSquadManager = NULL;
-	mUnitManager = NULL;
-	mAlliedArmyManager = NULL;
 
 	msInstance = NULL;
 }
@@ -62,20 +68,39 @@ Commander* Commander::getInstance() {
 }
 
 void Commander::computeActions() {
+	// Don't call too often
+	if (mGameTime->getFrameCount(mFrameCallLast) < config::frame_distribution::COMMANDER) {
+		return;
+	}
+	mFrameCallLast = mGameTime->getFrameCount();
+
 	Profiler::getInstance()->start("Commander::update()");
 
-	/// @todo Commander computer actions more complex actions
-
-	computeReactions();
-	mSquadManager->update();
+	computeOwnReactions();
+	computeAlliedReactions();
 
 	Profiler::getInstance()->end("Commander::update()");
 }
 
-void Commander::computeReactions() {
-	if (!config::module::PLAYER_REACT) {
+void Commander::computeOwnReactions() {
+	if (!config::module::OWN_REACT) {
 		return;
 	}
+
+	/// @todo should we expand? When attacking, workers saturated, or minerals running low in an expansion
+	// Check if we should expand
+	if (mSelfClassifier->getLastExpansionStartTime() > config::commander::EXPANSION_INTERVAL_MIN) {
+
+	}
+
+	/// @todo should we attack? When expanding
+}
+
+void Commander::computeAlliedReactions() {
+	if (!config::module::ALLIED_REACT) {
+		return;
+	}
+
 
 	// Check for active allied squads
 	vector<AlliedSquadCstPtr> squads = mAlliedArmyManager->getSquads<AlliedSquad>();
@@ -112,7 +137,7 @@ void Commander::computeReactions() {
 	}
 
 
-	// @todo check for player expanding
+	/// @todo check for player expanding
 }
 
 void Commander::issueCommand(const std::string& command) {
@@ -266,7 +291,7 @@ void Commander::orderScout(bool alliedOrdered, Reasons reason) {
 	/// @todo what about existing scout, remove it?
 	
 	// Get available unit compositions
-	//std::vector<UnitAgent*> freeUnits = mpUnitManager->getUnitsByFilter(UnitFilter_WorkersFree);
+	//std::vector<UnitAgent*> freeUnits = munitManager->getUnitsByFilter(UnitFilter_WorkersFree);
 	//UnitAgent* unit = freeUnits.at(0);
 	//freeUnits.clear();
 	//freeUnits.push_back(unit);
@@ -302,6 +327,7 @@ void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
 	if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter())) {
 		BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
 		mIntentionWriter->writeIntention(Intention_BotExpand, reason);
+		mExpansionTimeLast;
 	} else {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Expansion not available yet");
 		/// @todo write the reason why we can't expand

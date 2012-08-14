@@ -1,14 +1,11 @@
 #pragma once
 
-#include <memory.h>
+#include "ResourceDefs.h"
 #include <map>
 #include <BWAPI/TilePosition.h>
 
 // Namespace for the project
 namespace bats {
-
-// Forward declarations
-class ResourceGroup;
 
 /**
  * Tracks and counts the current number of resources all over the map.
@@ -37,7 +34,7 @@ public:
 	 * thus it cannot change values of the ResourceGroup
 	 * @see end() to get the end of the list.
 	 */
-	std::map<int, std::tr1::shared_ptr<ResourceGroup>>::const_iterator begin() const;
+	ResourceGroupCstIt begin() const;
 
 	/**
 	 * Returns the end of an iterator to all ResourceGroups on the map.
@@ -47,14 +44,14 @@ public:
 	 * thus it cannot change values of the ResourceGroup
 	 * @see begin() to get the beginning of the list.
 	 */
-	std::map<int, std::tr1::shared_ptr<ResourceGroup>>::const_iterator end() const;
+	ResourceGroupCstIt end() const;
 
 	/**
 	 * Returns the resource group with the specified resource group id.
 	 * @param groupId the resource group id of the resource.
 	 * @return resource group with the specified resource group id. NULL if not exists.
 	 */
-	std::tr1::shared_ptr<const ResourceGroup> getResourceGroup(int groupId) const;
+	ResourceGroupCstPtr getResourceGroup(int groupId) const;
 
 	/**
 	 * Returns the resource group for the specified expansion position.
@@ -62,7 +59,15 @@ public:
 	 * @return resource group with the specified expansion position. NULL if no resource
 	 * group exist on that position.
 	 */
-	 std::tr1::shared_ptr<const ResourceGroup> getResourceGroup(const BWAPI::TilePosition& expansionPosition);
+	ResourceGroupCstPtr getResourceGroup(const BWAPI::TilePosition& expansionPosition) const;
+
+	/**
+	 * Finds the closest resource group to the specified position
+	 * @param position the position to search from
+	 * @return closest resource group from the specified position
+	 */
+	ResourceGroupCstPtr getClosestResourceGroup(const BWAPI::TilePosition& position) const;
+	  
 
 	/**
 	 * Updates all the resource groups and resources. It will not update every frame
@@ -73,7 +78,7 @@ public:
 
 private:
 	/**
-	 * Singleton constructor to enforce singleton usage.
+	 * Private constructor to enforce singleton usage.
 	 */
 	ResourceCounter();
 
@@ -83,12 +88,12 @@ private:
 	void addResourceGroups();
 
 	int mFrameLastCall;
-	std::map<int, std::tr1::shared_ptr<ResourceGroup>> mGroupsById;
+	std::map<int, ResourceGroupPtr> mGroupsById;
 	/** Used for faster searching when we want a resource group from the specified
 	 * expansion position. It has exactly the same resource groups as mGroupsById
 	 * and thus needs not to be updated. */
-	std::map<BWAPI::TilePosition, std::tr1::shared_ptr<ResourceGroup>> mGroupsByPosition;
+	std::map<BWAPI::TilePosition, ResourceGroupPtr> mGroupsByPosition;
 
-	static ResourceCounter* mpsInstance;
+	static ResourceCounter* msInstance;
 };
 }

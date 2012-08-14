@@ -15,7 +15,7 @@ public:
 	/**
 	*
 	*/
-	TerranProductionBuilding(BWAPI::Unit* pUnit);
+	TerranProductionBuilding(BWAPI::Unit* unit);
 
 	~TerranProductionBuilding();
 

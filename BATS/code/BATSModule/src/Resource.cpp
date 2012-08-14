@@ -6,11 +6,11 @@
 using namespace BWAPI;
 using namespace bats;
 
-Resource::Resource(BWAPI::Unit* pUnit) :
-	M_INITIAL(pUnit->getInitialResources()),
-	M_UNIT_ID(pUnit->getID()),
-	M_POSITION(pUnit->getTilePosition()),
-	mCurrent(pUnit->getResources())
+Resource::Resource(BWAPI::Unit* unit) :
+	M_INITIAL(unit->getInitialResources()),
+	M_UNIT_ID(unit->getID()),
+	M_POSITION(unit->getTilePosition()),
+	mCurrent(unit->getResources())
 {
 	// Does nothing
 }
@@ -36,14 +36,14 @@ const TilePosition& Resource::getPosition() const {
 }
 
 void Resource::update() {
-	Unit* pUnit = Broodwar->getUnit(M_UNIT_ID);
+	Unit* unit = Broodwar->getUnit(M_UNIT_ID);
 
-	DEBUG_MESSAGE_CONDITION(NULL == pUnit, utilities::LogLevel_Warning,
+	DEBUG_MESSAGE_CONDITION(NULL == unit, utilities::LogLevel_Warning,
 		"Resource::update() | unit is NULL, where is the unit. Can't we get units that aren't " <<
 		" visible?");
 
-	if (NULL != pUnit && pUnit->isVisible()) {
-		mCurrent = pUnit->getResources();
+	if (NULL != unit && unit->isVisible()) {
+		mCurrent = unit->getResources();
 	}
 }
 

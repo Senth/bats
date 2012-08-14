@@ -67,11 +67,11 @@ private:
 	/**
 	 * Creates a new resource bound to the specified unit.
 	 * Private only ResourceGroup can create Resources
-	 * @pre pUnit is not NULL
-	 * @pre pUnit is a resource unit.
-	 * @param pUnit the resource unit.
+	 * @pre unit is not NULL
+	 * @pre unit is a resource unit.
+	 * @param unit the resource unit.
 	 */
-	Resource(BWAPI::Unit* pUnit);
+	Resource(BWAPI::Unit* unit);
 
 	int mCurrent;
 	const int M_UNIT_ID;

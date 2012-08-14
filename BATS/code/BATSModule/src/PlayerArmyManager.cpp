@@ -173,38 +173,38 @@ void PlayerArmyManager::onConstantChanged(config::ConstantName constantName) {
 	}
 }
 
-void PlayerArmyManager::addUnit(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::addUnit(BWAPI::Unit* unit) {
 	// Note, this function does not update the squads, it simply add the unit to this class,
 	// meaning in the next update phase the squads might be altered.
 	
 	// Don't add buildings and workers
-	if (!pUnit->getType().isBuilding() && !pUnit->getType().isWorker()) {
+	if (!unit->getType().isBuilding() && !unit->getType().isWorker()) {
 
 		// This will create the unit with an INVALID_KEY for squad if it doesn't exist in the map
 		// If it exist, it will do nothing.
-		mUnitSquad[pUnit];
+		mUnitSquad[unit];
 	}
 }
 
-void PlayerArmyManager::removeUnit(BWAPI::Unit* pUnit) {
+void PlayerArmyManager::removeUnit(BWAPI::Unit* unit) {
 	// Note, this function does not update the squads, it simply removes the unit from the squad
 	// and this class, meaning in the next update phase the squads might be altered.
-	std::map<Unit*, PlayerSquadId>::iterator unitIt = mUnitSquad.find(pUnit);
+	std::map<Unit*, PlayerSquadId>::iterator unitIt = mUnitSquad.find(unit);
 	if (unitIt != mUnitSquad.end() && unitIt->second.isValid()) {
-		mSquads[unitIt->second]->removeUnit(pUnit);
+		mSquads[unitIt->second]->removeUnit(unit);
 		mUnitSquad.erase(unitIt);
 	}
 }
 
-void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId squadId) {
+void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* unit, PlayerSquadId squadId) {
 	// Change squad if needed
-	PlayerSquadId oldSquadId = mUnitSquad[pUnit];
+	PlayerSquadId oldSquadId = mUnitSquad[unit];
 	if (oldSquadId != squadId) {
 		if (oldSquadId.isValid()) {
-			mSquads[oldSquadId]->removeUnit(pUnit);
+			mSquads[oldSquadId]->removeUnit(unit);
 		}
-		mSquads[squadId]->addUnit(pUnit);
-		mUnitSquad[pUnit] = squadId;
+		mSquads[squadId]->addUnit(unit);
+		mUnitSquad[unit] = squadId;
 	}
 
 	
@@ -214,8 +214,8 @@ void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId s
 	// not diagonally squares.
 	std::list<Unit*> queuedUnits;
 
-	//const TilePosition& unitPos = pUnit->getTilePosition();
-	Position center = getGridPosition(pUnit);
+	//const TilePosition& unitPos = unit->getTilePosition();
+	Position center = getGridPosition(unit);
 	std::pair<Position, Position> gridRange = getValidGridRange(center, GRID_RANGE_EXCLUDE_CERTAIN);
 	for (int x = gridRange.first.x(); x <= gridRange.second.x(); ++x) {
 		for (int y = gridRange.first.y(); y <= gridRange.second.y(); ++y) {
@@ -234,7 +234,7 @@ void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId s
 							setUnitAsChecked(unitIt->first);
 						}
 						// Another squad - check include range
-						else if (withinIncludeDistance(pUnit, unitIt->first)) {
+						else if (withinIncludeDistance(unit, unitIt->first)) {
 							queuedUnits.push_back(unitIt->first);
 							setUnitAsChecked(unitIt->first);
 						}
@@ -270,14 +270,14 @@ void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId s
 
 						// Same squad or old (if valid), check exclude_distance
 						if (unitSquadId == squadId || (oldSquadId.isValid() && unitSquadId == oldSquadId)) {
-							if (withinExcludeDistance(pUnit, unitIt->first)) {
+							if (withinExcludeDistance(unit, unitIt->first)) {
 								setUnitAsChecked(unitIt->first);
 								addCloseUnitsToSquad(unitIt->first, squadId);
 							}
 						}
 						// Else - not same squad, check include_distance
 						else {
-							if (withinIncludeDistance(pUnit, unitIt->first)) {
+							if (withinIncludeDistance(unit, unitIt->first)) {
 								setUnitAsChecked(unitIt->first);
 								addCloseUnitsToSquad(unitIt->first, squadId);
 							}
@@ -289,12 +289,12 @@ void PlayerArmyManager::addCloseUnitsToSquad(BWAPI::Unit* pUnit, PlayerSquadId s
 	}
 }
 
-void PlayerArmyManager::setUnitAsChecked(BWAPI::Unit* pUnit) {
-	const Position& gridPos = getGridPosition(pUnit);
+void PlayerArmyManager::setUnitAsChecked(BWAPI::Unit* unit) {
+	const Position& gridPos = getGridPosition(unit);
 	if (gridPos != Positions::Invalid) {
-		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = true;
+		mGridUnits[gridPos.x()][gridPos.y()][unit] = true;
 	}
-	mUnitsToCheck.erase(pUnit);
+	mUnitsToCheck.erase(unit);
 }
 
 std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator PlayerArmyManager::setUnitAsChecked(const std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator& unitIt) {
@@ -305,43 +305,43 @@ std::map<BWAPI::Unit*, PlayerSquadId>::const_iterator PlayerArmyManager::setUnit
 	return mUnitsToCheck.erase(unitIt);
 }
 
-bool PlayerArmyManager::withinExcludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
-	return getSquaredDistance(pUnitA->getTilePosition(), pUnitB->getTilePosition()) <=
+bool PlayerArmyManager::withinExcludeDistance(BWAPI::Unit* unitA, BWAPI::Unit* unitB) const {
+	return getSquaredDistance(unitA->getTilePosition(), unitB->getTilePosition()) <=
 		config::classification::squad::EXCLUDE_DISTANCE_SQUARED;
 }
 
-bool PlayerArmyManager::withinIncludeDistance(BWAPI::Unit* pUnitA, BWAPI::Unit* pUnitB) const {
-	return getSquaredDistance(pUnitA->getTilePosition(), pUnitB->getTilePosition()) <=
+bool PlayerArmyManager::withinIncludeDistance(BWAPI::Unit* unitA, BWAPI::Unit* unitB) const {
+	return getSquaredDistance(unitA->getTilePosition(), unitB->getTilePosition()) <=
 		config::classification::squad::INCLUDE_DISTANCE_SQUARED;
 }
 
-BWAPI::Position PlayerArmyManager::getGridPosition(BWAPI::Unit* pUnit) const {
+BWAPI::Position PlayerArmyManager::getGridPosition(BWAPI::Unit* unit) const {
 	TilePosition unitPos = BWAPI::TilePositions::Invalid;
 
 	// Loaded
-	if (pUnit->isLoaded()) {
+	if (unit->isLoaded()) {
 		// Get position of the transport, this is needed because the position of the units
 		// are not updated while loaded.
-		Unit* pTransport = pUnit->getTransport();
+		Unit* pTransport = unit->getTransport();
 		assert(NULL != pTransport);
 		if (NULL != pTransport) {
 			unitPos = pTransport->getTilePosition();
 		} else {
 			ERROR_MESSAGE(false, "Unit is loaded, but doesn't have a transport!");
-			unitPos = pUnit->getTilePosition();
+			unitPos = unit->getTilePosition();
 		}
 	}
 	// Use regular position
 	else {
-		unitPos = pUnit->getTilePosition();
+		unitPos = unit->getTilePosition();
 	}
 
 	Position gridPos = Positions::Invalid;
 	if (unitPos.isValid()) {
 		gridPos = mLookupTableGridPosition[unitPos.x()][unitPos.y()];
 	} else if (unitPos != TilePositions::Invalid && unitPos != TilePositions::None && unitPos != TilePositions::Unknown) {
-		ERROR_MESSAGE(false, "Invalid unit " << pUnit->getType().getName() <<
-			" (" << pUnit->getID() << ") position: " << unitPos);
+		ERROR_MESSAGE(false, "Invalid unit " << unit->getType().getName() <<
+			" (" << unit->getID() << ") position: " << unitPos);
 	}
 
 	return gridPos;
@@ -438,11 +438,11 @@ void PlayerArmyManager::removeSquad(PlayerSquadId squadId) {
 	mSquads[squadId].reset();
 }
 
-void PlayerArmyManager::addUnitToGrid(BWAPI::Unit* pUnit) {
-	Position gridPos = getGridPosition(pUnit);
+void PlayerArmyManager::addUnitToGrid(BWAPI::Unit* unit) {
+	Position gridPos = getGridPosition(unit);
 
 	if (gridPos != Positions::Invalid) {
-		mGridUnits[gridPos.x()][gridPos.y()][pUnit] = false;
+		mGridUnits[gridPos.x()][gridPos.y()][unit] = false;
 	}
 }
 

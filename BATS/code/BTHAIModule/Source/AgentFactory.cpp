@@ -3,7 +3,7 @@
 #include "StructureAgent.h"
 #include "UnitAgent.h"
 #include "TransportAgent.h"
-#include "BATSModule/include/TypeDefs.h"
+#include "BATSModule/include/SquadDefs.h"
 
 /** Terran agents */
 #include "CommandCenterAgent.h"

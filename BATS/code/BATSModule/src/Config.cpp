@@ -73,7 +73,18 @@ namespace attack_coordinator {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
+namespace build_order {
+	const std::string DIR = CONFIG_DIR + "buildorder\\";
+}
+
 namespace classification {
+	namespace expansion {
+		double WORKERS_PER_MINERAL_SATURATION = 0.0;
+		double EXPANSION_MINERALS_LOW;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
+
 	namespace retreat {
 		int ENEMY_CLOSE_DISTANCE = 0;
 		double ENEMY_LARGER_THAN_US = 0.0;
@@ -104,6 +115,12 @@ namespace classification {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
+namespace commander {
+	double EXPANSION_INTERVAL_MIN = 0.0;
+
+	bool set(const utilities::VariableInfo& variableInfo);
+}
+
 namespace debug {
 	int GRAPHICS_VERBOSITY_IN_DEBUG = 0;
 	int GRAPHICS_VERBOSITY_IN_RELEASE = 0;
@@ -128,15 +145,12 @@ namespace debug {
 	bool set(const utilities::VariableInfo& variableInfo);
 }
 
-namespace build_order {
-	const std::string DIR = CONFIG_DIR + "buildorder\\";
-}
-
 namespace frame_distribution {
 	int EXPLORATION_MANAGER = 0;
 	int RESOURCE_COUNTER = 0;
 	int ALLIED_ARMY_REARRANGE_SQUADS = 0;
 	int DEFENSE_MANAGER = 0;
+	int COMMANDER = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -153,8 +167,8 @@ namespace log {
 }
 
 namespace module {
-	bool PLAYER_REACT = true;
-	bool OWN_INITIATIVE = true;
+	bool ALLIED_REACT = true;
+	bool OWN_REACT = true;
 	bool WRITE_INTENTION = true;
 
 	bool set(const utilities::VariableInfo& variableInfo);
@@ -255,6 +269,8 @@ void handleVariable(const utilities::VariableInfo& variableInfo) {
 		success = attack_coordinator::set(variableInfo);
 	} else if (variableInfo.section == "classification") {
 		success = classification::set(variableInfo);
+	} else if (variableInfo.section == "commander") {
+		success = commander::set(variableInfo);
 	} else if (variableInfo.section == "debug") {
 		success = debug::set(variableInfo);
 	} else if (variableInfo.section == "frame_distribution") {
@@ -362,7 +378,9 @@ bool attack_coordinator::weights::set(const utilities::VariableInfo& variableInf
 }
 
 bool classification::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.subsection == "retreat") {
+	if (variableInfo.subsection == "expansion") {
+		return expansion::set(variableInfo);
+	} else if (variableInfo.subsection == "retreat") {
 		return retreat::set(variableInfo);
 	} else if (variableInfo.subsection == "squad") {
 		return squad::set(variableInfo);
@@ -371,6 +389,22 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 	} else {
 		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
 			"' in " <<variableInfo.file << ".ini");
+	}
+
+	return true;
+}
+
+bool classification::expansion::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "workers_per_mineral_saturation") {
+		gOldValue = toString(WORKERS_PER_MINERAL_SATURATION);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(WORKERS_PER_MINERAL_SATURATION));
+		WORKERS_PER_MINERAL_SATURATION = variableInfo;
+	} else if (variableInfo.name == "expansion_minerals_low") {
+		gOldValue = toString(EXPANSION_MINERALS_LOW);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPANSION_MINERALS_LOW));
+		EXPANSION_MINERALS_LOW = variableInfo;
+	} else {
+		return false;
 	}
 
 	return true;
@@ -440,6 +474,18 @@ bool classification::squad::set(const utilities::VariableInfo& variableInfo) {
 		EXCLUDE_DISTANCE_SQUARED = EXCLUDE_DISTANCE * EXCLUDE_DISTANCE;
 		GRID_SQUARE_DISTANCE = EXCLUDE_DISTANCE / 2;
 	} else  {
+		return false;
+	}
+
+	return true;
+}
+
+bool commander::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "expansion_interval_min") {
+		gOldValue = toString(EXPANSION_INTERVAL_MIN);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPANSION_INTERVAL_MIN));
+		EXPANSION_INTERVAL_MIN = variableInfo;
+	} else {
 		return false;
 	}
 
@@ -546,6 +592,10 @@ bool frame_distribution::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(DEFENSE_MANAGER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE_MANAGER));
 		DEFENSE_MANAGER = variableInfo;
+	} else if (variableInfo.name == "commander") {
+		gOldValue = toString(COMMANDER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(COMMANDER));
+		COMMANDER = variableInfo;
 	} else {
 		return false;
 	}
@@ -566,14 +616,14 @@ bool game::set(const utilities::VariableInfo& variableInfo) {
 }
 
 bool module::set(const utilities::VariableInfo& variableInfo) {
-	if (variableInfo.name == "player_react") {
-		gOldValue = toString(PLAYER_REACT);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(PLAYER_REACT));
-		PLAYER_REACT = variableInfo;
-	} else if (variableInfo.name == "own_initiative") {
-		gOldValue = toString(OWN_INITIATIVE);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(OWN_INITIATIVE));
-		OWN_INITIATIVE = variableInfo;
+	if (variableInfo.name == "allied_react") {
+		gOldValue = toString(ALLIED_REACT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REACT));
+		ALLIED_REACT = variableInfo;
+	} else if (variableInfo.name == "own_react") {
+		gOldValue = toString(OWN_REACT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(OWN_REACT));
+		OWN_REACT = variableInfo;
 	} else if (variableInfo.name == "write_intention") {
 		gOldValue = toString(WRITE_INTENTION);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(WRITE_INTENTION));

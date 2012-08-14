@@ -41,13 +41,13 @@ std::vector<const UnitSet> UnitComposition::getUnitSets() const {
 	return vacantSets;
 }
 
-bool UnitComposition::addUnit(UnitAgent* pUnit) {
+bool UnitComposition::addUnit(UnitAgent* unit) {
 	size_t i = 0;
 
 	// Find the unit type and add one unit, if it is
 	// found then return directly with add result
 	while (i < mUnitSets.size()) {
-		if (mUnitSets[i] == pUnit->getUnitType()) {
+		if (mUnitSets[i] == unit->getUnitType()) {
 			bool addOk = mUnitSets[i].addUnits(1);
 			return addOk;
 		}
@@ -58,13 +58,13 @@ bool UnitComposition::addUnit(UnitAgent* pUnit) {
 	return false;
 }
 
-bool UnitComposition::removeUnit(UnitAgent* pUnit) {
+bool UnitComposition::removeUnit(UnitAgent* unit) {
 	size_t i = 0;
 
 	// Find the unit type and remove one unit, if it is
 	// found then return directly with the remove result
 	while (i < mUnitSets.size()) {
-		if (mUnitSets[i] == pUnit->getUnitType()) {
+		if (mUnitSets[i] == unit->getUnitType()) {
 			bool removeOk = mUnitSets[i].removeUnits(1);
 			return removeOk;
 		}

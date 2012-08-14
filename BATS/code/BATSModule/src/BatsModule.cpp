@@ -268,96 +268,96 @@ void BatsModule::onNukeDetect(BWAPI::Position target) {
 }
 #pragma warning(pop)
 
-void BatsModule::onUnitDiscover(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitDiscover(BWAPI::Unit* unit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
 
-		if (isOurs(pUnit)) {
-			mUnitManager->addAgent(pUnit);
+		if (isOurs(unit)) {
+			mUnitManager->addAgent(unit);
 
 			// Remove from build order if it's a building
-			if (pUnit->getType().isBuilding()) {
-				BuildPlanner::getInstance()->unlock(pUnit->getType());
+			if (unit->getType().isBuilding()) {
+				BuildPlanner::getInstance()->unlock(unit->getType());
 			}
-		} else if (isEnemy(pUnit)) {
-			mExplorationManager->addSpottedUnit(pUnit);
-			mPlayerArmyManager->addUnit(pUnit);
-		} else if (isAllied(pUnit)) {
-			mPlayerArmyManager->addUnit(pUnit);
+		} else if (isEnemy(unit)) {
+			mExplorationManager->addSpottedUnit(unit);
+			mPlayerArmyManager->addUnit(unit);
+		} else if (isAllied(unit)) {
+			mPlayerArmyManager->addUnit(unit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
-				pUnit->getType().getName());
+				unit->getType().getName());
 		}
 	}
 }
 
-void BatsModule::onUnitEvade(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitEvade(BWAPI::Unit* unit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
 
-		if (isOurs(pUnit)) {
-			mUnitManager->removeAgent(pUnit);			
-			if (pUnit->getType().isBuilding()) {
-				BuildPlanner::getInstance()->buildingDestroyed(pUnit);
+		if (isOurs(unit)) {
+			mUnitManager->removeAgent(unit);			
+			if (unit->getType().isBuilding()) {
+				BuildPlanner::getInstance()->buildingDestroyed(unit);
 			}
-			UnitCreator::getInstance()->updatePopulation(pUnit->getType());
+			UnitCreator::getInstance()->updatePopulation(unit->getType());
 			// Assist workers under attack
-			if (pUnit->getType().isWorker()) {
+			if (unit->getType().isWorker()) {
 				/// @todo assist worker.
-				/// Commander::getInstance()->assistWorker(mpAgentManager->getAgent(pUnit->getID()));
+				/// Commander::getInstance()->assistWorker(mpAgentManager->getAgent(unit->getID()));
 			}
 
 			mUnitManager->cleanup();
 		}
 		// Enemies
-		else if (isEnemy(pUnit)) {
-			mPlayerArmyManager->removeUnit(pUnit);
+		else if (isEnemy(unit)) {
+			mPlayerArmyManager->removeUnit(unit);
 		}
 		// Allied
-		else if (isAllied(pUnit)) {
-			mPlayerArmyManager->removeUnit(pUnit);
+		else if (isAllied(unit)) {
+			mPlayerArmyManager->removeUnit(unit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
-				pUnit->getType().getName());
+				unit->getType().getName());
 		}
 	}
 }
 
 #pragma warning(push)
 #pragma warning(disable:4100)
-void BatsModule::onUnitShow(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitShow(BWAPI::Unit* unit) {
 	// Does nothing, handled in onUnitDiscover()
 }
 
-void BatsModule::onUnitHide(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitHide(BWAPI::Unit* unit) {
 	// Does nothing, handled in onUnitEvade()
 }
 
-void BatsModule::onUnitCreate(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitCreate(BWAPI::Unit* unit) {
 	// Does nothing, handled in onUnitDiscover()
 }
 #pragma warning(pop)
 
-void BatsModule::onUnitDestroy(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitDestroy(BWAPI::Unit* unit) {
 	TEST_SELF();
 
-	if (isEnemy(pUnit)) {
-		mExplorationManager->unitDestroyed(pUnit);
+	if (isEnemy(unit)) {
+		mExplorationManager->unitDestroyed(unit);
 	}
 }
 
-void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitMorph(BWAPI::Unit* unit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
-		if (isOurs(pUnit)) {
+		if (isOurs(unit)) {
 			if (BuildPlanner::isZerg()) {
-				mUnitManager->morphDrone(pUnit);
-				BuildPlanner::getInstance()->unlock(pUnit->getType());
+				mUnitManager->morphDrone(unit);
+				BuildPlanner::getInstance()->unlock(unit->getType());
 			} else {
-				onUnitDiscover(pUnit);
+				onUnitDiscover(unit);
 			}
 		}
 	}
@@ -365,7 +365,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* pUnit) {
 
 #pragma warning(push)
 #pragma warning(disable:4100)
-void BatsModule::onUnitRenegade(BWAPI::Unit* pUnit) {
+void BatsModule::onUnitRenegade(BWAPI::Unit* unit) {
 	// Does nothing
 }
 #pragma warning(pop)
@@ -417,11 +417,13 @@ void BatsModule::updateGame() {
 	mWaitGoalManager->update();
 	mPlayerArmyManager->update();
 
-	mUnitManager->computeActions();
+	mExplorationManager->update();
+	mSquadManager->update();
 	BuildPlanner::getInstance()->computeActions();
 	mCommander->computeActions();
 	mDefenseManager->update();
-	mExplorationManager->update();
+	mUnitManager->computeActions();
+	
 
 	mProfiler->end("updateGame");
 }
@@ -466,11 +468,10 @@ void BatsModule::releaseGameClasses() {
 }
 
 void BatsModule::showDebug() const {
-	BuildPlanner::getInstance()->printInfo();
 	if (config::debug::GRAPHICS_VERBOSITY != config::debug::GraphicsVerbosity_Off) {
 		mProfiler->start("printGraphicDebugInfo()");
 
-
+		BuildPlanner::getInstance()->printGraphicDebugInfo();
 		mPlayerArmyManager->printGraphicDebugInfo();
 		mSquadManager->printGraphicDebugInfo();
 		mUnitManager->printGraphicDebugInfo();

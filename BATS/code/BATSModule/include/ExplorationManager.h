@@ -128,7 +128,9 @@ public:
 	 */
 	bool isActive() const;
 
-	/** Called each update to issue orders. */
+	/** 
+	 * Called each update to issue orders.
+	 */
 	void update();
 
 	/** Returns the next position to explore for this squad. This will calculate
@@ -139,19 +141,21 @@ public:
 	 */
 	BWAPI::TilePosition getNextToExplore(const std::tr1::shared_ptr<Squad>& squad);
 
-	/** Shows all spotted objects as squares on the SC map. Use for debug purpose. */
-	void printInfo() const;
+	/**
+	 * Shows all spotted objects as squares on the SC map. Use for debug purpose.
+	 */
+	void printGraphicDebugInfo() const;
 
 	/** Notify the ExplorationManager that an enemy unit has been spotted.
-	 * @param pUnit the unit that has been spotted.
+	 * @param unit the unit that has been spotted.
 	 */
-	void addSpottedUnit(BWAPI::Unit* pUnit);
+	void addSpottedUnit(BWAPI::Unit* unit);
 
 	/** Notify the ExplorationManager that an enemy unit has been destroyed. If the
 	 * enemy unit was among the spotted units, it is removed from the list.
-	 * @param pUnit the unit that has been destroyed.
+	 * @param unit the unit that has been destroyed.
 	 */
-	void unitDestroyed(BWAPI::Unit* pUnit);
+	void unitDestroyed(BWAPI::Unit* unit);
 
 	/** Returns the list of spotted enemy buildings.
 	 * @return a list with all spotted units. 
@@ -194,7 +198,9 @@ public:
 	 */
 	bool hasSpottedBuilding() const;
 
-	/** Shows some data about the enemy on screen. */
+	/** 
+	 * Shows some data about the enemy on screen.
+	 */
 	void showIntellData() const;
 
 	/**
@@ -209,16 +215,11 @@ public:
 
 	/**
 	 * Returns true if a unit can reach position 'destination'. 
-	 * @param pUnit the unit to check if it can move
-	 * @param destination the location pUnit wants to check
+	 * @param unit the unit to check if it can move
+	 * @param destination the location unit wants to check
 	 * @return true if the unit can reach position 'destination', else false
 	 */
-	static bool canReach(BaseAgent* pUnit, const BWAPI::TilePosition& destination);
-
-	// /*
-	// * Scans for vulnerable enemy bases, i.e. bases without protection from detectors.
-	// */
-	// BWAPI::TilePosition scanForVulnerableBase();
+	static bool canReach(BaseAgent* unit, const BWAPI::TilePosition& destination);
 
 	/** Checks if an enemy detector is covering the specified position.
 	 * This can give a false negative, i.e. when an observer is located at that position
@@ -257,24 +258,23 @@ private:
 	 */
 	ExplorationManager();
 
+	int getLastVisitFrame(BWTA::Region* region);
+	void calcEnemyForceData();
+	void calcOwnForceData();
+	void cleanup();
+
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedStructures;
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedUnits;
 
 	std::vector<ExploreData> mExploreData;
-	int getLastVisitFrame(BWTA::Region* region);
 
 	ForceData mForceOwn;
 	ForceData mForceEnemy;
 
-	static ExplorationManager* mpsInstance;
-
-	void calcEnemyForceData();
-	void calcOwnForceData();
-
-	void cleanup();
-
 	bool mActive;
 	int mFrameLastCall;
+
+	static ExplorationManager* mInstance;
 
 	/**
 	 * When we shall calculate the specific force

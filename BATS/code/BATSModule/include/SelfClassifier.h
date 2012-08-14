@@ -5,12 +5,15 @@
 
 // forward declarations
 class AgentManager;
+class CommandCenterAgent;
 
 // Namespace for the project
 namespace bats {
 
-// Formard declarations
+// Forward declarations
 class BuildPlanner;
+class SquadManager;
+class GameTime;
 
 
 /**
@@ -47,15 +50,60 @@ public:
 	 */
 	bool isUpgradeSoonDone(const std::vector<BWAPI::UnitType>& affectedUnitTypes) const;
 
+	/**
+	 * Checks if all expansions are saturated with workers.
+	 * @return true the worker count is enough to saturate all expansions
+	 */
+	bool areExpansionsSaturated() const;
+
+	/**
+	 * Checks if an expansion is running low on minerals.
+	 * @note Does NOT return true for an expansion that has no minerals.
+	 * @return true if an expansion is low on minerals, but above 0.
+	 */
+	bool isAnExpansionLowOnMinerals() const;
+
+	/**
+	 * Returns the number of active expansions. Active in this meaning is expansions that
+	 * have minerals above the low limit (used for isAnExpansionLowOnMinerals()).
+	 * @return number of active expansions
+	 */
+	int getActiveExpansionCount() const;
+
+	/**
+	 * Checks if we're currently attacking something, i.e. we have an attack squad
+	 * @return true if we have an attack squad.
+	 */
+	bool isAttacking() const;
+
+	/**
+	 * Checks how many seconds has elapsed since the last expansion was started. If an
+	 * expansion gets killed it will not count this one, meaning if the last built expansion
+	 * was killed it will return the time from the penultimate expansion built instead.
+	 * @return seconds since the last alive expansion was started.
+	 */
+	double getLastExpansionStartTime() const;
+
 private:
 	/**
 	 * Private constructor to enforce singleton usage.
 	 */
 	SelfClassifier();
 
-	AgentManager* mpAgentManager;
-	BuildPlanner* mpBuildPlanner;
+	/**
+	 * Checks if the specified expansion is low on minerals. The low value is configured
+	 * in the config file. Section: classification.expansion, Name: expansion_minerals_low
+	 * (EXPANSION_MINERALS_LOW)
+	 * @param mainStructure the expansion to check if it's low on minerals
+	 * @return true if the expansion is low on minerals, otherwise false.
+	 */
+	bool hasExpansionLowOrNoMinerals(const CommandCenterAgent* mainStructure) const;
 
-	static SelfClassifier* mpsInstance;
+	AgentManager* mAgentManager;
+	BuildPlanner* mBuildPlanner;
+	SquadManager* mSquadManager;
+	GameTime* mGameTime;
+
+	static SelfClassifier* msInstance;
 };
 }

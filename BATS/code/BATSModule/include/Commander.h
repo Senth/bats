@@ -4,7 +4,7 @@
 #include <map>
 #include <memory.h>
 #include <BWAPI/TilePosition.h>
-#include "TypeDefs.h"
+#include "SquadDefs.h"
 #include "IntentionWriter.h"
 
 // Namespace for the project
@@ -16,6 +16,8 @@ class UnitCompositionFactory;
 class UnitManager;
 class PlayerArmyManager;
 class DefenseManager;
+class SelfClassifier;
+class GameTime;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -101,7 +103,13 @@ private:
 	 * Computes reactive player behavior, i.e. if it shall attack when an allied moves
 	 * out to attack etc.
 	 */
-	void computeReactions();
+	void computeAlliedReactions();
+
+	/**
+	 * Computes own reactions, or own initiative, such as attacking when expanding
+	 * sending out a scout etc.
+	 */
+	void computeOwnReactions();
 
 	/**
 	 * Finishes and executes the squad command ordered by the player.
@@ -137,7 +145,7 @@ private:
 	 * Initiates the expand command
 	 * @param alliedOrdered if it was the allied who ordered the scout
 	 * @param reason a reason for the command, used when the command is successful
-	 * and a reason should be specified why the cammand was issued.
+	 * and a reason should be specified why the command was issued.
 	 */
 	void orderExpand(bool alliedOrdered, Reasons reason);
 
@@ -159,8 +167,13 @@ private:
 	PlayerArmyManager* mAlliedArmyManager;
 	DefenseManager* mDefenseManager;
 	IntentionWriter* mIntentionWriter;
+	SelfClassifier* mSelfClassifier;
+	GameTime* mGameTime;
 
 	std::map<std::string, Commands> mCommandStringToEnums;
+
+	double mExpansionTimeLast;
+	int mFrameCallLast;
 
 	static Commander* msInstance;
 };
