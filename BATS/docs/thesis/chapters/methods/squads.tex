@@ -151,7 +151,7 @@ Now you know how it works, but which units will be used for the drop, as drops s
 %: Write which drops are available in the current version of BATS
 
 \paragraph{Squad movement}
-The target location to drop is, as mentioned, required by the attack coordinater, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map, illustrated in figure \ref{fig:drop_squad_movement}.
+The target location to drop is, as mentioned, required by the attack coordinator, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map, illustrated in figure \ref{fig:drop_squad_movement}.
 \begin{figure}[htb]
 %: Insert image of drop movement path
 %: Add color to the caption
@@ -173,7 +173,7 @@ The hold squad has one goal, to hold a position from enemies; any position could
 
 Terran siege tanks have a special ability when in this squad, and the bot has researched the siege tank ability. The siege tank will automatically siege up in the roaming area effectively defending the hold perimeter (and other close positions) from its position.
 
-Hold squads use \nameref{sec:unit_composition}s to know which units should be in the hold squad—section \ref{sec:unit_composition} describes the unit composition. The current unit compositions used by BATS are listed below; the top is the composition with least priority, whereas the bottom is the one with highest priority. The name of the composition is in bold text.
+Hold squads use \nameref{sec:unit_composition}s to know which units should be in the hold squad—section \ref{sec:unit_composition} describes the unit composition and lists the configuration file for hold squad in listing \ref{lst:unit_composition_defense}. The current unit compositions used by BATS are listed below; the top is the composition with least priority, whereas the bottom is the one with highest priority. The name of the composition is in bold text.
 
 \begin{enumerate}
 	\item \textbf{Marine spotter}~1 Marine.
@@ -183,13 +183,58 @@ Hold squads use \nameref{sec:unit_composition}s to know which units should be in
 \end{enumerate}
 The Marine spotter is used to watch for enemies as one marine alone is not a good defender. Marines and medics generally make a good composition, but these number are too low to hold of almost any attack, but they can still delay the attack until reinforcements can arrive. Tanks are very good positional holders and can hold of almost anything coming from the choke point. 
 
-As the marine auto-bunker feature has not been enable yet another composition could be made with only for marines, but this group would be very vurnable if the bunker was not present and there is no such feature in UnitComposition yet, i.e. to set a requirement for the composition, such as target position needs to have a bunker.
+As the marine auto-bunker feature has not been enable yet another composition could be made with only for marines, but this group would be very vulnerable if the bunker was not present and there is no such feature in unit composition yet, i.e. to set a requirement for the composition, such as target position needs to have a bunker.
 
 \subsection{Scout squad}
 \label{sec:scout_squad}
 
 \subsection{Unit composition}
 \label{sec:unit_composition}
+In a nutshell, the unit composition is a feature for the squads to require specific types of units. E.g. hold squads require specific unit groups (compositions) as was explained above in section \ref{sec:hold_squad}. Below in listing \ref{lst:unit_composition_defense} the unit composition file for the hold squad is listed.
+
+\begin{lstlisting}[caption={Hold squad unit compositions},label={lst:unit_composition_defense},language=ini]
+; ---------- Marine Spotter ----------
+[marine_spotter]
+Priority = 1
+
+[marine_spotter.units]
+Terran_Marine = 1
+
+; ---------- Bunker Marines ----------
+[bunker_marines]
+Priority = 2
+
+[bunker_marines.units]
+Terran_Marine = 4
+
+; ---------- Marine Medics ----------
+[marine_medics]
+Priority = 3
+
+[marine_medics.units]
+Terran_Marine = 4
+Terran_Medic = 1
+
+; ---------- 1 Tank ----------
+[tanks_1]
+Priority = 4
+
+[tanks_1.units]
+Terran_Siege_Tank_Siege_Mode = 1
+
+; ---------- 2 Tanks ----------
+[tanks_2]
+Priority = 5
+
+[tanks_2.units]
+Terran_Siege_Tank_Siege_Mode = 2
+\end{lstlisting}
+The unit composition has two important elements: The priority and the units, higher value means higher priority, the units for the composition are listed under the units sub-section.
+
+To use compositions one calls the unit composition factory which takes a type (hold-squad, drop, etc.) of composition and a list of units (usually free units). The unit composition factory will check which compositions can be created with the available units—the composition needs to be full—and then return these sorted by priority. It is then up to the caller of unit composition factory to decide which composition to use—for hold squads it will always use the one with highest priority, drops on the other hand takes one random at the time of writing.
 
 \subsection{Wait goals}
 \label{sec:wait_goals}
+Wait goals were created for simple trigger abilities, although to function fully as independent trigger some rework needs to be done as they do not send any events and are not repeatable. These can be added to any squad at the moment, but will only have any effect if the derived squad handles them in any way, as the attack squad does. Wait goals are added to the wait goal manager which updates the goals to check if they have succeeded, failed, or timed out.
+
+Wait goals can be added to a set type, this allows all wait goals with the same set type to be easily extracted; attack coordinator uses this when adding existing wait goals to a new attack squad.

@@ -44,7 +44,7 @@ The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows how a
 \end{figure}
 
 \paragraph{Coordinated attacks}
-To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_goals} added by the attack coordinator. These are fully described in section \ref{sec:wait_goals} and briefly described here. The wait goal for attack squads is a wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out (\attackCoordinatorWaitGoalTimeout). The wait goal is added to all existing squads and the new squad gets the already existing wait goals, when all attacks are in position they will start their attack simultaneously.
+To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_goals} added by the attack coordinator—fully described in section \ref{sec:wait_goals}. The wait goal for attack squads is a wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out (\attackCoordinatorWaitGoalTimeout). The wait goal is added to all existing squads and the new squad gets the already existing wait goals, when all attacks are in position they will start their attack simultaneously.
 
 \subsection{Calculation of distance weight}
 Distance weight is a simple calculation: if no other attack squads are present it defaults to 1.0. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
