@@ -34,6 +34,7 @@ class ScoutSquad : public Squad{
 		virtual std::string getName() const;
 
 	private:
-		bool mAvoidEnemy;	/**< If the squad avoids enemy or not */
+		bool mNewEnemyOnDetect;
+		bool mEnemyDetected;
 };
 }

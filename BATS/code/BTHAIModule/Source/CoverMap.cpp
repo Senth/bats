@@ -219,7 +219,7 @@ bool CoverMap::canBuild(UnitType toBuild, TilePosition buildSpot)
 	//Step 6: If Zerg, check creep
 	if (bats::BuildPlanner::isZerg())
 	{
-		if (UnitAgent::isOfType(toBuild, UnitTypes::Zerg_Hatchery))
+		if (toBuild == UnitTypes::Zerg_Hatchery)
 		{
 			//Do not build if we have creep (to spread creep out)
 			if (Broodwar->hasCreep(buildSpot))
@@ -259,7 +259,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	}
 
 	//If we find unpowered buildings, build a Pylon there
-	if (BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Pylon))
+	if (toBuild == UnitTypes::Protoss_Pylon)
 	{
 		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 		for (int i = 0; i < (int)agents.size(); i++)
@@ -278,7 +278,7 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 		}
 	}
 
-	if (BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Pylon))
+	if (toBuild == UnitTypes::Protoss_Pylon)
 	{
 		if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Pylon) > 0)
 		{
@@ -298,9 +298,9 @@ TilePosition CoverMap::findBuildSpot(UnitType toBuild)
 	}
 
 	//Build near chokepoints: Bunker, Photon Cannon, Creep Colony
-	if (BaseAgent::isOfType(toBuild, UnitTypes::Terran_Bunker) ||
-		BaseAgent::isOfType(toBuild, UnitTypes::Protoss_Photon_Cannon) ||
-		BaseAgent::isOfType(toBuild, UnitTypes::Zerg_Creep_Colony))
+	if (toBuild == UnitTypes::Terran_Bunker ||
+		toBuild == UnitTypes::Protoss_Photon_Cannon ||
+		toBuild == UnitTypes::Zerg_Creep_Colony)
 	{
 		TilePosition cp = findChokepoint();
 		if (cp != TilePositions::Invalid)
@@ -739,11 +739,11 @@ Corners CoverMap::getCorners(UnitType type, TilePosition center)
 		margin = 1;
 	}
 
-	if (BaseAgent::isOfType(type, UnitTypes::Terran_Supply_Depot))
+	if (type == UnitTypes::Terran_Supply_Depot)
 	{
 		margin = 0;
 	}
-	if (BaseAgent::isOfType(type, UnitTypes::Protoss_Pylon))
+	if (type == UnitTypes::Protoss_Pylon)
 	{
 		margin = 0;
 	}
@@ -755,7 +755,10 @@ Corners CoverMap::getCorners(UnitType type, TilePosition center)
 
 	//Special case: Terran Addon buildings
 	//Add 2 extra spaces to the right to make space for the addons.
-	if (BaseAgent::isOfType(type, UnitTypes::Terran_Factory) || BaseAgent::isOfType(type, UnitTypes::Terran_Starport) || BaseAgent::isOfType(type, UnitTypes::Terran_Command_Center) || BaseAgent::isOfType(type, UnitTypes::Terran_Science_Facility))
+	if (type == UnitTypes::Terran_Factory ||
+		type == UnitTypes::Terran_Starport ||
+		type == UnitTypes::Terran_Command_Center ||
+		type == UnitTypes::Terran_Science_Facility)
 	{
 		x2 += 2;
 	}

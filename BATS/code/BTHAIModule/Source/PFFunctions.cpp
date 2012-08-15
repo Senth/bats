@@ -3,12 +3,12 @@
 using namespace BWAPI;
 using namespace std;
 
-float PFFunctions::getDistance(Position p1, Position p2)
+float PFFunctions::getDistance(const Position& p1, const Position& p2)
 {
 	return (float)p1.getDistance(p2);
 }
 
-float PFFunctions::getDistance(Position pos, Unit* unit)
+float PFFunctions::getDistance(const Position& pos, const Unit* unit)
 {
 	return (float)unit->getDistance(pos);
 }
@@ -39,11 +39,11 @@ int PFFunctions::getSize(UnitType type)
 	return 12;
 }
 
-float PFFunctions::calcOwnUnitP(float d, Unit* unit, Unit* otherOwnUnit)
+float PFFunctions::calcOwnUnitP(float d, const Unit* unit, const Unit* otherOwnUnit)
 {
-	if (unit->getID() == otherOwnUnit->getID())
+	if (unit == otherOwnUnit)
 	{
-		//Dont count collision with yourself...
+		//Don't count collision with yourself...
 		return 0;
 	}
 
@@ -67,7 +67,7 @@ float PFFunctions::calcOwnUnitP(float d, Unit* unit, Unit* otherOwnUnit)
 			p = -20;
 		}
 	}
-	if (unit->getType().getID() == UnitTypes::Zerg_Lurker && otherOwnUnit->getType().getID() == UnitTypes::Zerg_Lurker)
+	if (unit->getType() == UnitTypes::Zerg_Lurker && otherOwnUnit->getType() == UnitTypes::Zerg_Lurker)
 	{
 		//Let cloaked units stay away from non-cloaked units to avoid
 		//getting killed by splash damage.
@@ -104,9 +104,9 @@ float PFFunctions::calcOwnUnitP(float d, Unit* unit, Unit* otherOwnUnit)
 
 float PFFunctions::calcAvoidWorkerP(float d, BaseAgent* unit, BaseAgent* oUnit)
 {
-	if (unit->getUnitID() == oUnit->getUnitID())
+	if (unit == oUnit)
 	{
-		//Dont count collision with yourself...
+		//Don't count collision with yourself...
 		return 0;
 	}
 
@@ -119,7 +119,7 @@ float PFFunctions::calcAvoidWorkerP(float d, BaseAgent* unit, BaseAgent* oUnit)
 	float p = 0;
 
     if (d <= 20)
-{
+	{
         p = -20;
     }
 	else if (d > 20 && d <= 32)
@@ -130,7 +130,7 @@ float PFFunctions::calcAvoidWorkerP(float d, BaseAgent* unit, BaseAgent* oUnit)
     return p;
 }
 
-float PFFunctions::calcMineP(float d, Unit* unit)
+float PFFunctions::calcMineP(float d, const Unit* unit)
 {
 	float p = 0;
 
@@ -155,7 +155,7 @@ float PFFunctions::calcMineP(float d, Unit* unit)
 
 float PFFunctions::calcNavigationP(float d)
 {
-    float p = (float)200 - (float)0.1 * d;
+    float p = 200.0f - 0.1f * d;
     if (p < 0)
     {
         p = 0;
@@ -163,13 +163,69 @@ float PFFunctions::calcNavigationP(float d)
     return p;
 }
 
-float PFFunctions::getNavigationP(Position cPos, Position goal)
+float PFFunctions::getTrailP(BaseAgent* agent, int cX, int cY)
+{
+	// Don't use trail for now
+	return 0.0f;
+
+	if (agent->getUnit()->isBeingConstructed()) return 0;
+
+	float p = 0.0f;
+	Position nPos = Position(cX, cY);
+
+	//Add current position to trail
+	//agent->addTrailPosition(agent->getUnit()->getPosition());
+
+	//Get trail
+	// vector<Position> trail = agent->getTrail();
+	//for (size_t i = 0; i < trail.size(); i++)
+	//{
+	//	Position tPos = trail.at(i);
+	//	//Broodwar->printf("%d: (%d,%d)", i, tPos.x(), tPos.y());
+
+	//	double dist = tPos.getDistance(nPos);
+	//	if (dist <= 10.0) p = -5.0;
+	//}
+
+
+	return p;
+}
+
+float PFFunctions::getTerrainP(BaseAgent* agent, int cX, int cY)
+{
+	Position cPos = Position(cX, cY);
+	if (!agent->getUnit()->hasPath(cPos))
+	{
+		return -1000.0;
+	}
+	
+	return 0;
+}
+
+float PFFunctions::getGoalP(const Position& cPos, const TilePosition& goal)
+{
+	if (goal == TilePositions::Invalid) return 0;
+
+	Position gPos = Position(goal);
+
+	float dist = (float)cPos.getDistance(gPos);
+
+	float p = 150.0f - 0.01f * dist;
+	if (p < 0)
+    {
+        p = 0;
+    }
+
+	return p;
+}
+
+float PFFunctions::getNavigationP(const Position& cPos, const Position& goal)
 {
     float dist = getDistance(cPos, goal);
     return calcNavigationP(dist);
 }
 
-float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool defensive)
+float PFFunctions::calcAttackingUnitP(float d, const Unit* attacker, const Unit* enemy, bool defensive)
 {
 	//Check if enemy unit exists and is visible.
 	if (!enemy->exists())
@@ -196,11 +252,16 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 	}
 
 	//Calc max wep range
-    int myMSD = attacker->getType().groundWeapon().maxRange();
+    int myMSD = 0;
 	if (enemy->getType().isFlyer())
 	{
-		myMSD = attacker->getType().airWeapon().maxRange();
+		myMSD = getAirRange(attacker);
 	}
+	else
+	{
+		myMSD = getGroundRange(attacker);
+	}
+
 	if (!attacker->getType().canAttack())
 	{
 		//Unit cannot attack, use sightrange instead
@@ -214,12 +275,20 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 	{
 		myMSD = 6*32;
 	}
+	if (attacker->getType().getID() == UnitTypes::Zerg_Overlord.getID())
+	{
+		myMSD = 6*32;
+	}
 
 	//Calc attacker wep range
-	int enemyMSD = enemy->getType().groundWeapon().maxRange();
+	int enemyMSD = 0;
 	if (attacker->getType().isFlyer())
 	{
-		enemyMSD = enemy->getType().airWeapon().maxRange();
+		enemyMSD = getAirRange(enemy);
+	}
+	else
+	{
+		enemyMSD = getGroundRange(enemy);
 	}
     
     float p = 0;
@@ -231,7 +300,6 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 		//enemyMSD = (int)(enemy->getType().sightRange() * 1.2);
 	}
 
-	
 	if (!defensive)
 	{
 		//Offensive mode -> attack
@@ -239,7 +307,7 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 		{
 			if (d < myMSD - 5)
 			{
-				float fact = (float)200 / myMSD;
+				float fact = 200.0f / myMSD;
 				p = d * fact;
 				if (p < 0)
 				{
@@ -248,11 +316,13 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 			}
 			else if (d >= myMSD - 5 && d < myMSD)
 			{
-				p = (float)200;
+				p = 200.0f;
 			}
 			else
 			{
-				float p = (float)180 - (float)0.1 * d;
+				float d1 = d - myMSD;
+
+				p = 180.0f - 0.5f * d1;
 				if (p < 0)
 				{
 					p = 0;
@@ -263,17 +333,60 @@ float PFFunctions::calcAttackingUnitP(float d, Unit* attacker, Unit* enemy, bool
 	else
 	{
 		//Defensive mode -> retreat
-		p = (float)(d * 2);
-		if (d > enemyMSD * 1.5)
-		{
-			p = 0;
-		}
+		p = -enemyMSD * 1.2f + d;
+		if (p > 0) p = 0;
 	}
 
     return p;
 }
 
-bool PFFunctions::canAttack(Unit* ownUnit, Unit* target)
+int PFFunctions::getGroundRange(const Unit* cUnit)
+{
+	int range = 0;
+	if (cUnit->getType().groundWeapon().targetsGround()) 
+	{
+		int gwR = cUnit->getType().groundWeapon().maxRange();
+		if (gwR > range)
+		{
+			range = gwR;
+		}
+	}
+	if (cUnit->getType().airWeapon().targetsGround()) 
+	{
+		int gwR = cUnit->getType().airWeapon().maxRange();
+		if (gwR > range)
+		{
+			range = gwR;
+		}
+	}
+
+	return range;
+}
+
+int PFFunctions::getAirRange(const Unit* cUnit)
+{
+	int range = 0;
+	if (cUnit->getType().groundWeapon().targetsAir()) 
+	{
+		int gwR = cUnit->getType().groundWeapon().maxRange();
+		if (gwR > range)
+		{
+			range = gwR;
+		}
+	}
+	if (cUnit->getType().airWeapon().targetsAir()) 
+	{
+		int gwR = cUnit->getType().airWeapon().maxRange();
+		if (gwR > range)
+		{
+			range = gwR;
+		}
+	}
+
+	return range;
+}
+
+bool PFFunctions::canAttack(const Unit* ownUnit, const Unit* target)
 {
 	UnitType oType = ownUnit->getType();
 	UnitType tType = target->getType();
@@ -303,25 +416,3 @@ bool PFFunctions::canAttack(Unit* ownUnit, Unit* target)
 
 	return false;
 }
-
-float PFFunctions::calcDefensiveUnitP(float d, Unit* ownUnit, Unit* enemy)
-{
-	int range = 0;
-	if (enemy->getType().canAttack())
-	{
-		range = (int)(enemy->getType().groundWeapon().maxRange() * 1.5);
-	}
-	if (!canAttack(enemy, ownUnit))
-	{
-		range = 0;
-	}
-    
-    float p = (float)(d * 2);
-	if (d > range)
-	{
-		p = 0;
-	}
-
-    return p;
-}
-

@@ -90,25 +90,16 @@ bool BaseAgent::matches(Unit *mUnit) const
 
 bool BaseAgent::isOfType(UnitType type) const
 {
-	if (unit->getType().getID() == type.getID())
+	if (unit->getType() == type)
 	{
 		return true;
 	}
 	return false;
 }
 
-bool BaseAgent::isOfType(Unit* mUnit, UnitType type)
+bool BaseAgent::isOfType(const Unit* mUnit, UnitType type)
 {
-	if (mUnit->getType().getID() == type.getID())
-	{
-		return true;
-	}
-	return false;
-}
-
-bool BaseAgent::isOfType(UnitType mType, UnitType toCheckType)
-{
-	if (mType.getID() == toCheckType.getID())
+	if (mUnit->getType() == type)
 	{
 		return true;
 	}

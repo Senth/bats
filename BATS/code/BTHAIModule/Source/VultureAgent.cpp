@@ -37,6 +37,8 @@ void VultureAgent::computeActions()
 		}
 	}
 
-	findAndTryAttack();
-	computeMoveAction();
+	bool attackingEnemy = findAndTryAttack();
+	if (!attackingEnemy) {
+		computeMoveAction();
+	}
 }

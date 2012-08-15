@@ -48,7 +48,7 @@ Commander::Commander() {
 	mSelfClassifier = SelfClassifier::getInstance();
 	mGameTime = GameTime::getInstance();
 
-	mFrameCallLast = INT_MIN;
+	mFrameCallLast = -config::frame_distribution::COMMANDER;
 	mExpansionTimeLast = 0.0;
 
 	initStringToEnums();
@@ -87,13 +87,42 @@ void Commander::computeOwnReactions() {
 		return;
 	}
 
-	/// @todo should we expand? When attacking, workers saturated, or minerals running low in an expansion
-	// Check if we should expand
-	if (mSelfClassifier->getLastExpansionStartTime() > config::commander::EXPANSION_INTERVAL_MIN) {
-
+	// EXPAND
+	// -> When attacking, workers saturated, or minerals running low in an expansion
+	// Only expand if we haven't expanded for a while, and set how many maximum numbers of expansions
+	// we are allowed to have.
+	if (!mSelfClassifier->isExpanding() &&
+		mSelfClassifier->getActiveExpansionCount() < config::commander::EXPANSION_ACTIVE_MAX &&
+		mSelfClassifier->getLastExpansionStartTime() > config::commander::EXPANSION_INTERVAL_MIN)
+	{
+		if (mSelfClassifier->isAttacking()) {
+			issueCommand(Command_Expand, false, Reason_BotAttacking);
+		} else if (mSelfClassifier->areExpansionsSaturated()) {
+			issueCommand(Command_Expand, false, Reason_BotExpansionRunningLow);
+		} else if (mSelfClassifier->isAnExpansionLowOnMinerals()) {
+			issueCommand(Command_Expand, false, Reason_BotExpansionsSaturated);
+		}
 	}
 
-	/// @todo should we attack? When expanding
+
+	// ATTACK
+	// -> When expanding, when upgrade soon is done
+	/// @todo when shall we drop and when shall we attack?
+	if (!mSelfClassifier->isAttacking()) {
+		if (mSelfClassifier->isExpanding()) {
+			issueCommand(Command_Attack, false, Reason_BotExpanding);
+		} else {
+			vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+			if (mSelfClassifier->isUpgradeSoonDone(freeUnits)) {
+				issueCommand(Command_Attack, false, Reason_BotUpgradeSoonDone);
+			}
+		}
+	}
+
+
+	// SCOUT
+	// Always try to have a scout out after we have x workers
+	
 }
 
 void Commander::computeAlliedReactions() {
@@ -324,8 +353,8 @@ void Commander::orderScout(bool alliedOrdered, Reasons reason) {
 }
 
 void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
-	if(BuildPlanner::getInstance()->isExpansionAvailable(BWAPI::Broodwar->self()->getRace().getCenter())) {
-		BuildPlanner::getInstance()->expand(BWAPI::Broodwar->self()->getRace().getCenter());
+	if(BuildPlanner::getInstance()->isExpansionAvailable()) {
+		BuildPlanner::getInstance()->expand();
 		mIntentionWriter->writeIntention(Intention_BotExpand, reason);
 		mExpansionTimeLast;
 	} else {

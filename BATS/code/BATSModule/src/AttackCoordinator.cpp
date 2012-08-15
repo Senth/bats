@@ -311,7 +311,7 @@ double AttackCoordinator::calculateDefendedWeight(const BWAPI::TilePosition& att
 double AttackCoordinator::calculateExpansionTimeWeight(const BWAPI::TilePosition& expansionPosition) const {
 	double weight = 1.0;
 
-	shared_ptr<const ResourceGroup> resourceGroup = mpResourceCounter->getResourceGroup(expansionPosition);
+	shared_ptr<const ResourceGroup> resourceGroup = mpResourceCounter->getClosestResourceGroup(expansionPosition);
 
 	if (NULL != resourceGroup) {
 		// Calculate how much the interval is

@@ -197,8 +197,7 @@ void WorkerAgent::computeActions()
 
 		shared_ptr<bats::Squad> squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad) {
-			bool defensive = squad->isAvoidingEnemies();
-			computeMoveAction(defensive, defensive);
+			computeMoveAction();
 
 			/// @todo repair something?
 		} else {

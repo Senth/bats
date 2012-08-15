@@ -196,10 +196,7 @@ public:
 	bool isOfType(BWAPI::UnitType type) const;
 
 	/** Returns true if the unit is of the specified type. */
-	static bool isOfType(BWAPI::Unit* mUnit, BWAPI::UnitType type);
-
-	/** Returns true if mType is the same UnitType as toCheckType. */
-	static bool isOfType(BWAPI::UnitType mType, BWAPI::UnitType toCheckType);
+	static bool isOfType(const BWAPI::Unit* mUnit, BWAPI::UnitType type);
 
 	/** Checks if there are any enemy detector units withing range of the
 	 * specified position. True if there is, false if not. */

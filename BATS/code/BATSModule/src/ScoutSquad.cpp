@@ -1,5 +1,6 @@
 #include "ScoutSquad.h"
 #include "ExplorationManager.h"
+#include "Utilities/Logger.h"
 
 using namespace bats;
 using BWAPI::TilePosition;
@@ -12,7 +13,8 @@ ScoutSquad::ScoutSquad(
 	:	
 	Squad(units, avoidEnemy, true, unitComposition)
 {
-	// Does nothing
+	mNewEnemyOnDetect = true;
+	mEnemyDetected = false;
 }
 
 ScoutSquad::~ScoutSquad(){
@@ -39,17 +41,32 @@ std::string ScoutSquad::getName() const{
 
 void ScoutSquad::updateDerived() {
 	/// @todo move create goal, and check goal state here.
+
+	/// @todo check if we can cloak the unit, or if its cloaked
+	/// Don't mind enemies then if there are no detectors in range
+	
+	// Check for nearby enemies
+	if (isEnemyAttackUnitsWithinSight()) {
+		// If enemies were detected last time it means this are not new enemies
+		if (mEnemyDetected) {
+			mNewEnemyOnDetect = false;
+		}
+
+		mEnemyDetected = true;
+	} else {
+		mNewEnemyOnDetect = true;
+		mEnemyDetected = false;
+	}
 }
 
 Squad::GoalStates ScoutSquad::checkGoalState() const{
 	TilePosition currentPos = getCenter();
 	TilePosition goal = getGoalPosition();
-	if(isEnemyAttackUnitsWithinSight()){
-		BWAPI::Broodwar->printf("Enemy detected");
+	if(mNewEnemyOnDetect && mEnemyDetected){
+		DEBUG_MESSAGE(utilities::LogLevel_Fine, "ScoutSquad: Enemy detected, changing goal");
+		return Squad::GoalState_Failed;
+	} else if (goal == BWAPI::TilePositions::Invalid) {
 		return Squad::GoalState_Succeeded;
-	}
-	if (goal == BWAPI::TilePositions::Invalid) {
-	return Squad::GoalState_Succeeded;
 	} else if (isCloseTo(goal)) {
 		return Squad::GoalState_Succeeded;
 	}

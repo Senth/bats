@@ -108,10 +108,10 @@ public:
 	void addBuildingFirst(BWAPI::UnitType type);
 
 	/** Requests to expand the base. */
-	void expand(BWAPI::UnitType commandCenterUnit);
+	void expand();
 
 	/** Check if expansion is available. */
-	bool isExpansionAvailable(BWAPI::UnitType commandCenterUnit);
+	bool isExpansionAvailable();
 
 	/** Adds a refinery to the build order list. */
 	void addRefinery();

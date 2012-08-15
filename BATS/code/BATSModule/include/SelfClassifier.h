@@ -6,6 +6,7 @@
 // forward declarations
 class AgentManager;
 class CommandCenterAgent;
+class UnitAgent;
 
 // Namespace for the project
 namespace bats {
@@ -43,12 +44,13 @@ public:
 
 	/**
 	 * Checks if an upgrade, that will have an effect of any of the specified units,
-	 * soon is done. Soon is specified in config file as config::classifier::UPGRADE_SOON_DONE
-	 * @param affectedUnitTypes all unit types that are or will be used to attack/defend.
-	 * @return true if an upgrade, that will have an effect of any of the specified units,
+	 * soon is done. Soon is specified in the config file as
+	 * config::classifier::UPGRADE_SOON_DONE
+	 * @param affectedUnits all units too check if any upgrade will have any effect on them
+	 * @return true if an upgrade, that will have an effect of any of the specified units
 	 * soon is done.
 	 */
-	bool isUpgradeSoonDone(const std::vector<BWAPI::UnitType>& affectedUnitTypes) const;
+	bool isUpgradeSoonDone(const std::vector<UnitAgent*>& affectedUnits) const;
 
 	/**
 	 * Checks if all expansions are saturated with workers.

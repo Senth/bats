@@ -4,6 +4,7 @@
 using namespace bats;
 
 const double SECONDS_PER_FRAME_FASTEST = 0.042;
+const double FRAMES_PER_SECOND = 1.0 / SECONDS_PER_FRAME_FASTEST;
 
 GameTime* GameTime::mpsInstance = NULL;
 
@@ -39,4 +40,12 @@ double GameTime::getElapsedTime(int sinceFrame) const {
 
 int GameTime::getFrameCount(int sinceFrame) const {
 	return BWAPI::Broodwar->getFrameCount() - sinceFrame;
+}
+
+double GameTime::convertFramesToSeconds(int frames) {
+	return frames * SECONDS_PER_FRAME_FASTEST;
+}
+
+int GameTime::convertSecondsToFrames(double seconds) {
+	return seconds * FRAMES_PER_SECOND;
 }

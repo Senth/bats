@@ -44,12 +44,17 @@ enum Intentions {
 enum Reasons {
 	Reason_AlliedExpanding, /**< The allied started to build an expansion */
 	Reason_AlliedMovingToAttack, /**< Allied squad is moving out to attack */
+	Reason_BotAttacking, /**< Bot is attacking */
 	Reason_BotAttackSuccess, /**< The attack finished successfully */
 	Reason_BotDidNotAttack, /**< Did not attack anything */
 	Reason_BotDropTimedOut, /**< Drop timed out */
+	Reason_BotExpanding, /**< Bot is expanding */
+	Reason_BotExpansionRunningLow, /**< An expansion is running low on minerals */
+	Reason_BotExpansionsSaturated, /**< Expansions are saturated */
 	Reason_BotIsUnderAttack, /**< Bot is under attack */
 	Reason_BotNotEnoughUnits, /**< Bot does not have enough units for the action */
 	Reason_BotTooManyAttacks, /**< The bot has too many attacks for the action */
+	Reason_BotUpgradeSoonDone, /**< An upgrade is soon done */
 	Reason_EnemyTooStrong, /**< Enemy force is too strong */
 
 	Reason_Lim /**< Invalid reason */

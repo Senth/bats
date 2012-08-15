@@ -170,7 +170,7 @@ protected:
 	 * Checks if debug is off for the derived class (and thus this class)
 	 * @return true if debug is off for derived class
 	 */
-	virtual bool isDebugOff() const = 0;
+	virtual bool isDebugOn() const = 0;
 
 	/**
 	 * Returns the debug string that shall be printed on the squad. By default this will

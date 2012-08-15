@@ -17,35 +17,48 @@ private:
 public:
 
 	/** Returns the distance between two positions. */
-	static float getDistance(BWAPI::Position p1, BWAPI::Position p2);
+	static float getDistance(const BWAPI::Position& p1, const BWAPI::Position& p2);
 
 	/** Returns the distance between a unit and a position. */
-	static float getDistance(BWAPI::Position pos, BWAPI::Unit* unit);
+	static float getDistance(const BWAPI::Position& pos, const BWAPI::Unit* unit);
 
 	/** Calculates the potential otherOwnUnit generates around unit at distance d. */
-	static float calcOwnUnitP(float d, BWAPI::Unit* unit, BWAPI::Unit* otherOwnUnit);
+	static float calcOwnUnitP(float d, const BWAPI::Unit* unit, const BWAPI::Unit* otherOwnUnit);
 
 	/** Calculates the potential own workers generate around themselves. Used to avoid collision
 	 * at chokepoints. */
 	static float calcAvoidWorkerP(float d, BaseAgent* unit, BaseAgent* oUnit);
 
 	/** Calculates the potential a Spider Mine generates around unit at distance d. */
-	static float calcMineP(float d, BWAPI::Unit* unit);
+	static float calcMineP(float d, const BWAPI::Unit* unit);
 	
+	/** Calculates the terrain potential in a position. */
+	static float getTerrainP(BaseAgent* agent, int cX, int cY);
+
+	/** Calculates the trail potential in a position. Trails are used to reduce the local
+	 * optima problem when using potential fields. */
+	static float getTrailP(BaseAgent* agent, int cX, int cY);
+
+	/** Calculates the goal potential in a position. */
+	static float getGoalP(const BWAPI::Position& cPos, const BWAPI::TilePosition& goal);
+
 	/** Calculates the general potential field value at distance d used when moving towards a point. */
 	static float calcNavigationP(float d);
 
 	/** Returns the total potential for navigating from cPos to goal. */
-	static float getNavigationP(BWAPI::Position cPos, BWAPI::Position goal);
+	static float getNavigationP(const BWAPI::Position& cPos, const BWAPI::Position& goal);
 
 	/** Calculates the potential an attacking unit generates at distance d around an enemy unit. */
-	static float calcAttackingUnitP(float d, BWAPI::Unit* attacker, BWAPI::Unit* enemy, bool defensive);
-
-	/** Calculates the potential a defensive unit generates at distance d around an enemy unit. */
-	static float calcDefensiveUnitP(float d, BWAPI::Unit* ownUnit, BWAPI::Unit* enemy);
+	static float calcAttackingUnitP(float d, const BWAPI::Unit* attacker, const BWAPI::Unit* enemy, bool defensive);
 
 	/** Returns true if the own unit can attack the target. */
-	static bool canAttack(BWAPI::Unit* ownUnit, BWAPI::Unit* target);
+	static bool canAttack(const BWAPI::Unit* ownUnit, const BWAPI::Unit* target);
+
+	/** Returns the max range for the unit targeting ground. */
+	static int getGroundRange(const BWAPI::Unit* cUnit);
+
+	/** Returns the max range for the unit targeting air. */
+	static int getAirRange(const BWAPI::Unit* cUnit);
 	
 };
 

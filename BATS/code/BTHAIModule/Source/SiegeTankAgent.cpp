@@ -53,10 +53,10 @@ void SiegeTankAgent::computeActions()
 		
 	}
 
-	findAndTryAttack();
+	bool attackingEnemy = findAndTryAttack();
 
 	// Only try to move when in normal mode (cannot move while sieged).
-	if (!unit->isSieged())
+	if (!unit->isSieged() && !attackingEnemy)
 	{
 		computeMoveAction();
 	}

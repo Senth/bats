@@ -59,7 +59,7 @@ void IntentionWriter::writeIntention(Intentions intention, Reasons reason, const
 	}
 	fullMessage += ".";
 
-	DEBUG_MESSAGE(utilities::LogLevel_Finest, "WriteIntention::writeIntention(): " <<
+	DEBUG_MESSAGE(utilities::LogLevel_Finest, "IntentionWriter: " <<
 		mIntentions[intention].getName() << "—" << mReasons[reason].getName() << " -> " << fullMessage
 	);
 	Broodwar->sendTextEx(true, "%s", fullMessage.c_str());
@@ -182,12 +182,17 @@ void IntentionWriter::initStringToEnumWrappers() {
 	// Reasons
 	mReasonStringToEnums["AlliedExpanding"] = Reason_AlliedExpanding;
 	mReasonStringToEnums["AlliedMovingToAttack"] = Reason_AlliedMovingToAttack;
+	mReasonStringToEnums["BotAttacking"] = Reason_BotAttacking;
 	mReasonStringToEnums["BotAttackSuccess"] = Reason_BotAttackSuccess;
 	mReasonStringToEnums["BotDidNotAttack"] = Reason_BotDidNotAttack;
 	mReasonStringToEnums["BotDropTimedOut"] = Reason_BotDropTimedOut;
+	mReasonStringToEnums["BotExpanding"] = Reason_BotExpanding;
+	mReasonStringToEnums["BotExpansionRunningLow"] = Reason_BotExpansionRunningLow;
+	mReasonStringToEnums["BotExpansionsSaturated"] = Reason_BotExpansionsSaturated;
 	mReasonStringToEnums["BotIsUnderAttack"] = Reason_BotIsUnderAttack;
 	mReasonStringToEnums["BotNotEnoughUnits"] = Reason_BotNotEnoughUnits;
 	mReasonStringToEnums["BotTooManyAttacks"] = Reason_BotTooManyAttacks;
+	mReasonStringToEnums["BotUpgradeSoonDone"] = Reason_BotUpgradeSoonDone;
 	mReasonStringToEnums["EnemyTooStrong"] = Reason_EnemyTooStrong;
 
 	ERROR_MESSAGE_CONDITION(mReasonStringToEnums.size() != Reason_Lim,

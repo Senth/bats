@@ -42,6 +42,9 @@ void UnitAgent::printGraphicDebugInfo() const
 	if (!unit->isCompleted()) return;
 	
 
+	msPfManager->displayPF(this);
+
+
 	// Medium
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
 		const Position& unitPos = unit->getPosition();
@@ -155,9 +158,10 @@ void UnitAgent::computeKitingActions()
 	}
 }
 
-void UnitAgent::findAndTryAttack()
+bool UnitAgent::findAndTryAttack()
 {
 	bool avoidingEnemies = false; 
+	bool attackingEnemy = false;
 
 	// Check unit's squad state
 	if (getSquadId().isValid()) {
@@ -170,9 +174,11 @@ void UnitAgent::findAndTryAttack()
 	if (!avoidingEnemies) {
 		Unit* pTargetUnit = TargetingAgent::findTarget(this);
 		if (NULL != pTargetUnit) {
-			unit->attack(pTargetUnit);
+			attackingEnemy = unit->attack(pTargetUnit);
 		}
 	}
+
+	return attackingEnemy;
 }
 
 void UnitAgent::computeMoveAction()
@@ -346,7 +352,7 @@ int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange) const
 				{
 					double dist = unit->getDistance((*i));
 					if (dist <= maxRange)
-				{
+					{
 						eCnt++;
 					}
 				}

@@ -12,6 +12,8 @@ GoliathAgent::GoliathAgent(Unit* mUnit) : UnitAgent(mUnit)
 
 void GoliathAgent::computeActions()
 {
-	findAndTryAttack();
-	computeMoveAction();
+	bool attackingEnemy = findAndTryAttack();
+	if (!attackingEnemy) {
+		computeMoveAction();
+	}
 }

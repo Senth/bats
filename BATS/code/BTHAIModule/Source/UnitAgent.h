@@ -39,8 +39,9 @@ public:
 	/**
 	 * Finds an target for the unit to attack. But only attacks if the unit isn't in
 	 * a squad that avoids enemies.
+	 * @return true if an enemy was found and the unit is now starting to attack it
 	 */
-	void findAndTryAttack();
+	bool findAndTryAttack();
 
 	/**
 	 * Handles attacking unit actions, this function takes into account if the squad 

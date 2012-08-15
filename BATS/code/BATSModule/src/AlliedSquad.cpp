@@ -333,8 +333,8 @@ std::string AlliedSquad::getDebugString() const {
 	return PlayerSquad::getDebugString() + ss.str();
 }
 
-bool AlliedSquad::isDebugOff() const {
-	return config::debug::modules::ALLIED_SQUAD == false;
+bool AlliedSquad::isDebugOn() const {
+	return config::debug::modules::ALLIED_SQUAD;
 }
 
 std::string AlliedSquad::getStateString() const {

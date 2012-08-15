@@ -78,6 +78,8 @@ namespace build_order {
 }
 
 namespace classification {
+	double UPGRADE_SOON_DONE = 0.0;
+
 	namespace expansion {
 		double WORKERS_PER_MINERAL_SATURATION = 0.0;
 		double EXPANSION_MINERALS_LOW;
@@ -117,6 +119,7 @@ namespace classification {
 
 namespace commander {
 	double EXPANSION_INTERVAL_MIN = 0.0;
+	int EXPANSION_ACTIVE_MAX = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -130,7 +133,7 @@ namespace debug {
 	namespace modules {
 		bool ENEMY_SQUAD = false;
 		bool ALLIED_SQUAD = false;
-		bool ALLIED_ARMY_MANAGER = false;
+		bool PLAYER_ARMY_MANAGER = false;
 		bool AGENT_UNIT = false;
 		bool AGENT_STRUCTURE = false;
 		bool AGENT_WORKER = false;
@@ -138,6 +141,7 @@ namespace debug {
 		bool COVER_MAP = false;
 		bool DEFENSE = false;
 		bool HOLD_SQUAD = false;
+		bool POTENTIAL_FIELDS = false;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -385,7 +389,13 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 	} else if (variableInfo.subsection == "squad") {
 		return squad::set(variableInfo);
 	} else if (variableInfo.subsection.empty()) {
-		return false;
+		if (variableInfo.name == "upgrade_soon_done") {
+			gOldValue = toString(UPGRADE_SOON_DONE);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(UPGRADE_SOON_DONE));
+			UPGRADE_SOON_DONE = variableInfo;
+		} else {
+			return false;
+		}
 	} else {
 		ERROR_MESSAGE(false, "Unkown subsection '" << variableInfo.subsection <<
 			"' in " <<variableInfo.file << ".ini");
@@ -485,6 +495,10 @@ bool commander::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(EXPANSION_INTERVAL_MIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPANSION_INTERVAL_MIN));
 		EXPANSION_INTERVAL_MIN = variableInfo;
+	} else if (variableInfo.name == "expansion_active_max") {
+		gOldValue = toString(EXPANSION_ACTIVE_MAX);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPANSION_ACTIVE_MAX));
+		EXPANSION_ACTIVE_MAX = variableInfo;
 	} else {
 		return false;
 	}
@@ -536,10 +550,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_SQUAD);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_SQUAD));
 		ALLIED_SQUAD = variableInfo;
-	} else if (variableInfo.name == "allied_army_manager") {
-		gOldValue = toString(ALLIED_ARMY_MANAGER);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_ARMY_MANAGER));
-		ALLIED_ARMY_MANAGER = variableInfo;
+	} else if (variableInfo.name == "player_army_manager") {
+		gOldValue = toString(PLAYER_ARMY_MANAGER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(PLAYER_ARMY_MANAGER));
+		PLAYER_ARMY_MANAGER = variableInfo;
 	} else if (variableInfo.name == "agent_unit") {
 		gOldValue = toString(AGENT_UNIT);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_UNIT));
@@ -568,6 +582,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(HOLD_SQUAD);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(HOLD_SQUAD));
 		HOLD_SQUAD = variableInfo;
+	} else if (variableInfo.name == "potential_fields") {
+		gOldValue = toString(POTENTIAL_FIELDS);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(POTENTIAL_FIELDS));
+		POTENTIAL_FIELDS = variableInfo;
 	} else {
 		return false;
 	}

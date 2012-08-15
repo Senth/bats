@@ -6,6 +6,7 @@
 #include "AttackSquad.h"
 #include "SquadDefs.h"
 #include "GameTime.h"
+#include "BTHAIModule/Source/UnitAgent.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CommandCenterAgent.h"
 #include <BWAPI/Game.h>
@@ -53,16 +54,44 @@ bool SelfClassifier::isExpanding() const {
 	}
 }
 
-#pragma warning(push)
-#pragma warning(disable: 4100)
-bool SelfClassifier::isUpgradeSoonDone(const std::vector<BWAPI::UnitType>& affectedUnitTypes) const {
-	/// @todo isUpgradeSoonDone, waiting for upgrades in BuildPlanner.
-	return true;
+bool SelfClassifier::isUpgradeSoonDone(const std::vector<UnitAgent*>& affectedUnits) const {
+	// Get affected unit types
+	set<UnitType> affectedUnitTypes;
+	for (size_t i = 0; i < affectedUnits.size(); ++i) {
+		affectedUnitTypes.insert(affectedUnits[i]->getUnitType());
+	}
+
+	// Get affected upgrades
+	set<UpgradeType> affectedUpgradeTypes;
+	set<UnitType>::const_iterator unitTypeIt;
+	for (unitTypeIt = affectedUnitTypes.begin(); unitTypeIt != affectedUnitTypes.end(); ++unitTypeIt) {
+		affectedUpgradeTypes.insert(unitTypeIt->upgrades().begin(), unitTypeIt->upgrades().end());
+	}
+
+
+	// Is any building upgrading? If so, is it soon done and will it affect any of the units?
+	set<Unit*> ourUnits = Broodwar->self()->getUnits();
+	set<Unit*>::const_iterator unitIt;
+	for (unitIt = ourUnits.begin(); unitIt != ourUnits.end(); ++unitIt) {
+		UpgradeType upgradeType = (*unitIt)->getUpgrade();
+		if (upgradeType != UpgradeTypes::None) {
+			set<UpgradeType>::const_iterator foundIt = affectedUpgradeTypes.find(upgradeType);
+			if (foundIt != affectedUpgradeTypes.end()) {
+
+				// Is the upgrade soon done?
+				double timeLeft = mGameTime->convertFramesToSeconds((*unitIt)->getRemainingUpgradeTime());
+				if (timeLeft <= config::classification::UPGRADE_SOON_DONE) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
-#pragma warning(pop)
 
 bool SelfClassifier::areExpansionsSaturated() const {
-	int cWorkers = mAgentManager->getNoWorkers();
+	int cWorkers = mAgentManager->getMiningWorkerCount();
 	int cMineralPatches = 0;
 
 	// Get number of resources

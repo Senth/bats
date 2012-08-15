@@ -52,6 +52,20 @@ public:
 	 * @return number of frames since the the specified frame.
 	 */
 	int getFrameCount(int sinceFrame = 0) const;
+
+	/**
+	 * Converts frames to seconds
+	 * @param frames number of frames
+	 * @return corresponding number of seconds for the frames
+	 */
+	static double convertFramesToSeconds(int frames);
+
+	/**
+	 * Converts seconds into frames
+	 * @param seconds number of seconds
+	 * @return corresponding number of frames for the seconds
+	 */
+	static int convertSecondsToFrames(double seconds);
 	
 private:
 	/**

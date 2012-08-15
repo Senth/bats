@@ -315,7 +315,7 @@ int AgentManager::getNoWorkers()
 	return wCnt;
 }
 
-int AgentManager::noMiningWorkers()
+int AgentManager::getMiningWorkerCount()
 {
 	int cnt = 0;
 	for (int i = 0; i < (int)mAgents.size(); i++)

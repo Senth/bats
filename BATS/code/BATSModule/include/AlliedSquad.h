@@ -82,7 +82,7 @@ public:
 
 protected:
 	virtual void updateDerived();
-	virtual bool isDebugOff() const;
+	virtual bool isDebugOn() const;
 	virtual std::string getDebugString() const;
 
 private:

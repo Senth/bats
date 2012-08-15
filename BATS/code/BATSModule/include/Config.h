@@ -104,6 +104,9 @@ namespace bats {
 		 * Classification rules for player and enemies
 		 */
 		namespace classification {
+			/** Maximum time left on an upgrade before it's considered soon done. */
+			extern double UPGRADE_SOON_DONE;
+
 			/**
 			 * Rules for calculation expansions
 			 */
@@ -206,6 +209,8 @@ namespace bats {
 			/** Minimum number of seconds that must have passed since building an expansion
 			 * before expanding again, in seconds */
 			extern double EXPANSION_INTERVAL_MIN;
+			/** Maximum number of active expansions we are allowed to have */
+			extern int EXPANSION_ACTIVE_MAX;
 		}
 
 		/**
@@ -241,7 +246,7 @@ namespace bats {
 			namespace modules {
 				extern bool ENEMY_SQUAD;
 				extern bool ALLIED_SQUAD;
-				extern bool ALLIED_ARMY_MANAGER;
+				extern bool PLAYER_ARMY_MANAGER;
 				extern bool AGENT_UNIT;
 				extern bool AGENT_STRUCTURE;
 				extern bool AGENT_WORKER;
@@ -249,6 +254,7 @@ namespace bats {
 				extern bool COVER_MAP;
 				extern bool DEFENSE;
 				extern bool HOLD_SQUAD;
+				extern bool POTENTIAL_FIELDS;
 			}
 		}
 

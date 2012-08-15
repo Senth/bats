@@ -466,7 +466,7 @@ void PlayerArmyManager::printGraphicDebugInfo() const {
 
 
 	// Only draw if turned on
-	if (config::debug::modules::ALLIED_ARMY_MANAGER) {
+	if (config::debug::modules::PLAYER_ARMY_MANAGER) {
 		// High 
 		// Draw two circles around each unit, orange for excluding, green for including
 		// Draw id on each unit

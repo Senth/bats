@@ -68,7 +68,7 @@ public:
 	int getNoWorkers();
 
 	/** Returns the current number of active workers gathering minerals. */
-	int noMiningWorkers();
+	int getMiningWorkerCount();
 
 	/** Returns the closest free worker from the specified position, or NULL if not found. */
 	BaseAgent* findClosestFreeWorker(BWAPI::TilePosition pos);

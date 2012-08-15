@@ -145,10 +145,11 @@ void BuildPlanner::computeActions(){
 		}
 	}
 
-	if (!hasResourcesLeft())
-	{
-		expand(Broodwar->self()->getRace().getCenter());
-	}
+	// Commander checks if we should expand
+	//if (!hasResourcesLeft())
+	//{
+	//	expand();
+	//}
 }
 
 bool BuildPlanner::hasResourcesLeft(){
@@ -609,27 +610,15 @@ void BuildPlanner::addBuildingFirst(UnitType type){
 	buildOrder.insert(buildOrder.begin(), type);
 }
 
-void BuildPlanner::expand(UnitType commandCenterUnit){
-	if (containsType(commandCenterUnit))
-	{
-		return;
-	}
-
+void BuildPlanner::expand(){
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-	if (pos == TilePositions::Invalid)
+	if (pos != TilePositions::Invalid)
 	{
-		//No expansion site found.
-		return;
+		buildOrder.insert(buildOrder.begin(), Broodwar->self()->getRace().getCenter());
 	}
-
-	buildOrder.insert(buildOrder.begin(), commandCenterUnit);
 }
 
-bool BuildPlanner::isExpansionAvailable(UnitType commandCenterUnit){
-	if (containsType(commandCenterUnit)){
-		return false;
-	}
-
+bool BuildPlanner::isExpansionAvailable(){
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
 	if (pos == TilePositions::Invalid){
 		//No expansion site found.

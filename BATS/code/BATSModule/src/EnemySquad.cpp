@@ -15,6 +15,6 @@ void EnemySquad::updateDerived() {
 	// Does nothing
 }
 
-bool EnemySquad::isDebugOff() const {
-	return config::debug::modules::ENEMY_SQUAD == false;
+bool EnemySquad::isDebugOn() const {
+	return config::debug::modules::ENEMY_SQUAD;
 }

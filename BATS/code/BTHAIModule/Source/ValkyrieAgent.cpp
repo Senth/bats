@@ -30,7 +30,9 @@ void ValkyrieAgent::computeActions()
 	}
 	else
 	{
-		findAndTryAttack();
-		computeMoveAction();
+		bool attackingEnemy = findAndTryAttack();
+		if (!attackingEnemy) {
+			computeMoveAction();
+		}
 	}
 }

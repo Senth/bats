@@ -801,10 +801,9 @@ bool Squad::isEnemyAttackUnitsWithinSight() const {
 	}
 
 	// Use double squared distance (squared for faster calculation)
-	double sightDistanceSquared = getSightDistance();
-	sightDistanceSquared *= sightDistanceSquared;
+	int sightDistance = getSightDistance();
 
-	const TilePosition& center = getCenter();
+	Position center = Position(getCenter());
 
 	// Check for nearby enemies, RETURN early
 	const std::set<Unit*>& units = Broodwar->getAllUnits();	
@@ -834,8 +833,7 @@ bool Squad::isEnemyAttackUnitsWithinSight() const {
 
 			// Check if the unit is within range
 			if (canAttackUs) {
-				double diffDistance = static_cast<double>(getSquaredDistance(center, (*unitIt)->getTilePosition()));
-				if (diffDistance <= sightDistanceSquared) {
+				if (bats::isWithinRange(center, (*unitIt)->getPosition(), sightDistance)) {
 					return true;
 				}
 			}
@@ -849,7 +847,7 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 
 	int sightDistanceSquared = getSightDistance();
 	sightDistanceSquared *= sightDistanceSquared;
-	TilePosition center = getCenter();
+	Position center = Position(getCenter());
 
 	std::vector<Unit*> foundUnits;
 	const std::set<Unit*>& units = Broodwar->getAllUnits();	
@@ -862,7 +860,7 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 			if (!onlyAttackingUnits || (*unitIt)->getType().canAttack()) {
 
 				// Check if the unit is within range
-				int diffDistance = getSquaredDistance(center, (*unitIt)->getTilePosition());
+				int diffDistance = getSquaredDistance(center, (*unitIt)->getPosition());
 				if (diffDistance <= sightDistanceSquared) {
 					foundUnits.push_back(*unitIt);
 				}
@@ -876,7 +874,7 @@ vector<Unit*> Squad::getEnemyUnitsWithinSight(bool onlyAttackingUnits) const {
 int Squad::getSightDistance() const {
 	int maxSight = 0;
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		int unitSightCurrent = mUnits[i]->getUnitType().sightRange();
+		int unitSightCurrent = Broodwar->self()->sightRange(mUnits[i]->getUnitType());
 		if (unitSightCurrent > maxSight) {
 			maxSight = unitSightCurrent;
 		}

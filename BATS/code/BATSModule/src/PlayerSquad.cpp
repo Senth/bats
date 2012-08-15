@@ -204,7 +204,7 @@ bool PlayerSquad::belongsToThisSquad(BWAPI::Unit* unit) const {
 
 void PlayerSquad::printGraphicDebugInfo() const {
 	// Skip if not turned on
-	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off && isDebugOff())
+	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off || !isDebugOn())
 	{
 		return;
 	}

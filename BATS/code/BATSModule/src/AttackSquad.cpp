@@ -89,6 +89,11 @@ void AttackSquad::handleNormalBehavior() {
 		return;
 	}
 
+	// If no goal, creat goal...
+	if (getGoalPosition() == TilePositions::Invalid) {
+		msAttackCoordinator->requestAttack(getThis());
+	}
+
 
 	// Never regroup if attacking
 	if (isAttacking()) {
