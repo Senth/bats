@@ -187,6 +187,13 @@ As the marine auto-bunker feature has not been enable yet another composition co
 
 \subsection{Scout squad}
 \label{sec:scout_squad}
+The scout squad scouts regions and expansions that have not been scouted for a long time, to be exact it will always go the region or expansion that was the longest time anyone from our team visited it. The \nameref{sec:exploration_manager} that handles this and thus the scout squad gets it target location from it. To avoid multiple scouts moving to the same location the scout location will reset its last visit time when the squad gets the location, although it hasn't been visited at all.
+
+When an enemy is seen the scout will abandon its current scout location and find another one, the idea is not to suicide in to the enemy but keep it alive at all times. This, however, does not currently work as good as the unit doesn't avoid the enemy and must be lucky to get the other scout location in the right direction first. While the potential field manager has an avoid enemy functionality implemented this did not work very well with the retreat functionality 
+
+This feature can be added in potential field manager to use potential fields when fleeing from an enemy. 
+
+Limitations with the current version of the scout. Although another unit might visit the target location the squad will not complete its goal until it has reached there itself. The second limitation is that the scout path is not optimal, thus it can move from one end of the map to the other (already passing recently scouted areas), an improvement would be to either let the squad get regions and expansions that abut to its current location, or search for the most optimal path (in regard to visit not-recently visited locations) when moving to the target location—i.e. use its via path. The first option is probably preferable as it is easy to calculate and easy to check if the first limitation should be solved, otherwise one must check all via paths and the path might not be the optimal anymore if one location is removed.
 
 \subsection{Unit composition}
 \label{sec:unit_composition}
@@ -237,4 +244,4 @@ To use compositions one calls the unit composition factory which takes a type (h
 \label{sec:wait_goals}
 Wait goals were created for simple trigger abilities, although to function fully as independent trigger some rework needs to be done as they do not send any events and are not repeatable. These can be added to any squad at the moment, but will only have any effect if the derived squad handles them in any way, as the attack squad does. Wait goals are added to the wait goal manager which updates the goals to check if they have succeeded, failed, or timed out.
 
-Wait goals can be added to a set type, this allows all wait goals with the same set type to be easily extracted; attack coordinator uses this when adding existing wait goals to a new attack squad.
+Wait goals can be added to a set type, this allows all wait goals with the same set type to be easily extracted—attack coordinator uses this when adding existing wait goals to a new attack squad.
