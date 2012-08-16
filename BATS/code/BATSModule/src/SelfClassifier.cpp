@@ -5,6 +5,7 @@
 #include "SquadManager.h"
 #include "AttackSquad.h"
 #include "SquadDefs.h"
+#include "ScoutSquad.h"
 #include "GameTime.h"
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "BTHAIModule/Source/AgentManager.h"
@@ -47,7 +48,7 @@ bool SelfClassifier::isExpanding() const {
 	// Check with the build planner if we're building any expansion
 	if (mBuildPlanner->countInProduction(baseType) > 0) {
 		return true;
-	} else if (mBuildPlanner->nextIsOfType(baseType)) {
+	} else if (mBuildPlanner->containsType(baseType)) {
 		return true;
 	} else {
 		return false;
@@ -95,10 +96,10 @@ bool SelfClassifier::areExpansionsSaturated() const {
 	int cMineralPatches = 0;
 
 	// Get number of resources
-	const vector<BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
+	const vector<const BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
 	for (size_t i = 0; i < agents.size(); ++i) {
 		/// @todo use SturctureMainAgent instead
-		CommandCenterAgent* mainStructure = dynamic_cast<CommandCenterAgent*>(agents[i]);
+		const CommandCenterAgent* mainStructure = dynamic_cast<const CommandCenterAgent*>(agents[i]);
 
 		if (NULL != mainStructure) {
 			ResourceGroupCstPtr resourceGroup = mainStructure->getResourceGroup();
@@ -113,10 +114,10 @@ bool SelfClassifier::areExpansionsSaturated() const {
 
 bool SelfClassifier::isAnExpansionLowOnMinerals() const {
 	// Get all expansions
-	const vector<BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
+	const vector<const BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
 	for (size_t i = 0; i < agents.size(); ++i) {
-		/// @todo use SturctureMainAgent instead
-		CommandCenterAgent* mainStructure = dynamic_cast<CommandCenterAgent*>(agents[i]);
+		/// @todo use StructureMainAgent instead
+		const CommandCenterAgent* mainStructure = dynamic_cast<const CommandCenterAgent*>(agents[i]);
 
 		if (NULL != mainStructure) {
 			ResourceGroupCstPtr resourceGroup = mainStructure->getResourceGroup();
@@ -135,10 +136,10 @@ int SelfClassifier::getActiveExpansionCount() const {
 	int cExpansions = 0;
 
 	// Get all expansions
-	const vector<BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
+	const vector<const BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
 	for (size_t i = 0; i < agents.size(); ++i) {
 		/// @todo use SturctureMainAgent instead
-		CommandCenterAgent* mainStructure = dynamic_cast<CommandCenterAgent*>(agents[i]);
+		const CommandCenterAgent* mainStructure = dynamic_cast<const CommandCenterAgent*>(agents[i]);
 
 		if (NULL != mainStructure) {
 			if (!hasExpansionLowOrNoMinerals(mainStructure)) {
@@ -157,7 +158,7 @@ bool SelfClassifier::hasExpansionLowOrNoMinerals(const CommandCenterAgent* mainS
 }
 
 bool SelfClassifier::isAttacking() const {
-	const std::vector<AttackSquadPtr>& attackSquads = mSquadManager->getSquads<AttackSquad>();
+	const std::vector<AttackSquadCstPtr>& attackSquads = mSquadManager->getSquads<AttackSquad>();
 	
 	for (size_t i = 0; i < attackSquads.size(); ++i) {
 		if (!attackSquads[i]->isRetreating()) {
@@ -172,7 +173,7 @@ double SelfClassifier::getLastExpansionStartTime() const {
 	double lastExpansionFrame = 0;
 
 	// Get all expansions
-	const vector<BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
+	const vector<const BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());
 	for (size_t i = 0; i < agents.size(); ++i) {
 		if (agents[i]->getCreationFrame() > lastExpansionFrame) {
 			lastExpansionFrame = agents[i]->getCreationFrame();
@@ -180,4 +181,22 @@ double SelfClassifier::getLastExpansionStartTime() const {
 	}
 
 	return mGameTime->getElapsedTime(lastExpansionFrame);
+}
+
+bool SelfClassifier::isScouting() const {
+	const std::vector<ScoutSquadCstPtr>& scoutSquads = mSquadManager->getSquads<ScoutSquad>();
+
+	return !scoutSquads.empty();
+}
+
+bool SelfClassifier::isHighOnMinerals() const {
+	return Broodwar->self()->minerals() >= config::classification::HIGH_ON_MINERALS;
+}
+
+bool SelfClassifier::isHighOnGas() const {
+	return Broodwar->self()->gas() >= config::classification::HIGH_ON_GAS;
+}
+
+bool SelfClassifier::isHighOnResources() const {
+	return isHighOnMinerals() && isHighOnGas();
 }

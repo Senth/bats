@@ -156,8 +156,10 @@ void IntentionWriter::handleReasonVariable(const utilities::VariableInfo& variab
 void IntentionWriter::initStringToEnumWrappers() {
 	// Intentions
 	mIntentionStringToEnums["AlliedAttackFollow"] = Intention_AlliedAttackFollow;
+	mIntentionStringToEnums["ALliedAttackFollowNot"] = Intention_AlliedAttackFollowNot;
 	mIntentionStringToEnums["BotAttack"] = Intention_BotAttack;
 	mIntentionStringToEnums["BotAttackMerged"] = Intention_BotAttackMerged;
+	mIntentionStringToEnums["BotAttackMergedNot"] = Intention_BotAttackMergedNot;
 	mIntentionStringToEnums["BotAttackNewPosition"] = Intention_BotAttackNewPosition;
 	mIntentionStringToEnums["BotAttackNot"] = Intention_BotAttackNot;
 	mIntentionStringToEnums["BotComingToAid"] = Intention_BotComingToAid;
@@ -170,6 +172,9 @@ void IntentionWriter::initStringToEnumWrappers() {
 	mIntentionStringToEnums["BotRetreat"] = Intention_BotRetreat;
 	mIntentionStringToEnums["BotScout"] = Intention_BotScout;
 	mIntentionStringToEnums["BotScoutNot"] = Intention_BotScoutNot;
+	mIntentionStringToEnums["BotTransitionLate"] = Intention_BotTransitionLate;
+	mIntentionStringToEnums["BotTransitionMid"] = Intention_BotTransitionMid;
+	mIntentionStringToEnums["BotTransitionNot"] = Intention_BotTransitionNot;
 	mIntentionStringToEnums["WeShouldRetreat"] = Intention_WeShouldRetreat;
 	
 	
@@ -180,6 +185,8 @@ void IntentionWriter::initStringToEnumWrappers() {
 
 
 	// Reasons
+	mReasonStringToEnums["AlliedAttackDisappeared"] = Reason_AlliedAttackDisappeared;
+	mReasonStringToEnums["ALliedAttackNotExist"] = Reason_AlliedAttackNotExist;
 	mReasonStringToEnums["AlliedExpanding"] = Reason_AlliedExpanding;
 	mReasonStringToEnums["AlliedMovingToAttack"] = Reason_AlliedMovingToAttack;
 	mReasonStringToEnums["BotAttacking"] = Reason_BotAttacking;
@@ -189,9 +196,11 @@ void IntentionWriter::initStringToEnumWrappers() {
 	mReasonStringToEnums["BotExpanding"] = Reason_BotExpanding;
 	mReasonStringToEnums["BotExpansionRunningLow"] = Reason_BotExpansionRunningLow;
 	mReasonStringToEnums["BotExpansionsSaturated"] = Reason_BotExpansionsSaturated;
+	mReasonStringToEnums["BotHighOnResources"] = Reason_BotHighOnResources;
 	mReasonStringToEnums["BotIsUnderAttack"] = Reason_BotIsUnderAttack;
 	mReasonStringToEnums["BotNotEnoughUnits"] = Reason_BotNotEnoughUnits;
 	mReasonStringToEnums["BotTooManyAttacks"] = Reason_BotTooManyAttacks;
+	mReasonStringToEnums["BotTransitionNoMore"] = Reason_BotTransitionNoMore;
 	mReasonStringToEnums["BotUpgradeSoonDone"] = Reason_BotUpgradeSoonDone;
 	mReasonStringToEnums["EnemyTooStrong"] = Reason_EnemyTooStrong;
 

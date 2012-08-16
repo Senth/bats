@@ -18,6 +18,7 @@ class PlayerArmyManager;
 class DefenseManager;
 class SelfClassifier;
 class GameTime;
+class BuildPlanner;
 
 /**
  * The commander creates squads and sends them out to various locations. The squads are
@@ -84,7 +85,9 @@ private:
 		Command_Attack,
 		Command_Drop,
 		Command_Expand,
+		Command_Join,
 		Command_Scout,
+		Command_Transition,
 
 		Command_Lim
 	};
@@ -117,37 +120,61 @@ private:
 	void finishAlliedCreatingCommand();
 
 	/**
-	 * Initiates an attack
+	 * Initiates a frontal attack or adds new units if a frontal attack already exist
 	 * @param alliedOrdered if it was the allied who ordered the attack
-	 * @param reason a reason for the command, used when the command is successful
-	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim which will
-	 * not write any reason.
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
 	 */
-	void orderAttack(bool alliedOrdered, Reasons reason);
+	void orderAttack(bool alliedOrdered, Reasons reason = Reason_Lim);
+
+	/**
+	 * Either
+	 * \li If no frontal attack exists -> Creates a new frontal attack that will follow the
+	 * current allied frontal attack;
+	 * \li If a frontal attack exist and is following an allied attack -> Adds new units to
+	 * the attack; or
+	 * \li If a frontal attack exist but is not following an allied attack -> Starts to follow
+	 * the allied frontal attack with the current units, i.e. no units are added.
+	 * @param alliedOrdered if it was the allied who ordered the drop
+	 */
+	void orderJoin(bool alliedOrdered, Reasons reason = Reason_Lim);
 
 	/**
 	 * Initiates a drop
 	 * @param alliedOrdered if it was the allied who ordered the drop
-	 * @param reason a reason for the command, used when the command is successful
-	 * and a reason should be specified why the command was issued.
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
 	 */
-	void orderDrop(bool alliedOrdered, Reasons reason);
+	void orderDrop(bool alliedOrdered, Reasons reason = Reason_Lim);
 
 	/**
 	 * Initiates a scout
 	 * @param alliedOrdered if it was the allied who ordered the scout
-	 * @param reason a reason for the command, used when the command is successful
-	 * and a reason should be specified why the command was issued. 
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
 	 */
-	void orderScout(bool alliedOrdered, Reasons reason);
+	void orderScout(bool alliedOrdered, Reasons reason = Reason_Lim);
 
 	/**
 	 * Initiates the expand command
 	 * @param alliedOrdered if it was the allied who ordered the scout
-	 * @param reason a reason for the command, used when the command is successful
-	 * and a reason should be specified why the command was issued.
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
 	 */
-	void orderExpand(bool alliedOrdered, Reasons reason);
+	void orderExpand(bool alliedOrdered, Reasons reason = Reason_Lim);
+
+	/**
+	 * Transitions to the next phase in game, i.e. early -> mid -> late-game.
+	 * @param alliedOrdered if it was the allied who ordered the transition
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
+	 */
+	void orderTransition(bool alliedOrdered, Reasons reason = Reason_Lim);
 
 	/**
 	 * Initialize string to enumerations for the commands
@@ -163,12 +190,13 @@ private:
 	SquadPtr mAlliedSquadCommand;
 	SquadManager* mSquadManager;
 	UnitManager* mUnitManager;
-	UnitCompositionFactory* mUnitCompositionFactory;
-	PlayerArmyManager* mAlliedArmyManager;
-	DefenseManager* mDefenseManager;
+	BuildPlanner* mBuildPlanner;
+	const UnitCompositionFactory* mUnitCompositionFactory;
+	const PlayerArmyManager* mAlliedArmyManager;
+	const DefenseManager* mDefenseManager;
 	IntentionWriter* mIntentionWriter;
-	SelfClassifier* mSelfClassifier;
-	GameTime* mGameTime;
+	const SelfClassifier* mSelfClassifier;
+	const GameTime* mGameTime;
 
 	std::map<std::string, Commands> mCommandStringToEnums;
 

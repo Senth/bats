@@ -47,5 +47,5 @@ double GameTime::convertFramesToSeconds(int frames) {
 }
 
 int GameTime::convertSecondsToFrames(double seconds) {
-	return seconds * FRAMES_PER_SECOND;
+	return static_cast<int>(seconds * FRAMES_PER_SECOND);
 }

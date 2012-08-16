@@ -153,7 +153,7 @@ std::vector<std::tr1::shared_ptr<SquadType>> SquadManager::getSquads() {
 	for (SquadIt squadIt = mSquads.begin(); squadIt != mSquads.end(); ++squadIt) {
 		std::tr1::shared_ptr<SquadType> pSquad(
 			std::tr1::dynamic_pointer_cast<SquadType>(squadIt->second)
-			);
+		);
 
 		if (NULL != pSquad) {
 			foundSquads.push_back(pSquad);

@@ -81,8 +81,6 @@ Squad::Squad(
 	mThis = weak_ptr<Squad>(strongPtr);
 	msSquadManager->addSquad(strongPtr);
 
-	createGoal();
-
 	// Add listener
 	config::addOnConstantChangedListener(TO_CONSTANT_NAME(config::classification::squad::MEASURE_SIZE), this);
 }

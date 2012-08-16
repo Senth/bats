@@ -18,28 +18,34 @@ using namespace std::tr1;
 using namespace std;
 
 AttackCoordinator* AttackSquad::msAttackCoordinator = NULL;
-ExplorationManager* AttackSquad::msExplorationManager = NULL;
-PlayerArmyManager* AttackSquad::msPlayerArmyManager = NULL;
-DefenseManager* AttackSquad::msDefenseManager = NULL;
+const ExplorationManager* AttackSquad::msExplorationManager = NULL;
+const PlayerArmyManager* AttackSquad::msPlayerArmyManager = NULL;
+const DefenseManager* AttackSquad::msDefenseManager = NULL;
 
 const std::string ATTACK_SQUAD_NAME = "AttackSquad";
 
 AttackSquad::AttackSquad(
 	const std::vector<UnitAgent*>& units,
 	bool distracting,
-	const UnitComposition& unitComposition)
+	const UnitComposition& unitComposition,
+	AlliedSquadCstPtr alliedSquadFollow)
 	:
 	Squad(units, distracting, true, unitComposition)
 {
 	mDistraction = distracting;
 	mWaitInPosition = false;
 	mAttackedEnemyStructures = false;
+	mAlliedSquadFollow = alliedSquadFollow;
 
 	if (msAttackCoordinator == NULL) {
 		msAttackCoordinator = AttackCoordinator::getInstance();
 		msExplorationManager = ExplorationManager::getInstance();
 		msPlayerArmyManager = PlayerArmyManager::getInstance();
 		msDefenseManager = DefenseManager::getInstance();
+	}
+
+	if (NULL == alliedSquadFollow) {
+		msAttackCoordinator->requestAttack(getThis());
 	}
 }
 
@@ -48,7 +54,7 @@ AttackSquad::~AttackSquad() {
 }
 
 void AttackSquad::handleAlliedRegrouping() {
-	if (NULL == mpAlliedSquadFollow) {
+	if (NULL == mAlliedSquadFollow) {
 		return;
 	}
 
@@ -56,7 +62,7 @@ void AttackSquad::handleAlliedRegrouping() {
 	if (getTemporaryGoalPosition() == TilePositions::Invalid) {
 		if (needsAlliedRegrouping()) {
 			setAvoidEnemyUnits(true);
-			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+			setTemporaryGoalPosition(mAlliedSquadFollow->getCenter());
 		}
 	}
 	// Currently regrouping, update regroup position if not finished
@@ -64,7 +70,7 @@ void AttackSquad::handleAlliedRegrouping() {
 		if (finishedAlliedRegrouping()) {
 			clearAlliedRegrouping();
 		} else {
-			setTemporaryGoalPosition(mpAlliedSquadFollow->getCenter());
+			setTemporaryGoalPosition(mAlliedSquadFollow->getCenter());
 		}
 	}
 }
@@ -85,7 +91,7 @@ void AttackSquad::updateDerived() {
 
 void AttackSquad::handleNormalBehavior() {
 	// Early return if following an allied squad
-	if (NULL != mpAlliedSquadFollow) {
+	if (NULL != mAlliedSquadFollow) {
 		return;
 	}
 
@@ -125,14 +131,14 @@ void AttackSquad::handleNormalBehavior() {
 
 void AttackSquad::handleFollowAllied() {
 	// Early return if not following an allied squad
-	if (NULL == mpAlliedSquadFollow) {
+	if (NULL == mAlliedSquadFollow) {
 		return;
 	}
 
 
 	// Allied squad might have merged, search for a close squad (that's not home)
-	if(mpAlliedSquadFollow->isEmpty()) {
-		mpAlliedSquadFollow.reset();
+	if(mAlliedSquadFollow->isEmpty()) {
+		mAlliedSquadFollow.reset();
 
 		vector<pair<AlliedSquadCstPtr, int>> foundSquads =
 			msPlayerArmyManager->getSquadsWithin<AlliedSquad>(
@@ -143,9 +149,9 @@ void AttackSquad::handleFollowAllied() {
 
 		// Chose the closest squad that is outside home (not idle)
 		vector<pair<AlliedSquadCstPtr, int>>::const_iterator squadIt = foundSquads.begin();
-		while (NULL == mpAlliedSquadFollow && squadIt != foundSquads.end()) {
+		while (NULL == mAlliedSquadFollow && squadIt != foundSquads.end()) {
 			if (squadIt->first->getState() != AlliedSquad::State_IdleInBase) {
-				mpAlliedSquadFollow = squadIt->first;
+				mAlliedSquadFollow = squadIt->first;
 			}
 
 			++squadIt;
@@ -153,9 +159,9 @@ void AttackSquad::handleFollowAllied() {
 	}
 
 	// Follow the allied squad
-	if (NULL != mpAlliedSquadFollow) {
+	if (NULL != mAlliedSquadFollow) {
 
-		switch (mpAlliedSquadFollow->getState()) {
+		switch (mAlliedSquadFollow->getState()) {
 			// Allied is still -> do nothing
 			case AlliedSquad::State_IdleOutsideBase:
 				handleAlliedRegrouping();
@@ -167,7 +173,7 @@ void AttackSquad::handleFollowAllied() {
 				if (isRegroupingWithAllied()) {
 					clearAlliedRegrouping();
 				}
-				setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
+				setGoalPosition(mAlliedSquadFollow->getTargetPosition());
 				setAvoidEnemyUnits(true);
 				break;
 			}
@@ -177,7 +183,7 @@ void AttackSquad::handleFollowAllied() {
 				if (isRegroupingWithAllied()) {
 					clearAlliedRegrouping();
 				}
-				setGoalPosition(mpAlliedSquadFollow->getTargetPosition());
+				setGoalPosition(mAlliedSquadFollow->getTargetPosition());
 				setAvoidEnemyUnits(false);
 				break;
 			}
@@ -185,6 +191,8 @@ void AttackSquad::handleFollowAllied() {
 			// Allied is attacking -> Find something close to attack
 			case AlliedSquad::State_Attacking:
 				/// @todo don't call request attack every frame!
+				/// @todo what if it's only units? New feature of attacks squads should handle
+				/// this automatically then.
 				handleAlliedRegrouping();
 				if (!isRegroupingWithAllied()) {
 					setAvoidEnemyUnits(false);
@@ -195,13 +203,14 @@ void AttackSquad::handleFollowAllied() {
 			// Allied is safe -> retreat, then merge with Patrol Squad (disband)
 			case AlliedSquad::State_IdleInBase:
 				setRetreatPosition(msDefenseManager->findRetreatPosition());
-				mpAlliedSquadFollow.reset();
+				mAlliedSquadFollow.reset();
 				break;
 		}
 	}
 	// Did not find an allied squad -> retreat, then merge with Patrol Squad (disband)
 	else {
 		setRetreatPosition(msDefenseManager->findRetreatPosition());
+		msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_AlliedAttackDisappeared);
 	}
 }
 
@@ -227,8 +236,8 @@ void AttackSquad::handleRetreat() {
 	// Check if enemy army is larger than our size (probably a lot larger)
 	int cEnemySupplies = pEnemy->getSupplyCount();
 	int cOurSupplies = getSupplyCount();
-	if (NULL != mpAlliedSquadFollow) {
-		cOurSupplies += mpAlliedSquadFollow->getSupplyCount();
+	if (NULL != mAlliedSquadFollow) {
+		cOurSupplies += mAlliedSquadFollow->getSupplyCount();
 	}
 
 	if (cOurSupplies * config::classification::retreat::ENEMY_LARGER_THAN_US <= cEnemySupplies) {
@@ -239,7 +248,7 @@ void AttackSquad::handleRetreat() {
 	// Check if our supplies are decreasing too quickly
 	int cEnemyDeltaSupplies = pEnemy->getDeltaSupplyCount();
 	int cOurDeltaSupplies = getDeltaSupplyCount();
-	/// @todo Don't use allied squads for now, if they split this can cause great inaccuracies
+	/// @todo Don't use allied squads for now, if they split it can cause great inaccuracies
 	//if (NULL != mpAlliedSquadFollow) {
 	//	cOurDeltaSupplies += mpAlliedSquadFollow->getDeltaSupplyCount();
 	//}
@@ -271,42 +280,15 @@ void AttackSquad::handleRetreat() {
 	}
 }
 
-bool AttackSquad::createGoal() {
-	// Check if allied big frontal attack is out of home
-	if (NULL == mpAlliedSquadFollow && isFrontalAttack()) {
-		AlliedSquadCstPtr pBigAlliedSquad = msPlayerArmyManager->getAlliedFrontalSquad();
-
-		// Check if squad is outside of home
-		if (NULL != pBigAlliedSquad && !pBigAlliedSquad->isEmpty()) {
-			if (pBigAlliedSquad->getState() != AlliedSquad::State_IdleInBase) {
-				mpAlliedSquadFollow = pBigAlliedSquad;
-				setCanRegroup(false);
-			}
-		}
-	}
-
-
-	// Not following allied -> request regular attack
-	if (NULL == mpAlliedSquadFollow) {
-		msAttackCoordinator->requestAttack(getThis());
-	}
-
-	return true;
-}
-
 Squad::GoalStates AttackSquad::checkGoalState() const {
 	Squad::GoalStates goalState = Squad::GoalState_NotCompleted;
 
 	// Only check goal if we're not following an allied squad
-	if (NULL == mpAlliedSquadFollow) {
+	if (NULL == mAlliedSquadFollow) {
 		// Check if all enemy structures are dead nearby, and we have attacked one
 		if (isEnemyStructuresNearGoalDead()) {
 			goalState = Squad::GoalState_Succeeded;
 		}
-
-		/// @todo check if enemy force is too strong.
-
-		/// @todo check for enemy units to kill them?
 	}
 
 	return goalState;
@@ -354,11 +336,11 @@ bool AttackSquad::isFrontalAttack() const {
 }
 
 bool AttackSquad::isFollowingAlliedSquad() const {
-	return NULL != mpAlliedSquadFollow;
+	return NULL != mAlliedSquadFollow;
 }
 
 AlliedSquadCstPtr AttackSquad::getAlliedSquad() const {
-	return mpAlliedSquadFollow;
+	return mAlliedSquadFollow;
 }
 
 std::string AttackSquad::getName() const {
@@ -377,11 +359,11 @@ void AttackSquad::onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitG
 #pragma warning(pop)
 
 bool AttackSquad::needsAlliedRegrouping() const {
-	if (NULL == mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
+	if (NULL == mAlliedSquadFollow || mAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
 		return false;
 	}
 
-	if (!isCloseTo(mpAlliedSquadFollow->getCenter(), config::squad::attack::ALLIED_REGROUP_BEGIN)) {
+	if (!isCloseTo(mAlliedSquadFollow->getCenter(), config::squad::attack::ALLIED_REGROUP_BEGIN)) {
 		return true;
 	} else {
 		return false;
@@ -389,11 +371,11 @@ bool AttackSquad::needsAlliedRegrouping() const {
 }
 
 bool AttackSquad::finishedAlliedRegrouping() const {
-	if (NULL != mpAlliedSquadFollow || mpAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
+	if (NULL != mAlliedSquadFollow || mAlliedSquadFollow->getCenter() == TilePositions::Invalid) {
 		return true;
 	}
 
-	if (isCloseTo(mpAlliedSquadFollow->getCenter(), config::squad::attack::ALLIED_REGROUP_END)) {
+	if (isCloseTo(mAlliedSquadFollow->getCenter(), config::squad::attack::ALLIED_REGROUP_END)) {
 		return true;
 	} else {
 		return false;
@@ -404,8 +386,8 @@ string AttackSquad::getDebugInfo() const {
 	stringstream ss;
 	ss << left << setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Follow: ";
 
-	if (NULL != mpAlliedSquadFollow) {
-		ss << mpAlliedSquadFollow->getId();
+	if (NULL != mAlliedSquadFollow) {
+		ss << mAlliedSquadFollow->getId();
 	} else {
 		ss << "None";
 	}
@@ -447,11 +429,15 @@ void AttackSquad::onGoalSucceeded() {
 	if (!mAttackedEnemyStructures) {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "AttackSquad never attacked, finding another goal...");
 		clearMovement();
-		createGoal();
+		msAttackCoordinator->requestAttack(getThis());
 		msIntentionWriter->writeIntention(Intention_BotAttackNewPosition, Reason_BotDidNotAttack, getGoalPosition());
 	} else {
 		// Retreat
 		msIntentionWriter->writeIntention(Intention_BotRetreat, Reason_BotAttackSuccess);
 		setRetreatPosition(msDefenseManager->findRetreatPosition());
 	}
+}
+
+void AttackSquad::followAlliedSquad(AlliedSquadCstPtr alliedSquad) {
+	mAlliedSquadFollow = alliedSquad;
 }

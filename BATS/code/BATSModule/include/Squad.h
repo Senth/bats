@@ -408,7 +408,7 @@ protected:
 	/**
 	 * Check whether the goal is completed or not. Shall return whether
 	 * the current goal state of the squad.
-	 * @deprecated Will be removed in future versions. Test this in computeSquadSpecificActions()
+	 * @deprecated Will be removed in future versions. Test this in updateDerived()
 	 * instead
 	 * @return current goal state of the squad.
 	 */
@@ -417,7 +417,7 @@ protected:
 	/**
 	 * Called when a new goal shall be created.
 	 * @deprecated Will be removed in future versions. Create the goal in
-	 * computeSquadSpecificActions(), constructor, or somewhere else.
+	 * updateDerived(), constructor, or somewhere else.
 	 * @returns true a goal was successfully created.
 	 */
 	virtual bool createGoal() {return false;}
@@ -583,6 +583,19 @@ protected:
 	static IntentionWriter* msIntentionWriter;
 
 private:
+	/**
+	 * Disallow copy constructor. Will generate a compile or link error when used.
+	 * @param nonCopyable, non copyable object
+	 */
+	Squad(const Squad& nonCopyable);
+
+	/**
+	 * Disallow assignment operator. Will generate a compile or link error when used.
+	 * @param nonCopyable non copyable object
+	 * @return nonCopyable object
+	 */
+	Squad& operator=(const Squad& nonCopyable);
+
 	/**
 	 * Handle retreats, checks if the retreat is complete and then calls
 	 * onRetreatCompleted().

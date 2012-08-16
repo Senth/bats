@@ -106,34 +106,29 @@ struct ForceData {
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
  * @author Matteus Magnusson (matteus.magnusson@gmail.com)
- * Matteus Magnusson changed the code so that it works better with BATS.
+ * Changed the code so that it works better with BATS.
  * Updated the documentation, added, and removed functions.
  */
 class ExplorationManager {
 public:
-	/** Destructor */
+	/**
+	 * Destructor
+	 */
 	~ExplorationManager();
 
-	/** Returns the instance of the class. Will create an instance if none exist.
+	/**
+	 * Returns the instance of the class. Will create an instance if none exist.
 	 * @return instance of the class. 
 	 */
 	static ExplorationManager* getInstance();
-
-	/** Sets ExplorationManager to inactive. Is used when perfect information is activated. */
-	void setInactive();
-
-	/** Returns true if the ExplorationManager is active, false if not. It shall always
-	 ** be active if no perfect information is available.
-	 * @return true if the ExplorationManager is active, false if not. 
-	 */
-	bool isActive() const;
 
 	/** 
 	 * Called each update to issue orders.
 	 */
 	void update();
 
-	/** Returns the next position to explore for this squad. This will calculate
+	/**
+	 * Returns the next position to explore for this squad. This will calculate
 	 * a close valid position to go to explore. It will prioritize areas that haven't
 	 * been explored for a while.
 	 * @param squad the squad to return a position for
@@ -146,16 +141,18 @@ public:
 	 */
 	void printGraphicDebugInfo() const;
 
-	/** Notify the ExplorationManager that an enemy unit has been spotted.
+	/**
+	 * Notify the ExplorationManager that an enemy unit has been spotted.
 	 * @param unit the unit that has been spotted.
 	 */
-	void addSpottedUnit(BWAPI::Unit* unit);
+	void addSpottedUnit(const BWAPI::Unit* unit);
 
-	/** Notify the ExplorationManager that an enemy unit has been destroyed. If the
+	/**
+	 * Notify the ExplorationManager that an enemy unit has been destroyed. If the
 	 * enemy unit was among the spotted units, it is removed from the list.
 	 * @param unit the unit that has been destroyed.
 	 */
-	void unitDestroyed(BWAPI::Unit* unit);
+	void unitDestroyed(const BWAPI::Unit* unit);
 
 	/** Returns the list of spotted enemy buildings.
 	 * @return a list with all spotted units. 
@@ -167,15 +164,17 @@ public:
 	 */
 	std::vector<std::tr1::shared_ptr<SpottedObject>>& getSpottedBuildings();
 
-	/** Returns the closest enemy spotted building from a start position, or BWAPI::TilePosition(-1,-1) if 
-	 * none was found.
+	/** 
+	 * Returns the closest enemy spotted building from a start position.
 	 * @param startPosition the position we want to start searching from
-	 * @return position of the closest building that has been spotted, including the squared distance.
-	 * If no building was found it will return BWAPI::TilePositions::Invalid (in .first).
+	 * @return position of the closest building that has been spotted (first), including the
+	 * squared distance (second).
+	 * If no building was found it will return BWAPI::TilePositions::Invalid (first).
 	 */
 	std::pair<BWAPI::TilePosition, int> getClosestSpottedBuilding(const BWAPI::TilePosition& startPosition) const;
 
-	/** Calculates the number of spotted enemy structure within the specified range (in tiles).
+	/** 
+	 * Calculates the number of spotted enemy structure within the specified range (in tiles).
 	 * @param position the position to check if there are any enemy structures in range.
 	 * @param range the radius to check from the position
 	 * @return number of enemy structures in range.
@@ -210,6 +209,7 @@ public:
 	 * @param destination the location a ground unit want to move to.
 	 * @return true if the ground unit can reach position 'destination' from 'source'.
 	 * Else false
+	 * @deprecated Will be removed in a later version, this function does not belong here.
 	 */
 	static bool canReach(const BWAPI::TilePosition& source, const BWAPI::TilePosition& destination);
 
@@ -218,14 +218,17 @@ public:
 	 * @param unit the unit to check if it can move
 	 * @param destination the location unit wants to check
 	 * @return true if the unit can reach position 'destination', else false
+	 * @deprecated Will be removed in a later version, this function does not belong here.
 	 */
-	static bool canReach(BaseAgent* unit, const BWAPI::TilePosition& destination);
+	static bool canReach(const BaseAgent* unit, const BWAPI::TilePosition& destination);
 
-	/** Checks if an enemy detector is covering the specified position.
+	/** 
+	 * Checks if an enemy detector is covering the specified position.
 	 * This can give a false negative, i.e. when an observer is located at that position
 	 * and we don't have a detector in range.
 	 * @param position the position we want to see if a detector is covering
 	 * @return true if a visible enemy detector is covering the position.
+	 * @deprecated Will be removed in a later version, this function does not belong here?
 	 */
 	bool isEnemyDetectorCovering(const BWAPI::TilePosition& position) const;
 
@@ -257,10 +260,20 @@ private:
 	 * Private constructor to enforce singleton usage.
 	 */
 	ExplorationManager();
-
-	int getLastVisitFrame(BWTA::Region* region);
+	
+	/**
+	 * Calculates the enemy force strength
+	 */
 	void calcEnemyForceData();
+	
+	/**
+	 * Calculates our force strength
+	 */
 	void calcOwnForceData();
+	
+	/**
+	 * Remove buildings that have been moved or destroyed
+	 */
 	void cleanup();
 
 	std::vector<std::tr1::shared_ptr<SpottedObject>> mSpottedStructures;
@@ -271,10 +284,9 @@ private:
 	ForceData mForceOwn;
 	ForceData mForceEnemy;
 
-	bool mActive;
 	int mFrameLastCall;
 
-	static ExplorationManager* mInstance;
+	static ExplorationManager* msInstance;
 
 	/**
 	 * When we shall calculate the specific force

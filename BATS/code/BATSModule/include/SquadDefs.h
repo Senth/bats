@@ -4,9 +4,7 @@
 #include <memory>
 
 namespace bats {
-	struct _SquadType{};
-	typedef utilities::KeyType<bats::_SquadType> SquadId;
-
+	// Player and enemy squads 
 	struct _PlayerSquadType{};
 	typedef utilities::KeyType<bats::_PlayerSquadType> PlayerSquadId;
 
@@ -25,6 +23,10 @@ namespace bats {
 	typedef std::tr1::shared_ptr<const EnemySquad> EnemySquadCstPtr;
 	typedef const std::tr1::shared_ptr<EnemySquad>& EnemySquadRef;
 
+	// Bot squads
+	struct _SquadType{};
+	typedef utilities::KeyType<bats::_SquadType> SquadId;
+
 	class Squad;
 	typedef std::tr1::shared_ptr<Squad> SquadPtr;
 	typedef std::tr1::shared_ptr<const Squad> SquadCstPtr;
@@ -34,6 +36,11 @@ namespace bats {
 	typedef std::tr1::shared_ptr<AttackSquad> AttackSquadPtr;
 	typedef std::tr1::shared_ptr<const AttackSquad> AttackSquadCstPtr;
 	typedef const std::tr1::shared_ptr<AttackSquad>& AttackSquadRef;
+
+	class ScoutSquad;
+	typedef std::tr1::shared_ptr<ScoutSquad> ScoutSquadPtr;
+	typedef std::tr1::shared_ptr<const ScoutSquad> ScoutSquadCstPtr;
+	typedef const std::tr1::shared_ptr<ScoutSquad>& ScoutSquadRef;
 
 	class PatrolSquad;
 	typedef std::tr1::shared_ptr<PatrolSquad> PatrolSquadPtr;

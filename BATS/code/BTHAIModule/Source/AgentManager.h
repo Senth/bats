@@ -65,10 +65,10 @@ public:
 	void computeActions();
 
 	/** Returns the current number of active worker units. */
-	int getNoWorkers();
+	int getWorkerCount() const;
 
 	/** Returns the current number of active workers gathering minerals. */
-	int getMiningWorkerCount();
+	int getMiningWorkerCount() const;
 
 	/** Returns the closest free worker from the specified position, or NULL if not found. */
 	BaseAgent* findClosestFreeWorker(BWAPI::TilePosition pos);

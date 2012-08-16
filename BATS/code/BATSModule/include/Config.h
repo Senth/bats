@@ -106,6 +106,10 @@ namespace bats {
 		namespace classification {
 			/** Maximum time left on an upgrade before it's considered soon done. */
 			extern double UPGRADE_SOON_DONE;
+			/** If above this value, we're high on minerals */
+			extern int HIGH_ON_MINERALS;
+			/** If above this value, we're high on gas */
+			extern int HIGH_ON_GAS;
 
 			/**
 			 * Rules for calculation expansions
@@ -211,6 +215,8 @@ namespace bats {
 			extern double EXPANSION_INTERVAL_MIN;
 			/** Maximum number of active expansions we are allowed to have */
 			extern int EXPANSION_ACTIVE_MAX;
+			/** Minimum number of workers before we start scouting */
+			extern int SCOUT_ON_WORKER_COUNT;
 		}
 
 		/**

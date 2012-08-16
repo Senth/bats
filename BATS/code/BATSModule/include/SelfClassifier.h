@@ -86,6 +86,39 @@ public:
 	 */
 	double getLastExpansionStartTime() const;
 
+	/**
+	 * Checks if we have an active scout squad.
+	 * @return true if we have a scout, false otherwise.
+	 */
+	bool isScouting() const;
+
+	/**
+	 * Checks if we're high on minerals, configured in the config file, under
+	 * [classification] high_on_minerals
+	 * @return true if we're low on minerals
+	 * @see isHighOnGas()
+	 * @see isHighOnResources()
+	 */
+	bool isHighOnMinerals() const;
+
+	/**
+	 * Checks if we're high on gas, configured in the config file, under 
+	 * [classification] high_on_gas
+	 * @return true if we're low on gas
+	 * @see isHighOnMinerals()
+	 * @see isHighOnResources()
+	 */
+	bool isHighOnGas() const;
+
+	/**
+	 * Checks if we're high on resources, this function is the same as calling
+	 * (isHighOnMinerals() && isHighOnGas()).
+	 * @return true if we're both high on minerals and gas.
+	 * @see isHighOnMinerals()
+	 * @see isHighOnGas()
+	 */
+	bool isHighOnResources() const;
+
 private:
 	/**
 	 * Private constructor to enforce singleton usage.
@@ -101,10 +134,10 @@ private:
 	 */
 	bool hasExpansionLowOrNoMinerals(const CommandCenterAgent* mainStructure) const;
 
-	AgentManager* mAgentManager;
-	BuildPlanner* mBuildPlanner;
-	SquadManager* mSquadManager;
-	GameTime* mGameTime;
+	const AgentManager* mAgentManager;
+	const BuildPlanner* mBuildPlanner;
+	const SquadManager* mSquadManager;
+	const GameTime* mGameTime;
 
 	static SelfClassifier* msInstance;
 };

@@ -1,5 +1,4 @@
-#ifndef __SPOTTEDOBJECT_H__
-#define __SPOTTEDOBJECT_H__
+#pragma once
 
 #include <BWAPI.h>
 #include <BWTA.h>
@@ -8,25 +7,27 @@
  ** It contains all details about a spotted enemy unit or neutral resource. 
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Matteus Magnusson (senth.wallace@gmail.com)
+ * Now using const and references, and changed to TilePositions::Invalid default value.
  */
 class SpottedObject {
 
 private:
-	BWAPI::UnitType type;
-	BWAPI::Position position;
-	BWAPI::TilePosition tilePosition;
-	int unitID;
-	bool active;
+	BWAPI::UnitType mType;
+	BWAPI::Position mPosition;
+	BWAPI::TilePosition mTilePosition;
+	int mUnitId;
+	bool mActive;
 
 public:
 	/** Default constructor. Should not be used. */
 	SpottedObject();
 
 	/** Creates an object from a unit reference. */
-	SpottedObject(BWAPI::Unit* mUnit);
+	SpottedObject(const BWAPI::Unit* unit);
 
 	/** Creates a spotted object from an interesting position. */
-	SpottedObject(BWAPI::Position pos);
+	SpottedObject(const BWAPI::Position& pos);
 
 	/** Returns true if this SpottedObject is active, false if not. */
 	bool isActive() const;
@@ -38,23 +39,15 @@ public:
 	int getUnitID() const;
 
 	/** Returns the type of the spotted unit. */
-	BWAPI::UnitType getType() const;
+	const BWAPI::UnitType& getType() const;
 
 	/** Returns the position of the spotted unit. */
-	BWAPI::Position getPosition() const;
+	const BWAPI::Position& getPosition() const;
 
-	/** Returns the tileposition of the spotted unit. */
-	BWAPI::TilePosition getTilePosition() const;
+	/** Returns the tile position of the spotted unit. */
+	const BWAPI::TilePosition& getTilePosition() const;
 
 	/** Returns true if the SpottedObject is at this TilePosition. */
-	bool isAt(BWAPI::TilePosition tilePos) const;
-
-	/** Returns the distance between the spotted object and a position */
-	double getDistance(BWAPI::Position pos) const;
-
-	/** Returns the distance between the spotted object and a tileposition */
-	double getDistance(BWAPI::TilePosition tilePos) const;
+	bool isAt(const BWAPI::TilePosition& tilePos) const;
 
 };
-
-#endif

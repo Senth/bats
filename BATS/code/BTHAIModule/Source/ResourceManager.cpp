@@ -74,7 +74,7 @@ bool ResourceManager::needWorker()
 	int idealNoWorkers = noBases * workersPerBase + noRefinery * 3;
 	if (idealNoWorkers > 60) idealNoWorkers = 60;
 
-	int noWorkers = AgentManager::getInstance()->getNoWorkers();
+	int noWorkers = AgentManager::getInstance()->getWorkerCount();
 	if (noWorkers < idealNoWorkers)
 	{
 		//Check if we have enough resources

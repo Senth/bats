@@ -22,13 +22,17 @@ public:
 	/**
 	 * Constructor that takes units to be used with the squad.
 	 * @param units all units to be added to the squad.
-	 * @param distracting if the attack squad is distracting or not. Defaults to false
-	 * @param unitComposition the unit composition the attack squad uses.
+	 * @param distracting (optional) if the attack squad is distracting or not. Defaults to false
+	 * @param unitComposition (optional) the unit composition the attack squad uses. Defaults to 
+	 * UnitCompositionFactory::INVALID
+	 * @param alliedSquadFollow (optional) if the squad shall follow an allied squad. Defaults
+	 * to NULL.
 	 */
 	AttackSquad(
 		const std::vector<UnitAgent*>& units,
 		bool distracting = false,
-		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID
+		const UnitComposition& unitComposition = UnitCompositionFactory::INVALID,
+		AlliedSquadCstPtr alliedSquadFollow = AlliedSquadCstPtr()
 	);
 
 	/**
@@ -81,6 +85,14 @@ public:
 	bool isFollowingAlliedSquad() const;
 
 	/**
+	 * This will make the squad follow an allied squad. If the allied squad dies
+	 * or retreats this squad will do the same (or it will try to retreat if the allied squad
+	 * has died).
+	 * @param alliedSquad the allied squad to follow
+	 */
+	void followAlliedSquad(AlliedSquadCstPtr alliedSquad);
+
+	/**
 	 * Returns the allied squad this squad is following
 	 * @return allied squad this squad is following, NULL if not following any allied squad
 	 */
@@ -109,13 +121,12 @@ protected:
 	virtual void updateDerived();
 	virtual void onWaitGoalAdded(const std::tr1::shared_ptr<WaitGoal>& newWaitGoal);
 	virtual void onGoalSucceeded();
-	virtual bool createGoal();
 	virtual GoalStates checkGoalState() const;
 
 	static AttackCoordinator* msAttackCoordinator;
-	static ExplorationManager* msExplorationManager;
-	static PlayerArmyManager* msPlayerArmyManager;
-	static DefenseManager* msDefenseManager;
+	static const ExplorationManager* msExplorationManager;
+	static const PlayerArmyManager* msPlayerArmyManager;
+	static const DefenseManager* msDefenseManager;
 private:
 	/**
 	 * Check if the squad needs to regroup with the allied forces.
@@ -181,6 +192,6 @@ private:
 	bool mDistraction;	/**< If the attack is a distracting attack or not */
 	bool mWaitInPosition;
 	bool mAttackedEnemyStructures;
-	AlliedSquadCstPtr mpAlliedSquadFollow;
+	AlliedSquadCstPtr mAlliedSquadFollow;
 };
 }

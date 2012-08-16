@@ -21,43 +21,43 @@ struct TransitionGraph {
 };
 
 class BuildPlanner {
-
-private:
-	std::vector<BWAPI::UnitType> buildOrder;
-	std::vector<BuildQueueItem> buildQueue;
-	int lastCommandCenter;	
-	int lastCallFrame;
-	std::vector<bats::CoreUnit> mCoreUnitsList;
-protected:
-	BuildPlanner();
-	void lock(int buildOrderIndex, int unitId);
-	bool executeOrder(BWAPI::UnitType type);
-	bool shallBuildSupplyDepot();
-	std::string format(BWAPI::UnitType type);
-	bool hasResourcesLeft();
-	int mineralsNearby(BWAPI::TilePosition center);	
-
-	static BuildPlanner* instance;
-
 public:
 	// transition graph used for maintaining the path taken to current phase
 	TransitionGraph mtransitionGraph;
 	/** Destructor. */
 	~BuildPlanner();
-	static std::string mCurrentPhase;
+	
 	/** Returns the instance to the BuildPlanner that is currently used. */
 	static BuildPlanner* getInstance();
 
 	/**
+	 * Returns the number of structures in the queue, i.e. not in production
+	 * @return number of structures left to build
+	 */
+	size_t getQueueCount() const;
+
+	/**
 	 * Used to get the unit list created from the BuildOrderFileReader instance
 	 */
-	std::vector<bats::CoreUnit> getUnitList();
+	std::vector<bats::CoreUnit> getUnitList() const;
 
-	/** Called on user command to switch phase. */	
+	/**
+	 * Returns the current phase of the Build Planner, i.e. early, mid, or late game.
+	 * @return current phase of the Build Planner, possible values are "early", "mid", or "late".
+	 */
+	const std::string& getCurrentPhase() const;
+
+	/**
+	 * Checks if we can transition, this essentially checks if we're not the late game, as
+	 * we can't transition any more when we're in the late game.
+	 */
+	bool canTransition() const;
+
+	/** Called on user command to switch phase. */
 	void switchToPhase(std::string fileName);
 
 	/** Returns the number of units of the specified type currently being produced. */
-	int countInProduction(BWAPI::UnitType type);
+	int countInProduction(BWAPI::UnitType type) const;
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -82,24 +82,24 @@ public:
 	void commandCenterBuilt();
 
 	/** Shows some debug info on screen. */
-	void printGraphicDebugInfo();
+	void printGraphicDebugInfo() const;
 
 	/** Is called when no build spot has been found for the specified type. Gives each build planner
 	 * an opportunity to handle it. */
 	void handleNoBuildspotFound(BWAPI::UnitType toBuild);
 
 	/** Checks if more supply buildings are needed. */
-	bool shallBuildSupply();
+	bool shallBuildSupply() const;
 
 	/** Checks if a supply is under construction. */
-	bool supplyBeingBuilt();
+	bool supplyBeingBuilt() const;
 
 	/** Returns true if next in build order is of the specified type. Returns false if
 	 * build order is empty. */
-	bool nextIsOfType(BWAPI::UnitType type);
+	bool nextIsOfType(BWAPI::UnitType type) const;
 
 	/** Returns true if build order contains a unit of the specified type. */
-	bool containsType(BWAPI::UnitType type);
+	bool containsType(BWAPI::UnitType type) const;
 
 	/** Adds a building to the build order queue. */
 	void addBuilding(BWAPI::UnitType type);
@@ -111,24 +111,46 @@ public:
 	void expand();
 
 	/** Check if expansion is available. */
-	bool isExpansionAvailable();
+	bool isExpansionAvailable() const;
 
 	/** Adds a refinery to the build order list. */
 	void addRefinery();
 
-	/** Checks if the specified BWAPI::TilePosition is covered by a detector buildings sight radius. */
+	/** Checks if the specified BWAPI::TilePosition is covered by a detector buildings sight radius.
+	 * @deprecated should not be here */
 	static bool coveredByDetector(BWAPI::TilePosition pos);
 
 	/** Morphs a Zerg drone to a building. */
 	bool executeMorph(BWAPI::UnitType target, BWAPI::UnitType evolved);
 
-	/** Returns true if the player is Terran. */
+	/** Returns true if the player is Terran.
+	 * @deprecated should not be here */
 	static bool isTerran();
 
-	/** Returns true if the player is Protoss. */
+	/** Returns true if the player is Protoss.
+	 * @deprecated should not be here */
 	static bool isProtoss();
 
-	/** Returns true if the player is Zerg. */
+	/** Returns true if the player is Zerg. 
+	 * @deprecated should not be here */
 	static bool isZerg();
+
+private:
+	BuildPlanner();
+	void lock(int buildOrderIndex, int unitId);
+	bool executeOrder(BWAPI::UnitType type);
+	bool shallBuildSupplyDepot() const;
+	std::string format(BWAPI::UnitType type) const;
+	bool hasResourcesLeft() const;
+	int mineralsNearby(BWAPI::TilePosition center) const;
+
+	std::vector<BWAPI::UnitType> mBuildOrder;
+	std::vector<BuildQueueItem> mBuildQueue;
+	int mLastCommandCenter;	/**< @deprecated, don't use */
+	int mLastCallFrame;
+	std::vector<bats::CoreUnit> mCoreUnitsList;
+	std::string mCurrentPhase;	
+
+	static BuildPlanner* instance;
 };
 }

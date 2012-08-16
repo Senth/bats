@@ -301,7 +301,7 @@ void AgentManager::computeActions()
 	Profiler::getInstance()->end("AgentManager::update()");
 }
 
-int AgentManager::getNoWorkers()
+int AgentManager::getWorkerCount() const
 {
 	int wCnt = 0;
 	for (int i = 0; i < (int)mAgents.size(); i++)
@@ -315,7 +315,7 @@ int AgentManager::getNoWorkers()
 	return wCnt;
 }
 
-int AgentManager::getMiningWorkerCount()
+int AgentManager::getMiningWorkerCount() const
 {
 	int cnt = 0;
 	for (int i = 0; i < (int)mAgents.size(); i++)

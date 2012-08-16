@@ -19,8 +19,10 @@ namespace bats {
  */
 enum Intentions {
 	Intention_AlliedAttackFollow, /**< Will follow the allied attacking squad */
+	Intention_AlliedAttackFollowNot, /**< Will not follow the allied attacking squad */
 	Intention_BotAttack, /**< A regular attack by the enemy */
-	Intention_BotAttackMerged, /**< Merged new units with the old squad */
+	Intention_BotAttackMerged, /**< Added new units to the squad */
+	Intention_BotAttackMergedNot, /**< Did not add any new units to the squad */
 	Intention_BotAttackNewPosition, /**< Finding a new position to attack */
 	Intention_BotAttackNot, /**< It's not possible to create another attack */
 	Intention_BotComingToAid, /**< The bot is coming to aid the player in defending */
@@ -33,6 +35,9 @@ enum Intentions {
 	Intention_BotRetreat, /**< The bot retreats from a battle */
 	Intention_BotScout, /**< Creates a scout */
 	Intention_BotScoutNot, /**< Could not create a scout */
+	Intention_BotTransitionLate, /**< Bot will transition to late phase */
+	Intention_BotTransitionMid, /**< Bot will transition to the mid phase */
+	Intention_BotTransitionNot, /**< Bot will not transition */
 	Intention_WeShouldRetreat, /**< Good if we retreat */
 
 	Intention_Lim /**< Invalid intention */
@@ -42,6 +47,8 @@ enum Intentions {
  * Reasons for the intentions
  */
 enum Reasons {
+	Reason_AlliedAttackDisappeared, /**< Allied attack disappeared from our attack */
+	Reason_AlliedAttackNotExist, /**< There is no allied attack to follow */
 	Reason_AlliedExpanding, /**< The allied started to build an expansion */
 	Reason_AlliedMovingToAttack, /**< Allied squad is moving out to attack */
 	Reason_BotAttacking, /**< Bot is attacking */
@@ -51,9 +58,11 @@ enum Reasons {
 	Reason_BotExpanding, /**< Bot is expanding */
 	Reason_BotExpansionRunningLow, /**< An expansion is running low on minerals */
 	Reason_BotExpansionsSaturated, /**< Expansions are saturated */
+	Reason_BotHighOnResources, /**< Bot is high on both minerals and gas */
 	Reason_BotIsUnderAttack, /**< Bot is under attack */
 	Reason_BotNotEnoughUnits, /**< Bot does not have enough units for the action */
 	Reason_BotTooManyAttacks, /**< The bot has too many attacks for the action */
+	Reason_BotTransitionNoMore, /**< No more transitions available for the bot */
 	Reason_BotUpgradeSoonDone, /**< An upgrade is soon done */
 	Reason_EnemyTooStrong, /**< Enemy force is too strong */
 

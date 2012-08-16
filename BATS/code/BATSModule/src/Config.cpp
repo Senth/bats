@@ -79,6 +79,8 @@ namespace build_order {
 
 namespace classification {
 	double UPGRADE_SOON_DONE = 0.0;
+	int HIGH_ON_MINERALS = 0;
+	int HIGH_ON_GAS = 0;
 
 	namespace expansion {
 		double WORKERS_PER_MINERAL_SATURATION = 0.0;
@@ -120,6 +122,7 @@ namespace classification {
 namespace commander {
 	double EXPANSION_INTERVAL_MIN = 0.0;
 	int EXPANSION_ACTIVE_MAX = 0;
+	int SCOUT_ON_WORKER_COUNT = 0;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -393,6 +396,14 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 			gOldValue = toString(UPGRADE_SOON_DONE);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(UPGRADE_SOON_DONE));
 			UPGRADE_SOON_DONE = variableInfo;
+		} else if (variableInfo.name == "high_on_minerals") {
+			gOldValue = toString(HIGH_ON_MINERALS);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(HIGH_ON_MINERALS));
+			HIGH_ON_MINERALS = variableInfo;
+		} else if (variableInfo.name == "high_on_gas") {
+			gOldValue = toString(HIGH_ON_GAS);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(HIGH_ON_GAS));
+			HIGH_ON_GAS = variableInfo;
 		} else {
 			return false;
 		}
@@ -499,6 +510,10 @@ bool commander::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(EXPANSION_ACTIVE_MAX);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPANSION_ACTIVE_MAX));
 		EXPANSION_ACTIVE_MAX = variableInfo;
+	} else if (variableInfo.name == "scout_on_worker_count") {
+		gOldValue = toString(SCOUT_ON_WORKER_COUNT);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(SCOUT_ON_WORKER_COUNT));
+		SCOUT_ON_WORKER_COUNT = variableInfo;
 	} else {
 		return false;
 	}

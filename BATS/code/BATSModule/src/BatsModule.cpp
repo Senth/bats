@@ -12,6 +12,7 @@
 #include "WaitGoalManager.h"
 #include "PlayerArmyManager.h"
 #include "DefenseManager.h"
+#include "SelfClassifier.h"
 #include "IntentionWriter.h"
 #include "BTHAIModule/Source/FileReaderUtils.h"
 #include "BTHAIModule/Source/AgentManager.h"
@@ -181,7 +182,7 @@ void BatsModule::onSendText(std::string text) {
 			Broodwar->printf("Invalid command, valid debug modes are\n/debug message|graphics value\nSee \"/debug message\" or \"/debug graphics\" for valid values.");
 		}
 
-	} else if (text == "/transition" || text == "transition") {
+	} else if (text == "/transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
 	} else if (startsWith(text,"/transition")) {				
 		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
@@ -201,6 +202,8 @@ void BatsModule::onSendText(std::string text) {
 		Broodwar->setLocalSpeed(speed);
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Global speed set to: " << speed);
 		Broodwar->sendText(text.c_str());
+	} else if (text == "test") {
+		// Test something
 	} else {
 		// Default behavior
 		Broodwar->sendText(text.c_str());
@@ -225,7 +228,7 @@ void BatsModule::onReceiveText(BWAPI::Player* pPlayer, std::string text) {
 		Broodwar->setLocalSpeed(speed);
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received speed message, speed set to: " << speed);
 	} else if (mCommander->isCommandAvailable(text)) {
-		DEBUG_MESSAGE(utilities::LogLevel_Fine, "Command mesasge recieved: " << text);
+		DEBUG_MESSAGE(utilities::LogLevel_Fine, "Command message received: " << text);
 		mCommander->issueCommand(text);
 	} else {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Received message: " << text);
@@ -387,7 +390,7 @@ bool BatsModule::isGameLost() const {
 		++agentIt;
 	}
 
-	if (mUnitManager->getNoWorkers() == 0 &&
+	if (mUnitManager->getWorkerCount() == 0 &&
 		Broodwar->self()->minerals() <= WORKER_MINERAL_PRICE &&
 		!attackingUnitExist)
 	{
@@ -465,6 +468,7 @@ void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mSquadManager);
 	SAFE_DELETE(mWaitGoalManager);
 	SAFE_DELETE(mGameTime);
+	delete SelfClassifier::getInstance();
 }
 
 void BatsModule::showDebug() const {

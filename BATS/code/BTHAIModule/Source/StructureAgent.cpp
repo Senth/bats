@@ -222,7 +222,7 @@ bool StructureAgent::canBuildUnit(UnitType type) const
 void StructureAgent::sendWorkers()
 {
 	//We have constructed a new base. Make some workers move here.
-	int noWorkers = AgentManager::getInstance()->getNoWorkers();
+	int noWorkers = AgentManager::getInstance()->getWorkerCount();
 	int toSend = noWorkers / AgentManager::getInstance()->countNoBases();
 	int hasSent = 0;
 

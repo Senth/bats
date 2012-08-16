@@ -14,6 +14,7 @@
 #include "ScoutSquad.h"
 #include "BuildPlanner.h"
 #include "GameTime.h"
+#include "BuildPlanner.h"
 
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/Profiler.h"
@@ -38,6 +39,7 @@ Commander::Commander() {
 	mIntentionWriter = NULL;
 	mSelfClassifier = NULL;
 	mGameTime = NULL;
+	mBuildPlanner = NULL;
 
 	mAlliedArmyManager = PlayerArmyManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
@@ -47,6 +49,7 @@ Commander::Commander() {
 	mIntentionWriter = IntentionWriter::getInstance();
 	mSelfClassifier = SelfClassifier::getInstance();
 	mGameTime = GameTime::getInstance();
+	mBuildPlanner = BuildPlanner::getInstance();
 
 	mFrameCallLast = -config::frame_distribution::COMMANDER;
 	mExpansionTimeLast = 0.0;
@@ -98,9 +101,9 @@ void Commander::computeOwnReactions() {
 		if (mSelfClassifier->isAttacking()) {
 			issueCommand(Command_Expand, false, Reason_BotAttacking);
 		} else if (mSelfClassifier->areExpansionsSaturated()) {
-			issueCommand(Command_Expand, false, Reason_BotExpansionRunningLow);
-		} else if (mSelfClassifier->isAnExpansionLowOnMinerals()) {
 			issueCommand(Command_Expand, false, Reason_BotExpansionsSaturated);
+		} else if (mSelfClassifier->isAnExpansionLowOnMinerals()) {
+			issueCommand(Command_Expand, false, Reason_BotExpansionRunningLow);
 		}
 	}
 
@@ -112,7 +115,7 @@ void Commander::computeOwnReactions() {
 		if (mSelfClassifier->isExpanding()) {
 			issueCommand(Command_Attack, false, Reason_BotExpanding);
 		} else {
-			vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+			const vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 			if (mSelfClassifier->isUpgradeSoonDone(freeUnits)) {
 				issueCommand(Command_Attack, false, Reason_BotUpgradeSoonDone);
 			}
@@ -121,8 +124,24 @@ void Commander::computeOwnReactions() {
 
 
 	// SCOUT
-	// Always try to have a scout out after we have x workers
-	
+	// -> Always after we have x workers
+	if (!mSelfClassifier->isScouting()) {
+		int cWorkers = mUnitManager->getWorkerCount();
+
+		if (cWorkers >= config::commander::SCOUT_ON_WORKER_COUNT) {
+			issueCommand(Command_Scout, false);
+		}
+	}
+
+
+	// TRANSITION
+	// -> When we're high on resources and no buildings are in the build order
+	if (mBuildPlanner->canTransition() &&
+		mBuildPlanner->getQueueCount() == 0 &&
+		mSelfClassifier->isHighOnResources())
+	{
+		issueCommand(Command_Transition, false, Reason_BotHighOnResources);
+	}
 }
 
 void Commander::computeAlliedReactions() {
@@ -201,8 +220,16 @@ void Commander::issueCommand(Commands command, bool alliedOrdered, Reasons reaso
 		orderExpand(alliedOrdered, reason);
 		break;
 
+	case Command_Join:
+		orderJoin(alliedOrdered, reason);
+		break;
+
 	case Command_Scout:
 		orderScout(alliedOrdered, reason);
+		break;
+
+	case Command_Transition:
+		orderTransition(alliedOrdered, reason);
 		break;
 
 		/// @todo abort command
@@ -252,14 +279,7 @@ void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 	// Only add if we have free units
 	if (!freeUnits.empty()) {
 		// Add the units to the old attack squad if it exists
-		shared_ptr<AttackSquad> oldSquad;
-		map<SquadId, shared_ptr<Squad>>::iterator squadIt = mSquadManager->begin();
-		while (oldSquad == NULL && squadIt != mSquadManager->end()) {
-			if (squadIt->second->getName() == "AttackSquad") {
-				oldSquad = dynamic_pointer_cast<AttackSquad>(squadIt->second);
-			}
-			++squadIt;
-		}
+		AttackSquadPtr oldSquad = mSquadManager->getFrontalAttack();
 
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
@@ -284,11 +304,90 @@ void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 	}
 }
 
+void Commander::orderJoin(bool alliedOrdered, Reasons reason) {
+	bool orderSuccess = false;
+	Intentions sendIntention = Intention_Lim;
+	Reasons sendReason = reason;
+
+	// Do we have an existing squad and it's not following -> Join with it
+	AttackSquadPtr attackSquad = mSquadManager->getFrontalAttack();
+
+	if (NULL != attackSquad && !attackSquad->isFollowingAlliedSquad()) {
+		sendIntention = Intention_AlliedAttackFollowNot;
+
+		AlliedSquadCstPtr alliedSquad = mAlliedArmyManager->getAlliedFrontalSquad();
+		
+		if (NULL != alliedSquad) {
+			attackSquad->followAlliedSquad(alliedSquad);
+			sendIntention = Intention_AlliedAttackFollow;
+			orderSuccess = true;
+		}
+		// There's no allied squad to follow
+		else {
+			sendReason = Reason_AlliedAttackNotExist;
+		}
+	}
+
+
+	// Else if, existing squad and following -> Add more units to the mix
+	else if (NULL != attackSquad && attackSquad->isFollowingAlliedSquad()) {
+		sendIntention = Intention_BotAttackMergedNot;
+
+		// Only add units to the attack if we're not under attack
+		if (!mDefenseManager->isUnderAttack()) {
+			const std::vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+
+			if (!freeUnits.empty()) {
+				attackSquad->addUnits(freeUnits);
+				sendIntention = Intention_BotAttackMerged;
+				orderSuccess = true;
+			} else {
+				sendReason = Reason_BotNotEnoughUnits;
+			}
+		} else {
+			sendReason = Reason_BotIsUnderAttack;
+		}
+	}
+
+
+	// Else -> Create a new squad and follow
+	else {
+		sendIntention = Intention_AlliedAttackFollowNot;
+
+		// Only add units to the attack if we're not under attack
+		if (!mDefenseManager->isUnderAttack()) {
+			const std::vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+
+			if (!freeUnits.empty()) {
+				AlliedSquadCstPtr alliedSquad = mAlliedArmyManager->getAlliedFrontalSquad();
+
+				if (NULL != alliedSquad) {
+					new AttackSquad(freeUnits, false, UnitCompositionFactory::INVALID, alliedSquad);
+					sendIntention = Intention_AlliedAttackFollow;
+					orderSuccess = true;
+				} else {
+					sendReason = Reason_AlliedAttackNotExist;
+				}
+			} else {
+				sendReason = Reason_BotNotEnoughUnits;
+			}
+		} else {
+			sendReason = Reason_BotIsUnderAttack;
+		}
+	}
+
+	if (orderSuccess) {
+		mIntentionWriter->writeIntention(sendIntention, sendReason);
+	} else if (alliedOrdered) {
+		mIntentionWriter->writeIntention(sendIntention, sendReason);
+	}
+}
+
 void Commander::orderDrop(bool alliedOrdered, Reasons reason) {
 	/// @todo Check how many attacks we have (frontal, distracting)
 	/// Can we create a distracting attack?
 
-	/// @todo get defensive squad units for a counter-attack drop.
+	/// @todo get defensive squad units for a counter-attack drop, even when we're under attack
 
 	// Get available unit compositions
 	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
@@ -352,6 +451,26 @@ void Commander::orderScout(bool alliedOrdered, Reasons reason) {
 	}
 }
 
+void Commander::orderTransition(bool alliedOrdered, Reasons reason) {
+
+	// Only transition if we're not in late game already
+	if (mBuildPlanner->canTransition()) {
+		Intentions intention = Intention_Lim;
+		if (mBuildPlanner->getCurrentPhase() == "early") {
+			intention = Intention_BotTransitionMid;
+		} else if (mBuildPlanner->getCurrentPhase() == "mid") {
+			intention = Intention_BotTransitionLate;
+		}
+		mIntentionWriter->writeIntention(intention, reason);
+		
+		mBuildPlanner->switchToPhase("");
+	} else {
+		if (alliedOrdered) {
+			mIntentionWriter->writeIntention(Intention_BotTransitionNot, Reason_BotTransitionNoMore);
+		}
+	}
+}
+
 void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
 	if(BuildPlanner::getInstance()->isExpansionAvailable()) {
 		BuildPlanner::getInstance()->expand();
@@ -370,7 +489,9 @@ void Commander::initStringToEnums() {
 	mCommandStringToEnums["attack"] = Command_Attack;
 	mCommandStringToEnums["drop"] = Command_Drop;
 	mCommandStringToEnums["expand"] = Command_Expand;
+	mCommandStringToEnums["join"] = Command_Join;
 	mCommandStringToEnums["scout"] = Command_Scout;
+	mCommandStringToEnums["transition"] = Command_Transition;
 
 	if (mCommandStringToEnums.size() != Command_Lim) {
 		ERROR_MESSAGE(false, "Commander: Command String to enum does not have same size as enumerations!");

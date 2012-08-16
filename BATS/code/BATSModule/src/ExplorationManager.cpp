@@ -19,13 +19,11 @@ using namespace std;
 using std::tr1::shared_ptr;
 using namespace bats;
 
-ExplorationManager* ExplorationManager::mInstance = NULL;
+ExplorationManager* ExplorationManager::msInstance = NULL;
 
 const double CLOSE_BASE_DISTANCE = 12.0;
 
 ExplorationManager::ExplorationManager() {
-	mActive = true;
-	
 	mForceOwn.reset();
 	mForceEnemy.reset();
 	mCalcTurnCurrent = CalcTurn_First;
@@ -47,22 +45,14 @@ ExplorationManager::ExplorationManager() {
 }
 
 ExplorationManager::~ExplorationManager() {
-	mInstance = NULL;
-}
-
-void ExplorationManager::setInactive() {
-	mActive = false;
-}
-
-bool ExplorationManager::isActive() const {
-	return mActive;
+	msInstance = NULL;
 }
 
 ExplorationManager* ExplorationManager::getInstance() {
-	if (mInstance == NULL) {
-		mInstance = new ExplorationManager();
+	if (msInstance == NULL) {
+		msInstance = new ExplorationManager();
 	}
-	return mInstance;
+	return msInstance;
 }
 
 void ExplorationManager::update() {
@@ -72,10 +62,6 @@ void ExplorationManager::update() {
 		return;
 	}
 	mFrameLastCall = cFrame;
-
-	if (!mActive) {
-		return;
-	}
 	
 	Profiler::getInstance()->start("ExplorationManager::update()");
 
@@ -156,26 +142,6 @@ TilePosition ExplorationManager::getNextToExplore(const std::tr1::shared_ptr<Squ
 	}
 
 	return goal;
-}
-
-int ExplorationManager::getLastVisitFrame(BWTA::Region* region) {
-	for (size_t i = 0; i < mExploreData.size(); i++) {
-		if (mExploreData[i].matches(region)) {
-
-			//Check if region is visible. If so, set lastVisitFrame to now
-			if (Broodwar->isVisible(mExploreData[i].getCenterPosition())) {
-				mExploreData[i].updateVisited();
-			}
-
-			return mExploreData[i].getLastVisitFrame();
-		}
-	}
-	
-	//Error: No region found
-	TilePosition goal = TilePosition(region->getCenter());
-	DEBUG_MESSAGE(utilities::LogLevel_Warning, "ExplorationManager::getLastVisitFrame() | " <<
-		"Unable to find region for tile (" << goal.x() << ", " << goal.y() << ")!");
-	return -1;
 }
 
 void ExplorationManager::showIntellData() const {
@@ -275,7 +241,7 @@ void ExplorationManager::printGraphicDebugInfo() const
 	//Draw a circle around detectors
 }
 
-void ExplorationManager::addSpottedUnit(BWAPI::Unit* unit) {
+void ExplorationManager::addSpottedUnit(const BWAPI::Unit* unit) {
 	if (unit->getType().isBuilding()) {
 		
 		//Check if we already have seen this building
@@ -306,7 +272,7 @@ void ExplorationManager::addSpottedUnit(BWAPI::Unit* unit) {
 	}
 }
 
-void ExplorationManager::unitDestroyed(BWAPI::Unit* unit) {
+void ExplorationManager::unitDestroyed(const BWAPI::Unit* unit) {
 	TilePosition unitPos = unit->getTilePosition();
 	if (unit->getType().isBuilding()) {
 		bool removed = false;
@@ -431,7 +397,7 @@ bool ExplorationManager::canReach(const BWAPI::TilePosition& source, const BWAPI
 	return pathOk;
 }
 
-bool ExplorationManager::canReach(BaseAgent* pAgent, const BWAPI::TilePosition& destination) {
+bool ExplorationManager::canReach(const BaseAgent* pAgent, const BWAPI::TilePosition& destination) {
 	return pAgent->getUnit()->hasPath(Position(destination));
 }
 
