@@ -24,14 +24,17 @@ The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows how a
 		\node [block, right of=player_frontal] (find_places) {Find places to attack};
 		\node [decision, right of=find_places] (bot_frontal) {Squad is frontal attack};
 		\node [block, right of=bot_frontal] (defend) {Calculate defended weights};
-		\node [block, below of=player_frontal] (join_forces) {Join forces with player};
+		\node [decision, below of=player_frontal] (bot_frontal2) {Squad is frontal attack};
+		\node [block, below of=bot_frontal2] (join_forces) {Join forces with player};
 		\node [block, below of=bot_frontal] (distance) {Calculate distance weights};
 		\node [block, below of=distance] (type) {Calculate type weights};
 		\node [block, right of=type] (select) {Select position with highest weight};
 		
 		\path [line] (init) -- (player_frontal);
 		\path [line] (player_frontal) -- node [near start] {no} (find_places);
-		\path [line] (player_frontal) -- node [near start] {yes} (join_forces);
+		\path [line] (player_frontal) -- node [near start] {yes} (bot_frontal2);
+		\path [line] (bot_frontal2) -- node [near start] {yes} (join_forces);
+		\path [line] (bot_frontal2) -| node [near start] {no} (find_places);
 		\path [line] (find_places) -- (bot_frontal);
 		\path [line] (bot_frontal) -- node [near start] {no} (defend);
 		\path [line] (bot_frontal) -- node [near start] {yes} (distance);
