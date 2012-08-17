@@ -4,3 +4,6 @@
 The exploration manager in BATS have mostly gotten its functionality from BTHAI’s exploration manager, some functionality has been change, added, or removed to work better with BATS. The main functionality of the exploration manager is to keep track of when a region and expansion was last checked. It does this by by checking if either a region’s center or an expansion position is visible, if it is, it will automatically update the time of the last visit. This information is used by both \nameref{sec:scout_squad} to get the next scout location—i.e. the one with oldest visit time—and \nameref{sec:attack_coordinator} to get expansions that have not been visited for \attackCoordinatorExpansionNotCheckedTime—used for attacks. How \nameref{sec:scout_squad} and \nameref{sec:attack_coordinator} uses this functionality is described in section \ref{sec:scout_squad} and \ref{sec:attack_coordinator} respectively.
 
 Exploration manager saves all buildings it has spotted, because BATS does not have full map vision and thus needs to save the information of the enemy. This is used by \nameref{sec:attack_coordinator} to get a all buildings to decide a place to attack and \nameref{sec:attack_squad} to find a common spot to attack when near the target location.
+
+\subsection{Resource Counter}
+\label{sec:resource_counter}
