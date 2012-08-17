@@ -189,7 +189,7 @@ bool SelfClassifier::hasDrop() const {
 }
 
 bool SelfClassifier::canDrop() const {
-	const vector<const UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+	const vector<const UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
 
 	// Any drop unit compositions available?
 	const vector<UnitComposition>& compositions = 

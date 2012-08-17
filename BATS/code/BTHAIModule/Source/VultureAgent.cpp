@@ -37,6 +37,8 @@ void VultureAgent::computeActions()
 		}
 	}
 
+	/// @todo drop mines near choke points
+
 	bool attackingEnemy = findAndTryAttack();
 	if (!attackingEnemy) {
 		computeMoveAction();
