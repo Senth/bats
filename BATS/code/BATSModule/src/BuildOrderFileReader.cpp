@@ -11,6 +11,8 @@ using namespace std;
 using namespace bats;
 
 const string BUILD_ORDER_EXT = ".txt";
+const string TECH_TYPE_NAME = "TechType:";
+const string UPGRADE_TYPE_NAME = "UpgradeType:";
 
 BuildOrderFileReader::BuildOrderFileReader(){
 	//TODO: read the transition config file
@@ -49,8 +51,8 @@ TransitionGraph BuildOrderFileReader::readTransitionFile(string fileName){
 			}
 		}
 		inFile.close();
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "BuildOrder: Transition config file " << filePath << " loaded");
 	}
-	DEBUG_MESSAGE(utilities::LogLevel_Info, "BuildOrder: Transition config file " << filePath << " loaded");
 	return graph;
 }
 
@@ -58,7 +60,7 @@ vector<bats::CoreUnit> BuildOrderFileReader::getUnitList(){
 	return mCoreUnitsList;
 }
 
-vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileName, vector<UnitType> &buildOrder){
+void BuildOrderFileReader::readBuildOrder(string phase, string fileName, vector<BuildItem> &buildOrder){
 	//string filename = getFilename("buildorder\\" + phase + "\\");
 	//vector<UnitType> buildOrder;
 	DEBUG_MESSAGE(utilities::LogLevel_Info, "BuildOrder: changed to phase " << phase);
@@ -76,16 +78,12 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 	else
 	{
 		string line;
-		char buffer[256];
 				
 		while (!inFile.eof())
 		{
-			inFile.getline(buffer, 100);
-			if (buffer[0] != ';')
+			getline(inFile, line);
+			if (line[0] != ';')
 			{
-				stringstream ss;
-				ss << buffer;
-				line = ss.str();
 				if (line == "<build-order>")
 					type = "build-order";
 				else if(line == "<units>")
@@ -93,7 +91,7 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 				else if(line == "<must-have>")
 					type = "must-have";
 				else if(type == "build-order")
-					addBuildingType(line, buildOrder);				
+					addBuildOrderItem(line, buildOrder);				
 				else if(type == "units")			
 					addUnitType(line, mCoreUnitsList, false);
 				else if(type == "must-have")
@@ -101,10 +99,9 @@ vector<UnitType> BuildOrderFileReader::readBuildOrder(string phase, string fileN
 			}
 		}
 		inFile.close();
-	}
 
-	DEBUG_MESSAGE(utilities::LogLevel_Info, "Build order file " << filePath << " loaded");
-	return buildOrder;
+		DEBUG_MESSAGE(utilities::LogLevel_Info, "Build order file " << filePath << " loaded");
+	}
 }
 
 void BuildOrderFileReader::addUnitType(string line, vector<bats::CoreUnit> &coreUnits, bool mustHave){
@@ -137,16 +134,43 @@ void BuildOrderFileReader::addUnitType(string line, vector<bats::CoreUnit> &core
 	}
 }
 
-void BuildOrderFileReader::addBuildingType(string line, vector<UnitType> &buildOrder){
+void BuildOrderFileReader::addBuildOrderItem(string line, vector<BuildItem> &buildOrder){
 	if (line == "") return;
 
-	//Replace all _ with whitespaces, or they wont match
-	replace(line);
+	
 
-	UnitType unitType = BWAPI::UnitTypes::getUnitType(line);
-	if (unitType != UnitTypes::Unknown) {
-		buildOrder.push_back(unitType);
-	} else {
-		ERROR_MESSAGE(false, "No matching buliding found for " << line);
+	// Tech
+	if (utilities::string::startsWith(line, TECH_TYPE_NAME)) {
+		string techName = line.substr(TECH_TYPE_NAME.size());
+		//replace(techName);
+		techName = utilities::string::trim(techName);
+		const TechType& techType = TechTypes::getTechType(techName);
+		if (techType != TechTypes::Unknown) {
+			buildOrder.push_back(techType);
+		} else {
+			ERROR_MESSAGE(false, "BuildOrderFileReader: No matching tech upgrade found for " << techName);
+		}
 	}
+	// Upgrade
+	else if (utilities::string::startsWith(line, UPGRADE_TYPE_NAME)) {
+		string upgradeName = line.substr(UPGRADE_TYPE_NAME.size());
+		upgradeName = utilities::string::trim(upgradeName);
+		const UpgradeType& upgradeType = UpgradeTypes::getUpgradeType(upgradeName);
+		if (upgradeType != UpgradeTypes::Unknown) {
+			buildOrder.push_back(upgradeType);
+		} else {
+			ERROR_MESSAGE(false, "BuildOrderFileReader: No matching upgrade found for " << upgradeName);
+		}
+	}
+	// Structure
+	else {
+		const UnitType& unitType = UnitTypes::getUnitType(line);
+		if (unitType != UnitTypes::Unknown) {
+			buildOrder.push_back(unitType);
+		} else {
+			ERROR_MESSAGE(false, "BuildOrderFileReader: No matching buliding found for " << line);
+		}
+	}
+
+
 }

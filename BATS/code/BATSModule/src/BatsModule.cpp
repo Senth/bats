@@ -148,7 +148,7 @@ void BatsModule::onSendText(std::string text) {
 	utilities::string::toLower(text);
 
 	// /d# needs to be overridden because base class calls a class we don't initialize
-	if (startsWith(text, "/d") || startsWith(text, "/debug ")) {
+	if (utilities::string::startsWith(text, "/d") || utilities::string::startsWith(text, "/debug ")) {
 
 		if (text == "/d1" || text == "/debug graphics low") {
 			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_Low;
@@ -158,7 +158,7 @@ void BatsModule::onSendText(std::string text) {
 			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_High;
 		} else if (text == "/d0" || text == "/debug graphics off") {
 			config::debug::GRAPHICS_VERBOSITY = config::debug::GraphicsVerbosity_Off;
-		} else if (startsWith(text, "/debug message")) {
+		} else if (utilities::string::startsWith(text, "/debug message")) {
 			if (text == "/debug message finest") {
 				utilities::setVerbosityLevel(utilities::LogLevel_Finest, OUTPUT_STARCRAFT);
 			} else if (text == "/debug message finer") {
@@ -176,7 +176,7 @@ void BatsModule::onSendText(std::string text) {
 			} else {
 				Broodwar->printf("Invalid message value. Valid message values are:\noff\nsevere\nwarning\ninfo\nfine\nfiner\nfinest");
 			}
-		} else if (startsWith(text, "/debug graphics")) {
+		} else if (utilities::string::startsWith(text, "/debug graphics")) {
 			Broodwar->printf("Invalid graphics value. Valid graphics values are:\noff\nhigh\nmedium\nlow");
 		} else {
 			Broodwar->printf("Invalid command, valid debug modes are\n/debug message|graphics value\nSee \"/debug message\" or \"/debug graphics\" for valid values.");
@@ -184,14 +184,14 @@ void BatsModule::onSendText(std::string text) {
 
 	} else if (text == "/transition") {
 		BuildPlanner::getInstance()->switchToPhase("");
-	} else if (startsWith(text,"/transition")) {				
+	} else if (utilities::string::startsWith(text,"/transition")) {				
 		BuildPlanner::getInstance()->switchToPhase(text.substr(12, text.length()-12));
 	} else if (mCommander->isCommandAvailable(text)) {
 		mCommander->issueCommand(text);
 	} else if (text == "/reload config") {
 		config::loadConfig();
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Configuration reloaded");
-	} else if (startsWith(text, "speed")) {
+	} else if (utilities::string::startsWith(text, "speed")) {
 		int speed = -1;
 
 		std::string speedValueStr = text.substr(5);
@@ -217,7 +217,7 @@ void BatsModule::onReceiveText(BWAPI::Player* pPlayer, std::string text) {
 
 	utilities::string::toLower(text);
 
-	if (startsWith(text, "speed")) {
+	if (utilities::string::startsWith(text, "speed")) {
 		int speed = -1;
 
 		std::string speedValueStr = text.substr(5);
@@ -235,21 +235,6 @@ void BatsModule::onReceiveText(BWAPI::Player* pPlayer, std::string text) {
 	}
 }
 #pragma warning(pop)
-
-bool BatsModule::startsWith(const std::string& text,const std::string& token) {
-	
-	if(text.length() < token.length() || text.length() == 0 || token.length() == 0)
-		return false;
-
-	for(unsigned int i=0; i<token.length(); ++i)
-	{
-		if(text[i] != token[i])
-			return false;
-	}
-
-	return true;
-}
-
 
 void BatsModule::onPlayerLeft(BWAPI::Player* player) {
 	TEST_SELF();

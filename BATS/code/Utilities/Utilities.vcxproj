@@ -82,6 +82,7 @@
     <ClCompile Include="IniReader.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MassIniReader.cpp" />
+    <ClCompile Include="String.cpp" />
     <ClCompile Include="Vec3Float.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

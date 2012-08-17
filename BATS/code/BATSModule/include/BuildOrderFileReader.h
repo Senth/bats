@@ -24,7 +24,7 @@ private:
 	/**
 	* Adds Building to the build order list.
 	*/	
-	void addBuildingType(std::string line, std::vector<BWAPI::UnitType> &buildOrder);
+	void addBuildOrderItem(std::string line, std::vector<BuildItem> &buildOrder);
 
 	/**
 	* Adds unit to the Core Units list.
@@ -39,7 +39,7 @@ public:
 	* @param fileName is name of the file
 	* @param buildOrder in order to queue the next phase if theres is left overs from previous phase
 	*/
-	vector<BWAPI::UnitType> readBuildOrder(string phase, string fileName, vector<BWAPI::UnitType> &buildOrder);
+	void readBuildOrder(string phase, string fileName, vector<BuildItem> &buildOrder);
 
 	/**
 	Used only after calling readBuildOrder member method

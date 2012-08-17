@@ -70,5 +70,16 @@ namespace string {
 	inline void toUpper(std::string& text) {
 		std::transform(text.begin(), text.end(), text.begin(), ::toupper);
 	}
+
+	/**
+	 * Checks if a string starts with the other string
+	 * @param text the whole text to check if it starts with "startsWith"
+	 * @param startWith the text should start with this
+	 * @param caseInsensitive (optional) set to true if you want do an
+	 * case insensitive comparison (not effective)
+	 * @return true if text starts with the string "startWith"
+	 */
+	bool startsWith(const std::string& text, const std::string& startsWith, bool caseInsensitive = false);
+	
 }
 }

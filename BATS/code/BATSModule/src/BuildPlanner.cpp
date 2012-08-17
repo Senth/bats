@@ -19,7 +19,7 @@ BuildPlanner::BuildPlanner(){
 	mCurrentPhase = "early";
 	BuildOrderFileReader br = BuildOrderFileReader();
 	mtransitionGraph = br.readTransitionFile("transition.txt");
-	mBuildOrder = br.readBuildOrder(mCurrentPhase, mtransitionGraph.early, mBuildOrder);	 // default is early
+	br.readBuildOrder(mCurrentPhase, mtransitionGraph.early, mBuildOrder);	 // default is early
 	mCoreUnitsList = br.getUnitList();
 	mLastCallFrame = Broodwar->getFrameCount();
 }
@@ -52,39 +52,34 @@ bool BuildPlanner::canTransition() const {
 }
 
 void BuildPlanner::switchToPhase(std::string fileName){
-	BuildOrderFileReader br = BuildOrderFileReader();
-	if(fileName == ""){
-		if(BuildPlanner::mCurrentPhase == "early"){
+	BuildOrderFileReader br;
+	if(fileName.empty()){
+		if(mCurrentPhase == "early"){
 			br.readBuildOrder("mid", mtransitionGraph.mid, mBuildOrder);
-			BuildPlanner::mCurrentPhase = "mid";
-			BuildPlanner::mCoreUnitsList = br.getUnitList();
+			mCurrentPhase = "mid";
+			mCoreUnitsList = br.getUnitList();
 			UnitCreator::getInstance()->switchPhase();
 		}
-		else if(BuildPlanner::mCurrentPhase == "mid"){
+		else if(mCurrentPhase == "mid"){
 			br.readBuildOrder("late", mtransitionGraph.late, mBuildOrder);
-			BuildPlanner::mCurrentPhase = "late";
-			BuildPlanner::mCoreUnitsList = br.getUnitList();
+			mCurrentPhase = "late";
+			mCoreUnitsList = br.getUnitList();
 			UnitCreator::getInstance()->switchPhase();
 		}
 	}
-	else if(fileName.length()>0){
-		if(BuildPlanner::mCurrentPhase == "early"){
-			if(br.readBuildOrder("mid", fileName, mBuildOrder).size()>0){
-				BuildPlanner::mCoreUnitsList = br.getUnitList();
-				BuildPlanner::mCurrentPhase = "mid";
-				UnitCreator::getInstance()->switchPhase();
-			}
-			else
-				ERROR_MESSAGE(false, "Error loading file " << fileName);
+
+	else {
+		if(mCurrentPhase == "early"){
+			br.readBuildOrder("mid", fileName, mBuildOrder);
+			mCoreUnitsList = br.getUnitList();
+			mCurrentPhase = "mid";
+			UnitCreator::getInstance()->switchPhase();
 		}
-		else if(BuildPlanner::mCurrentPhase == "mid"){
-			if(br.readBuildOrder("late", fileName, mBuildOrder).size()>0){
-				BuildPlanner::mCurrentPhase = "late";
-				BuildPlanner::mCoreUnitsList = br.getUnitList();
-				UnitCreator::getInstance()->switchPhase();
-			}
-			else
-				ERROR_MESSAGE(false, "Error loading file " << fileName);
+		else if(mCurrentPhase == "mid"){
+			br.readBuildOrder("late", fileName, mBuildOrder);
+			mCurrentPhase = "late";
+			mCoreUnitsList = br.getUnitList();
+			UnitCreator::getInstance()->switchPhase();
 		}
 		else{
 			DEBUG_MESSAGE(utilities::LogLevel_Fine, "All transition used");
@@ -103,9 +98,10 @@ void BuildPlanner::buildingDestroyed(Unit* building){
 	}
 	if (building->getType().isAddon())
 	{
+		/// @todo add addons here later
 		return;
 	}
-	mBuildOrder.insert(mBuildOrder.begin(), building->getType());
+	addBuildingFirst(building->getType());
 }
 
 void BuildPlanner::computeActions(){
@@ -135,8 +131,8 @@ void BuildPlanner::computeActions(){
 			{
 				worker->reset();
 			}
-			mBuildOrder.insert(mBuildOrder.begin(), mBuildQueue.at(i).toBuild);
-			ResourceManager::getInstance()->unlockResources(mBuildQueue.at(i).toBuild);
+			mBuildOrder.insert(mBuildOrder.begin(), mBuildQueue.at(i).structure);
+			ResourceManager::getInstance()->unlockResources(mBuildQueue.at(i).structure);
 			mBuildQueue.erase(mBuildQueue.begin() + i);
 			return;
 		}
@@ -218,14 +214,14 @@ bool BuildPlanner::shallBuildSupply() const{
 	//2. Check if any building is unpowered (Protoss only)
 	if (isProtoss())
 	{
-		if (mBuildOrder.size() > 0)
+		if (!mBuildOrder.empty())
 		{
-			if (mBuildOrder.at(0) != UnitTypes::Protoss_Pylon)
+			if (mBuildOrder[0].structure != UnitTypes::Protoss_Pylon)
 			{
 				vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 				for (size_t i = 0; i < agents.size(); i++)
 				{
-					BaseAgent* agent = agents.at(i);
+					BaseAgent* agent = agents[i];
 					if (agent->isAlive())
 					{
 						Unit* cUnit = agent->getUnit();
@@ -287,7 +283,16 @@ bool BuildPlanner::supplyBeingBuilt() const{
 	//Terran and Protoss
 	UnitType supply = Broodwar->self()->getRace().getSupplyProvider();
 
-	//1. Check if we are already building a supply
+	//1. Check if we have a supply in build queue
+	for (size_t i = 0; i < mBuildQueue.size(); i++)
+	{
+		if (mBuildQueue[i].structure == supply)
+		{
+			return true;
+		}
+	}
+
+	//2. Check if we are already building a supply
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (size_t i = 0; i < agents.size(); i++)
 	{
@@ -296,7 +301,7 @@ bool BuildPlanner::supplyBeingBuilt() const{
 		{
 			if (agent->getUnitType() == supply)
 			{
-				if (agent->getUnit()->isBeingConstructed())
+				if (!agent->getUnit()->isCompleted())
 				{
 					//Found one that is being constructed
 					return true;
@@ -305,25 +310,15 @@ bool BuildPlanner::supplyBeingBuilt() const{
 		}
 	}
 
-	//2. Check if we have a supply in build queue
-	for (size_t i = 0; i < mBuildQueue.size(); i++)
-	{
-		if (mBuildQueue.at(i).toBuild == supply)
-		{
-			return true;
-		}
-	}
-
 	return false;
 }
 
-void BuildPlanner::lock(int buildOrderIndex, int unitId){
-	UnitType type = mBuildOrder.at(buildOrderIndex);
+void BuildPlanner::lock(int buildOrderIndex, int workerId){
+	UnitType structureType = mBuildOrder.at(buildOrderIndex).structure;
 	mBuildOrder.erase(mBuildOrder.begin() + buildOrderIndex);
 
-	BuildQueueItem item;
-	item.toBuild = type;
-	item.assignedWorkerId = unitId;
+	BuildItem item(structureType);
+	item.assignedWorkerId = workerId;
 	item.assignedFrame = Broodwar->getFrameCount();
 
 	mBuildQueue.push_back(item);
@@ -332,7 +327,7 @@ void BuildPlanner::lock(int buildOrderIndex, int unitId){
 void BuildPlanner::remove(UnitType type){
 	for (size_t i = 0; i < mBuildOrder.size(); i++)
 	{
-		if (mBuildOrder.at(i) == type)
+		if (mBuildOrder.at(i).structure == type)
 		{
 			mBuildOrder.erase(mBuildOrder.begin() + i);
 			return;
@@ -343,7 +338,7 @@ void BuildPlanner::remove(UnitType type){
 void BuildPlanner::unlock(UnitType type){
 	for (size_t i = 0; i < mBuildQueue.size(); i++)
 	{
-		if (mBuildQueue.at(i).toBuild == type)
+		if (mBuildQueue.at(i).structure == type)
 		{
 			mBuildQueue.erase(mBuildQueue.begin() + i);
 			return;
@@ -383,88 +378,96 @@ bool BuildPlanner::executeMorph(UnitType target, UnitType evolved){
 	return false;
 }
 
-bool BuildPlanner::executeOrder(UnitType type){
-	//Max 3 concurrent buildings allowed at the same time
-	if (mBuildQueue.size() >= 3)
-	{
-		return false;
-	}
+bool BuildPlanner::executeOrder(const BuildItem& item){
 
-	//Hold if we are to build a new base
-	if (mBuildQueue.size() > 0)
-	{
-		if (mBuildQueue.at(0).toBuild.isResourceDepot())
+	// Structures
+	switch (item.type) {
+	case BuildType_Structure:
+		//Max 3 concurrent buildings allowed at the same time
+		if (mBuildQueue.size() >= 3)
 		{
 			return false;
 		}
-		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (size_t i = 0; i < agents.size(); i++)
+
+		//Hold if we are to build a new base
+		if (mBuildQueue.size() > 0)
 		{
-			if (agents.at(i)->getUnitType().isResourceDepot() && agents.at(i)->getUnit()->isBeingConstructed())
+			if (mBuildQueue.at(0).structure.isResourceDepot())
 			{
 				return false;
 			}
-		}
-	}
-
-	if (type.isResourceDepot())
-	{
-		TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-		if (pos == TilePositions::Invalid)
-		{
-			//No expansion site found.
-			if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
-			return true;
-		}
-	}
-	if (type.isRefinery())
-	{
-		TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
-		if (rSpot == TilePositions::Invalid)
-		{
-			//No build spot found
-			if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
-			return true;
-		}
-	}
-	if (isZerg())
-	{
-		pair<UnitType, int> builder = type.whatBuilds();
-		if (builder.first != UnitTypes::Zerg_Drone)
-		{
-			//Needs to be morphed
-			if (executeMorph(builder.first, type))
+			vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+			for (size_t i = 0; i < agents.size(); i++)
 			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-
-	//Check if we have resources
-	if (!ResourceManager::getInstance()->hasResources(type)){
-		return false;
-	}	
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (size_t i = 0; i < agents.size(); i++){
-		BaseAgent* agent = agents.at(i);
-		if (agent != NULL && agent->isAlive()){
-			if (agent->canBuild(type)){
-				if (agent->assignToBuild(type)){
-					lock(0, agent->getUnitID());
-					return true;
-				}
-				else{
-					//Unable to find a build spot. Don't bother checking for all
-					//other workers
-					handleNoBuildspotFound(type);
+				if (agents.at(i)->getUnitType().isResourceDepot() && agents.at(i)->getUnit()->isBeingConstructed())
+				{
 					return false;
 				}
 			}
 		}
+
+		if (item.structure.isResourceDepot())
+		{
+			TilePosition pos = CoverMap::getInstance()->findExpansionSite();
+			if (pos == TilePositions::Invalid)
+			{
+				//No expansion site found.
+				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
+				return true;
+			}
+		}
+		if (item.structure.isRefinery())
+		{
+			TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
+			if (rSpot == TilePositions::Invalid)
+			{
+				//No build spot found
+				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
+				return true;
+			}
+		}
+		if (isZerg())
+		{
+			pair<UnitType, int> builder = item.structure.whatBuilds();
+			if (builder.first != UnitTypes::Zerg_Drone)
+			{
+				//Needs to be morphed
+				if (executeMorph(builder.first, item.structure))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		//Check if we have resources
+		if (!ResourceManager::getInstance()->hasResources(item.structure)){
+			return false;
+		}	
+		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+		for (size_t i = 0; i < agents.size(); i++){
+			BaseAgent* agent = agents.at(i);
+			if (agent != NULL && agent->isAlive()){
+				if (agent->canBuild(item.structure)){
+					if (agent->assignToBuild(item.structure)){
+						lock(0, agent->getUnitID());
+						return true;
+					}
+					else{
+						//Unable to find a build spot. Don't bother checking for all
+						//other workers
+						handleNoBuildspotFound(item.structure);
+						return false;
+					}
+				}
+			}
+		}
+		return false;
+		break;
+
 	}
 	return false;
 }
@@ -502,14 +505,32 @@ void BuildPlanner::commandCenterBuilt(){
 	mLastCommandCenter = Broodwar->getFrameCount();
 }
 
-string BuildPlanner::format(UnitType type) const{
-	string name = type.getName();
+string BuildPlanner::format(const BuildItem& item) const{
+	string name = "Unknown";
+	switch (item.type) {
+		case BuildType_Structure:
+			name = item.structure.getName();
+			break;
+
+		case BuildType_Tech:
+			name = item.tech.getName();
+			break;
+
+		case BuildType_Upgrade:
+			name = item.upgrade.getName();
+			break;
+
+		default:
+			name = "Unknown";
+			break;
+	}
 	size_t i = name.find(" ");
-	string fname = name.substr(i + 1, name.length());
-	return fname;
+	name = name.substr(i + 1);
+	return name;
 }
 
 void BuildPlanner::printGraphicDebugInfo() const {
+	/// @todo add debug module and config from config.h
 	size_t max = 4;
 	if (mBuildOrder.size() < 4)
 	{
@@ -534,7 +555,7 @@ void BuildPlanner::printGraphicDebugInfo() const {
 	Broodwar->drawTextScreen(150,0,"Buildqueue:");
 	for (size_t i = 0; i < qmax; i++)
 	{
-		Broodwar->drawTextScreen(150,16*line, format(mBuildQueue.at(i).toBuild).c_str());
+		Broodwar->drawTextScreen(150,16*line, format(mBuildQueue.at(i).structure).c_str());
 		line++;
 	}
 }
@@ -568,13 +589,13 @@ void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 }
 
 bool BuildPlanner::nextIsOfType(UnitType type) const {
-	if (mBuildOrder.size() == 0)
+	if (mBuildOrder.empty())
 	{
 		return false;
 	}
 	else
 	{
-		if (mBuildOrder.at(0) == type)
+		if (mBuildOrder[0].structure == type)
 		{
 			return true;
 		}
@@ -585,7 +606,7 @@ bool BuildPlanner::nextIsOfType(UnitType type) const {
 bool BuildPlanner::containsType(UnitType type) const {
 	for (size_t i = 0; i < mBuildOrder.size(); i++)
 	{
-		if (mBuildOrder.at(i) == type)
+		if (mBuildOrder[i].structure == type)
 		{
 			return true;
 		}

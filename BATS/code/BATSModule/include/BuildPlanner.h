@@ -7,19 +7,63 @@
 namespace bats {
 
 /**
- * Manages build orders in three phases: early, mid, and late game.
- * Handles user command "transition"
- * @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+ * Different types in the build queue
  */
-struct BuildQueueItem {
-	BWAPI::UnitType toBuild;
+enum BuildTypes {
+	BuildType_Structure,
+	BuildType_Upgrade,
+	BuildType_Tech,
+	
+	BuildType_Lim
+};
+
+/**
+ * Queue item for the build order, can be a structure, tech upgrade, or regular upgrade.
+ */
+struct BuildItem {
+	BuildTypes type;
+	BWAPI::TechType tech; /**< None when not tech type */
+	BWAPI::UnitType structure; /**< None when not structure */
+	BWAPI::UpgradeType upgrade; /**< None when not upgrade */
 	int assignedFrame;
-	int assignedWorkerId;
+	int assignedWorkerId; /**< Not used for upgrades */
+
+	/**
+	 * Constructor for tech upgrade. Structure and upgrade will be set to None.
+	 * @param techType type of tech for this build item
+	 */
+	BuildItem(const BWAPI::TechType& techType) :
+		type(BuildType_Tech), tech(techType), structure(BWAPI::UnitTypes::None),
+		upgrade(BWAPI::UpgradeTypes::None), assignedFrame(0), assignedWorkerId(-1) {
+	}
+
+	/**
+	 * Constructor for structures. tech and upgrade will be set to None.
+	 * @param structureType type of structure to build
+	 */
+	BuildItem(const BWAPI::UnitType& structureType) :
+		type(BuildType_Structure), tech(BWAPI::TechTypes::None), structure(structureType),
+		upgrade(BWAPI::UpgradeTypes::None), assignedFrame(0), assignedWorkerId(-1) {
+	}
+
+	/**
+	 * Constructor for regular upgrade. Tech and structure will be set to None.
+	 * @param upgradeType type of regular upgrade for this build item
+	 */
+	BuildItem(const BWAPI::UpgradeType& upgradeType) :
+		type(BuildType_Upgrade), tech(BWAPI::TechTypes::None), structure(BWAPI::UnitTypes::None),
+		upgrade(upgradeType), assignedFrame(0), assignedWorkerId(-1) {
+	}
 };
 struct TransitionGraph {
 	std::string early,mid,late;	
 };
 
+/**
+ * Manages build orders in three phases: early, mid, and late game.
+ * Handles user command "transition"
+ * @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+ */
 class BuildPlanner {
 public:
 	// transition graph used for maintaining the path taken to current phase
@@ -138,14 +182,14 @@ public:
 private:
 	BuildPlanner();
 	void lock(int buildOrderIndex, int unitId);
-	bool executeOrder(BWAPI::UnitType type);
+	bool executeOrder(const BuildItem& type);
 	bool shallBuildSupplyDepot() const;
-	std::string format(BWAPI::UnitType type) const;
+	std::string format(const BuildItem& type) const;
 	bool hasResourcesLeft() const;
 	int mineralsNearby(BWAPI::TilePosition center) const;
 
-	std::vector<BWAPI::UnitType> mBuildOrder;
-	std::vector<BuildQueueItem> mBuildQueue;
+	std::vector<BuildItem> mBuildOrder;
+	std::vector<BuildItem> mBuildQueue;
 	int mLastCommandCenter;	/**< @deprecated, don't use */
 	int mLastCallFrame;
 	std::vector<bats::CoreUnit> mCoreUnitsList;

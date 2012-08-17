@@ -12,6 +12,7 @@ vulture-tank
 <build-order>
 Terran_Supply_Depot
 Terran_Barracks
+Terran_Refinery
 Terran_Factory
 Terran_Machine_Shop
 TechType: Tank_Siege_Mode
