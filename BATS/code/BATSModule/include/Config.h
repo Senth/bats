@@ -110,6 +110,8 @@ namespace bats {
 			extern int HIGH_ON_MINERALS;
 			/** If above this value, we're high on gas */
 			extern int HIGH_ON_GAS;
+			/** How many units we need to create an attack */
+			extern size_t FRONTAL_ATTACK_UNITS_MIN;
 
 			/**
 			 * Rules for calculation expansions

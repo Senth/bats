@@ -46,6 +46,9 @@
     <Filter Include="Helpers\TypeDefinitions">
       <UniqueIdentifier>{17bbd082-d94e-4d6e-8c13-1dec509f2cb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classification\Army and Squads">
+      <UniqueIdentifier>{290f4973-36c3-4096-a284-09b46aa65618}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BatsModule.h">
@@ -120,9 +123,6 @@
     <ClInclude Include="include\ScoutSquad.h">
       <Filter>Squads\Types</Filter>
     </ClInclude>
-    <ClInclude Include="include\AlliedSquad.h">
-      <Filter>Classification</Filter>
-    </ClInclude>
     <ClInclude Include="include\SelfClassifier.h">
       <Filter>Classification</Filter>
     </ClInclude>
@@ -144,15 +144,6 @@
     <ClInclude Include="include\HoldSquad.h">
       <Filter>Squads\Types</Filter>
     </ClInclude>
-    <ClInclude Include="include\PlayerSquad.h">
-      <Filter>Classification</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PlayerArmyManager.h">
-      <Filter>Classification</Filter>
-    </ClInclude>
-    <ClInclude Include="include\EnemySquad.h">
-      <Filter>Classification</Filter>
-    </ClInclude>
     <ClInclude Include="include\IntentionWriter.h">
       <Filter>Intention</Filter>
     </ClInclude>
@@ -167,6 +158,21 @@
     </ClInclude>
     <ClInclude Include="include\ResourceDefs.h">
       <Filter>Helpers\TypeDefinitions</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AlliedClassifier.h">
+      <Filter>Classification</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerSquad.h">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AlliedSquad.h">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EnemySquad.h">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerArmyManager.h">
+      <Filter>Classification\Army and Squads</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -242,9 +248,6 @@
     <ClCompile Include="src\ScoutSquad.cpp">
       <Filter>Squads\Types</Filter>
     </ClCompile>
-    <ClCompile Include="src\AlliedSquad.cpp">
-      <Filter>Classification</Filter>
-    </ClCompile>
     <ClCompile Include="src\SelfClassifier.cpp">
       <Filter>Classification</Filter>
     </ClCompile>
@@ -269,15 +272,6 @@
     <ClCompile Include="src\HoldSquad.cpp">
       <Filter>Squads\Types</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlayerSquad.cpp">
-      <Filter>Classification</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlayerArmyManager.cpp">
-      <Filter>Classification</Filter>
-    </ClCompile>
-    <ClCompile Include="src\EnemySquad.cpp">
-      <Filter>Classification</Filter>
-    </ClCompile>
     <ClCompile Include="src\IntentionWriter.cpp">
       <Filter>Intention</Filter>
     </ClCompile>
@@ -286,6 +280,21 @@
     </ClCompile>
     <ClCompile Include="src\IntentionMessage.cpp">
       <Filter>Intention\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AlliedClassifier.cpp">
+      <Filter>Classification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AlliedSquad.cpp">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EnemySquad.cpp">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerArmyManager.cpp">
+      <Filter>Classification\Army and Squads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerSquad.cpp">
+      <Filter>Classification\Army and Squads</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

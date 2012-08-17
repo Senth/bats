@@ -17,6 +17,7 @@ class UnitManager;
 class PlayerArmyManager;
 class DefenseManager;
 class SelfClassifier;
+class AlliedClassifier;
 class GameTime;
 class BuildPlanner;
 
@@ -137,6 +138,9 @@ private:
 	 * \li If a frontal attack exist but is not following an allied attack -> Starts to follow
 	 * the allied frontal attack with the current units, i.e. no units are added.
 	 * @param alliedOrdered if it was the allied who ordered the drop
+	 * @param reason an optional reason for the command, used when the command is successful
+	 * and a reason should be specified why the command was issued. Defaults to Reason_Lim,
+	 * i.e. it will not print out any reason.
 	 */
 	void orderJoin(bool alliedOrdered, Reasons reason = Reason_Lim);
 
@@ -196,6 +200,7 @@ private:
 	const DefenseManager* mDefenseManager;
 	IntentionWriter* mIntentionWriter;
 	const SelfClassifier* mSelfClassifier;
+	const AlliedClassifier* mAlliedClassifier;
 	const GameTime* mGameTime;
 
 	std::map<std::string, Commands> mCommandStringToEnums;

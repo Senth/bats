@@ -41,7 +41,7 @@ std::vector<const UnitSet> UnitComposition::getUnitSets() const {
 	return vacantSets;
 }
 
-bool UnitComposition::addUnit(UnitAgent* unit) {
+bool UnitComposition::addUnit(const UnitAgent* unit) {
 	size_t i = 0;
 
 	// Find the unit type and add one unit, if it is
@@ -58,7 +58,7 @@ bool UnitComposition::addUnit(UnitAgent* unit) {
 	return false;
 }
 
-bool UnitComposition::removeUnit(UnitAgent* unit) {
+bool UnitComposition::removeUnit(const UnitAgent* unit) {
 	size_t i = 0;
 
 	// Find the unit type and remove one unit, if it is
@@ -87,10 +87,10 @@ const std::string& UnitComposition::getType() const {
 	return mType;
 }
 
-std::vector<UnitAgent*> UnitComposition::addUnits(const std::vector<UnitAgent*>& units) {
+std::vector<const UnitAgent*> UnitComposition::addUnits(const std::vector<const UnitAgent*>& units) {
 	// Try to add all units, those that can't be added will be placed in the notAddedUnits
 	// vector and returned.
-	std::vector<UnitAgent*> notAddedUnits;
+	std::vector<const UnitAgent*> notAddedUnits;
 
 	for (size_t i = 0; i < units.size(); ++i) {
 		bool addOk = addUnit(units[i]);
@@ -102,10 +102,10 @@ std::vector<UnitAgent*> UnitComposition::addUnits(const std::vector<UnitAgent*>&
 	return notAddedUnits;
 }
 
-std::vector<UnitAgent*> UnitComposition::removeUnits(const std::vector<UnitAgent*>& units) {
-	// Try to remove all units, those that can't be added will be placed in the notRemovedUnits
+std::vector<const UnitAgent*> UnitComposition::removeUnits(const std::vector<const UnitAgent*>& units) {
+	// Try to remove all units, those that can't be removed will be placed in the notRemovedUnits
 	// vector and returned
-	std::vector<UnitAgent*> notRemovedUnits;
+	std::vector<const UnitAgent*> notRemovedUnits;
 
 	for (size_t i = 0; i < units.size(); ++i) {
 		bool removeOk = removeUnit(units[i]);

@@ -6,7 +6,11 @@
 #include "AttackSquad.h"
 #include "SquadDefs.h"
 #include "ScoutSquad.h"
+#include "DropSquad.h"
 #include "GameTime.h"
+#include "DefenseManager.h"
+#include "UnitManager.h"
+#include "UnitCompositionFactory.h"
 #include "BTHAIModule/Source/UnitAgent.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CommandCenterAgent.h"
@@ -22,11 +26,17 @@ SelfClassifier::SelfClassifier() {
 	mAgentManager = NULL;
 	mBuildPlanner = NULL;
 	mSquadManager = NULL;
+	mDefenseManager = NULL;
+	mUnitManager = NULL;
+	mUnitCompositionFactory = NULL;
 	mGameTime = NULL;
 
 	mAgentManager = AgentManager::getInstance();
 	mBuildPlanner = BuildPlanner::getInstance();
 	mSquadManager = SquadManager::getInstance();
+	mDefenseManager = DefenseManager::getInstance();
+	mUnitManager = UnitManager::getInstance();
+	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
 	mGameTime = GameTime::getInstance();
 }
 
@@ -167,6 +177,41 @@ bool SelfClassifier::isAttacking() const {
 	}
 
 	return false;
+}
+
+bool SelfClassifier::hasFrontalAttack() const {
+	return NULL != mSquadManager->getFrontalAttack();
+}
+
+bool SelfClassifier::hasDrop() const {
+	const vector<DropSquadCstPtr>& dropSquads = mSquadManager->getSquads<DropSquad>();
+	return !dropSquads.empty();
+}
+
+bool SelfClassifier::canDrop() const {
+	const vector<const UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+
+	// Any drop unit compositions available?
+	const vector<UnitComposition>& compositions = 
+		mUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
+
+	return !compositions.empty();
+}
+
+bool SelfClassifier::canFrontalAttack() const {
+	return canFrontalAttack(mUnitManager->getUnitsByFilter(UnitFilter_Free));
+}
+
+bool SelfClassifier::canFrontalAttack(const std::vector<UnitAgent*>& units) const {
+	return canFrontalAttack(*reinterpret_cast<const std::vector<const UnitAgent*>*>(&units));
+}
+
+bool SelfClassifier::canFrontalAttack(const std::vector<const UnitAgent*>& units) const {
+	return units.size() >= config::classification::FRONTAL_ATTACK_UNITS_MIN;
+}
+
+bool SelfClassifier::isUnderAttack() const {
+	return mDefenseManager->isUnderAttack();
 }
 
 double SelfClassifier::getLastExpansionStartTime() const {

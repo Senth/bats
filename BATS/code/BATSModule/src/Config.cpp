@@ -81,6 +81,7 @@ namespace classification {
 	double UPGRADE_SOON_DONE = 0.0;
 	int HIGH_ON_MINERALS = 0;
 	int HIGH_ON_GAS = 0;
+	size_t FRONTAL_ATTACK_UNITS_MIN = 0;
 
 	namespace expansion {
 		double WORKERS_PER_MINERAL_SATURATION = 0.0;
@@ -404,6 +405,10 @@ bool classification::set(const utilities::VariableInfo& variableInfo) {
 			gOldValue = toString(HIGH_ON_GAS);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(HIGH_ON_GAS));
 			HIGH_ON_GAS = variableInfo;
+		} else if (variableInfo.name == "frontal_attack_units_min") {
+			gOldValue = toString(FRONTAL_ATTACK_UNITS_MIN);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(FRONTAL_ATTACK_UNITS_MIN));
+			FRONTAL_ATTACK_UNITS_MIN = variableInfo;
 		} else {
 			return false;
 		}

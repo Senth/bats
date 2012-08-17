@@ -35,7 +35,8 @@ AttackSquad::AttackSquad(
 	mDistraction = distracting;
 	mWaitInPosition = false;
 	mAttackedEnemyStructures = false;
-	mAlliedSquadFollow = alliedSquadFollow;
+	followAlliedSquad(alliedSquadFollow);
+	mAlliedBeenOutsideBase = false;
 
 	if (msAttackCoordinator == NULL) {
 		msAttackCoordinator = AttackCoordinator::getInstance();
@@ -135,6 +136,10 @@ void AttackSquad::handleFollowAllied() {
 		return;
 	}
 
+	if (mAlliedSquadFollow->isActive()) {
+		mAlliedBeenOutsideBase = true;
+	}
+
 
 	// Allied squad might have merged, search for a close squad (that's not home)
 	if(mAlliedSquadFollow->isEmpty()) {
@@ -201,9 +206,15 @@ void AttackSquad::handleFollowAllied() {
 				break;
 
 			// Allied is safe -> retreat, then merge with Patrol Squad (disband)
+			// Allied not moved out from base -> regroup with it
 			case AlliedSquad::State_IdleInBase:
-				setRetreatPosition(msDefenseManager->findRetreatPosition());
-				mAlliedSquadFollow.reset();
+				if (mAlliedBeenOutsideBase) {
+					setRetreatPosition(msDefenseManager->findRetreatPosition());
+					mAlliedSquadFollow.reset();
+				} else {
+					handleAlliedRegrouping();
+					setAvoidEnemyUnits(true);
+				}
 				break;
 		}
 	}
@@ -439,5 +450,8 @@ void AttackSquad::onGoalSucceeded() {
 }
 
 void AttackSquad::followAlliedSquad(AlliedSquadCstPtr alliedSquad) {
-	mAlliedSquadFollow = alliedSquad;
+	if (alliedSquad != NULL) {
+		mAlliedSquadFollow = alliedSquad;
+		setCanRegroup(false);
+	}
 }

@@ -53,7 +53,7 @@ void PlayerArmyManager::update() {
 	if (cFrame - mLastFrameUpdate >= config::frame_distribution::ALLIED_ARMY_REARRANGE_SQUADS) {
 		mLastFrameUpdate = cFrame;
 
-		Profiler::getInstance()->start("AlliedArmyManager::update()");
+		Profiler::getInstance()->start("PlayerArmyManager::update()");
 
 		rearrangeSquads(true);
 		rearrangeSquads(false);
@@ -62,7 +62,7 @@ void PlayerArmyManager::update() {
 
 		setAlliedFrontalSquad();
 
-		Profiler::getInstance()->end("AlliedArmyManager::update()");
+		Profiler::getInstance()->end("PlayerArmyManager::update()");
 	}
 
 
@@ -77,10 +77,8 @@ void PlayerArmyManager::update() {
 }
 
 void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
-	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads()");
-
-
-	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Initialization");
+	Profiler::getInstance()->start("PlayerArmyManager::rearrangeSquads()");
+	Profiler::getInstance()->start("PlayerArmyManager::rearrangeSquads() | Initialization");
 		
 	// Remove all existing units from the grid
 	for (size_t x = 0; x < mGridUnits.size(); ++x) {
@@ -101,8 +99,8 @@ void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
 		}
 	}
 
-	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Initialization");
-	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Find not checked unit");
+	Profiler::getInstance()->end("PlayerArmyManager::rearrangeSquads() | Initialization");
+	Profiler::getInstance()->start("PlayerArmyManager::rearrangeSquads() | Find not checked unit");
 
 	// Find a non-checked unit in a non-checked squad, i.e. iterate through all existing squads
 	// first. This will avoid creating and then merging unnecessary squads. I.e. all units that
@@ -141,8 +139,8 @@ void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
 
 	} while (foundUnit);
 
-	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Find not checked unit");
-	Profiler::getInstance()->start("AlliedArmyManager::rearrangeSquads() | Create squads for rest");
+	Profiler::getInstance()->end("PlayerArmyManager::rearrangeSquads() | Find not checked unit");
+	Profiler::getInstance()->start("PlayerArmyManager::rearrangeSquads() | Create squads for rest");
 
 
 	// Create squads for the rest of the units that went out of the squad's bounds
@@ -163,8 +161,8 @@ void PlayerArmyManager::rearrangeSquads(bool updateAllied) {
 		addCloseUnitsToSquad(currentUnit, newSquad->getId());
 	}
 
-	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads() | Create squads for rest");
-	Profiler::getInstance()->end("AlliedArmyManager::rearrangeSquads()");
+	Profiler::getInstance()->end("PlayerArmyManager::rearrangeSquads() | Create squads for rest");
+	Profiler::getInstance()->end("PlayerArmyManager::rearrangeSquads()");
 }
 
 void PlayerArmyManager::onConstantChanged(config::ConstantName constantName) {

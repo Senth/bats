@@ -156,7 +156,7 @@ void IntentionWriter::handleReasonVariable(const utilities::VariableInfo& variab
 void IntentionWriter::initStringToEnumWrappers() {
 	// Intentions
 	mIntentionStringToEnums["AlliedAttackFollow"] = Intention_AlliedAttackFollow;
-	mIntentionStringToEnums["ALliedAttackFollowNot"] = Intention_AlliedAttackFollowNot;
+	mIntentionStringToEnums["AlliedAttackFollowNot"] = Intention_AlliedAttackFollowNot;
 	mIntentionStringToEnums["BotAttack"] = Intention_BotAttack;
 	mIntentionStringToEnums["BotAttackMerged"] = Intention_BotAttackMerged;
 	mIntentionStringToEnums["BotAttackMergedNot"] = Intention_BotAttackMergedNot;
@@ -186,7 +186,7 @@ void IntentionWriter::initStringToEnumWrappers() {
 
 	// Reasons
 	mReasonStringToEnums["AlliedAttackDisappeared"] = Reason_AlliedAttackDisappeared;
-	mReasonStringToEnums["ALliedAttackNotExist"] = Reason_AlliedAttackNotExist;
+	mReasonStringToEnums["AlliedAttackNotExist"] = Reason_AlliedAttackNotExist;
 	mReasonStringToEnums["AlliedExpanding"] = Reason_AlliedExpanding;
 	mReasonStringToEnums["AlliedMovingToAttack"] = Reason_AlliedMovingToAttack;
 	mReasonStringToEnums["BotAttacking"] = Reason_BotAttacking;

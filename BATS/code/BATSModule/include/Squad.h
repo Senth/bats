@@ -585,7 +585,7 @@ protected:
 private:
 	/**
 	 * Disallow copy constructor. Will generate a compile or link error when used.
-	 * @param nonCopyable, non copyable object
+	 * @param nonCopyable non copyable object
 	 */
 	Squad(const Squad& nonCopyable);
 

@@ -137,6 +137,17 @@ std::vector<UnitComposition> UnitCompositionFactory::getUnitCompositionsByType(
 	const std::vector<UnitAgent*>& availableUnits,
 	UnitCompositions type) const
 {
+	const UnitCompositionFactory* constThis = this;
+	return constThis->getUnitCompositionsByType(
+		*reinterpret_cast<const std::vector<const UnitAgent*>*>(&availableUnits),
+		type
+	);
+}
+
+std::vector<UnitComposition> UnitCompositionFactory::getUnitCompositionsByType(
+	const std::vector<const UnitAgent*>& availableUnits,
+	UnitCompositions type) const
+{
 	assert(type >= UnitComposition_First);
 	assert(type < UnitComposition_Lim);
 

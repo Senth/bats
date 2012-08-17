@@ -65,14 +65,14 @@ public:
 	 * @return true if the unit was successfully added; false if all slots are occupied
 	 * for this unit type.
 	 */
-	bool addUnit(UnitAgent* unit);
+	bool addUnit(const UnitAgent* unit);
 
 	/**
 	 * Tries to remove a unit from the unit composition.
 	 * @param unit the unit we're trying to remove.
 	 * @return true if the unit was successfully removed; false if no units of this type exists.
 	 */
-	bool removeUnit(UnitAgent* unit);
+	bool removeUnit(const UnitAgent* unit);
 
 	/**
 	 * Returns the priority of the UnitComposition. If no priority has been set
@@ -92,24 +92,6 @@ public:
 	 * @return type of the composition
 	 */
 	const std::string& getType() const;
-
-	/**
-	 * Tries to add all units to the unit composition.
-	 * @param units all the units we're trying to add.
-	 * @return an empty vector if all units were succussfully added; if some units failed
-	 * to be added to the unit set, because all slots are occupied, these will be returned
-	 * in the vector.
-	 */
-	std::vector<UnitAgent*> addUnits(const std::vector<UnitAgent*>& units);
-
-	/**
-	 * Tries to remove all units from the unit composition.
-	 * @param units all the units we're trying to remove.
-	 * @return an empty vector if all units were successfully removed; if some units failed
-	 * to be removed from the unit set, because no units of these types exists, these will be
-	 * returned in the vector.
-	 */
-	std::vector<UnitAgent*> removeUnits(const std::vector<UnitAgent*>& units);
 
 	/**
 	 * Operator that checks if this unit composition has lower priority then the one
@@ -161,6 +143,24 @@ private:
 	 * @param priority the priority of the unit composition. Needs to be in the range [0,100].
 	 */
 	void setPriority(int priority);
+
+	/**
+	 * Tries to add all units to the unit composition.
+	 * @param units all the units we're trying to add.
+	 * @return an empty vector if all units were succussfully added; if some units failed
+	 * to be added to the unit set, because all slots are occupied, these will be returned
+	 * in the vector.
+	 */
+	std::vector<const UnitAgent*> addUnits(const std::vector<const UnitAgent*>& units);
+
+	/**
+	 * Tries to remove all units from the unit composition.
+	 * @param units all the units we're trying to remove.
+	 * @return an empty vector if all units were successfully removed; if some units failed
+	 * to be removed from the unit set, because no units of these types exists, these will be
+	 * returned in the vector.
+	 */
+	std::vector<const UnitAgent*> removeUnits(const std::vector<const UnitAgent*>& units);
 
 	friend class UnitCompositionFactory;
 

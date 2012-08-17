@@ -574,8 +574,11 @@ void DefenseManager::updateUnderAttackPositions() {
 				if ((*unitIt)->getType().isBuilding() && (*unitIt)->isUnderAttack()) {
 					mAlliedUnderAttack = true;
 					mDefendAlliedUnit = (*unitIt);
+				} else {
+					++unitIt;
 				}
 			}
+			++alliedIt;
 		}
 	}
 }

@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AlliedClassifier.cpp" />
     <ClCompile Include="src\AlliedSquad.cpp" />
     <ClCompile Include="src\AttackCoordinator.cpp" />
     <ClCompile Include="src\DefenseManager.cpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitGoalManager.cpp" />
     <ClCompile Include="src\WaitReadySquad.cpp" />
+    <ClInclude Include="include\AlliedClassifier.h" />
     <ClInclude Include="include\AlliedSquad.h" />
     <ClInclude Include="include\AttackCoordinator.h" />
     <ClInclude Include="include\AttackSquad.h" />

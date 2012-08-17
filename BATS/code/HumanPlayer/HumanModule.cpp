@@ -34,6 +34,8 @@ void HumanModule::onSendText(std::string text) {
 		Broodwar->setLocalSpeed(speed);
 		Broodwar->printf("Global speed set to: %i", speed);
 		Broodwar->sendText(text.c_str());
+	} else {
+		Broodwar->sendText(text.c_str());
 	}
 }
 void HumanModule::onReceiveText(BWAPI::Player* player, std::string text) {

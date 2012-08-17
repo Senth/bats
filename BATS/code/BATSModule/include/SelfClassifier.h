@@ -15,12 +15,13 @@ namespace bats {
 class BuildPlanner;
 class SquadManager;
 class GameTime;
-
+class DefenseManager;
+class UnitManager;
+class UnitCompositionFactory;
 
 /**
- * Checks various states for the bot itself. These include
- * \li If the bot is currently expanding
- * \li upgrades that will finish soon
+ * Checks various states the bot has. This is essentially a container of functionality
+ * found (and could be derived) from many other classes.
  * @author Matteus Magnusson <matteus.magnusson@gmail.com>
  */
 class SelfClassifier {
@@ -77,6 +78,48 @@ public:
 	 * @return true if we have an attack squad.
 	 */
 	bool isAttacking() const;
+
+	/**
+	 * Checks if we have an active frontal attack
+	 * @return true if we have a frontal attack
+	 */
+	bool hasFrontalAttack() const;
+
+	/**
+	 * Checks if we have an active drop
+	 * @return true if we have an active drop
+	 */
+	bool hasDrop() const;
+
+	/**
+	 * Checks if we have the ability to create a drop, uses free units
+	 * @return true if we can create a drop
+	 */
+	bool canDrop() const;
+
+	/**
+	 * Checks if we have enough units to do a frontal attack, uses free units
+	 * @return true if we can do a frontal attack
+	 */
+	bool canFrontalAttack() const;
+
+	/**
+	 * Checks if we have enough units to do a frontal attack with the specified units
+	 * @param units units to do the attack with
+	 * @return true if we have enough units to do a frontal attack
+	 */
+	bool canFrontalAttack(const std::vector<const UnitAgent*>& units) const;
+
+	/**
+	 * \copydoc canFrontalAttack(const std::vector<const UnitAgent*>&)
+	 */
+	bool canFrontalAttack(const std::vector<UnitAgent*>& units) const;
+
+	/**
+	 * Checks if we're currently under attack
+	 * @return true if we're under attack
+	 */
+	bool isUnderAttack() const;
 
 	/**
 	 * Checks how many seconds has elapsed since the last expansion was started. If an
@@ -137,6 +180,9 @@ private:
 	const AgentManager* mAgentManager;
 	const BuildPlanner* mBuildPlanner;
 	const SquadManager* mSquadManager;
+	const DefenseManager* mDefenseManager;
+	const UnitManager* mUnitManager;
+	const UnitCompositionFactory* mUnitCompositionFactory;
 	const GameTime* mGameTime;
 
 	static SelfClassifier* msInstance;

@@ -7,8 +7,8 @@
 #include "UnitManager.h"
 #include "IntentionWriter.h"
 #include "UnitCompositionFactory.h"
-#include "DefenseManager.h"
 #include "SelfClassifier.h"
+#include "AlliedClassifier.h"
 #include "AttackSquad.h"
 #include "DropSquad.h"
 #include "ScoutSquad.h"
@@ -35,21 +35,21 @@ Commander::Commander() {
 	mUnitManager = NULL;
 	mSquadManager = NULL;
 	mAlliedArmyManager = NULL;
-	mDefenseManager = NULL;
 	mIntentionWriter = NULL;
 	mSelfClassifier = NULL;
 	mGameTime = NULL;
 	mBuildPlanner = NULL;
+	mAlliedClassifier = NULL;
 
 	mAlliedArmyManager = PlayerArmyManager::getInstance();
 	mSquadManager = SquadManager::getInstance();
 	mUnitManager = UnitManager::getInstance();
 	mUnitCompositionFactory = UnitCompositionFactory::getInstance();
-	mDefenseManager = DefenseManager::getInstance();
 	mIntentionWriter = IntentionWriter::getInstance();
 	mSelfClassifier = SelfClassifier::getInstance();
 	mGameTime = GameTime::getInstance();
 	mBuildPlanner = BuildPlanner::getInstance();
+	mAlliedClassifier = AlliedClassifier::getInstance();
 
 	mFrameCallLast = -config::frame_distribution::COMMANDER;
 	mExpansionTimeLast = 0.0;
@@ -92,9 +92,8 @@ void Commander::computeOwnReactions() {
 
 	// EXPAND
 	// -> When attacking, workers saturated, or minerals running low in an expansion
-	// Only expand if we haven't expanded for a while, and set how many maximum numbers of expansions
-	// we are allowed to have.
-	if (!mSelfClassifier->isExpanding() &&
+	if (!mSelfClassifier->isUnderAttack() &&
+		!mSelfClassifier->isExpanding() &&
 		mSelfClassifier->getActiveExpansionCount() < config::commander::EXPANSION_ACTIVE_MAX &&
 		mSelfClassifier->getLastExpansionStartTime() > config::commander::EXPANSION_INTERVAL_MIN)
 	{
@@ -111,7 +110,7 @@ void Commander::computeOwnReactions() {
 	// ATTACK
 	// -> When expanding, when upgrade soon is done
 	/// @todo when shall we drop and when shall we attack?
-	if (!mSelfClassifier->isAttacking()) {
+	if (!mSelfClassifier->isUnderAttack() && !mSelfClassifier->isAttacking()) {
 		if (mSelfClassifier->isExpanding()) {
 			issueCommand(Command_Attack, false, Reason_BotExpanding);
 		} else {
@@ -124,8 +123,8 @@ void Commander::computeOwnReactions() {
 
 
 	// SCOUT
-	// -> Always after we have x workers
-	if (!mSelfClassifier->isScouting()) {
+	// -> Always after we have x workers, but not under attack
+	if (!mSelfClassifier->isUnderAttack() && !mSelfClassifier->isScouting()) {
 		int cWorkers = mUnitManager->getWorkerCount();
 
 		if (cWorkers >= config::commander::SCOUT_ON_WORKER_COUNT) {
@@ -150,42 +149,51 @@ void Commander::computeAlliedReactions() {
 	}
 
 
+	// ALLIED ATTACKING
 	// Check for active allied squads
 	vector<AlliedSquadCstPtr> squads = mAlliedArmyManager->getSquads<AlliedSquad>();
-	bool bigActive = false;
-	bool smallActive = false;
+	bool frontalActive = false;
+	bool distractingActive = false;
 	for (size_t i = 0; i < squads.size(); ++i) {
 		if (squads[i]->isActive()) {
 			// Big
 			if (squads[i]->isFrontalAttack()) {
-				bigActive = true;
+				frontalActive = true;
 			} else {
-				smallActive = true;
+				distractingActive = true;
 			}
 		}
 	}
 
-	
-	// Big is active -> we don't have any frontal attack, create frontal attack
-	if (bigActive) {
-		const AttackSquadPtr& frontalSquad = mSquadManager->getFrontalAttack();
-
-		if (NULL == frontalSquad) {
-			issueCommand(Command_Attack, false, Reason_AlliedMovingToAttack);
-		}
-	}
-
-	// Small is active -> Create distraction if we don't have a distraction out
-	if (smallActive) {
-		const vector<AttackSquadPtr>& distractingAttacks = mSquadManager->getDistractingAttacks();
-
-		if (distractingAttacks.empty()) {
+	// Big is active -> Attack with frontal, then a drop?
+	if (frontalActive) {
+		if (!mSelfClassifier->hasFrontalAttack() && mSelfClassifier->canFrontalAttack()) {
+			issueCommand(Command_Join, false, Reason_AlliedMovingToAttack);
+		} else if (!mSelfClassifier->hasDrop()) {
 			issueCommand(Command_Drop, false, Reason_AlliedMovingToAttack);
 		}
 	}
 
+	// Small is active -> Create distraction if we don't have a distraction out
+	if (distractingActive && !mSelfClassifier->hasDrop()) {
+		issueCommand(Command_Drop, false, Reason_AlliedMovingToAttack);
+	}
 
-	/// @todo check for player expanding
+
+
+	// ALLIED EXPANDING
+	// Attack with a drop first, if cannot, try frontal attack
+	if (mAlliedClassifier->isExpanding() &&
+		!mSelfClassifier->isUnderAttack() && 
+		!mSelfClassifier->isAttacking())
+	{
+		if (mSelfClassifier->canDrop()) {
+			issueCommand(Command_Drop, false, Reason_AlliedExpanding);
+			issueCommand(Command_Drop, false);
+		} else {
+			issueCommand(Command_Attack, false, Reason_AlliedExpanding);
+		}
+	}
 }
 
 void Commander::issueCommand(const std::string& command) {
@@ -232,7 +240,7 @@ void Commander::issueCommand(Commands command, bool alliedOrdered, Reasons reaso
 		orderTransition(alliedOrdered, reason);
 		break;
 
-		/// @todo abort command
+	/// @todo abort command
 
 	default:
 		ERROR_MESSAGE(false, "Commander: Unknown Command type!");
@@ -265,37 +273,29 @@ void Commander::finishAlliedCreatingCommand() {
 
 void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 	// Never do a frontal attack if we're under attack (defending)
-	if (mDefenseManager->isUnderAttack()) {
+	if (mSelfClassifier->isUnderAttack()) {
 		if (alliedOrdered) {
 			mIntentionWriter->writeIntention(Intention_BotAttackNot, Reason_BotIsUnderAttack);
 		}
 		return;
 	}
 
+
 	// Get free units
 	std::vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
-
 	// Only add if we have free units
-	if (!freeUnits.empty()) {
+	if (mSelfClassifier->canFrontalAttack(freeUnits)) {
 		// Add the units to the old attack squad if it exists
 		AttackSquadPtr oldSquad = mSquadManager->getFrontalAttack();
 
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
-			if (alliedOrdered) {
-				mIntentionWriter->writeIntention(Intention_BotAttackMerged);
-			}
+			mIntentionWriter->writeIntention(Intention_BotAttackMerged, reason);
 		} else {
 			AttackSquad* attackSquad = new AttackSquad(freeUnits);
-
-			if (attackSquad->isFollowingAlliedSquad()) {
-				mIntentionWriter->writeIntention(Intention_AlliedAttackFollow, reason);
-			} else {
-				const TilePosition attackPos = attackSquad->getGoalPosition();
-				mIntentionWriter->writeIntention(Intention_BotAttack, reason, attackPos);
-			}
-
+			const TilePosition attackPos = attackSquad->getGoalPosition();
+			mIntentionWriter->writeIntention(Intention_BotAttack, reason, attackPos);
 		}
 	} else {
 		if (alliedOrdered) {
@@ -334,7 +334,7 @@ void Commander::orderJoin(bool alliedOrdered, Reasons reason) {
 		sendIntention = Intention_BotAttackMergedNot;
 
 		// Only add units to the attack if we're not under attack
-		if (!mDefenseManager->isUnderAttack()) {
+		if (!mSelfClassifier->isUnderAttack()) {
 			const std::vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
 			if (!freeUnits.empty()) {
@@ -355,10 +355,10 @@ void Commander::orderJoin(bool alliedOrdered, Reasons reason) {
 		sendIntention = Intention_AlliedAttackFollowNot;
 
 		// Only add units to the attack if we're not under attack
-		if (!mDefenseManager->isUnderAttack()) {
+		if (!mSelfClassifier->isUnderAttack()) {
 			const std::vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
-			if (!freeUnits.empty()) {
+			if (mSelfClassifier->canFrontalAttack(freeUnits)) {
 				AlliedSquadCstPtr alliedSquad = mAlliedArmyManager->getAlliedFrontalSquad();
 
 				if (NULL != alliedSquad) {

@@ -163,10 +163,8 @@ void Squad::update() {
 		}
 		// Else create a goal
 		else if (!mUnitComposition.isValid() || mUnitComposition.isFull()) {
-			bool goalCreated = createGoal();
-			if (goalCreated) {
-				mState = State_Active;
-			}
+			createGoal();
+			mState = State_Active;
 		}
 
 		// Update unit movement if we changed to active state

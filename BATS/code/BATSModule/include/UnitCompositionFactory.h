@@ -52,6 +52,14 @@ public:
 	) const;
 
 	/**
+	 * \copydoc getUnitCompositionByType(const std::vector<UnitAgent*>&, UnitCompositions)
+	 */
+	std::vector<UnitComposition> getUnitCompositionsByType(
+		const std::vector<const UnitAgent*>& availableUnits,
+		UnitCompositions type
+	) const;
+
+	/**
 	 * An invalid unit composition.
 	 */
 	static UnitComposition INVALID;

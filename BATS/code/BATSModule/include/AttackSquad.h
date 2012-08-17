@@ -193,5 +193,6 @@ private:
 	bool mWaitInPosition;
 	bool mAttackedEnemyStructures;
 	AlliedSquadCstPtr mAlliedSquadFollow;
+	bool mAlliedBeenOutsideBase;
 };
 }
