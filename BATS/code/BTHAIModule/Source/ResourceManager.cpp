@@ -29,7 +29,7 @@ ResourceManager* ResourceManager::getInstance()
 
 bool ResourceManager::isProductionBuildingsIdle(){	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++){
+	for (size_t i = 0; i < agents.size(); i++){
 		BaseAgent* agent = agents.at(i);
 		Unit* unit = agent->getUnit();
 		BWAPI::UnitType type = agent->getUnitType();
@@ -63,6 +63,7 @@ bool ResourceManager::hasProductionBuilding()
 
 bool ResourceManager::needWorker()
 {
+	/// @todo remove, use SelfClassifier::instead
 	int workersPerBase = 18;
 	if (bats::BuildPlanner::isZerg())
 	{
@@ -78,11 +79,14 @@ bool ResourceManager::needWorker()
 	if (noWorkers < idealNoWorkers)
 	{
 		//Check if we have enough resources
+
 		int nMinerals = Broodwar->self()->getRace().getWorker().mineralPrice();
-		if (hasProductionBuilding())
-		{
-			nMinerals += 150;
-		}
+		// Matteus, accidentally found this code, this probably solves a bug
+		// where units are not prioritized, commenting it
+		//if (hasProductionBuilding())
+		//{
+		//	nMinerals += 150;
+		//}
 		return hasResources(nMinerals, 0);
 	}
 	return false;

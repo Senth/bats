@@ -1,4 +1,5 @@
 #include "BuildPlanner.h"
+#include "UnitManager.h"
 #include "BTHAIModule/Source/WorkerAgent.h"
 #include "BTHAIModule/Source/StructureAgent.h"
 #include "BTHAIModule/Source/BaseAgent.h"
@@ -13,9 +14,13 @@ using namespace bats;
 using namespace BWAPI;
 using namespace std;
 
-BuildPlanner* BuildPlanner::instance = NULL;
+BuildPlanner* BuildPlanner::msInstance = NULL;
 
 BuildPlanner::BuildPlanner(){
+	mResourceManager = NULL;
+
+	mResourceManager = ResourceManager::getInstance();
+
 	mCurrentPhase = "early";
 	BuildOrderFileReader br = BuildOrderFileReader();
 	mtransitionGraph = br.readTransitionFile("transition.txt");
@@ -25,14 +30,14 @@ BuildPlanner::BuildPlanner(){
 }
 
 BuildPlanner::~BuildPlanner(){
-	instance = NULL;
+	msInstance = NULL;
 }
 
 BuildPlanner* BuildPlanner::getInstance(){
-	if (instance == NULL){
-		instance = new BuildPlanner();
+	if (msInstance == NULL){
+		msInstance = new BuildPlanner();
 	}
-	return instance;
+	return msInstance;
 }
 
 size_t BuildPlanner::getQueueCount() const {
@@ -51,7 +56,7 @@ bool BuildPlanner::canTransition() const {
 	return mCurrentPhase != "late";
 }
 
-void BuildPlanner::switchToPhase(std::string fileName){
+void BuildPlanner::switchToPhase(const std::string& fileName){
 	BuildOrderFileReader br;
 	if(fileName.empty()){
 		if(mCurrentPhase == "early"){
@@ -87,7 +92,7 @@ void BuildPlanner::switchToPhase(std::string fileName){
 	}
 }
 
-void BuildPlanner::buildingDestroyed(Unit* building){
+void BuildPlanner::buildingDestroyed(const Unit* building){
 	if (building->getType() == UnitTypes::Protoss_Pylon)
 	{
 		return;
@@ -119,20 +124,20 @@ void BuildPlanner::computeActions(){
 		return;
 	}
 
-	//Check if we have possible "locked" items in the buildqueue
+	//Check if we have possible "locked" items in the build queue
 	for (size_t i = 0; i < mBuildQueue.size(); i++)
 	{
 		int elapsed = cFrame - mBuildQueue.at(i).assignedFrame;
 		if (elapsed >= 2000)
 		{
 			//Reset the build request
-			WorkerAgent* worker = (WorkerAgent*)AgentManager::getInstance()->getAgent(mBuildQueue.at(i).assignedWorkerId);
+			WorkerAgent* worker = (WorkerAgent*)AgentManager::getInstance()->getAgent(mBuildQueue.at(i).assignedBuildId);
 			if (worker != NULL)
 			{
 				worker->reset();
 			}
 			mBuildOrder.insert(mBuildOrder.begin(), mBuildQueue.at(i).structure);
-			ResourceManager::getInstance()->unlockResources(mBuildQueue.at(i).structure);
+			mResourceManager->unlockResources(mBuildQueue.at(i).structure);
 			mBuildQueue.erase(mBuildQueue.begin() + i);
 			return;
 		}
@@ -181,7 +186,7 @@ bool BuildPlanner::hasResourcesLeft() const{
 	return true;
 }
 
-int BuildPlanner::mineralsNearby(TilePosition center) const{
+int BuildPlanner::mineralsNearby(const TilePosition& center) const{
 	int mineralCnt = 0;
 
 	for(set<Unit*>::iterator m = Broodwar->getMinerals().begin(); m != Broodwar->getMinerals().end(); m++)
@@ -313,52 +318,56 @@ bool BuildPlanner::supplyBeingBuilt() const{
 	return false;
 }
 
-void BuildPlanner::lock(int buildOrderIndex, int workerId){
-	UnitType structureType = mBuildOrder.at(buildOrderIndex).structure;
+void BuildPlanner::moveToQueue(int buildOrderIndex, int builderId){
+	BuildItem item = mBuildOrder.at(buildOrderIndex);
 	mBuildOrder.erase(mBuildOrder.begin() + buildOrderIndex);
 
-	BuildItem item(structureType);
-	item.assignedWorkerId = workerId;
+	item.assignedBuildId = builderId;
 	item.assignedFrame = Broodwar->getFrameCount();
 
 	mBuildQueue.push_back(item);
 }
 
-void BuildPlanner::remove(UnitType type){
-	for (size_t i = 0; i < mBuildOrder.size(); i++)
-	{
-		if (mBuildOrder.at(i).structure == type)
-		{
+void BuildPlanner::removeFirstOf(const UnitType& type){
+	for (size_t i = 0; i < mBuildOrder.size(); i++) {
+		if (mBuildOrder.at(i).structure == type) {
 			mBuildOrder.erase(mBuildOrder.begin() + i);
 			return;
 		}
 	}
 }
 
-void BuildPlanner::unlock(UnitType type){
-	for (size_t i = 0; i < mBuildQueue.size(); i++)
-	{
-		if (mBuildQueue.at(i).structure == type)
-		{
+void BuildPlanner::removeFirstOf(const BuildItem& item) {
+	for (size_t i = 0; i < mBuildOrder.size(); i++) {
+		if (mBuildOrder[i] == item) {
+			mBuildOrder.erase(mBuildOrder.begin() + i);
+			return;
+		}
+	}
+}
+
+void BuildPlanner::removeFromQueue(const UnitType& type){
+	for (size_t i = 0; i < mBuildQueue.size(); i++) {
+		if (mBuildQueue.at(i).structure == type) {
 			mBuildQueue.erase(mBuildQueue.begin() + i);
 			return;
 		}
 	}
 }
 
-void BuildPlanner::handleWorkerDestroyed(UnitType type, int workerID){
+void BuildPlanner::handleWorkerDestroyed(const UnitType& type, int workerID){
 	for (size_t i = 0; i < mBuildQueue.size(); i++)
 	{
-		if (mBuildQueue.at(i).assignedWorkerId == workerID)
+		if (mBuildQueue.at(i).assignedBuildId == workerID)
 		{
 			mBuildQueue.erase(mBuildQueue.begin() + i);
 			mBuildOrder.insert(mBuildOrder.begin(), type);
-			ResourceManager::getInstance()->unlockResources(type);
+			mResourceManager->unlockResources(type);
 		}
 	}
 }
 
-bool BuildPlanner::executeMorph(UnitType target, UnitType evolved){
+bool BuildPlanner::executeMorph(const UnitType& target, const UnitType& evolved){
 	BaseAgent* agent = AgentManager::getInstance()->getClosestAgent(Broodwar->self()->getStartLocation(), target);
 	if (agent != NULL)
 	{
@@ -366,94 +375,114 @@ bool BuildPlanner::executeMorph(UnitType target, UnitType evolved){
 		if (sAgent->canMorphInto(evolved))
 		{
 			sAgent->getUnit()->morph(evolved);
-			lock(0, sAgent->getUnitID());
+			moveToQueue(0, sAgent->getUnitID());
 			return true;
 		}
 	}
 	else
 	{
 		//No building available that can do this morph.
-		remove(evolved);
+		removeFirstOf(evolved);
 	}
 	return false;
 }
 
 bool BuildPlanner::executeOrder(const BuildItem& item){
+	switch (item.type) {
+	case BuildType_Tech:
+		if (mResourceManager->hasResources(item.tech)) {
+			// Do we already have this tech upgrade?
+			if (Broodwar->self()->hasResearched(item.tech)) {
+				removeFirstOf(item);
+			}
+
+			const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+			for (size_t i = 0; i < agents.size(); ++i) {
+				
+			}
+		}
+		break;
+
+
+	case BuildType_Upgrade:
+		if (mResourceManager->hasResources(item.upgrade)) {
+			// Do we already have this upgrade?
+			if (Broodwar->self()->getUpgradeLevel(item.upgrade) <= item.upgradeLevel) {
+				removeFirstOf(item);
+			}
+
+			/// @todo
+		}
+		break;
+
 
 	// Structures
-	switch (item.type) {
-	case BuildType_Structure:
+	case BuildType_Structure: {
 		//Max 3 concurrent buildings allowed at the same time
-		if (mBuildQueue.size() >= 3)
-		{
-			return false;
-		}
+		// No need for a limitation
+		//if (mBuildQueue.size() >= 3) {
+		//	return false;
+		//}
 
 		//Hold if we are to build a new base
-		if (mBuildQueue.size() > 0)
-		{
-			if (mBuildQueue.at(0).structure.isResourceDepot())
-			{
+		if (!mBuildQueue.empty()) {
+			if (mBuildQueue.at(0).structure.isResourceDepot()) {
 				return false;
 			}
+
 			vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-			for (size_t i = 0; i < agents.size(); i++)
-			{
-				if (agents.at(i)->getUnitType().isResourceDepot() && agents.at(i)->getUnit()->isBeingConstructed())
+			for (size_t i = 0; i < agents.size(); i++) {
+				if (agents.at(i)->getUnitType().isResourceDepot() &&
+					agents.at(i)->getUnit()->isBeingConstructed())
 				{
 					return false;
 				}
 			}
 		}
 
-		if (item.structure.isResourceDepot())
-		{
+		else if (item.structure.isResourceDepot()) {
 			TilePosition pos = CoverMap::getInstance()->findExpansionSite();
-			if (pos == TilePositions::Invalid)
-			{
+			if (pos == TilePositions::Invalid) {
 				//No expansion site found.
 				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
 				return true;
 			}
 		}
-		if (item.structure.isRefinery())
-		{
+
+		else if (item.structure.isRefinery()) {
 			TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
-			if (rSpot == TilePositions::Invalid)
-			{
+			if (rSpot == TilePositions::Invalid) {
 				//No build spot found
 				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
 				return true;
 			}
 		}
-		if (isZerg())
-		{
+
+		if (isZerg()) {
 			pair<UnitType, int> builder = item.structure.whatBuilds();
-			if (builder.first != UnitTypes::Zerg_Drone)
-			{
+			if (builder.first != UnitTypes::Zerg_Drone) {
 				//Needs to be morphed
-				if (executeMorph(builder.first, item.structure))
-				{
+				if (executeMorph(builder.first, item.structure)) {
 					return true;
 				}
-				else
-				{
+				else {
 					return false;
 				}
 			}
 		}
 
 		//Check if we have resources
-		if (!ResourceManager::getInstance()->hasResources(item.structure)){
+		if (!mResourceManager->hasResources(item.structure)){
 			return false;
-		}	
-		vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (size_t i = 0; i < agents.size(); i++){
-			BaseAgent* agent = agents.at(i);
+		}
+
+		vector<UnitAgent*> freeWorkers = UnitManager::getInstance()->getUnitsByFilter(UnitFilter_WorkersFree);
+		for (size_t i = 0; i < freeWorkers.size(); i++){
+			UnitAgent* agent = freeWorkers.at(i);
 			if (agent != NULL && agent->isAlive()){
 				if (agent->canBuild(item.structure)){
 					if (agent->assignToBuild(item.structure)){
-						lock(0, agent->getUnitID());
+						moveToQueue(0, agent->getUnitID());
 						return true;
 					}
 					else{
@@ -466,6 +495,11 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 			}
 		}
 		return false;
+		break;
+	}
+
+	default:
+		ERROR_MESSAGE(false, "BuildPlanner: Unknown build type");
 		break;
 
 	}
@@ -499,10 +533,6 @@ void BuildPlanner::addRefinery(){
 	if (!this->nextIsOfType(refinery)){
 		mBuildOrder.insert(mBuildOrder.begin(), refinery);
 	}
-}
-
-void BuildPlanner::commandCenterBuilt(){
-	mLastCommandCenter = Broodwar->getFrameCount();
 }
 
 string BuildPlanner::format(const BuildItem& item) const{
@@ -560,7 +590,7 @@ void BuildPlanner::printGraphicDebugInfo() const {
 	}
 }
 
-void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
+void BuildPlanner::handleNoBuildspotFound(const UnitType& toBuild){
 	bool removeOrder = false;
 	if (toBuild == UnitTypes::Protoss_Photon_Cannon) removeOrder = true;
 	if (toBuild == UnitTypes::Terran_Missile_Turret) removeOrder = true;
@@ -572,7 +602,7 @@ void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 
 	if (removeOrder)
 	{
-		remove(toBuild);
+		removeFirstOf(toBuild);
 	}
 
 	if (!removeOrder)
@@ -588,7 +618,7 @@ void BuildPlanner::handleNoBuildspotFound(UnitType toBuild){
 	}
 }
 
-bool BuildPlanner::nextIsOfType(UnitType type) const {
+bool BuildPlanner::nextIsOfType(const UnitType& type) const {
 	if (mBuildOrder.empty())
 	{
 		return false;
@@ -603,7 +633,7 @@ bool BuildPlanner::nextIsOfType(UnitType type) const {
 	return false;
 }
 
-bool BuildPlanner::containsType(UnitType type) const {
+bool BuildPlanner::containsType(const UnitType& type) const {
 	for (size_t i = 0; i < mBuildOrder.size(); i++)
 	{
 		if (mBuildOrder[i].structure == type)
@@ -614,7 +644,7 @@ bool BuildPlanner::containsType(UnitType type) const {
 	return false;
 }
 
-bool BuildPlanner::coveredByDetector(TilePosition pos) {
+bool BuildPlanner::coveredByDetector(const TilePosition& pos) {
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (size_t i = 0; i < agents.size(); i++)
 	{
@@ -636,11 +666,11 @@ bool BuildPlanner::coveredByDetector(TilePosition pos) {
 	return false;
 }
 
-void BuildPlanner::addBuilding(UnitType type){
+void BuildPlanner::addBuilding(const UnitType& type){
 	mBuildOrder.push_back(type);
 }
 
-void BuildPlanner::addBuildingFirst(UnitType type){
+void BuildPlanner::addBuildingFirst(const UnitType& type){
 	mBuildOrder.insert(mBuildOrder.begin(), type);
 }
 
@@ -661,7 +691,7 @@ bool BuildPlanner::isExpansionAvailable() const {
 	return true;
 }
 
-int BuildPlanner::countInProduction(UnitType type) const {
+int BuildPlanner::countInProduction(const UnitType& type) const {
 	int count = 0;
 	
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
@@ -704,4 +734,64 @@ int BuildPlanner::countInProduction(UnitType type) const {
 	}
 
 	return count;
+}
+
+bool BuildPlanner::canUpgrade(const UpgradeType& type, const Unit* unit) const {
+	//1. Check if unit is idle
+	if (!unit->isIdle()) {
+		return false;
+	}
+
+	//2. Check if unit can do this upgrade
+	if (!Broodwar->canUpgrade(unit, type)) {
+		return false;
+	}
+
+	//3. Check if we have enough resources
+	if (!ResourceManager::getInstance()->hasResources(type)) {
+		return false;
+	}
+
+	//4. Check if unit is being constructed
+	if (unit->isBeingConstructed()) {
+		return false;
+	}
+
+	//5. Check if we are currently upgrading it
+	if (Broodwar->self()->isUpgrading(type)) {
+		return false;
+	}
+
+	//All clear. Can do the upgrade.
+	return true;
+}
+
+bool BuildPlanner::canResearch(const TechType& type, const Unit* unit) const {
+	//1. Check if unit can do this upgrade
+	if (!Broodwar->canResearch(unit, type)) {
+		return false;
+	}
+
+	//2. Check if we have enough resources
+	if (!ResourceManager::getInstance()->hasResources(type)) {
+		return false;
+	}
+
+	//3. Check if unit is idle
+	if (!unit->isIdle()) {
+		return false;
+	}
+
+	//4. Check if unit is being constructed
+	if (unit->isBeingConstructed()) {
+		return false;
+	}
+
+	//5. Check if we are currently researching it
+	if (Broodwar->self()->isResearching(type)) {
+		return false;
+	}
+
+	//All clear. Can do the research.
+	return true;
 }

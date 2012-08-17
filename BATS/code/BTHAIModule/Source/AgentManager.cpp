@@ -193,7 +193,7 @@ void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 	if (newAgent->isBuilding())
 	{
 		CoverMap::getInstance()->addConstructedBuilding(newAgent->getUnit());
-		bats::BuildPlanner::getInstance()->unlock(newAgent->getUnit()->getType());
+		bats::BuildPlanner::getInstance()->removeFromQueue(newAgent->getUnit()->getType());
 		ResourceManager::getInstance()->unlockResources(newAgent->getUnit()->getType());
 	}
 }

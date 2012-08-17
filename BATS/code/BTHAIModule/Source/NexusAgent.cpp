@@ -18,7 +18,6 @@ NexusAgent::NexusAgent(Unit* mUnit) : StructureAgent(mUnit)
 		hasSentWorkers = true;
 	}
 	
-	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 }
 
 void NexusAgent::computeActions()

@@ -3,6 +3,9 @@
 #include <BWAPI.h>
 #include "UnitCreator.h"
 
+// Forward declarations
+class ResourceManager;
+
 // Namespace for the project
 namespace bats {
 
@@ -25,8 +28,9 @@ struct BuildItem {
 	BWAPI::TechType tech; /**< None when not tech type */
 	BWAPI::UnitType structure; /**< None when not structure */
 	BWAPI::UpgradeType upgrade; /**< None when not upgrade */
+	int upgradeLevel;
 	int assignedFrame;
-	int assignedWorkerId; /**< Not used for upgrades */
+	int assignedBuildId; /**< Not used for upgrades */
 
 	/**
 	 * Constructor for tech upgrade. Structure and upgrade will be set to None.
@@ -34,7 +38,8 @@ struct BuildItem {
 	 */
 	BuildItem(const BWAPI::TechType& techType) :
 		type(BuildType_Tech), tech(techType), structure(BWAPI::UnitTypes::None),
-		upgrade(BWAPI::UpgradeTypes::None), assignedFrame(0), assignedWorkerId(-1) {
+		upgrade(BWAPI::UpgradeTypes::None), upgradeLevel(0),
+		assignedFrame(0), assignedBuildId(-1) {
 	}
 
 	/**
@@ -43,7 +48,8 @@ struct BuildItem {
 	 */
 	BuildItem(const BWAPI::UnitType& structureType) :
 		type(BuildType_Structure), tech(BWAPI::TechTypes::None), structure(structureType),
-		upgrade(BWAPI::UpgradeTypes::None), assignedFrame(0), assignedWorkerId(-1) {
+		upgrade(BWAPI::UpgradeTypes::None), upgradeLevel(0),
+		assignedFrame(0), assignedBuildId(-1) {
 	}
 
 	/**
@@ -52,8 +58,33 @@ struct BuildItem {
 	 */
 	BuildItem(const BWAPI::UpgradeType& upgradeType) :
 		type(BuildType_Upgrade), tech(BWAPI::TechTypes::None), structure(BWAPI::UnitTypes::None),
-		upgrade(upgradeType), assignedFrame(0), assignedWorkerId(-1) {
+		upgrade(upgradeType), upgradeLevel(1),
+		assignedFrame(0), assignedBuildId(-1) {
 	}
+
+	/**
+	 * Equality operator
+	 * @param rhs the right hand side item
+	 * @return true if both both are the same type (i.e. same structure/tech/upgrade type)
+	 * and additionally for upgrades same upgradeLevel
+	 */
+	bool operator==(const BuildItem& rhs) const {
+		if (type != rhs.type) {
+			return false;
+		}
+
+		switch (type) {
+			case BuildType_Upgrade:
+				return upgrade == upgrade && upgradeLevel == upgradeLevel;
+
+			case BuildType_Tech:
+				return tech == tech;
+
+			case BuildType_Structure:
+				return structure == structure;
+		}
+	}
+
 };
 struct TransitionGraph {
 	std::string early,mid,late;	
@@ -63,6 +94,9 @@ struct TransitionGraph {
  * Manages build orders in three phases: early, mid, and late game.
  * Handles user command "transition"
  * @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
+ * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+ * Added ability to research upgrades and tech.
+ * @todo Add doxygen comments for old code
  */
 class BuildPlanner {
 public:
@@ -98,39 +132,42 @@ public:
 	bool canTransition() const;
 
 	/** Called on user command to switch phase. */
-	void switchToPhase(std::string fileName);
+	void switchToPhase(const std::string& fileName);
 
 	/** Returns the number of units of the specified type currently being produced. */
-	int countInProduction(BWAPI::UnitType type) const;
+	int countInProduction(const BWAPI::UnitType& type) const;
 
 	/** Called each update to issue orders. */
 	void computeActions();
 
 	/** Notifies that an own unit has been destroyed. */
-	void buildingDestroyed(BWAPI::Unit* building);
+	void buildingDestroyed(const BWAPI::Unit* building);
 
 	/** When a request to construct a new building is issued, no construction are
 	 * allowed until the worker has moved to the build spot and started constructing
 	 * the building. This is to avoid that the needed resources are not used up by
 	 * other build orders. During this time the BuildPlanner is locked, and new 
 	 * construction can only be done when unlock has been called. */
-	void unlock(BWAPI::UnitType type);
+	void removeFromQueue(const BWAPI::UnitType& type);
 
 	/** Removes a building from the build order. */
-	void remove(BWAPI::UnitType type);
+	void removeFirstOf(const BWAPI::UnitType& type);
+
+	/**
+	 * Removes the first of the specified item from the build order
+	 * @param item the item to remove from the build order.
+	 */
+	void removeFirstOf(const BuildItem& item);
 
 	/** Called when a worker that is constructing a building is destroyed. */
-	void handleWorkerDestroyed(BWAPI::UnitType type, int workerID);
-
-	/** Sets that a new command center has been built. */
-	void commandCenterBuilt();
+	void handleWorkerDestroyed(const BWAPI::UnitType& type, int workerID);
 
 	/** Shows some debug info on screen. */
 	void printGraphicDebugInfo() const;
 
 	/** Is called when no build spot has been found for the specified type. Gives each build planner
 	 * an opportunity to handle it. */
-	void handleNoBuildspotFound(BWAPI::UnitType toBuild);
+	void handleNoBuildspotFound(const BWAPI::UnitType& toBuild);
 
 	/** Checks if more supply buildings are needed. */
 	bool shallBuildSupply() const;
@@ -140,16 +177,16 @@ public:
 
 	/** Returns true if next in build order is of the specified type. Returns false if
 	 * build order is empty. */
-	bool nextIsOfType(BWAPI::UnitType type) const;
+	bool nextIsOfType(const BWAPI::UnitType& type) const;
 
 	/** Returns true if build order contains a unit of the specified type. */
-	bool containsType(BWAPI::UnitType type) const;
+	bool containsType(const BWAPI::UnitType& type) const;
 
 	/** Adds a building to the build order queue. */
-	void addBuilding(BWAPI::UnitType type);
+	void addBuilding(const BWAPI::UnitType& type);
 
 	/** Adds a building first in the build order queue. */
-	void addBuildingFirst(BWAPI::UnitType type);
+	void addBuildingFirst(const BWAPI::UnitType& type);
 
 	/** Requests to expand the base. */
 	void expand();
@@ -162,10 +199,10 @@ public:
 
 	/** Checks if the specified BWAPI::TilePosition is covered by a detector buildings sight radius.
 	 * @deprecated should not be here */
-	static bool coveredByDetector(BWAPI::TilePosition pos);
+	__declspec(deprecated) static bool coveredByDetector(const BWAPI::TilePosition& pos);
 
 	/** Morphs a Zerg drone to a building. */
-	bool executeMorph(BWAPI::UnitType target, BWAPI::UnitType evolved);
+	bool executeMorph(const BWAPI::UnitType& target, const BWAPI::UnitType& evolved);
 
 	/** Returns true if the player is Terran.
 	 * @deprecated should not be here */
@@ -181,20 +218,23 @@ public:
 
 private:
 	BuildPlanner();
-	void lock(int buildOrderIndex, int unitId);
+	void moveToQueue(int buildOrderIndex, int unitId);
 	bool executeOrder(const BuildItem& type);
 	bool shallBuildSupplyDepot() const;
 	std::string format(const BuildItem& type) const;
 	bool hasResourcesLeft() const;
-	int mineralsNearby(BWAPI::TilePosition center) const;
+	int mineralsNearby(const BWAPI::TilePosition& center) const;
+	bool canUpgrade(const BWAPI::UpgradeType& type, const BWAPI::Unit* unit) const;
+	bool canResearch(const BWAPI::TechType& type, const BWAPI::Unit* unit) const;
 
 	std::vector<BuildItem> mBuildOrder;
 	std::vector<BuildItem> mBuildQueue;
-	int mLastCommandCenter;	/**< @deprecated, don't use */
 	int mLastCallFrame;
 	std::vector<bats::CoreUnit> mCoreUnitsList;
 	std::string mCurrentPhase;	
 
-	static BuildPlanner* instance;
+	ResourceManager* mResourceManager;
+
+	static BuildPlanner* msInstance;
 };
 }

@@ -379,21 +379,24 @@ bool WorkerAgent::areaFree() const
 
 bool WorkerAgent::buildSpotExplored() const
 {
-	int sightDist = 64;
-	if (toBuild.isRefinery())
-	{
-		sightDist = 160; //5 tiles
-	}
+	// Check if it's visible.
+	return Broodwar->isVisible(buildSpot);
 
-	double dist = unit->getPosition().getDistance(Position(buildSpot));
-	//Broodwar->printf("Dist=%d, toReach=%d", (int)dist, sightDist);
-	if (dist > sightDist)
-	{
-		//Broodwar->printf("Not there");
-		return false;
-	}
-	//Broodwar->printf("Arrived");
-	return true;
+	//int sightDist = 64;
+	//if (toBuild.isRefinery())
+	//{
+	//	sightDist = 160; //5 tiles
+	//}
+
+	//double dist = unit->getPosition().getDistance(Position(buildSpot));
+	////Broodwar->printf("Dist=%d, toReach=%d", (int)dist, sightDist);
+	//if (dist > sightDist)
+	//{
+	//	//Broodwar->printf("Not there");
+	//	return false;
+	//}
+	////Broodwar->printf("Arrived");
+	//return true;
 }
 
 WorkerAgent::States WorkerAgent::getState() const

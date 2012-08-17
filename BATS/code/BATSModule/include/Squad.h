@@ -412,7 +412,7 @@ protected:
 	 * instead
 	 * @return current goal state of the squad.
 	 */
-	virtual GoalStates checkGoalState() const {return GoalState_NotCompleted;}
+	__declspec(deprecated) virtual GoalStates checkGoalState() const {return GoalState_NotCompleted;}
 
 	/**
 	 * Called when a new goal shall be created.
@@ -420,21 +420,21 @@ protected:
 	 * updateDerived(), constructor, or somewhere else.
 	 * @returns true a goal was successfully created.
 	 */
-	virtual bool createGoal() {return false;}
+	__declspec(deprecated) virtual bool createGoal() {return false;}
 
 	/**
 	 * Called when a goal fails. Disbands the squad, derive this function if you want to
 	 * create a new repeating goal.
 	 * @deprecated Will be removed in future versions.
 	 */
-	virtual void onGoalFailed();
+	__declspec(deprecated) virtual void onGoalFailed();
 
 	/**
 	 * Called when a goal succeeds. Disbands the squad, derive this function if you want to
 	 * create a new goal repeating goal.
 	 * @deprecated Will be removed in future versions.
 	 */
-	virtual void onGoalSucceeded();
+	__declspec(deprecated) virtual void onGoalSucceeded();
 
 	/**
 	 * Sets the current retreating goal, this will also disable any regrouping functionality

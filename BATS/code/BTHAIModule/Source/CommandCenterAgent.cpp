@@ -21,7 +21,6 @@ CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 	}
 
 	agentType = "CommandCenterAgent";
-	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 
 	if (msResourceCounter == NULL) {
 		msResourceCounter = bats::ResourceCounter::getInstance();

@@ -155,6 +155,9 @@ void BuildOrderFileReader::addBuildOrderItem(string line, vector<BuildItem> &bui
 	else if (utilities::string::startsWith(line, UPGRADE_TYPE_NAME)) {
 		string upgradeName = line.substr(UPGRADE_TYPE_NAME.size());
 		upgradeName = utilities::string::trim(upgradeName);
+
+		/// @todo get an upgrade level (if available)
+
 		const UpgradeType& upgradeType = UpgradeTypes::getUpgradeType(upgradeName);
 		if (upgradeType != UpgradeTypes::Unknown) {
 			buildOrder.push_back(upgradeType);

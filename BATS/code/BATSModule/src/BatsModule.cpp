@@ -266,7 +266,7 @@ void BatsModule::onUnitDiscover(BWAPI::Unit* unit) {
 
 			// Remove from build order if it's a building
 			if (unit->getType().isBuilding()) {
-				BuildPlanner::getInstance()->unlock(unit->getType());
+				BuildPlanner::getInstance()->removeFromQueue(unit->getType());
 			}
 		} else if (isEnemy(unit)) {
 			mExplorationManager->addSpottedUnit(unit);
@@ -343,7 +343,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* unit) {
 		if (isOurs(unit)) {
 			if (BuildPlanner::isZerg()) {
 				mUnitManager->morphDrone(unit);
-				BuildPlanner::getInstance()->unlock(unit->getType());
+				BuildPlanner::getInstance()->removeFromQueue(unit->getType());
 			} else {
 				onUnitDiscover(unit);
 			}

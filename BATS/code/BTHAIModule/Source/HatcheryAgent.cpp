@@ -14,22 +14,21 @@ HatcheryAgent::HatcheryAgent(Unit* mUnit) : StructureAgent(mUnit)
 	hasSentWorkers = false;
 	if (AgentManager::getInstance()->countNoBases() == 0)
 	{
-		//We dont do this for the first Nexus.
+		//We don't do this for the first Nexus.
 		hasSentWorkers = true;
 	}
-	if (mUnit->getType().getID() == UnitTypes::Zerg_Lair.getID())
+	if (mUnit->getType() == UnitTypes::Zerg_Lair)
 	{
-		//Upgrade. Dont send workers.
+		//Upgrade. Don't send workers.
 		hasSentWorkers = true;
 	}
-	if (mUnit->getType().getID() == UnitTypes::Zerg_Hive.getID())
+	if (mUnit->getType() == UnitTypes::Zerg_Hive)
 	{
-		//Upgrade. Dont send workers.
+		//Upgrade. Don't send workers.
 		hasSentWorkers = true;
 	}
 	
 	agentType = "HatcheryAgent";
-	bats::BuildPlanner::getInstance()->commandCenterBuilt();
 }
 
 void HatcheryAgent::computeActions()

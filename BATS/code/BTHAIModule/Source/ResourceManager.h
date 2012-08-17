@@ -52,8 +52,9 @@ public:
 	/** Returns the instance to the BuildPlanner that is currently used. */
 	static ResourceManager* getInstance();
 
-	/** Checks if we need to construct a new worker. */
-	bool needWorker();
+	/** Checks if we need to construct a new worker.
+	 * @deprecated bats::SelfClassifier::areExpansionsSaturated() can be used instead. */
+	__declspec(deprecated) bool needWorker();
 
 	/** Checks if we have enough resources free to build the specified unit. */
 	bool hasResources(BWAPI::UnitType type);
