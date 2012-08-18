@@ -165,6 +165,12 @@ public:
 	/** Returns true if the unit is currently being built */
 	bool isBeingBuilt() const;
 
+	/**
+	 * Checks if the unit has been completed, i.e. not being built
+	 * @return true if the unit has completed
+	 */
+	bool isCompleted() const;
+
 	/** Returns true if this agent can build units of the specified type. */
 	virtual bool canBuild(BWAPI::UnitType type) const;
 

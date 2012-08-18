@@ -19,7 +19,7 @@ Terran_Armory
 Terran_Starport
 Terran_Control_Tower
 TechType: Cloaking_Field
-TechType: Apollo_Reactor
+UpgradeType: Apollo_Reactor
 UpgradeType: Terran_Vehicle_Weapons 2
 UpgradeType: Terran_Vehicle_Plating 1
 

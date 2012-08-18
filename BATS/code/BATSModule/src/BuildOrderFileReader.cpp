@@ -153,16 +153,27 @@ void BuildOrderFileReader::addBuildOrderItem(string line, vector<BuildItem> &bui
 	}
 	// Upgrade
 	else if (utilities::string::startsWith(line, UPGRADE_TYPE_NAME)) {
-		string upgradeName = line.substr(UPGRADE_TYPE_NAME.size());
-		upgradeName = utilities::string::trim(upgradeName);
+		string upgradeLine = line.substr(UPGRADE_TYPE_NAME.size());
+		upgradeLine = utilities::string::trim(upgradeLine);
 
-		/// @todo get an upgrade level (if available)
+		// Get an upgrade level (if available)
+		size_t splitPos = upgradeLine.find_last_of(' ');
 
-		const UpgradeType& upgradeType = UpgradeTypes::getUpgradeType(upgradeName);
-		if (upgradeType != UpgradeTypes::Unknown) {
-			buildOrder.push_back(upgradeType);
+		string upgradeName = upgradeLine.substr(0, splitPos);
+		BuildItem upgrade = UpgradeTypes::getUpgradeType(upgradeName);
+
+		// Found upgrade level, extracting
+		if (splitPos != upgradeLine.npos) {
+			stringstream ss;
+			ss << upgradeLine.substr(splitPos+1);
+			ss >> upgrade.upgradeLevel;
+		}
+
+		
+		if (upgrade.upgrade != UpgradeTypes::Unknown) {
+			buildOrder.push_back(upgrade);
 		} else {
-			ERROR_MESSAGE(false, "BuildOrderFileReader: No matching upgrade found for " << upgradeName);
+			ERROR_MESSAGE(false, "BuildOrderFileReader: No matching upgrade found for " << upgradeLine);
 		}
 	}
 	// Structure

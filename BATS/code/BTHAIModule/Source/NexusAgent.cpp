@@ -33,8 +33,8 @@ void NexusAgent::computeActions()
 
 			if (AgentManager::getInstance()->countNoUnits(UnitTypes::Protoss_Forge) > 0)
 			{
-				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Pylon);
-				bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Protoss_Photon_Cannon);
+				bats::BuildPlanner::getInstance()->addItemFirst(UnitTypes::Protoss_Pylon);
+				bats::BuildPlanner::getInstance()->addItemFirst(UnitTypes::Protoss_Photon_Cannon);
 			}
 		}
 	}

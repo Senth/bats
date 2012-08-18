@@ -4,7 +4,6 @@
 #include "BatsModule/include/ExplorationManager.h"
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/DefenseManager.h"
-#include "UpgradesPlanner.h"
 #include "WorkerAgent.h"
 #include "ResourceManager.h"
 
@@ -128,11 +127,6 @@ void StructureAgent::computeActions()
 		handleUnderAttack();
 
 		if (!unit->isIdle())
-		{
-			return;
-		}
-
-		if (UpgradesPlanner::getInstance()->checkUpgrade(this))
 		{
 			return;
 		}

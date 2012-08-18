@@ -40,7 +40,7 @@ void CommandCenterAgent::computeActions()
 
 	if (!mHasSentWorkers)
 	{
-		if (isBeingBuilt())
+		if (isCompleted())
 		{
 			sendWorkers();
 			mHasSentWorkers = true;

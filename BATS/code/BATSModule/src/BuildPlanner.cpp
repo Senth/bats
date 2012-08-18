@@ -93,61 +93,81 @@ void BuildPlanner::switchToPhase(const std::string& fileName){
 }
 
 void BuildPlanner::buildingDestroyed(const Unit* building){
-	if (building->getType() == UnitTypes::Protoss_Pylon)
-	{
-		return;
+	bool readdUnit = true;
+
+	if (building->getType() == UnitTypes::Protoss_Pylon) {
+		readdUnit = false;
 	}
-	if (building->getType() == UnitTypes::Terran_Supply_Depot)
-	{
-		return;
+	else if (building->getType() == UnitTypes::Terran_Supply_Depot) {
+		readdUnit = false;
 	}
-	if (building->getType().isAddon())
-	{
+	else if (building->getType().isAddon()) {
 		/// @todo add addons here later
-		return;
+		readdUnit = false;;
 	}
-	addBuildingFirst(building->getType());
+
+	if (readdUnit) {
+		addItemFirst(building->getType());
+	}
+
+	
+	// Check if the building was upgrading something?
+	bool found = false;
+	size_t i = 0;
+	while(!found && i < mBuildQueue.size()) {
+		if (mBuildQueue[i].assignedBuilderId == building->getID()) {
+			mBuildQueue[i].assignedBuilderId = -1;
+			mBuildQueue[i].assignedFrame = 0;
+			addItemFirst(mBuildQueue[i]);
+			mBuildQueue.erase(mBuildQueue.begin() + i);
+			found = true;
+		}
+		++i;
+	}
 }
 
 void BuildPlanner::computeActions(){
 	//Don't call too often
 	int cFrame = Broodwar->getFrameCount();
-	if (cFrame - mLastCallFrame < 30)
-	{
+	// @todo config variable
+	if (cFrame - mLastCallFrame < 30) {
 		return;
 	}
 	mLastCallFrame = cFrame;
 
-	if (AgentManager::getInstance()->getWorkerCount() == 0)
-	{
-		//No workers so cant do anything
-		return;
-	}
+	checkUpgradeDone();
 
-	//Check if we have possible "locked" items in the build queue
-	for (size_t i = 0; i < mBuildQueue.size(); i++)
-	{
-		int elapsed = cFrame - mBuildQueue.at(i).assignedFrame;
-		if (elapsed >= 2000)
-		{
-			//Reset the build request
-			WorkerAgent* worker = (WorkerAgent*)AgentManager::getInstance()->getAgent(mBuildQueue.at(i).assignedBuildId);
-			if (worker != NULL)
-			{
-				worker->reset();
+	// We can do something even without workers as we have addons and upgrades.
+	//if (AgentManager::getInstance()->getWorkerCount() == 0)
+	//{
+	//	//No workers so cant do anything
+	//	return;
+	//}
+
+	//Check if we have possible "locked" buildings in the build queue
+	for (size_t i = 0; i < mBuildQueue.size(); i++) {
+		if (mBuildQueue[i].type == BuildType_Structure) {
+			int elapsed = cFrame - mBuildQueue[i].assignedFrame;
+			/// @todo config variable
+			if (elapsed >= 700) {
+				//Reset the build request
+				WorkerAgent* worker = dynamic_cast<WorkerAgent*>(AgentManager::getInstance()->getAgent(mBuildQueue[i].assignedBuilderId));
+				if (worker != NULL) {
+					worker->reset();
+				}
+				addItemFirst(mBuildQueue[i].structure);
+				mResourceManager->unlockResources(mBuildQueue[i].structure);
+				mBuildQueue.erase(mBuildQueue.begin() + i);
+				return;
 			}
-			mBuildOrder.insert(mBuildOrder.begin(), mBuildQueue.at(i).structure);
-			mResourceManager->unlockResources(mBuildQueue.at(i).structure);
-			mBuildQueue.erase(mBuildQueue.begin() + i);
-			return;
 		}
 	}
 
 	//Check if we can build next building in the build order
-	if (mBuildOrder.size() > 0)
+	if (!mBuildOrder.empty())
 	{
 		// @todo check with unitcreator ?
-		executeOrder(mBuildOrder.at(0));
+		executeOrder(mBuildOrder.front());
 	}
 
 	//Check if we need more supply buildings
@@ -155,15 +175,9 @@ void BuildPlanner::computeActions(){
 	{
 		if (shallBuildSupply())
 		{
-			mBuildOrder.insert(mBuildOrder.begin(), Broodwar->self()->getRace().getSupplyProvider());
+			addItemFirst(Broodwar->self()->getRace().getSupplyProvider());
 		}
 	}
-
-	// Commander checks if we should expand
-	//if (!hasResourcesLeft())
-	//{
-	//	expand();
-	//}
 }
 
 bool BuildPlanner::hasResourcesLeft() const{
@@ -207,7 +221,7 @@ int BuildPlanner::mineralsNearby(const TilePosition& center) const{
 bool BuildPlanner::shallBuildSupply() const{
 	UnitType supply = Broodwar->self()->getRace().getSupplyProvider();
 
-	//1. If command center is next in queue, dont build pylon
+	//1. If command center is next in queue, don't build pylon
 	/*if (buildOrder.size() > 0)
 	{
 		if (buildOrder.at(0).isResourceDepot())
@@ -322,7 +336,7 @@ void BuildPlanner::moveToQueue(int buildOrderIndex, int builderId){
 	BuildItem item = mBuildOrder.at(buildOrderIndex);
 	mBuildOrder.erase(mBuildOrder.begin() + buildOrderIndex);
 
-	item.assignedBuildId = builderId;
+	item.assignedBuilderId = builderId;
 	item.assignedFrame = Broodwar->getFrameCount();
 
 	mBuildQueue.push_back(item);
@@ -358,10 +372,10 @@ void BuildPlanner::removeFromQueue(const UnitType& type){
 void BuildPlanner::handleWorkerDestroyed(const UnitType& type, int workerID){
 	for (size_t i = 0; i < mBuildQueue.size(); i++)
 	{
-		if (mBuildQueue.at(i).assignedBuildId == workerID)
+		if (mBuildQueue.at(i).assignedBuilderId == workerID)
 		{
 			mBuildQueue.erase(mBuildQueue.begin() + i);
-			mBuildOrder.insert(mBuildOrder.begin(), type);
+			addItemFirst(type);
 			mResourceManager->unlockResources(type);
 		}
 	}
@@ -391,14 +405,24 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 	switch (item.type) {
 	case BuildType_Tech:
 		if (mResourceManager->hasResources(item.tech)) {
-			// Do we already have this tech upgrade?
+			// Remove tech upgrade from build order if we have it already
 			if (Broodwar->self()->hasResearched(item.tech)) {
 				removeFirstOf(item);
 			}
 
+			// Find a agent that can build the upgrade
 			const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
 			for (size_t i = 0; i < agents.size(); ++i) {
-				
+				if (canResearch(item.tech, agents[i]->getUnit())) {
+					bool researchOk = agents[i]->getUnit()->research(item.tech);
+					if (researchOk) {
+						moveToQueue(0, agents[i]->getUnitID());
+					} else {
+						DEBUG_MESSAGE(utilities::LogLevel_Warning, "Failed to order research for " <<
+							item.tech.getName()
+						);
+					}
+				}
 			}
 		}
 		break;
@@ -407,11 +431,24 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 	case BuildType_Upgrade:
 		if (mResourceManager->hasResources(item.upgrade)) {
 			// Do we already have this upgrade?
-			if (Broodwar->self()->getUpgradeLevel(item.upgrade) <= item.upgradeLevel) {
+			if (Broodwar->self()->getUpgradeLevel(item.upgrade) >= item.upgradeLevel) {
 				removeFirstOf(item);
 			}
 
-			/// @todo
+			// Find a agent that can build the upgrade
+			const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+			for (size_t i = 0; i < agents.size(); ++i) {
+				if (canUpgrade(item.upgrade, agents[i]->getUnit())) {
+					bool upgradeOk = agents[i]->getUnit()->upgrade(item.upgrade);
+					if (upgradeOk) {
+						moveToQueue(0, agents[i]->getUnitID());
+					} else {
+						DEBUG_MESSAGE(utilities::LogLevel_Warning, "Failed to order research for " <<
+							item.upgrade.getName()
+						);
+					}
+				}
+			}
 		}
 		break;
 
@@ -423,6 +460,12 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		//if (mBuildQueue.size() >= 3) {
 		//	return false;
 		//}
+		
+		/// @todo Remove when BuildPlanner can handle addons
+		if (item.structure.isAddon()) {
+			removeFirstOf(item);
+			return false;
+		}
 
 		//Hold if we are to build a new base
 		if (!mBuildQueue.empty()) {
@@ -503,6 +546,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		break;
 
 	}
+
 	return false;
 }
 
@@ -531,7 +575,7 @@ void BuildPlanner::addRefinery(){
 	UnitType refinery = Broodwar->self()->getRace().getRefinery();
 
 	if (!this->nextIsOfType(refinery)){
-		mBuildOrder.insert(mBuildOrder.begin(), refinery);
+		addItemFirst(refinery);
 	}
 }
 
@@ -547,7 +591,8 @@ string BuildPlanner::format(const BuildItem& item) const{
 			break;
 
 		case BuildType_Upgrade:
-			name = item.upgrade.getName();
+			name = item.upgrade.getName() + " ";
+			name += item.upgradeLevel;
 			break;
 
 		default:
@@ -562,16 +607,14 @@ string BuildPlanner::format(const BuildItem& item) const{
 void BuildPlanner::printGraphicDebugInfo() const {
 	/// @todo add debug module and config from config.h
 	size_t max = 4;
-	if (mBuildOrder.size() < 4)
-	{
+	if (mBuildOrder.size() < 4) {
 		max = mBuildOrder.size();
 	}
 
 	int line = 1;
 	Broodwar->drawTextScreen(5,0,"Buildorder:");
-	for (size_t i = 0; i < max; i++)
-	{
-		Broodwar->drawTextScreen(5,16*line, format(mBuildOrder.at(i)).c_str());
+	for (size_t i = 0; i < max; i++) {
+		Broodwar->drawTextScreen(5,16*line, format(mBuildOrder[i]).c_str());
 		line++;
 	}
 
@@ -583,9 +626,8 @@ void BuildPlanner::printGraphicDebugInfo() const {
 
 	line = 1;
 	Broodwar->drawTextScreen(150,0,"Buildqueue:");
-	for (size_t i = 0; i < qmax; i++)
-	{
-		Broodwar->drawTextScreen(150,16*line, format(mBuildQueue.at(i).structure).c_str());
+	for (size_t i = 0; i < qmax; i++) {
+		Broodwar->drawTextScreen(150,16*line, format(mBuildQueue[i]).c_str());
 		line++;
 	}
 }
@@ -612,24 +654,28 @@ void BuildPlanner::handleNoBuildspotFound(const UnitType& toBuild){
 			//Insert a pylon to increase PSI coverage
 			if (!nextIsOfType(UnitTypes::Protoss_Pylon))
 			{
-				mBuildOrder.insert(mBuildOrder.begin(), UnitTypes::Protoss_Pylon);
+				addItemFirst(UnitTypes::Protoss_Pylon);
 			}
 		}
 	}
 }
 
 bool BuildPlanner::nextIsOfType(const UnitType& type) const {
-	if (mBuildOrder.empty())
-	{
+	if (mBuildOrder.empty()) {
 		return false;
-	}
-	else
-	{
-		if (mBuildOrder[0].structure == type)
-		{
-			return true;
+	} else {
+		UnitType supplyType = Broodwar->self()->getRace().getSupplyProvider();
+		// Check first
+		if (type == supplyType || mBuildOrder.front().structure != supplyType) {
+			return mBuildOrder.front().structure == type;
+		}
+		// Check second
+		else if (mBuildOrder.size() >= 2) {
+			return mBuildOrder[1].structure == type;
 		}
 	}
+
+
 	return false;
 }
 
@@ -670,15 +716,27 @@ void BuildPlanner::addBuilding(const UnitType& type){
 	mBuildOrder.push_back(type);
 }
 
-void BuildPlanner::addBuildingFirst(const UnitType& type){
-	mBuildOrder.insert(mBuildOrder.begin(), type);
+void BuildPlanner::addItemFirst(const BuildItem& item){
+	bool addFirst = false;
+	UnitType supplyType = Broodwar->self()->getRace().getSupplyProvider();
+	if (item.structure == supplyType || mBuildOrder.empty() || mBuildOrder.front() != supplyType) {
+		addFirst = true;
+	}
+
+	if (addFirst) {
+		mBuildOrder.insert(mBuildOrder.begin(), item);
+	}
+	// Else add second
+	else {
+		mBuildOrder.insert(mBuildOrder.begin()+1, item);
+	}
 }
 
 void BuildPlanner::expand(){
 	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
 	if (pos != TilePositions::Invalid)
 	{
-		mBuildOrder.insert(mBuildOrder.begin(), Broodwar->self()->getRace().getCenter());
+		addItemFirst(Broodwar->self()->getRace().getCenter());
 	}
 }
 
@@ -794,4 +852,26 @@ bool BuildPlanner::canResearch(const TechType& type, const Unit* unit) const {
 
 	//All clear. Can do the research.
 	return true;
+}
+
+void BuildPlanner::checkUpgradeDone() {
+	vector<BuildItem>::iterator queueIt = mBuildQueue.begin();
+	while (queueIt != mBuildQueue.end()) {
+		bool erase = false;
+		if (queueIt->type == BuildType_Tech) {
+			if (Broodwar->self()->hasResearched(queueIt->tech)) {
+				erase = true;
+			}
+		} else if (queueIt->type == BuildType_Upgrade) {
+			if (Broodwar->self()->getUpgradeLevel(queueIt->upgrade) >= queueIt->upgradeLevel) {
+				erase = true;
+			}
+		}
+
+		if (erase) {
+			queueIt = mBuildQueue.erase(queueIt);
+		} else {
+			++queueIt;
+		}
+	}
 }

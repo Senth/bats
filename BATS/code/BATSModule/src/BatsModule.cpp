@@ -18,7 +18,6 @@
 #include "BTHAIModule/Source/AgentManager.h"
 #include "BTHAIModule/Source/CoverMap.h"
 #include "BTHAIModule/Source/PathFinder.h"
-#include "BTHAIModule/Source/UpgradesPlanner.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "BTHAIModule/Source/Profiler.h"
 #include "Utilities/Helper.h"
@@ -202,8 +201,15 @@ void BatsModule::onSendText(std::string text) {
 		Broodwar->setLocalSpeed(speed);
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Global speed set to: " << speed);
 		Broodwar->sendText(text.c_str());
-	} else if (text == "test") {
-		// Test something
+	} else if (utilities::string::startsWith(text, "test")) {
+		std::string value = text.substr(5);
+
+		// Test something, this code below can be changed freely by whomever 
+		if (value == "supply") {
+			BuildPlanner::getInstance()->addItemFirst(UnitTypes::Terran_Supply_Depot);
+		} else if (value == "academy") {
+			BuildPlanner::getInstance()->addItemFirst(UnitTypes::Terran_Academy);
+		}
 	} else {
 		// Default behavior
 		Broodwar->sendText(text.c_str());
@@ -427,7 +433,6 @@ void BatsModule::initGameClasses() {
 	CoverMap::getInstance();
 	BuildPlanner::getInstance();
 	UnitCreator::getInstance();
-	UpgradesPlanner::getInstance();
 	ResourceManager::getInstance();
 	Pathfinder::getInstance();
 	mExplorationManager = ExplorationManager::getInstance();
@@ -443,7 +448,6 @@ void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mExplorationManager);
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
-	delete UpgradesPlanner::getInstance();
 	delete BuildPlanner::getInstance();
 	delete CoverMap::getInstance();
 	SAFE_DELETE(mCommander);

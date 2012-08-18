@@ -245,12 +245,6 @@
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UpgradesFileReader.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UpgradesPlanner.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Statistics.cpp">
       <Filter>Source Files\Statistics</Filter>
     </ClCompile>
@@ -443,12 +437,6 @@
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Source\ResourceManager.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UpgradesFileReader.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UpgradesPlanner.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="source\Statistics.h">

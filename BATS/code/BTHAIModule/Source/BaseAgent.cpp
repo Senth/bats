@@ -56,6 +56,10 @@ bool BaseAgent::isBeingBuilt() const {
 	return !unit->isCompleted();
 }
 
+bool BaseAgent::isCompleted() const {
+	return unit->isCompleted();
+}
+
 int BaseAgent::getUnitID() const
 {
 	return unitID;

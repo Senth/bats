@@ -223,8 +223,6 @@
     <ClCompile Include="Source\AgentManager.cpp" />
     <ClCompile Include="Source\MapDataReader.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\UpgradesFileReader.cpp" />
-    <ClCompile Include="Source\UpgradesPlanner.cpp" />
     <ClCompile Include="Source\Statistics.cpp" />
     <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\cthread.cpp" />
@@ -290,8 +288,6 @@
     <ClInclude Include="Source\AgentManager.h" />
     <ClInclude Include="Source\MapDataReader.h" />
     <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\UpgradesFileReader.h" />
-    <ClInclude Include="Source\UpgradesPlanner.h" />
     <ClInclude Include="source\Statistics.h" />
     <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\cthread.h" />

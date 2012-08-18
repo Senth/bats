@@ -3,7 +3,6 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "CoverMap.h"
 #include "Pathfinder.h"
-#include "UpgradesPlanner.h"
 #include "ResourceManager.h"
 #include "Statistics.h"
 #include "Profiler.h"

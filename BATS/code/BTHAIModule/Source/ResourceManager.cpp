@@ -97,8 +97,7 @@ bool ResourceManager::hasResources(UnitType type)
 	int nMinerals = type.mineralPrice();
 	int nGas = type.gasPrice();
 
-	if (type.isBuilding())
-	{
+	if (type.isBuilding()) {
 		/*if (hasProductionBuilding())
 		{
 			nMinerals += 150;
@@ -109,8 +108,8 @@ bool ResourceManager::hasResources(UnitType type)
 		}*/
 		//if (hasProductionBuilding())
 			//nMinerals += 100;
-		if(isProductionBuildingsIdle())
-			return false;
+		//if(isProductionBuildingsIdle())
+		//	return false;
 	}
 
 	return hasResources(nMinerals, nGas);

@@ -68,7 +68,7 @@ BaseAgent* AgentManager::getAgent(int unitID)
 {
 	BaseAgent* agent = NULL;
 
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->getUnitID() == unitID)
 		{
@@ -82,7 +82,7 @@ BaseAgent* AgentManager::getAgent(int unitID)
 
 void AgentManager::requestOverlord(TilePosition pos)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isOfType(UnitTypes::Zerg_Overlord) && mAgents.at(i)->isAlive())
 		{
@@ -97,7 +97,7 @@ void AgentManager::requestOverlord(TilePosition pos)
 
 BaseAgent* AgentManager::getAgent(UnitType type)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isOfType(type) && mAgents.at(i)->isAlive())
 		{
@@ -112,7 +112,7 @@ BaseAgent* AgentManager::getClosestBase(TilePosition pos)
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
 
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->getUnitType().isResourceDepot() && mAgents.at(i)->isAlive())
 		{
@@ -200,7 +200,7 @@ void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 
 void AgentManager::removeAgent(Unit* unit)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents[i]->matches(unit))
 		{
@@ -224,7 +224,7 @@ void AgentManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 
 void AgentManager::morphDrone(Unit* unit)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->matches(unit))
 		{
@@ -245,7 +245,7 @@ void AgentManager::cleanup()
 	//Step 1. Check if any agent is under attack. If so, dont cleanup since
 	//it might cause a Nullpointer.
 	//Seems to work now
-	/*for (int i = 0; i < (int)agents.size(); i++)
+	/*for (size_t i = 0; i < agents.size(); i++)
 	{
 		if (agents.at(i)->isUnderAttack())
 		{
@@ -255,8 +255,8 @@ void AgentManager::cleanup()
 
 	//Step 2. Do the cleanup.
 	int cnt = 0;
-	int oldSize = (int)mAgents.size();
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	//size_t oldSize = mAgents.size();
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (!mAgents.at(i)->isAlive())
 		{
@@ -266,7 +266,7 @@ void AgentManager::cleanup()
 			i--;
 		}
 	}
-	int newSize = (int)mAgents.size();
+	//size_t newSize = mAgents.size();
 }
 
 void AgentManager::computeActions()
@@ -304,7 +304,7 @@ void AgentManager::computeActions()
 int AgentManager::getWorkerCount() const
 {
 	int wCnt = 0;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		BaseAgent* agent = mAgents.at(i);
 		if (agent != NULL && agent->isWorker() && agent->isAlive())
@@ -318,7 +318,7 @@ int AgentManager::getWorkerCount() const
 int AgentManager::getMiningWorkerCount() const
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		BaseAgent* agent = mAgents.at(i);
 		if (agent->isWorker() && agent->isAlive())
@@ -339,7 +339,7 @@ BaseAgent* AgentManager::findClosestFreeWorker(TilePosition pos)
 	double bestDist = 10000;
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (int i = 0; i < (int)agents.size(); i++)
+	for (size_t i = 0; i < agents.size(); i++)
 	{
 		if (agents.at(i)->isFreeWorker())
 		{
@@ -356,7 +356,7 @@ BaseAgent* AgentManager::findClosestFreeWorker(TilePosition pos)
 
 bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		BaseAgent* agent = mAgents.at(i);
 		if (agent->isAlive() && agent->isWorker())
@@ -375,7 +375,7 @@ bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
 int AgentManager::noInProduction(UnitType type)
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isAlive())
 		{
@@ -391,7 +391,7 @@ int AgentManager::noInProduction(UnitType type)
 int AgentManager::countNoUnits(UnitType type)
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isAlive())
 		{
@@ -407,7 +407,7 @@ int AgentManager::countNoUnits(UnitType type)
 int AgentManager::countNoBases()
 {
 	int cnt = 0;
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isAlive())
 		{
@@ -422,7 +422,7 @@ int AgentManager::countNoBases()
 
 bool AgentManager::unitsInArea(TilePosition pos, int tileWidth, int tileHeight, int unitID)
 {
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		if (mAgents.at(i)->isAlive())
 		{
@@ -444,7 +444,7 @@ TilePosition AgentManager::getClosestDetector(TilePosition startPos)
 	TilePosition pos = TilePositions::Invalid;
 	double bestDist = 10000;
 
-	for (int i = 0; i < (int)mAgents.size(); i++)
+	for (size_t i = 0; i < mAgents.size(); i++)
 	{
 		BaseAgent* agent = mAgents.at(i);
 		if (agent->isAlive())

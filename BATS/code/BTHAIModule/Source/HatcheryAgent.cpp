@@ -3,7 +3,6 @@
 #include "WorkerAgent.h"
 #include "PFManager.h"
 #include "BatsModule/include/BuildPlanner.h"
-#include "UpgradesPlanner.h"
 #include "ResourceManager.h"
 
 using namespace BWAPI;
@@ -111,10 +110,6 @@ void HatcheryAgent::computeActions()
 			}
 		}
 	}
-	
-
-	//Check for upgrades
-	UpgradesPlanner::getInstance()->checkUpgrade(this);
 }
 
 bool HatcheryAgent::checkBuildUnit(UnitType type)

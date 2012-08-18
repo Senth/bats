@@ -30,7 +30,7 @@ struct BuildItem {
 	BWAPI::UpgradeType upgrade; /**< None when not upgrade */
 	int upgradeLevel;
 	int assignedFrame;
-	int assignedBuildId; /**< Not used for upgrades */
+	int assignedBuilderId; /**< Not used for upgrades */
 
 	/**
 	 * Constructor for tech upgrade. Structure and upgrade will be set to None.
@@ -39,7 +39,7 @@ struct BuildItem {
 	BuildItem(const BWAPI::TechType& techType) :
 		type(BuildType_Tech), tech(techType), structure(BWAPI::UnitTypes::None),
 		upgrade(BWAPI::UpgradeTypes::None), upgradeLevel(0),
-		assignedFrame(0), assignedBuildId(-1) {
+		assignedFrame(0), assignedBuilderId(-1) {
 	}
 
 	/**
@@ -49,7 +49,7 @@ struct BuildItem {
 	BuildItem(const BWAPI::UnitType& structureType) :
 		type(BuildType_Structure), tech(BWAPI::TechTypes::None), structure(structureType),
 		upgrade(BWAPI::UpgradeTypes::None), upgradeLevel(0),
-		assignedFrame(0), assignedBuildId(-1) {
+		assignedFrame(0), assignedBuilderId(-1) {
 	}
 
 	/**
@@ -59,13 +59,13 @@ struct BuildItem {
 	BuildItem(const BWAPI::UpgradeType& upgradeType) :
 		type(BuildType_Upgrade), tech(BWAPI::TechTypes::None), structure(BWAPI::UnitTypes::None),
 		upgrade(upgradeType), upgradeLevel(1),
-		assignedFrame(0), assignedBuildId(-1) {
+		assignedFrame(0), assignedBuilderId(-1) {
 	}
 
 	/**
 	 * Equality operator
 	 * @param rhs the right hand side item
-	 * @return true if both both are the same type (i.e. same structure/tech/upgrade type)
+	 * @return true if both items are the same type (i.e. same structure/tech/upgrade type)
 	 * and additionally for upgrades same upgradeLevel
 	 */
 	bool operator==(const BuildItem& rhs) const {
@@ -82,7 +82,19 @@ struct BuildItem {
 
 			case BuildType_Structure:
 				return structure == structure;
+
+			default:
+				return false;
 		}
+	}
+
+	/**
+	 * Inequality operator
+	 * @param rhs the right hand side item
+	 * @return true if the items are unequal to each other.
+	 */
+	bool operator!=(const BuildItem rhs) const {
+		return !operator==(rhs);
 	}
 
 };
@@ -175,8 +187,12 @@ public:
 	/** Checks if a supply is under construction. */
 	bool supplyBeingBuilt() const;
 
-	/** Returns true if next in build order is of the specified type. Returns false if
-	 * build order is empty. */
+	/**
+	 * Checks if the next structure in the build order is of this type.
+	 * @param type the type to check for. If type is not a supply provider and a supply
+	 * provider is first it will check the second element in the build order instead.
+	 * @return true if type is next in the build order
+	 */
 	bool nextIsOfType(const BWAPI::UnitType& type) const;
 
 	/** Returns true if build order contains a unit of the specified type. */
@@ -185,8 +201,13 @@ public:
 	/** Adds a building to the build order queue. */
 	void addBuilding(const BWAPI::UnitType& type);
 
-	/** Adds a building first in the build order queue. */
-	void addBuildingFirst(const BWAPI::UnitType& type);
+	/**
+	 * Adds an build item first, or second in the building queue. Supply depots are
+	 * always added first and if a supply depot already is first the item will
+	 * be added just after the supply depot.
+	 * @param item the item to build or research.
+	 */
+	void addItemFirst(const BuildItem& item);
 
 	/** Requests to expand the base. */
 	void expand();
@@ -218,6 +239,11 @@ public:
 
 private:
 	BuildPlanner();
+	/**
+	 * @todo rework moveToQueue, a bit dangerous use at the moment when executing from
+	 * executeOrder() as we don't know the index we just assume its 0. Better
+	 * would be to move an BuildItem and then search for it instead.
+	 */
 	void moveToQueue(int buildOrderIndex, int unitId);
 	bool executeOrder(const BuildItem& type);
 	bool shallBuildSupplyDepot() const;
@@ -226,6 +252,12 @@ private:
 	int mineralsNearby(const BWAPI::TilePosition& center) const;
 	bool canUpgrade(const BWAPI::UpgradeType& type, const BWAPI::Unit* unit) const;
 	bool canResearch(const BWAPI::TechType& type, const BWAPI::Unit* unit) const;
+
+	/**
+	 * Checks if an upgrade or tech upgrade has been completed and was ordered
+	 * to upgrade. If so, it removes it from the build queue.
+	 */
+	void checkUpgradeDone();
 
 	std::vector<BuildItem> mBuildOrder;
 	std::vector<BuildItem> mBuildQueue;

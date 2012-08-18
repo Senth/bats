@@ -1,5 +1,4 @@
 #include "TerranProductionBuilding.h"
-#include "BTHAIModule/Source/UpgradesPlanner.h"
 #include "BuildPlanner.h"
 #include "Utilities/Logger.h"
 
@@ -19,9 +18,20 @@ void TerranProductionBuilding::computeActions(){
 		if (!unit->isIdle()){
 			return;
 		}
-		if (UpgradesPlanner::getInstance()->checkUpgrade(this)){
-			return;
+
+		if (isOfType(UnitTypes::Terran_Starport)){
+			if (unit->getAddon() == NULL){
+				unit->buildAddon(UnitTypes::Terran_Control_Tower);
+				return;
+			}
 		}
+		if (isOfType(UnitTypes::Terran_Factory)){
+			if (unit->getAddon() == NULL){
+				unit->buildAddon(UnitTypes::Terran_Machine_Shop);
+				return;
+			}
+		}
+
 		if (!unit->isBeingConstructed() && unit->isIdle() && getUnit()->getType().canProduce()){
 			if(!UnitCreator::sLockForQueue){			
 				UnitType toBuild = UnitCreator::getInstance()->getNextProducableUnit(unit);
@@ -33,15 +43,6 @@ void TerranProductionBuilding::computeActions(){
 				}
 			}
 		}
-		if (isOfType(UnitTypes::Terran_Starport)){
-			if (unit->getAddon() == NULL){
-				unit->buildAddon(UnitTypes::Terran_Control_Tower);
-			}
-		}
-		if (isOfType(UnitTypes::Terran_Factory)){
-			if (unit->getAddon() == NULL){
-				unit->buildAddon(UnitTypes::Terran_Machine_Shop);
-			}
-		}
+
 	}
 }
