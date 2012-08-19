@@ -2,10 +2,12 @@
 #include "AgentManager.h"
 #include "BaseAgent.h"
 #include "BWTAExtern.h"
+#include "Profiler.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ExplorationManager.h"
 #include "BatsModule/include/Config.h"
-#include "Profiler.h"
+#include "BatsModule/include/Helper.h"
+#include "utilities/Logger.h"
 #include <cassert>
 #include <BWTA.h>
 #include <BWAPI/Game.h>
@@ -52,18 +54,21 @@ CoverMap* CoverMap::getInstance()
 }
 
 void CoverMap::initCoverMap() {
-	mCoverMap = new int*[mMapWidth];
+	mCoverMap = new TileStates*[mMapWidth];
 	for(int x = 0 ; x < mMapWidth ; x++) {
-		mCoverMap[x] = new int[mMapHeight];
+		mCoverMap[x] = new TileStates[mMapHeight];
+	}
 
-		//Fill from static map and Region connectability
+	// Fill from static map, if the region is ok or not.
+	for(int x = 0 ; x < mMapWidth ; x++) {
 		for (int y = 0; y < mMapHeight; y++) {
-			int ok = TileState_Buildable;
-			if (!Broodwar->isBuildable(x, y)) {
-				ok = TileState_Blocked;
+			if (Broodwar->isBuildable(x, y)) {
+				mCoverMap[x][y] = TileState_Buildable;
+			} else {
+				// Pad outwards so that we don't get small spaces
+				Corners corner(TilePosition(x, y), 1);
+				fill(corner, TileState_Blocked);
 			}
-
-			mCoverMap[x][y] = ok;
 		}
 	}
 
@@ -80,27 +85,26 @@ void CoverMap::initCoverMap() {
 
 	//Fill from minerals
 	for(set<Unit*>::iterator mineralIt = Broodwar->getMinerals().begin(); mineralIt != Broodwar->getMinerals().end(); ++mineralIt) {
-		Corners c;
-		c.x1 = (*mineralIt)->getTilePosition().x() - 1;
-		c.y1 = (*mineralIt)->getTilePosition().y() - 1;
-		c.x2 = (*mineralIt)->getTilePosition().x() + 2;
-		c.y2 = (*mineralIt)->getTilePosition().y() + 1;
-		fill(c);
-
-		mCoverMap[c.x1+2][c.y1+2] = TileState_Mineral;
+		Corners corners;
+		const TilePosition& mineralPos = (*mineralIt)->getTilePosition();
+		corners.x1 = mineralPos.x() - 1;
+		corners.y1 = mineralPos.y() - 1;
+		corners.x2 = mineralPos.x() + 2;
+		corners.y2 = mineralPos.y() + 1;
+		fill(corners, TileState_Mineral);
 	}
 
 	//Fill from gas
-	for(set<Unit*>::iterator mineralIt = Broodwar->getGeysers().begin(); mineralIt != Broodwar->getGeysers().end(); ++mineralIt)
+	for(set<Unit*>::iterator gasIt = Broodwar->getGeysers().begin(); gasIt != Broodwar->getGeysers().end(); ++gasIt)
 	{
-		Corners c;
-		c.x1 = (*mineralIt)->getTilePosition().x() - 1;
-		c.y1 = (*mineralIt)->getTilePosition().y() - 1;
-		c.x2 = (*mineralIt)->getTilePosition().x() + 4;
-		c.y2 = (*mineralIt)->getTilePosition().y() + 2;
-		fill(c);
-
-		mCoverMap[c.x1+2][c.y1+2] = TileState_Gas;
+		Corners corners;
+		const TilePosition& gasPos = (*gasIt)->getTilePosition();
+		corners.x1 = gasPos.x() - 1;
+		corners.y1 = gasPos.y() - 1;
+		corners.x2 = gasPos.x() + 4;
+		corners.y2 = gasPos.y() + 2;
+		fill(corners, TileState_Blocked);
+		mCoverMap[gasPos.x()][gasPos.y()] = TileState_Gas;
 	}
 
 	
@@ -282,7 +286,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 	if (toBuild.isRefinery())
 	{
 		//Use refinery method
-		return findRefineryBuildSpot(toBuild, Broodwar->self()->getStartLocation());
+		return findRefineryBuildSpot();
 	}
 
 	//If we find unpowered buildings, build a Pylon there
@@ -792,24 +796,23 @@ Corners CoverMap::getCorners(const UnitType& type, const TilePosition& center) c
 	return c;
 }
 
-TilePosition CoverMap::findRefineryBuildSpot(const UnitType& toBuild, const TilePosition& start) const
-{
-	TilePosition buildSpot = findClosestGasWithoutRefinery(toBuild, start);
-	if (buildSpot != TilePositions::Invalid)
-	{
+TilePosition CoverMap::findRefineryBuildSpot() const {
+	TilePosition buildSpot = findClosestGasWithoutRefinery();
+	if (buildSpot != TilePositions::Invalid) {
 		BaseAgent* base = AgentManager::getInstance()->getClosestBase(buildSpot);
-		if (base == NULL)
-		{
-			Broodwar->printf("No base found");
-			return TilePosition(-1,-1);
+		if (base == NULL) {
+			DEBUG_MESSAGE(utilities::LogLevel_Warning, "CoverMap::findRefineryBuildSpot(): No base found!");
+			return TilePositions::Invalid;
 		}
 		else
 		{
 			double dist = buildSpot.getDistance(base->getUnit()->getTilePosition());
 			if (dist >= 13) 
 			{
-				Broodwar->printf("Base too far away %d", (int)dist);
-				return TilePosition(-1,-1);
+				DEBUG_MESSAGE(utilities::LogLevel_Finer, "CoverMap::findRefineryBuildSpot(): Base too far away ("
+					<< dist << " tiles)"
+				);
+				return TilePositions::Invalid;
 			}
 		}
 
@@ -817,9 +820,9 @@ TilePosition CoverMap::findRefineryBuildSpot(const UnitType& toBuild, const Tile
 	return buildSpot;
 }
 
-TilePosition CoverMap::findClosestGasWithoutRefinery(const UnitType& toBuild, const TilePosition& start) const {
-	TilePosition bestSpot = TilePosition(-1,-1);
-	double bestDist = -1;
+TilePosition CoverMap::findClosestGasWithoutRefinery() const {
+	TilePosition bestSpot = TilePositions::Invalid;
+	int bestDist = INT_MAX;
 	TilePosition home = Broodwar->self()->getStartLocation();
 
 	for(int x = 0 ; x < mMapWidth ; x++) {
@@ -832,8 +835,8 @@ TilePosition CoverMap::findClosestGasWithoutRefinery(const UnitType& toBuild, co
 				for (size_t i = 0; i < agents.size(); i++) {
 					Unit* unit = agents[i]->getUnit();
 					if (unit->getType().isRefinery()) {
-						double dist = unit->getTilePosition().getDistance(cPos);
-						if (dist <= 2) {
+						int dist = bats::getSquaredDistance(unit->getTilePosition(), cPos);
+						if (dist <= 4) {
 							ok = false;
 						}
 					}
@@ -841,8 +844,8 @@ TilePosition CoverMap::findClosestGasWithoutRefinery(const UnitType& toBuild, co
 				if (ok) {
 					if (mExplorationManager->canReach(home, cPos)) {
 						BaseAgent* agent = AgentManager::getInstance()->getClosestBase(cPos);
-						double dist = agent->getUnit()->getTilePosition().getDistance(cPos);
-						if (bestDist == -1 || dist < bestDist) {
+						int dist = bats::getSquaredDistance(agent->getUnit()->getTilePosition(), cPos);
+						if (dist < bestDist) {
 							bestDist = dist;
 							bestSpot = cPos;
 						}
@@ -853,56 +856,6 @@ TilePosition CoverMap::findClosestGasWithoutRefinery(const UnitType& toBuild, co
 	}
 
 	return bestSpot;
-}
-
-TilePosition CoverMap::searchRefinerySpot() const
-{
-	for(int i = 0 ; i < mMapWidth ; i++)
-	{
-		for (int j = 0; j < mMapHeight; j++)
-		{
-			if (mCoverMap[i][j] == TileState_Gas)
-			{
-				TilePosition cPos = TilePosition(i,j);
-
-				bool found = false;
-				vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-				for (int i = 0; i < (int)agents.size(); i++)
-				{
-					if (agents.at(i)->getUnitType().isRefinery())
-				{
-						double dist = agents.at(i)->getUnit()->getTilePosition().getDistance(cPos);
-						TilePosition uPos = agents.at(i)->getUnit()->getTilePosition();
-						if (dist <= 2)
-				{
-							found = true;
-							break;
-						}
-					}
-				}
-
-				if (!found)
-				{
-					BaseAgent* agent = AgentManager::getInstance()->getClosestBase(cPos);
-					if (agent != NULL)
-					{
-						TilePosition bPos = agent->getUnit()->getTilePosition();
-						double dist = bPos.getDistance(cPos);
-
-						if (dist < 15)
-						{
-							if (mExplorationManager->canReach(bPos, cPos))
-							{
-								return cPos;
-							}			
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return TilePositions::Invalid;
 }
 
 TilePosition CoverMap::findExpansionSite() const
@@ -1046,21 +999,52 @@ void CoverMap::printGraphicDebugInfo()
 
 	// High
 	// Draw blocked and temporarily blocked squares
+	bool drawBox;
+	Color drawColor;
+	Position min;
+	Position max;
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
 		for (int x = 0; x < mMapWidth; x++) {
-			Position min;
-			Position max;
 			min.x() = x * TILE_SIZE;
 			max.x() = min.x() + TILE_SIZE - 1;
 			for (int y = 0; y < mMapHeight; y++) {
-				min.y() = y * TILE_SIZE;
-				max.y() = min.y() + TILE_SIZE - 1;
-				if (mCoverMap[x][y] == TileState_TempBlocked) {
-					Broodwar->drawBoxMap(min.x(), min.y(), max.x(), max.y(), Colors::Green);
-				} else if (mCoverMap[x][y] == TileState_Blocked) {
-					Broodwar->drawBoxMap(min.x(), min.y(), max.x(), max.y(), Colors::Red);
-				} else if (mCoverMap[x][y] == TileState_ExpansionReserved) {
-					Broodwar->drawBoxMap(min.x(), min.y(), max.x(), max.y(), Colors::Orange);
+				drawBox = false;
+
+				switch (mCoverMap[x][y]) {
+				case TileState_TempBlocked:
+					drawBox = true;
+					drawColor = Colors::Orange;
+					break;
+
+				case TileState_Mineral:
+					drawBox = true;
+					drawColor = Colors::Cyan;
+					break;
+
+				case TileState_Gas:
+					drawBox = true;
+					drawColor = Colors::Green;
+					break;
+
+				case TileState_Blocked:
+					drawBox = true;
+					drawColor = Colors::Red;
+					break;
+
+				case TileState_ExpansionReserved:
+					drawBox = true;
+					drawColor = Colors::Yellow;
+					break;
+
+				default:
+					// Does nothing
+					break;
+				}
+
+				if (drawBox) {
+					min.y() = y * TILE_SIZE;
+					max.y() = min.y() + TILE_SIZE - 1;
+					Broodwar->drawBoxMap(min.x(), min.y(), max.x(), max.y(), drawColor);
 				}
 			}
 		}

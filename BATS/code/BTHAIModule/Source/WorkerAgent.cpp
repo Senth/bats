@@ -269,8 +269,10 @@ void WorkerAgent::computeActions()
 
 		if (mCurrentState == FIND_BUILDSPOT)
 		{
-			msCoverMap->clearTemp(mToBuild, mBuildSpot);
-			mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
+			if (mBuildSpot == TilePositions::Invalid) {
+				mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
+				msCoverMap->fillTemp(mToBuild, mBuildSpot);
+			}
 			if (mBuildSpot != TilePositions::Invalid)
 			{
 				setState(MOVE_TO_SPOT);
@@ -279,7 +281,6 @@ void WorkerAgent::computeActions()
 
 		if (mCurrentState == MOVE_TO_SPOT)
 		{
-			msCoverMap->fillTemp(mToBuild, mBuildSpot);
 			if (!buildSpotExplored())
 			{
 				unit->rightClick(Position(mBuildSpot));
@@ -292,7 +293,7 @@ void WorkerAgent::computeActions()
 					bool ok = unit->build(mBuildSpot, mToBuild);
 					if (!ok)
 					{
-						msCoverMap->blockPosition(mBuildSpot);
+						//msCoverMap->blockPosition(mBuildSpot);
 						//Cant build at selected spot, get a new one.
 						setState(FIND_BUILDSPOT);
 					}

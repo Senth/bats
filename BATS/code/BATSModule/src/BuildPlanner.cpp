@@ -19,8 +19,10 @@ BuildPlanner* BuildPlanner::msInstance = NULL;
 
 BuildPlanner::BuildPlanner(){
 	mResourceManager = NULL;
+	mCoverMap = NULL;
 
 	mResourceManager = ResourceManager::getInstance();
+	mCoverMap = CoverMap::getInstance();
 
 	mCurrentPhase = "early";
 	BuildOrderFileReader br = BuildOrderFileReader();
@@ -485,7 +487,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		}
 
 		else if (item.structure.isResourceDepot()) {
-			TilePosition pos = CoverMap::getInstance()->findExpansionSite();
+			TilePosition pos = mCoverMap->findExpansionSite();
 			if (pos == TilePositions::Invalid) {
 				//No expansion site found.
 				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
@@ -494,7 +496,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		}
 
 		else if (item.structure.isRefinery()) {
-			TilePosition rSpot = CoverMap::getInstance()->searchRefinerySpot();
+			TilePosition rSpot = mCoverMap->findBuildSpot(item.structure);
 			if (rSpot == TilePositions::Invalid) {
 				//No build spot found
 				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());
@@ -733,7 +735,7 @@ void BuildPlanner::addItemFirst(const BuildItem& item){
 }
 
 void BuildPlanner::expand(){
-	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
+	TilePosition pos = mCoverMap->findExpansionSite();
 	if (pos != TilePositions::Invalid)
 	{
 		addItemFirst(Broodwar->self()->getRace().getCenter());
@@ -741,7 +743,7 @@ void BuildPlanner::expand(){
 }
 
 bool BuildPlanner::isExpansionAvailable() const {
-	TilePosition pos = CoverMap::getInstance()->findExpansionSite();
+	TilePosition pos = mCoverMap->findExpansionSite();
 	if (pos == TilePositions::Invalid){
 		//No expansion site found.
 		return false;

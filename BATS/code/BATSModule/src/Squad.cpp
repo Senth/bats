@@ -1,18 +1,18 @@
 #include "Squad.h"
-#include "Utilities/Helper.h"
-#include "BTHAIModule/Source/UnitAgent.h"
 #include "UnitComposition.h"
 #include "SquadManager.h"
 #include "IntentionWriter.h"
 #include "GameTime.h"
 #include "Config.h"
 #include "Helper.h"
+#include "BTHAIModule/Source/UnitAgent.h"
+#include "BTHAIModule/Source/WorkerAgent.h"
+#include "Utilities/Helper.h"
 #include <algorithm>
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-
-#include "BTHAIModule/Source/WorkerAgent.h"
+#include <BWTA.h>
 
 using namespace bats;
 using namespace std;

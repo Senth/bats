@@ -22,6 +22,19 @@ struct Corners {
 	int y2;
 
 	/**
+	 * Default constructor with optional parameters to set position and size
+	 * @param position sets the center position of the corners, defaults to (0,0)
+	 * @param size how many tiles outwards the corners should be covering. E.g. 0
+	 * means one tile, 1 means 3x3 tiles (1 tile outwards from the center). Defaults to 0
+	 */
+	Corners(const BWAPI::TilePosition& position = BWAPI::TilePosition(0,0), int size = 0) :
+		x1(position.x() - size),
+		x2(position.x() + size),
+		y1(position.y() - size),
+		y2(position.y() + size)
+	{}
+
+	/**
 	 * Adds a position to these corners.
 	 * @param position the position to add to these corners
 	 * @return a reference to this object
@@ -107,19 +120,16 @@ public:
 	void blockPosition(const BWAPI::TilePosition& buildSpot);
 
 	/** Finds and returns a buildSpot for the specified building type.
-	 * If no buildspot is found, a BWAPI::TilePosition(-1,-1) is returned. */
+	 * If no buildspot is found, a BWAPI::TilePositions::Invalid is returned. */
 	BWAPI::TilePosition findBuildSpot(const BWAPI::UnitType& toBuild) const;
 
 	/** Searches for the closest vespene gas that is not in use. If no gas is sighted,
 	 * the ExplorationManager is queried. */
-	BWAPI::TilePosition findRefineryBuildSpot(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& start) const;
+	BWAPI::TilePosition findRefineryBuildSpot() const;
 
 	/** Finds and returns the position of the closest free vespene gas around the specified start position.
 	 * If no gas vein is found, a BWAPI::TilePositions::Invalid is returned. */
-	BWAPI::TilePosition findClosestGasWithoutRefinery(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& start) const;
-
-	/** Searches for a spot to build a refinery at. Returns BWAPI::TilePositions::Invalid if no spot was found.*/
-	BWAPI::TilePosition searchRefinerySpot() const;
+	BWAPI::TilePosition findClosestGasWithoutRefinery() const;
 
 	/** Returns a position of a suitable site for expansion, i.e. new bases. */
 	BWAPI::TilePosition findExpansionSite() const;
@@ -217,7 +227,7 @@ private:
 	int mRange;
 	int mMapWidth;
 	int mMapHeight;
-	int** mCoverMap;
+	TileStates** mCoverMap;
 	typedef std::multimap<const BWTA::Region*, const BWAPI::TilePosition> RegionTileMap;
 	RegionTileMap mRegionTiles;
 

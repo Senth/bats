@@ -5,6 +5,7 @@
 
 // Forward declarations
 class ResourceManager;
+class CoverMap;
 
 // Namespace for the project
 namespace bats {
@@ -75,13 +76,13 @@ struct BuildItem {
 
 		switch (type) {
 			case BuildType_Upgrade:
-				return upgrade == upgrade && upgradeLevel == upgradeLevel;
+				return upgrade == rhs.upgrade && upgradeLevel == rhs.upgradeLevel;
 
 			case BuildType_Tech:
-				return tech == tech;
+				return tech == rhs.tech;
 
 			case BuildType_Structure:
-				return structure == structure;
+				return structure == rhs.structure;
 
 			default:
 				return false;
@@ -266,6 +267,7 @@ private:
 	std::string mCurrentPhase;	
 
 	ResourceManager* mResourceManager;
+	CoverMap* mCoverMap;
 
 	static BuildPlanner* msInstance;
 };
