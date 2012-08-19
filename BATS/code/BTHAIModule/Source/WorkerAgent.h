@@ -1,13 +1,18 @@
-#ifndef __WORKERAGENT_H__
-#define __WORKERAGENT_H__
+#pragma once
 
 #include "UnitAgent.h"
+
+// Forward declarations
+class CoverMap;
 
 /** The WorkerAgent class handles all tasks that a worker, for example a Terran SCV, can perform. The tasks
  * involves gathering minerals and gas, move to a selected buildspot and construct the specified building,
  * and if Terran SCV, repair a building or tank.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @todo doxygen
+ * @todo variable names
+ * @todo const and references
  */
 class WorkerAgent : public UnitAgent {
 public:
@@ -70,11 +75,10 @@ public:
 	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None) const;
 
 private:
-	States currentState;
-
-	BWAPI::UnitType toBuild;
-	BWAPI::TilePosition buildSpot;
-	BWAPI::TilePosition startSpot;
+	void handleKitingWorker();
+	BWAPI::Unit* getEnemyUnit();
+	BWAPI::Unit* getEnemyBuilding();
+	BWAPI::Unit* getEnemyWorker();
 	bool buildSpotExplored() const;
 	bool areaFree() const;
 	/**
@@ -82,14 +86,10 @@ private:
 	 * @return true if the worker completed building the assigned building.
 	 */
 	bool hasCompletedBuilding() const;
-	int startBuildFrame;
 
-	void handleKitingWorker();
-	BWAPI::Unit* getEnemyUnit();
-	BWAPI::Unit* getEnemyBuilding();
-	BWAPI::Unit* getEnemyWorker();
+	States mCurrentState;
+	BWAPI::UnitType mToBuild;
+	BWAPI::TilePosition mBuildSpot;
 
-	int lastFrame;
+	static CoverMap* msCoverMap;
 };
-
-#endif

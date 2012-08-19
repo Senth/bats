@@ -211,7 +211,7 @@ public:
 	 * Else false
 	 * @deprecated Will be removed in a later version, this function does not belong here.
 	 */
-	static bool canReach(const BWAPI::TilePosition& source, const BWAPI::TilePosition& destination);
+	__declspec(deprecated) static bool canReach(const BWAPI::TilePosition& source, const BWAPI::TilePosition& destination);
 
 	/**
 	 * Returns true if a unit can reach position 'destination'. 
@@ -220,7 +220,7 @@ public:
 	 * @return true if the unit can reach position 'destination', else false
 	 * @deprecated Will be removed in a later version, this function does not belong here.
 	 */
-	static bool canReach(const BaseAgent* unit, const BWAPI::TilePosition& destination);
+	__declspec(deprecated) static bool canReach(const BaseAgent* unit, const BWAPI::TilePosition& destination);
 
 	/** 
 	 * Checks if an enemy detector is covering the specified position.
@@ -230,12 +230,12 @@ public:
 	 * @return true if a visible enemy detector is covering the position.
 	 * @deprecated Will be removed in a later version, this function does not belong here?
 	 */
-	bool isEnemyDetectorCovering(const BWAPI::TilePosition& position) const;
+	__declspec(deprecated) bool isEnemyDetectorCovering(const BWAPI::TilePosition& position) const;
 
 	/**
 	 * \copydoc isEnemyDetectorCovering()
 	 */
-	bool isEnemyDetectorCovering(const BWAPI::Position& position) const;
+	__declspec(deprecated) bool isEnemyDetectorCovering(const BWAPI::Position& position) const;
 
 	/**
 	 * Find expansions that haven't been scouted for X seconds. X is specified by

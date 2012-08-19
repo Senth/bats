@@ -1,5 +1,7 @@
 #include "ProfilerObj.h"
 #include <sstream>
+#include <BWAPI/Game.h>
+#include <windows.h>
 
 using namespace BWAPI;
 using namespace std;

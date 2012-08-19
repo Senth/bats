@@ -1,7 +1,9 @@
 #include "MapDataReader.h"
+#include "BWTAExtern.h"
 #include "BATSModule/include/ExplorationManager.h"
 #include <fstream>
 #include <sstream>
+#include <BWTA.h>
 
 using namespace BWAPI;
 using namespace BWTA;
@@ -17,13 +19,13 @@ MapDataReader::~MapDataReader()
 	
 }
 
-int MapDataReader::getDistance(TilePosition t1, TilePosition t2)
+int MapDataReader::getDistance(const TilePosition& t1, const TilePosition& t2) const
 {
-	for (int i = 0; i < (int)data.size(); i++)
+	for (size_t i = 0; i < data.size(); i++)
 	{
-		if (data.at(i).matches(t1, t2))
+		if (data[i].matches(t1, t2))
 		{
-			return data.at(i).dist;
+			return data[i].dist;
 		}
 	}
 	int dist = (int)(t1.getDistance(t2));
@@ -38,7 +40,7 @@ void MapDataReader::readMap()
 		return;
 	}
 
-	if (!analyzed)
+	if (!::analyzed)
 	{
 		return;
 	}

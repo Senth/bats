@@ -1,12 +1,14 @@
-#ifndef __PROFILEROBJ_H__
-#define __PROFILERBJ_H__
+#pragma once
 
-#include "BaseAgent.h"
+#include <string>
 
 /** Helper class for Profiler. This class represents a profiling of one specific
  * codeblock. Profiling can be done on any number of codeblocks.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @todo doxygen
+ * @todo references and const
+ * @todo names
  */
 class ProfilerObj {
 
@@ -34,20 +36,18 @@ public:
 	/** Checks if this object matches the specified id std::string. */
 	bool matches(std::string mId);
 
-	/** Starts measuring a codeblock. */
+	/** Starts measuring a code block. */
 	void start();
 
-	/** Stops measuring a codeblock. */
+	/** Stops measuring a code block. */
 	void end();
 
 	/** Returns the time elapsed between last start and end (in milliseconds). */
 	int getElapsed();
 
-	/** Print data to the ingame chat window. */
+	/** Print data to the in game chat window. */
 	void show();
 
 	/** Returns the html std::string for this profiling object. */
 	std::string getDumpStr();
 };
-
-#endif

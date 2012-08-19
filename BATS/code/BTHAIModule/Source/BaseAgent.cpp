@@ -7,6 +7,7 @@
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/SquadDefs.h"
 #include "BatsModule/include/DefenseManager.h"
+#include <BWAPI/Unit.h>
 
 using namespace BWAPI;
 using namespace std;

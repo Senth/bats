@@ -10,7 +10,6 @@
 class UnitAgent;
 class BaseAgent;
 
-// Forward declaration
 namespace BWTA {
 	class Region;
 }
@@ -102,22 +101,6 @@ private:
 	 * Searches for and finds all choke points that needs defending.
 	 */
 	void updateDefendPositions();
-
-	/**
-	 * Checks if a region is occupied by either our structures or our allied structures.
-	 * Can be overridden to only check allied or our structures.
-	 * @param region the region to check if it's occupied by our team
-	 * @param includeOurStructures if our structures shall be included in the search,
-	 * defaults to true
-	 * @param includeAlliedStructures if allied structures shall be included in the search,
-	 * defaults to true.
-	 * @return true if the region is occupied by either any team structure.
-	 */
-	static bool isRegionOccupiedByOurTeam(
-		BWTA::Region* region,
-		bool includeOurStructures = true,
-		bool includeAlliedStructures = true
-	);
 
 	/**
 	 * Checks if the choke point is an edge choke point. To be an edge choke point it

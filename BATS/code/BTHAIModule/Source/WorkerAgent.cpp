@@ -5,6 +5,7 @@
 #include "CoverMap.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/SquadManager.h"
+#include "BatsModule/include/SquadDefs.h"
 #include "BatsModule/include/Squad.h"
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/DefenseManager.h"
@@ -15,25 +16,28 @@
 
 using namespace BWAPI;
 using namespace std;
-using namespace std::tr1;
+
+CoverMap* WorkerAgent::msCoverMap = NULL;
 
 WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
 	setState(GATHER_MINERALS);
-	startBuildFrame = 0;
-	startSpot = TilePositions::Invalid;
 	agentType = "WorkerAgent";
+
+	if (NULL == msCoverMap) {
+		msCoverMap = CoverMap::getInstance();
+	}
 }
 
 void WorkerAgent::destroyed()
 {
-	if (currentState == MOVE_TO_SPOT || currentState == CONSTRUCT || currentState == FIND_BUILDSPOT)
+	if (mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT || mCurrentState == FIND_BUILDSPOT)
 	{
 		if (!bats::BuildPlanner::isZerg())
 		{
 			//Broodwar->printf("Worker building %s destroyed", toBuild.getName().c_str());
-			bats::BuildPlanner::getInstance()->handleWorkerDestroyed(toBuild, unitID);
-			CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
+			bats::BuildPlanner::getInstance()->handleWorkerDestroyed(mToBuild, unitID);
+			msCoverMap->clearTemp(mToBuild, mBuildSpot);
 			setState(GATHER_MINERALS);
 		}
 	}
@@ -98,18 +102,6 @@ Unit* WorkerAgent::getEnemyWorker()
 
 void WorkerAgent::handleKitingWorker()
 {
-	//Kite them around
-	/*Squad* sq = Commander::getInstance()->getSquad(squadID);
-	if (sq != NULL)
-	{
-		TilePosition nGoal = ExplorationManager::getInstance()->getNextToExplore(sq);
-		if (nGoal != TilePositions::Invalid)
-		{
-			unit->rightClick(Position(nGoal));
-			return;
-		}
-	}*/
-	
 	//Bring them back to base
 	unit->rightClick(Position(Broodwar->self()->getStartLocation()));
 }
@@ -133,17 +125,17 @@ void WorkerAgent::printGraphicDebugInfo() const
 	// Low
 	// Draw boxes when building stuff
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
-		if (currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
+		if (mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT)
 		{
-			if (buildSpot.x() > 0)
+			if (mBuildSpot.x() > 0)
 			{
-				int w = toBuild.tileWidth() * 32;
-				int h = toBuild.tileHeight() * 32;
+				int w = mToBuild.tileWidth() * 32;
+				int h = mToBuild.tileHeight() * 32;
 
-				Position b = Position(buildSpot.x()*32 + w/2, buildSpot.y()*32 + h/2);
+				Position b = Position(mBuildSpot.x()*32 + w/2, mBuildSpot.y()*32 + h/2);
 				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
 
-				Broodwar->drawBoxMap(buildSpot.x()*32,buildSpot.y()*32,buildSpot.x()*32+w,buildSpot.y()*32+h,Colors::Blue,false);
+				Broodwar->drawBoxMap(mBuildSpot.x()*32,mBuildSpot.y()*32,mBuildSpot.x()*32+w,mBuildSpot.y()*32+h,Colors::Blue,false);
 			}
 		}
 	}
@@ -152,7 +144,7 @@ void WorkerAgent::printGraphicDebugInfo() const
 	// Medium
 	// Draw line to mineral/gas unit is mining from
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
-		if (currentState == GATHER_MINERALS || currentState == GATHER_GAS)
+		if (mCurrentState == GATHER_MINERALS || mCurrentState == GATHER_GAS)
 		{
 			Unit* target = unit->getTarget();
 			if (target != NULL)
@@ -195,7 +187,7 @@ void WorkerAgent::computeActions()
 	{
 		//Worker is in a squad
 
-		shared_ptr<bats::Squad> squad = msSquadManager->getSquad(getSquadId());
+		bats::SquadPtr squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad) {
 			computeMoveAction();
 
@@ -210,7 +202,7 @@ void WorkerAgent::computeActions()
 		}
 
 		//Check if workers are too far away from a base when attacking
-		if (currentState == ATTACKING)
+		if (mCurrentState == ATTACKING)
 		{
 			if (unit->getTarget() != NULL)
 			{
@@ -236,7 +228,7 @@ void WorkerAgent::computeActions()
 			}
 		}
 
-		if (currentState == GATHER_GAS)
+		if (mCurrentState == GATHER_GAS)
 		{
 			if (unit->isIdle())
 			{
@@ -245,7 +237,7 @@ void WorkerAgent::computeActions()
 			}
 		}
 	
-		if (currentState == REPAIRING)
+		if (mCurrentState == REPAIRING)
 		{
 			if (!unit->isRepairing())
 			{
@@ -263,11 +255,11 @@ void WorkerAgent::computeActions()
 			}
 		}
 
-		if (currentState == GATHER_MINERALS)
+		if (mCurrentState == GATHER_MINERALS)
 		{
 			if (unit->isIdle())
 			{
-				Unit* mineral = CoverMap::getInstance()->findClosestMineral(unit->getTilePosition());
+				Unit* mineral = msCoverMap->findClosestMineral(unit->getTilePosition());
 				if (mineral != NULL)
 				{
 					unit->rightClick(mineral);
@@ -275,38 +267,32 @@ void WorkerAgent::computeActions()
 			}
 		}
 
-		if (currentState == FIND_BUILDSPOT)
+		if (mCurrentState == FIND_BUILDSPOT)
 		{
-			CoverMap::getInstance()->clearTemp(toBuild, buildSpot);
-			buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
-			if (buildSpot != TilePositions::Invalid)
+			msCoverMap->clearTemp(mToBuild, mBuildSpot);
+			mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
+			if (mBuildSpot != TilePositions::Invalid)
 			{
 				setState(MOVE_TO_SPOT);
-				startBuildFrame = Broodwar->getFrameCount();
-				if (toBuild.isResourceDepot())
-				{
-					/// @todo worker building resource depot
-					//Commander::getInstance()->updateGoals();
-				}
 			}
 		}
 
-		if (currentState == MOVE_TO_SPOT)
+		if (mCurrentState == MOVE_TO_SPOT)
 		{
-			CoverMap::getInstance()->fillTemp(toBuild, buildSpot);
+			msCoverMap->fillTemp(mToBuild, mBuildSpot);
 			if (!buildSpotExplored())
 			{
-				unit->rightClick(Position(buildSpot));
+				unit->rightClick(Position(mBuildSpot));
 			}
 
 			if (buildSpotExplored() && !unit->isConstructing())
 			{
 				if (areaFree())
 				{
-					bool ok = unit->build(buildSpot, toBuild);
+					bool ok = unit->build(mBuildSpot, mToBuild);
 					if (!ok)
 					{
-						CoverMap::getInstance()->blockPosition(buildSpot);
+						msCoverMap->blockPosition(mBuildSpot);
 						//Cant build at selected spot, get a new one.
 						setState(FIND_BUILDSPOT);
 					}
@@ -321,11 +307,10 @@ void WorkerAgent::computeActions()
 			if (unit->isConstructing())
 			{
 				setState(CONSTRUCT);
-				startSpot = TilePositions::Invalid;
 			}
 		}
 
-		if (currentState == CONSTRUCT)
+		if (mCurrentState == CONSTRUCT)
 		{
 			if (hasCompletedBuilding())
 			{
@@ -345,7 +330,7 @@ bool WorkerAgent::hasCompletedBuilding() const
 {
 	/// @author Matteus Magnusson (matteus.magnusson@gmail.com)
 	/// Changed logic to test if the building is actually done, not begun
-	const set<Unit*> tileUnits = Broodwar->getUnitsOnTile(buildSpot.x(), buildSpot.y());
+	const set<Unit*> tileUnits = Broodwar->getUnitsOnTile(mBuildSpot.x(), mBuildSpot.y());
 	set<Unit*>::const_iterator tileUnitIt;
 	for (tileUnitIt = tileUnits.begin(); tileUnitIt != tileUnits.end(); ++tileUnitIt)
 	{
@@ -353,7 +338,7 @@ bool WorkerAgent::hasCompletedBuilding() const
 		if ((*tileUnitIt)->exists() && (*tileUnitIt)->getPlayer() == Broodwar->self())
 		{
 			// The building exist and is completed
-			if ((*tileUnitIt)->getType() == toBuild && (*tileUnitIt)->isCompleted())
+			if ((*tileUnitIt)->getType() == mToBuild && (*tileUnitIt)->isCompleted())
 			{
 				return true;
 			}
@@ -364,12 +349,12 @@ bool WorkerAgent::hasCompletedBuilding() const
 
 bool WorkerAgent::areaFree() const
 {
-	if (toBuild.isRefinery())
+	if (mToBuild.isRefinery())
 	{
 		return true;
 	}
 
-	if (AgentManager::getInstance()->unitsInArea(buildSpot, toBuild.tileWidth(), toBuild.tileHeight(), unit->getID()))
+	if (AgentManager::getInstance()->unitsInArea(mBuildSpot, mToBuild.tileWidth(), mToBuild.tileHeight(), unit->getID()))
 	{
 		return false;
 	}
@@ -380,7 +365,7 @@ bool WorkerAgent::areaFree() const
 bool WorkerAgent::buildSpotExplored() const
 {
 	// Check if it's visible.
-	return Broodwar->isVisible(buildSpot);
+	return Broodwar->isVisible(mBuildSpot);
 
 	//int sightDist = 64;
 	//if (toBuild.isRefinery())
@@ -401,17 +386,16 @@ bool WorkerAgent::buildSpotExplored() const
 
 WorkerAgent::States WorkerAgent::getState() const
 {
-	return currentState;
+	return mCurrentState;
 }
 
 void WorkerAgent::setState(States state)
 {
-	currentState = state;
+	mCurrentState = state;
 	
 	if (state == GATHER_MINERALS)
 	{
-		startSpot = TilePositions::Invalid;
-		buildSpot = TilePositions::Invalid;
+		mBuildSpot = TilePositions::Invalid;
 	}
 }
 
@@ -459,29 +443,25 @@ bool WorkerAgent::canBuild(UnitType type) const
 
 bool WorkerAgent::assignToBuild(UnitType type)
 {
-	toBuild = type;
-	buildSpot = CoverMap::getInstance()->findBuildSpot(toBuild);
-	if (buildSpot != TilePositions::Invalid)
+	mToBuild = type;
+	mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
+	if (mBuildSpot != TilePositions::Invalid)
 	{
-		ResourceManager::getInstance()->lockResources(toBuild);
+		ResourceManager::getInstance()->lockResources(mToBuild);
 		setState(FIND_BUILDSPOT);
 		return true;
 	}
 	else
 	{
 		//Broodwar->printf("No buildspot found for %s", type.getName().c_str());
-		startSpot = TilePositions::Invalid;
 		return false;
 	}
 }
 
 void WorkerAgent::reset()
 {
-	if (currentState == MOVE_TO_SPOT)
-	{
-		//The buildSpot is probably not reachable. Block it.	
-		CoverMap::getInstance()->blockPosition(buildSpot);
-	}
+	// Reset build spot
+	msCoverMap->clearTemp(mToBuild, mBuildSpot);
 
 	if (unit->isConstructing())
 	{
@@ -499,13 +479,13 @@ void WorkerAgent::reset()
 
 bool WorkerAgent::isConstructing(UnitType type) const
 {
-	if (currentState == FIND_BUILDSPOT || currentState == MOVE_TO_SPOT || currentState == CONSTRUCT)
+	if (mCurrentState == FIND_BUILDSPOT || mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT)
 	{
 		if (type == UnitTypes::None)
 		{
 			return true;
 		}
-		else if (type == toBuild)
+		else if (type == mToBuild)
 		{
 			return true;
 		}
@@ -517,7 +497,7 @@ bool WorkerAgent::isConstructing(UnitType type) const
 string WorkerAgent::getStateAsText() const
 {
 	string strReturn;
-	switch(currentState)
+	switch(mCurrentState)
 	{
 	case GATHER_MINERALS:
 		strReturn = "GATHER_MINERALS";

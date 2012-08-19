@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <algorithm>
 
 namespace utilities {
@@ -69,6 +70,18 @@ namespace string {
 	 */
 	inline void toUpper(std::string& text) {
 		std::transform(text.begin(), text.end(), text.begin(), ::toupper);
+	}
+
+	/**
+	 * Converts the type to a string
+	 * @param value the value to get as a string
+	 * @tparam the type to convert from
+	 */
+	template<typename T>
+	std::string toString(const T& value) {
+		std::stringstream ss;
+		ss << value;
+		return ss.str();
 	}
 
 	/**

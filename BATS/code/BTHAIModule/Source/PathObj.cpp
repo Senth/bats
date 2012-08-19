@@ -1,7 +1,7 @@
 #include "PathObj.h"
+#include <BWTA.h>
 
 using namespace BWAPI;
-using namespace BWTA;
 using namespace std;
 
 PathObj::PathObj(TilePosition cStart, TilePosition cEnd)
@@ -32,7 +32,7 @@ bool PathObj::isFinished()
 
 void PathObj::calculatePath() 
 {
-	path = getShortestPath(start, end);
+	path = BWTA::getShortestPath(start, end);
 	finished = true;
 }
 

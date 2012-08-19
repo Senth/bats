@@ -1,14 +1,18 @@
-#ifndef __BASEAGENT_H__
-#define __BASEAGENT_H__
+#pragma once
 
-#include <windows.h>
-#include <BWAPI.h>
-#include <BWTA.h>
-#include "BWTAExtern.h"
 #include "Utilities/KeyType.h"
 #include "BATSModule/include/SquadDefs.h"
+#include <windows.h>
+#include <BWAPI/TilePosition.h>
+#include <BWAPI/Position.h>
+#include <BWAPI/UnitType.h>
+
 
 // Forward declarations
+namespace BWAPI {
+	class Unit;
+}
+
 namespace bats {
 	class DefenseManager;
 }
@@ -232,5 +236,3 @@ public:
 	/** Orders the Zerg Queen to do an Ensnare at the specified area. */
 	static bool doEnsnare(BWAPI::TilePosition pos);
 };
-
-#endif

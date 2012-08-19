@@ -9,12 +9,11 @@
 #include "ExplorationManager.h"
 #include "GameTime.h"
 #include "SquadDefs.h"
-#include "Utilities/Logger.h"
 #include "UnitCompositionFactory.h"
+#include "BTHAIModule/Source/CoverMap.h"
+#include "Utilities/Logger.h"
 #include <BWAPI/Unit.h>
-#include <BWTA/Region.h>
-#include <BWTA/Chokepoint.h>
-#include <cstdlib> // For NULL
+#include <BWTA.h>
 
 using namespace bats;
 using namespace BWAPI;
@@ -250,42 +249,6 @@ void DefenseManager::updateDefendPositions() {
 	}
 }
 
-bool DefenseManager::isRegionOccupiedByOurTeam(BWTA::Region* region, bool includeOurStructures, bool includeAlliedStructures) {
-	assert(NULL != region);
-	if (NULL == region) {
-		return false;
-	}
-
-	set<Player*> teamPlayers;
-	if (includeAlliedStructures) {
-		teamPlayers = Broodwar->allies();
-	}
-	if (includeOurStructures) {
-		teamPlayers.insert(Broodwar->self());
-	}
-
-	const Position regionToCheckPos = region->getCenter();
-
-	set<Player*>::const_iterator playerIt;
-	for (playerIt = teamPlayers.begin(); playerIt != teamPlayers.end(); ++playerIt) {
-		const set<Unit*>& units = (*playerIt)->getUnits();
-		set<Unit*>::const_iterator unitIt;
-		for (unitIt = units.begin(); unitIt != units.end(); ++unitIt) {
-			Unit* unit = (*unitIt);
-			if (unit->getType().isBuilding()) {
-				BWTA::Region* unitRegion = BWTA::getRegion(unit->getPosition());
-				const Position& unitRegionPos = unitRegion->getCenter();
-				
-				if (unitRegionPos == regionToCheckPos) {
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
 bool DefenseManager::isChokepointEdge(BWTA::Chokepoint* chokepoint) {
 	assert(NULL != chokepoint);
 
@@ -293,7 +256,7 @@ bool DefenseManager::isChokepointEdge(BWTA::Chokepoint* chokepoint) {
 	BWTA::Region* occupiedRegion = NULL;
 	BWTA::Region* emptyRegion = NULL;
 
-	if (isRegionOccupiedByOurTeam(abutRegions.first)) {
+	if (CoverMap::isRegionOccupiedByOurTeam(abutRegions.first)) {
 		occupiedRegion = abutRegions.first;
 	} else {
 		emptyRegion = abutRegions.first;
@@ -301,7 +264,7 @@ bool DefenseManager::isChokepointEdge(BWTA::Chokepoint* chokepoint) {
 
 	// Now the second region needs to be inverse of the first region.
 	// E.g. first -> occupied, second -> empty.
-	if (isRegionOccupiedByOurTeam(abutRegions.second)) {
+	if (CoverMap::isRegionOccupiedByOurTeam(abutRegions.second)) {
 		if (NULL == occupiedRegion) {
 			occupiedRegion = abutRegions.second;
 		} else {
@@ -339,7 +302,7 @@ bool DefenseManager::isChokepointEdge(BWTA::Chokepoint* chokepoint) {
 
 	// Check if the any of the neighbors aren't occupied by use
 	for (size_t i = 0; i < emptyRegionNeigbors.size(); ++i) {
-		if (!isRegionOccupiedByOurTeam(emptyRegionNeigbors[i])) {
+		if (!CoverMap::isRegionOccupiedByOurTeam(emptyRegionNeigbors[i])) {
 			return true; // RETURN
 		}
 	}
@@ -588,9 +551,9 @@ bool DefenseManager::isOurOrAlliedChokepoint(BWTA::Chokepoint* chokepoint, bool 
 
 	const pair<BWTA::Region*, BWTA::Region*> regions = chokepoint->getRegions();
 
-	if (isRegionOccupiedByOurTeam(regions.first, testOur, !testOur)) {
+	if (CoverMap::isRegionOccupiedByOurTeam(regions.first, testOur, !testOur)) {
 		return true;
-	} else if (isRegionOccupiedByOurTeam(regions.second, testOur, !testOur)) {
+	} else if (CoverMap::isRegionOccupiedByOurTeam(regions.second, testOur, !testOur)) {
 		return true;
 	} else {
 		return false;

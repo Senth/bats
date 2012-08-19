@@ -2,9 +2,9 @@
 #include "Profiler.h"
 #include <fstream>
 #include <sstream>
+#include <BWAPI/Game.h>
 
 using namespace BWAPI;
-using namespace BWTA;
 using namespace std;
 
 bool Pathfinder::instanceFlag = false;

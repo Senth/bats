@@ -7,6 +7,7 @@
 #include "BTHAIModule/Source/TransportAgent.h"
 #include <vector>
 #include <algorithm>
+#include <BWTA.h>
 
 using namespace bats;
 using namespace std;

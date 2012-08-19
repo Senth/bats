@@ -1,27 +1,24 @@
-#ifndef __MAPDATAREADER_H__
-#define __MAPDATAREADER_H__
+#pragma once
 
 #include "BaseAgent.h"
+#include <vector>
 
 struct MapData {
 	BWAPI::TilePosition basePos;
 	BWAPI::TilePosition pos;
 	int dist;
 
-	bool matches(BWAPI::TilePosition t1, BWAPI::TilePosition t2)
-	{
-		if (t1.x() == basePos.x() && t1.y() == basePos.y() && t2.x() == pos.x() && t2.y() == pos.y())
-		{
-			return true;
-		}
-		return false;
+	bool matches(const BWAPI::TilePosition& t1, const BWAPI::TilePosition& t2) const {
+		return t1 == basePos && t2 == pos;
 	}
 };
 
 /** This class handles load/save of additional mapdata not contained in bwapi/bwta. This
  * is used to quick calculate ground distances between important regions like start positions.
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @todo add more doxygen documentation
+ * @todo add const and references
  */
 class MapDataReader {
 
@@ -47,7 +44,5 @@ public:
 
 	/** Returns the ground distance between two positions. If not found in
 	 * the data, bird distance is used. */
-	int getDistance(BWAPI::TilePosition t1, BWAPI::TilePosition t2);
+	int getDistance(const BWAPI::TilePosition& t1, const BWAPI::TilePosition& t2) const;
 };
-
-#endif

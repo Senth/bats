@@ -9,6 +9,7 @@
 #include "BuildOrderFileReader.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "Utilities/Logger.h"
+#include "Utilities/String.h"
 
 using namespace bats;
 using namespace BWAPI;
@@ -591,8 +592,7 @@ string BuildPlanner::format(const BuildItem& item) const{
 			break;
 
 		case BuildType_Upgrade:
-			name = item.upgrade.getName() + " ";
-			name += item.upgradeLevel;
+			name = item.upgrade.getName() + " " + utilities::string::toString(item.upgradeLevel);
 			break;
 
 		default:

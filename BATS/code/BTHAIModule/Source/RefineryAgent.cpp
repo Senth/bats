@@ -1,6 +1,7 @@
 #include "RefineryAgent.h"
 #include "WorkerAgent.h"
 #include "AgentManager.h"
+#include <BWAPI/Unit.h>
 
 using namespace BWAPI;
 using namespace std;

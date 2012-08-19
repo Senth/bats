@@ -446,6 +446,7 @@ void BatsModule::releaseGameClasses() {
 	SAFE_DELETE(mDefenseManager);
 	SAFE_DELETE(mPlayerArmyManager);
 	SAFE_DELETE(mExplorationManager);
+	Pathfinder::getInstance()->stop();
 	delete Pathfinder::getInstance();
 	delete ResourceManager::getInstance();
 	delete BuildPlanner::getInstance();

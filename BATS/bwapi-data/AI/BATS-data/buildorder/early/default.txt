@@ -10,7 +10,6 @@ Terran_Barracks
 Terran_Barracks
 Terran_Refinery
 Terran_Academy
-Terran_Bunker
 <units>
 80% Terran_Marine
 20% Terran_Medic

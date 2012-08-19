@@ -1,12 +1,12 @@
-#ifndef __PATHOBJ_H__
-#define __PATHOBJ_H__
+#pragma  once
 
-#include "BaseAgent.h"
+#include <vector>
+#include <BWAPI/TilePosition.h>
 
 /** Helper class for the threaded Pathfinder agent. Each PathObj contains the path between two
  * two positions, start and end. 
  *
- * Author: Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
  */
 class PathObj {
 
@@ -35,5 +35,3 @@ public:
 	/** Returns the path. */
 	std::vector<BWAPI::TilePosition> getPath();
 };
-
-#endif
