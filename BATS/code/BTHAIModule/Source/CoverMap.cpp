@@ -118,11 +118,7 @@ void CoverMap::initCoverMap() {
 			for(chokeIt = chokepoints.begin() ; chokeIt != chokepoints.end(); ++chokeIt) {
 				if ((*chokeIt)->getWidth() <= 5 * 32) {
 					TilePosition center = TilePosition((*chokeIt)->getCenter());
-					Corners corners;
-					corners.x1 = center.x() - 1;
-					corners.x2 = center.x() + 1;
-					corners.y1 = center.y() - 1;
-					corners.y2 = center.y() + 1;
+					Corners corners(center, 3);
 					fill(corners);
 				}
 			}
@@ -571,7 +567,6 @@ TilePosition CoverMap::findDefensePos(const Chokepoint* choke) const
 }
 
 bool CoverMap::isRegionOccupiedByOurTeam(const BWTA::Region* region, bool includeOurStructures, bool includeAlliedStructures) {
-	assert(NULL != region);
 	if (NULL == region) {
 		return false;
 	}

@@ -188,10 +188,13 @@ namespace squad {
 	double PING_WAIT_TIME_AFTER_FIRST = 0.0;
 	int REGROUP_DISTANCE_BEGIN = 0;
 	int REGROUP_DISTANCE_END = 0;
+	double REGROUP_DISTANCE_INCREMENT = 0.0;
 	double REGROUP_NEW_POSITION_TIME = 0.0;
 	double CALC_FURTHEST_AWAY_TIME = 1.0;
 	int CLOSE_DISTANCE = 0;
 	double SIGHT_DISTANCE_MULTIPLIER = 1.0;
+
+	bool set(const utilities::VariableInfo& variableInfo);
 
 	namespace attack {
 		int WAITING_POSITION_DISTANCE_FROM_GOAL = 0;
@@ -219,8 +222,6 @@ namespace squad {
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
-
-	bool set(const utilities::VariableInfo& variableInfo);
 }
 
 namespace unit {
@@ -697,6 +698,10 @@ bool squad::set(const utilities::VariableInfo& variableInfo) {
 			gOldValue = toString(REGROUP_DISTANCE_END);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_END));
 			REGROUP_DISTANCE_END = variableInfo;
+		} else if (variableInfo.name == "regroup_distance_increment") {
+			gOldValue = toString(REGROUP_DISTANCE_INCREMENT);
+			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_DISTANCE_INCREMENT));
+			REGROUP_DISTANCE_INCREMENT = variableInfo;
 		} else if (variableInfo.name == "regroup_new_position_time") {
 			gOldValue = toString(REGROUP_NEW_POSITION_TIME);
 			gTriggerQueue.push_back(TO_CONSTANT_NAME(REGROUP_NEW_POSITION_TIME));

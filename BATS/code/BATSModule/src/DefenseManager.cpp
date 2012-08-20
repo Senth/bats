@@ -349,7 +349,7 @@ TilePosition DefenseManager::findRoamPosition(const BWAPI::TilePosition& defendP
 					int structureDist = getSquaredDistance(structurePos, currentPos);
 
 					if (structureDist < bestDist) {
-                        if (isRegionOccupiedByOurTeam(BWTA::getRegion(currentPos))) {
+                        if (CoverMap::isRegionOccupiedByOurTeam(BWTA::getRegion(currentPos))) {
                             bestDist = structureDist;
                             roamPosition = currentPos;
                         }

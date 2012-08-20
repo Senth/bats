@@ -685,6 +685,26 @@ private:
 	 */
 	void updateSupply();
 
+	/**
+	 * Calculates and returns the squad dimension size. Each Large unit is 4 in size,
+	 * medium = 2, small = 1.
+	 * @return dimension size of squad in small units
+	 */
+	int getDimensionSize() const;
+
+	/**
+	 * Calculates the regroup increment (for begin and end) for this squad
+	 * @return the regroup increment to be used for this squad
+	 */
+	int getRegroupIncrement() const;
+
+	/**
+	 * Calculates a new regroup position for the squad and returns it. Currently
+	 * takes the unit that is closest to the goal.
+	 * @return new regroup position for the squad
+	 */
+	BWAPI::TilePosition findRegroupPosition() const;
+
 	std::vector<std::tr1::shared_ptr<WaitGoal>> mWaitGoals;
 	std::vector<UnitAgent*> mUnits;
 	std::list<BWAPI::TilePosition> mViaPath;

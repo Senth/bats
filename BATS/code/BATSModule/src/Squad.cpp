@@ -29,6 +29,9 @@ IntentionWriter* bats::Squad::msIntentionWriter = NULL;
 const int MAX_KEYS = 100;
 const double FROM_TILE_TO_POSITION = 32.0;
 const double FROM_POSITION_TO_TILE = 1.0 / FROM_TILE_TO_POSITION;
+const int UNIT_SMALL_SIZE = 1;
+const int UNIT_MEDIUM_SIZE = UNIT_SMALL_SIZE * 2;
+const int UNIT_LARGE_SIZE = UNIT_SMALL_SIZE * 4;
 
 Squad::Squad(
 	const std::vector<UnitAgent*>& units,
@@ -608,22 +611,19 @@ void Squad::handleRegroup() {
 	// Not regrouping, but needs regrouping
 	if (mRegroupPosition == TilePositions::Invalid) {
 		if (needsRegrouping()) {
-			setRegroupPosition(getCenter());
+			setRegroupPosition(findRegroupPosition());
 		}
 	}
 	// Stop regrouping if we're done
 	else {
 		if (finishedRegrouping()) {
 			clearRegroupPosition();
-		} else if (msGameTime->getElapsedTime() >= mRegroupStartTime + config::squad::REGROUP_NEW_POSITION_TIME &&
+		}
+		// Regroup "timed out" trying a new position
+		else if (msGameTime->getElapsedTime() >= mRegroupStartTime + config::squad::REGROUP_NEW_POSITION_TIME &&
 			isAUnitStill())
 		{
-			TilePosition newRegroupPosition = getCenter();
-
-			// Only add if the new position is different
-			if (newRegroupPosition != mRegroupPosition) {
-				setRegroupPosition(newRegroupPosition);
-			}
+			setRegroupPosition(findRegroupPosition());
 		}
 	}
 }
@@ -635,10 +635,11 @@ bool Squad::needsRegrouping() const {
 	}
 
 	const TilePosition& center = getCenter();
+	int regroupDistanceBegin = config::squad::REGROUP_DISTANCE_BEGIN + getRegroupIncrement();
 
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		if (!isWithinRange(center, mUnits[i]->getUnit()->getTilePosition(), config::squad::REGROUP_DISTANCE_BEGIN)) {
+		if (!isWithinRange(center, mUnits[i]->getUnit()->getTilePosition(), regroupDistanceBegin)) {
 			return true;
 		}
 	}
@@ -652,16 +653,20 @@ bool Squad::finishedRegrouping() const {
 		return true;
 	}
 
-	const TilePosition& center = getCenter();
+	int regroupDistanceEnd = config::squad::REGROUP_DISTANCE_END + getRegroupIncrement();
 
 	// Use same calculation both for air and ground
 	for (size_t i = 0; i < mUnits.size(); ++i) {
-		if (!isWithinRange(center, mUnits[i]->getUnit()->getTilePosition(), config::squad::REGROUP_DISTANCE_END)) {
+		if (!isWithinRange(mRegroupPosition, mUnits[i]->getUnit()->getTilePosition(), regroupDistanceEnd)) {
 			return false;
 		}
 	}
 
 	return true;
+}
+
+int Squad::getRegroupIncrement() const {
+	return static_cast<int>(ceil(config::squad::REGROUP_DISTANCE_INCREMENT * getDimensionSize()));
 }
 
 void Squad::setRegroupPosition(const BWAPI::TilePosition& regroupPosition) {
@@ -885,9 +890,40 @@ void Squad::printGraphicDebugInfo() const {
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
 		const string& info = getDebugInfo();
 
-		const Position& squadCenterOnMap = Position(getCenter());
+		const Position squadCenter = Position(getCenter());
 
-		BWAPI::Broodwar->drawTextMap(squadCenterOnMap.x(), squadCenterOnMap.y(), "%s", info.c_str());
+		BWAPI::Broodwar->drawTextMap(squadCenter.x(), squadCenter.y(), "%s", info.c_str());
+	}
+
+
+	// High
+	// Print regroup distances for the squad
+	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_High) {
+
+		if (mCanRegroup) {
+			// Draw regroup position and perimeter for when the regrouping is done
+			if (mRegroupPosition != TilePositions::Invalid) {
+				const Position regroupPosition = Position(mRegroupPosition);
+
+				BWAPI::Broodwar->drawCircleMap(
+					regroupPosition.x(),
+					regroupPosition.y(),
+					config::squad::REGROUP_DISTANCE_END + getRegroupIncrement() * TILE_SIZE,
+					Colors::Orange
+				);
+			}
+			// Draw the begin regroup perimeter for the squad
+			else {
+				const Position squadCenter = Position(getCenter());
+
+				BWAPI::Broodwar->drawCircleMap(
+					squadCenter.x(),
+					squadCenter.y(),
+					config::squad::REGROUP_DISTANCE_BEGIN + getRegroupIncrement() * TILE_SIZE,
+					Colors::Green
+				);
+			}
+		}
 	}
 }
 
@@ -942,4 +978,41 @@ void Squad::updateSupply() {
 	if (mSupplies.size() > config::classification::squad::MEASURE_SIZE) {
 		mSupplies.pop_back();
 	}
+}
+
+int Squad::getDimensionSize() const {
+	int size = 0;
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		const UnitSizeType& unitSizeType = mUnits[i]->getUnitType().size();
+
+		if (unitSizeType == UnitSizeTypes::Small) {
+			size += UNIT_SMALL_SIZE;
+		} else if (unitSizeType == UnitSizeTypes::Medium) {
+			size += UNIT_MEDIUM_SIZE;
+		} else if (unitSizeType == UnitSizeTypes::Large) {
+			size += UNIT_LARGE_SIZE;
+		}
+	}
+
+	return size;
+}
+
+BWAPI::TilePosition Squad::findRegroupPosition() const {
+	if (mGoalPosition == TilePositions::Invalid) {
+		return TilePositions::Invalid;
+	}
+	
+	BWAPI::TilePosition bestRegroup = TilePositions::Invalid;
+	int bestDist = INT_MAX;
+
+	for (size_t i = 0; i < mUnits.size(); ++i) {
+		const TilePosition& unitPos = mUnits[i]->getUnit()->getTilePosition();
+		int dist = bats::getSquaredDistance(unitPos, mGoalPosition);
+		if (dist < bestDist) {
+			bestDist = dist;
+			bestRegroup = unitPos;
+		}
+	}
+
+	return bestRegroup;
 }

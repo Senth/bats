@@ -319,17 +319,27 @@ namespace bats {
 			/** How long shall the Commander wait for pings after the first one */
 			extern double PING_WAIT_TIME_AFTER_FIRST;
 			/** Decides the distance away from the center a unit has to be until a regroup occurs.
-			 * If a unit is further away than this it will get a regroup goal to the center of
-			 * the squad to regroup.
+			 * If a unit is further away than this the squad will start to regroup. An increment
+			 * value is also used (REGROUP_DISTANCE_INCREMENT) depending on the size of the
+			 * squad.
 			 * @see REGROUP_DISTANCE_END for when regrouping shall end. These two variables
 			 * should not have the same value since this can cause threshold errors.
-			 */
+			 * @see REGROUP_DISTANCE_INCREMENT */
 			extern int REGROUP_DISTANCE_BEGIN;
 			/** Decides the distance away from the center all units has to be until a regroup
-			 * is considered to be done.
+			 * is considered to be done. An increment value in addition to this is used
+			 * (REGROUP_DISTANCE_INCREMENT). The end distance will increase with this depending
+			 * on the squad size.
 			 * @see REGROUP_DISTANCE_BEGIN for the distance when regrouping shall begin.
-			 */
+			 * @see REGROUP_DISTANCE_INCREMENT */
 			extern int REGROUP_DISTANCE_END;
+			/** How much the regroup distances shall increase depending on the squad size.
+			 * Both begin and end distance will increment with this value for each Small
+			 * unit in the squad. Small = 1 marines, Medium = 2 marines or vulture, Large =
+			 * 4 marines or tank. Meanin a tank has size 4.
+			 * @see REGROUP_DISTANCE_BEGIN
+			 * @see REGROUP_DISTANCE_END */
+			extern double REGROUP_DISTANCE_INCREMENT;
 			/** Time before trying with a new regroup position when a unit is still */
 			extern double REGROUP_NEW_POSITION_TIME;
 			/** How long time before recalculating the distance to the unit furthest away
