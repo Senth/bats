@@ -20,7 +20,7 @@ This is not how the squad moves, but where the squad's units move to. The potent
 	\item The goal location where the squad want to go to do their main task (e.g. scout, attack, defend location).
 	\item A retreat location to be able to retreat from an attack or anything else, there is no automatic retreat behavior in the base class, derived squads has to set the retreat location and the base class calls \texttt{onRetreatCompleted()} when the retreat has succeeded or failed.
 	\item To move to either the goal or retreat location a via path, that holds with multiple locations, can be used. This is useful when attacking or retreating with a drop making it move along the map's edges so that it does not run straight through the enemy.
-	\item Temporary goal location, used when derived classes need an additional goal location, such as \nameref{sec:attack_squad}s waiting in a position to attack or \nameref{sec:hold_squad}s moving from their roaming area to the defended area when an enemy enters the defend perimeter. The temporary goal location is, however, disabled when a retreat position is active.
+	\item Temporary goal location, used when derived classes need an additional goal location, such as \nameref{sec:attack_squad}s waiting in a location to attack or \nameref{sec:hold_squad}s moving from their roaming area to the defended area when an enemy enters the defend perimeter. The temporary goal location is, however, disabled when a retreat location is active.
 	\item Regroup location, the regroup is automatically handled by the squad when units are too spread out—a unit is further away than \squadRegroupDistanceBegin from the squad's center, the regroup stops again when all units are within \squadRegroupDistanceEnd. Currently the regroup location will be set to the center of the squad, not ideal but works for now. Bugs can occur when the squad is shaped as a C moving outside of a cliff, water, or space, the regroup location will then be on top of the cliff which ground units might not have access to; whichever the case it can cause undesired behaviors, a better behavior could be to use one of the first units location for the regroup. The regroup functionality can be disabled by derived classes, useful when sending reinforcements to the squad.
 \end{enumerate}
 
@@ -28,24 +28,24 @@ This is not how the squad moves, but where the squad's units move to. The potent
 The squad has four elements that can change the behavior of the squad.
 \begin{itemize}
 	\item \emph{Regrouping}, which has been fully described above in squad movement.
-	\item \emph{Retreating}. While the base class squad never uses this directly, derived classes can set a retreat position and the squad will then check when it is close to the retreat location. Once close it will call \texttt{onRetreatCompleted()} which has the default behavior of disbanding the squad, thus merging it with the Patrol squad. By overriding this function another behavior could be accomplished. Retreat locations are most commonly retrieved from \nameref{sec:defense_manager} via the \texttt{findRetreatPosition()}, if a squad uses another location this will be mentioned.
+	\item \emph{Retreating}. While the base class squad never uses this directly, derived classes can set a retreat location and the squad will then check when it is close to the retreat location. Once close it will call \texttt{onRetreatCompleted()} which has the default behavior of disbanding the squad, thus merging it with the Patrol squad. By overriding this function another behavior could be accomplished. Retreat locations are most commonly retrieved from \nameref{sec:defense_manager} via the \texttt{findRetreatPosition()}, if a squad uses another location this will be mentioned.
 	\item A squad can contain a \emph{unit composition}, this limits the squad to only contain units of the specific type, useful when creating special type of squads. Section \ref{sec:unit_composition} describes unit composition in more detail.
-	\item Some squads do not want to get close to enemies, in this case \emph{avoid enemies} can be turned on. This causes attacking units to move to a specific position without attacking while trying to avoid enemies, this works most of the time but not always; the potential field manager in BTHAI did not support this behavior entirely as it needs to check that the unit retreats in the right direction, this was slightly improved by adding the goal location to the potential field calculation when avoid enemies is set, the calculation of goal location was already implemented but not used in BTHAI.
+	\item Some squads do not want to get close to enemies, in this case \emph{avoid enemies} can be turned on. This causes attacking units to move to a specific location without attacking while trying to avoid enemies, this works most of the time but not always; the potential field manager in BTHAI did not support this behavior entirely as it needs to check that the unit retreats in the right direction, this was slightly improved by adding the goal location to the potential field calculation when avoid enemies is set, the calculation of goal location was already implemented but not used in BTHAI.
 	\item \emph{Wait goals} has been briefly described before in section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} and is fully described in section \ref{sec:wait_goals} \nameref{sec:wait_goals}. While adding these does not give the base squad any specific behavior, they can be used in the derived classes for trigger behaviors.
 \end{itemize}
 
 \subsection{Attack squad}
 \label{sec:attack_squad}
-The attack squad is the base class for all offensive squads—in the current version only drops are derived. If not derived, the squad will functions as a regular attack—a regular attack or battle in this section is a synonym for an attack or battle where it not follows an \nameref{sec:allied_squad}—if it is not ordered to follow an allied squad.
+The attack squad can both function as it own, but is also the base class for all attacks—in the current version only drops are derived. Used alone, it can either do a regular attack or follow an \nameref{sec:allied_squad}—a regular attack or battle in this section is a synonym for an attack or battle where it not follows an allied squad.
 
-For regular attacks the squad requests an attack from \nameref{sec:attack_coordinator} to get a location to attack. When the squad is in the wait position, i.e. close to the goal (\squadAttackWaitingPositionDistanceFromGoal), it will stop and wait for its wait goals to finish—i.e. to sync the attack with other attack squads. If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will start to retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation—retreats are covered later in this section. When all squads are in the wait position, or if any of the squads get spotted and are attacking the other squads start to initiate their attack on the goal location. To succeed with their mission they need to kill all structures in a radius of \squadAttackStructuresDestroyedGoalDistance from the goal location. After completion the squad will retreat and then disband the squad, merging with the \nameref{sec:patrol_squad}.
+For regular attacks the squad requests an attack from \nameref{sec:attack_coordinator} to get a location to attack and will start moving to attack location and regroup when needed. When the squad is close to the attack location (\squadAttackWaitingPositionDistanceFromGoal), i.e. its wait location, it will wait here until all its wait goals are finished, then it will continue moving to its attack goal. This will sync the attack with other attacking squads as they wait until the squad's either is in the wait location, under attack, or already attacking.
+
+If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will start to retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation—retreats are covered later in this section. To succeed with their mission they need to kill all structures within the radius of \squadAttackStructuresDestroyedGoalDistance from the attack location. After completion the squad will retreat back to the base, then disband the squad and merge with the \nameref{sec:patrol_squad}.
 
 \paragraph{Following an allied squad}
-To follow an allied squad either an allied squad can be set in the constructor to follow the allied squad initially, or a call to \texttt{followAlliedSquad(alliedSquad)} will convert the regular attack to follow the specified squad—attack squads can only be converted from regular to following allied, and not vice versa.
+To follow an allied squad it can either be set directly when creating the attack squad or later by a call to \texttt{followAlliedSquad(allliedSquad)}, this converts the regular attack to follow the specified squad—attack squads can only convert from a regular to following allied, and not vice versa.
 
-When the squad follows an allied squad it has a slightly different behavior. Because allied squads can merge (and split) the squad will first check if the allied squad is empty, if it is, it will search for close (\squadAttackFindAlliedSquadDistance) allied squads and follow the largest squad. If no allied squads were found, it will retreat and then disband.
-
-The squad behaves differently depending on the allied squad's current state, described below in listing \ref{lst:attack_follow_allied}.
+When the squad follows an allied squad it behaves differntly, depending on the allied squad's current state, described below in listing \ref{lst:attack_follow_allied}.
 
 \begin{lstlisting}[caption={Squad actions depending on the allied squad's state.},label={lst:attack_follow_allied}]
 switch (mpAlliedSquad->getState()) {
@@ -55,7 +55,7 @@ switch (mpAlliedSquad->getState()) {
 		setAvoidEnemyUnits(true);
 		break;
 	
-	// Go to allied target position, don't attack
+	// Go to allied target location, don't attack
 	case Retreating:
 		if (isRegroupingWithAllied()) {
 			clearAlliedRegrouping();
@@ -64,7 +64,7 @@ switch (mpAlliedSquad->getState()) {
 		setAvoidEnemyUnits(true);
 		break;
 
-	// Go to target position, attack if see anything
+	// Go to target location, attack if see anything
 	case MovingToAttack: 
 		if (isRegroupingWithAllied()) {
 			clearAlliedRegrouping();
@@ -89,14 +89,16 @@ switch (mpAlliedSquad->getState()) {
 		break;
 }
 \end{lstlisting}
-While most of the code speaks for itself, some functions need extra clarification. \texttt{handleAlliedRegrouping()} checks if the distance to the allied squad becomes to large (\squadAttackAlliedRegroupBegin), it both sets the regrouping position to the allied's center position and the squad to avoid enemy units—the regrouping is considered done when the distance between the squads are less or equal to \squadAttackAlliedRegroupEnd~away. \texttt{setGoalPosition(mpAlliedSquad->getTargetPosition())} sets the squad to move to the position where most of the allied squad's units are moving to. When using this in the state MovingToAttack, it will effectively regroup with allied squad as it will move to the same target position as the allied squad, meeting up around that location, if handleAlliedRegrouping() was used it would try to chase after the squads current location—much like in football (soccer) you shall run where the ball is heading and not where it is at the moment. This also allows the allied player to control where the bot shall attack as it will attack where the player decides to attack.
+While most of the code speaks for itself, some functions need extra clarification. \texttt{handleAlliedRegrouping()} checks if the distance to the allied squad becomes to large (\squadAttackAlliedRegroupBegin), it both sets the regrouping location to the allied's center location and the squad to avoid enemy units—the regrouping is considered done when the distance between the squads are less or equal to \squadAttackAlliedRegroupEnd~away. \texttt{setGoalPosition(mpAlliedSquad->getTargetPosition())} sets the squad to move to the location where most of the allied squad's units are moving to. When using this in the state MovingToAttack, it will effectively regroup with allied squad as it will move to the same target location as the allied squad, meeting up around that location, if handleAlliedRegrouping() was used it would try to chase after the squads current location—much like in football (soccer) you shall run where the ball is heading and not where it is at the moment. This also allows the allied player to control where the bot shall attack as it will attack where the player decides to attack.
 
-\texttt{mpsAttackCoordinator->requestAttack(this)} uses \nameref{sec:attack_coordinator} to find a place to attack; as mentioned in section \ref{sec:attack_coordinator} it will find an attack position close to the allied squad's target. Why not use the target as with MovingToAttack and have the AttackSquad create the attack position? Because
+\texttt{mpsAttackCoordinator->requestAttack(this)} uses \nameref{sec:attack_coordinator} to find a place to attack; as mentioned in section \ref{sec:attack_coordinator} it will find an attack location close to the allied squad's target. Why not use the target as with MovingToAttack and have the AttackSquad create the attack location? Because
 \begin{inparaenum}[1\upshape)]
 	\item we want all attack request to be in the same location, if the attacks needs to be fixed or better coordinated we only need to change it in one place;
 	\item in the future the squad could get a location of a prioritized building to attack; and
 	\item using allied target directly it will cause our units to fight exactly where the player is, which might crowd the place not making all units able to fight, but could be better if squads are smaller—more experimentation on this subject is needed.
 \end{inparaenum}
+
+In addition the squad need to cope with when the allied squad splits or merges with another allied squad. If the current allied squad is empty of units (as it can become when it merges with another allied squad) it will search for close (\squadAttackFindAlliedSquadDistance) allied squads and follow the largest squad. If no allied squads were found, it will retreat and then disband.
 
 \subsection{Drop squad}
 \label{sec:drop_squad}
@@ -144,16 +146,16 @@ case Attack:
 	break;
 }
 \end{lstlisting}
-You might question why not merge the state LoadUnits and Transport as this code would mean no real difference? Because there is more than meets the eye to setState() works differently for each state, \texttt{setState(LoadUnits)} sets the transportation unit to load units and disables regrouping; \texttt{setState(Transport)} enables regrouping again; and \texttt{setState(Attack)} sets the transportation to unload all units and regrouping is enabled.
+While the code explains it self setState() does not as it does not merely set the state but also the behavior of the squad in that state. \texttt{setState(LoadUnits)} sets the transportation(s) to load all ground units and disables regrouping; \texttt{setState(Transport)} enables regrouping again; and \texttt{setState(Attack)} sets the transportation to unload all units and enables regrouping.
 
-But how does the drop squad know if its goal has completed? Just as attack squad, it checks if all enemy structures close to the target is done. But as the goal of the drop is not to destroy all buildings, merely to distract the enemy, it also has a timeout function which will make the drop retreat after \squadDropAttackTimeout, but only if it's not currently in the target region.
+The drop squad uses the same method as attack squad to check if its goal has completed, although it rarely does. Because the goal of the drop is not to destroy all buildings, merely to distract the enemy, it also has a timeout function which will make the drop retreat after \squadDropAttackTimeout, but only if it's not currently in the target region.
 
 Now you know how it works, but which units will be used for the drop, as drops should not just use random units and hope for the best? It uses \nameref{sec:unit_composition}s for this—section \ref{sec:unit_composition} describes the unit composition. 
 
 %: Write which drops are available in the current version of BATS
 
 \paragraph{Squad movement}
-The target location to drop is, as mentioned, required by the attack coordinator, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map, illustrated in figure \ref{fig:drop_squad_movement}.
+The target location to drop is, as mentioned, required by the attack coordinator, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map illustrated in figure \ref{fig:drop_squad_movement}.
 \begin{figure}[htb]
 %: Insert image of drop movement path
 %: Add color to the caption
@@ -171,9 +173,9 @@ The patrol squad will never succeed with its goal, as the goal is to patrol betw
 
 \subsection{Hold squad}
 \label{sec:hold_squad}
-The hold squad has one goal, to hold a position from enemies; any position could be hold, but it is designed to hold choke points. The squad contains a hold position and a roam position. The hold position works in more or less the same way as patrol squad's defense position, i.e. if enemy units enter the defend perimeter (\squadDefendDefendPerimeter~in radius) it will move and attack those units, as the squad always will defend here it does not bother checking if enemies are within the enemy offensive perimeter as the patrol squad does. The roam position, or rather perimeter (\squadDefendRoamPerimeter~in radius), is where the units in the squad will move to and stay until any enemy units move within the defensive perimeter.
+The hold squad has one goal, to hold a location from enemies; any location could be hold, but it is designed to hold choke points. The squad contains a hold location and a roam location. The hold location works in more or less the same way as patrol squad's defense location, i.e. if enemy units enter the defend perimeter (\squadDefendDefendPerimeter~in radius) it will move and attack those units, as the squad always will defend here it does not bother checking if enemies are within the enemy offensive perimeter as the patrol squad does. The roam perimeter (\squadDefendRoamPerimeter~in radius) is where the units in the squad will move to and stay until any enemy units move within the defensive perimeter.
 
-Terran siege tanks have a special ability when in this squad, and the bot has researched the siege tank ability. The siege tank will automatically siege up in the roaming area effectively defending the hold perimeter (and other close positions) from its position.
+Terran siege tanks have a special ability when in this squad, and the bot has researched the siege mode ability. The siege tank will automatically siege up in the roaming area effectively defending the hold perimeter (and other close positions) from its location.
 
 Hold squads use \nameref{sec:unit_composition}s to know which units should be in the hold squad—section \ref{sec:unit_composition} describes the unit composition and lists the configuration file for hold squad in listing \ref{lst:unit_composition_defense}. The current unit compositions used by BATS are listed below; the top is the composition with least priority, whereas the bottom is the one with highest priority. The name of the composition is in bold text.
 
@@ -182,22 +184,26 @@ Hold squads use \nameref{sec:unit_composition}s to know which units should be in
 	\item \textbf{Marine Medics}~4 Marines, 1 Medic.
 	\item \textbf{Tanks 1}~1 Siege tank.
 	\item \textbf{Tanks 2}~2 Siege tanks.
+	\item \textbf{Tanks 4}~4 Siege tanks.
 \end{enumerate}
-The Marine spotter is used to watch for enemies as one marine alone is not a good defender. Marines and medics generally make a good composition, but these number are too low to hold of almost any attack, but they can still delay the attack until reinforcements can arrive. Tanks are very good positional holders and can hold of almost anything coming from the choke point. 
+The Marine spotter is used to watch for enemies as one marine alone is not a good defender. Marines and medics generally make a good composition, but these number are too low to hold of almost any attack, but they can still delay the attack until reinforcements can arrive. Tanks are very good positional holders and can hold of almost anything coming through the choke point\cite{day9}. 
 
-As the marine auto-bunker feature has not been enable yet another composition could be made with only for marines, but this group would be very vulnerable if the bunker was not present and there is no such feature in unit composition yet, i.e. to set a requirement for the composition, such as target position needs to have a bunker.
+If bunker strategy abilities had been implemented, another composition could be used, 4 marines, as they are good fending off enemies. One might think it is just to place a bunker in the build order and let the marines enter, but the marines in the hold squad needs to be in the same location as the bunker.
 
 \subsection{Scout squad}
 \label{sec:scout_squad}
-The scout squad scouts regions and expansions that have not been scouted for a long time, to be exact it will always go the region or expansion that was the longest time anyone from our team visited it. The \nameref{sec:exploration_manager} that handles this and thus the scout squad gets it target location from it. To avoid multiple scouts moving to the same location the scout location will reset its last visit time when the squad gets the location, although it hasn't been visited at all.
+Scouts regions and expansions that have not been scouted for a long time, to be exact it will always go the region or expansion that was the longest time anyone from our team visited it. The \nameref{sec:exploration_manager} handles this and thus the scout squad gets it target location from it. To avoid multiple scouts moving to the same location the scout location will set its last visit time when the squad gets the location, although it hasn't been visited at all.
 
 When an enemy is seen the scout will abandon its current scout location and find another one, the idea is to save the scout from being killed by the enemy. This, however, does not work correctly all times as the units will move away from the enemy and at the same time towards the goal, but if the new scout location happens to be on the other side of enemy the scout will just roam around the outer edge of the enemy. To be sure that the scout does not switch scout locations all the time when an enemy is present it will only switch once its close to any enemy, it will then need to get out of the range before it can switch goal again.
 
-Limitations with the current version of the scout. Although another unit might visit the target location the squad will not complete its goal until it has reached there itself. The second limitation is that the scout path is not optimal, thus it can move from one end of the map to the other (already passing recently scouted areas), an improvement would be to either let the squad get regions and expansions that abut to its current location, or search for the most optimal path (in regard to visit not-recently visited locations) when moving to the target location—i.e. use its via path. The first option is probably preferable as it is easy to calculate and easy to check if the first limitation should be solved, otherwise one must check all via paths and the path might not be the optimal anymore if one location is removed.
+\paragraph{Further optimizations}
+When another unit visits the target location the squad will not complete its goal until it has reached there itself. Currently the squad moves from one end of the map to the other (already passing recently scouted areas), an improvement would be to either let the squad get regions and expansions that abut to its current location (or more correctly improve Exploration Manager), or search for the most optimal path (in regard to visit not-recently visited locations) when moving to the target location—i.e. use its via path. The first option is probably preferable as it is easy to calculate and easy to check if the first limitation should be solved, otherwise one must check all via paths and the path might not be the optimal anymore if one location is removed.
 
 \subsection{Unit composition}
 \label{sec:unit_composition}
 In a nutshell, the unit composition is a feature for the squads to require specific types of units. E.g. hold squads require specific unit groups (compositions) as was explained above in section \ref{sec:hold_squad}. Below in listing \ref{lst:unit_composition_defense} the unit composition file for the hold squad is listed.
+
+%: Move unit composition listing to appendix
 
 \begin{lstlisting}[caption={Hold squad unit compositions},label={lst:unit_composition_defense},language=ini]
 ; ---------- Marine Spotter ----------
@@ -235,10 +241,17 @@ Priority = 5
 
 [tanks_2.units]
 Terran_Siege_Tank_Siege_Mode = 2
+
+; ---------- 4 Tanks ----------
+[tanks_4]
+Priority = 6
+
+[tanks_4.units]
+Terran_Siege_Tank_Siege_Mode = 4
 \end{lstlisting}
 The unit composition has two important elements: The priority and the units, higher value means higher priority, the units for the composition are listed under the units sub-section.
 
-To use compositions one calls the unit composition factory which takes a type (hold-squad, drop, etc.) of composition and a list of units (usually free units). The unit composition factory will check which compositions can be created with the available units—the composition needs to be full—and then return these sorted by priority. It is then up to the caller of unit composition factory to decide which composition to use—for hold squads it will always use the one with highest priority, drops on the other hand takes one random at the time of writing.
+To use compositions one calls the unit composition factory which takes a composition type (hold-squad, drop, etc.) of and a list of units (usually free units). The unit composition factory will check which compositions can be created with the available units—the composition needs to be full—and then return these sorted by priority. It is then up to the caller of unit composition factory to decide which composition to use—for hold squads it will always use the one with highest priority, drops on the other hand takes one random at the time of writing.
 
 \subsection{Wait goals}
 \label{sec:wait_goals}
@@ -247,4 +260,4 @@ Wait goals were created for simple one time trigger abilities. These can be adde
 To be updated wait goals shall be added to the wait goal manager which updates the goals, completed goals (succeeded, failed, timed out) will automatically be removed from the wait goal manager. When adding an wait goal to the manager an optional set type can be set, this allows all wait goals with the same set type to be easily extracted—\nameref{sec:attack coordinator} uses this when adding existing wait goals to a new attack squad.
 
 \paragraph{Existing wait goals}
-For now there is only one type of wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these, as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the enemy simultaneously. The wait goal will completed when the attack squad is in position, \squadAttackWaitingPositionDistanceFromGoal from the goal location, when the squad is under attack or attacks, or if the wait goal times out (\attackCoordinatorWaitGoalTimeout).
+For now there is only one type of wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these, as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the enemy simultaneously from diffent locations. The wait goal will complete when the attack squad is in position, \squadAttackWaitingPositionDistanceFromGoal from the attack location, when the squad is under attack or attacks, or if the wait goal times out (\attackCoordinatorWaitGoalTimeout).

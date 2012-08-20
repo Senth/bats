@@ -342,7 +342,6 @@ TilePosition DefenseManager::findRoamPosition(const BWAPI::TilePosition& defendP
 		for (int y = defendPosition.y() - maxDist; y <= defendPosition.y() + maxDist; y++) {
 			TilePosition currentPos(x, y);
 
-			/// @todo make sure it's the right region
 			if (ExplorationManager::canReach(currentPos, structurePos)) {
 				int roamDistance = getSquaredDistance(defendPosition, currentPos);
 
@@ -350,8 +349,10 @@ TilePosition DefenseManager::findRoamPosition(const BWAPI::TilePosition& defendP
 					int structureDist = getSquaredDistance(structurePos, currentPos);
 
 					if (structureDist < bestDist) {
-						bestDist = structureDist;
-						roamPosition = currentPos;
+                        if (isRegionOccupiedByOurTeam(BWTA::getRegion(currentPos))) {
+                            bestDist = structureDist;
+                            roamPosition = currentPos;
+                        }
 					}
 				}
 			}
