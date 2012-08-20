@@ -760,7 +760,7 @@ Corners CoverMap::getCorners(const UnitType& type, const TilePosition& center) c
 		margin = 1;
 	}
 	else if (type == UnitTypes::Terran_Supply_Depot) {
-		margin = 0;
+		margin = 1;
 	}
 	else if (type == UnitTypes::Protoss_Pylon) {
 		margin = 0;

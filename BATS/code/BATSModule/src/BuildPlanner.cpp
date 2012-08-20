@@ -17,12 +17,18 @@ using namespace std;
 
 BuildPlanner* BuildPlanner::msInstance = NULL;
 
+const int SUPPLIES_PROVIDED = 16;
+const int SUPPLIES_INCREMENT = 3;
+const int SUPPLIES_BEGIN = 8;
+
 BuildPlanner::BuildPlanner(){
 	mResourceManager = NULL;
 	mCoverMap = NULL;
+	mAgentManager = NULL;
 
 	mResourceManager = ResourceManager::getInstance();
 	mCoverMap = CoverMap::getInstance();
+	mAgentManager = AgentManager::getInstance();
 
 	mCurrentPhase = "early";
 	BuildOrderFileReader br = BuildOrderFileReader();
@@ -141,7 +147,7 @@ void BuildPlanner::computeActions(){
 	checkUpgradeDone();
 
 	// We can do something even without workers as we have addons and upgrades.
-	//if (AgentManager::getInstance()->getWorkerCount() == 0)
+	//if (mAgentManager->getWorkerCount() == 0)
 	//{
 	//	//No workers so cant do anything
 	//	return;
@@ -154,7 +160,7 @@ void BuildPlanner::computeActions(){
 			/// @todo config variable
 			if (elapsed >= 700) {
 				//Reset the build request
-				WorkerAgent* worker = dynamic_cast<WorkerAgent*>(AgentManager::getInstance()->getAgent(mBuildQueue[i].assignedBuilderId));
+				WorkerAgent* worker = dynamic_cast<WorkerAgent*>(mAgentManager->getAgent(mBuildQueue[i].assignedBuilderId));
 				if (worker != NULL) {
 					worker->reset();
 				}
@@ -186,7 +192,7 @@ void BuildPlanner::computeActions(){
 bool BuildPlanner::hasResourcesLeft() const{
 	int totalMineralsLeft = 0;
 
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+	vector<BaseAgent*> agents = mAgentManager->getAgents();
 	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
@@ -224,31 +230,17 @@ int BuildPlanner::mineralsNearby(const TilePosition& center) const{
 bool BuildPlanner::shallBuildSupply() const{
 	UnitType supply = Broodwar->self()->getRace().getSupplyProvider();
 
-	//1. If command center is next in queue, don't build pylon
-	/*if (buildOrder.size() > 0)
-	{
-		if (buildOrder.at(0).isResourceDepot())
-		{
-			return false;
-		}
-	}*/
 
-	//2. Check if any building is unpowered (Protoss only)
-	if (isProtoss())
-	{
-		if (!mBuildOrder.empty())
-		{
-			if (mBuildOrder[0].structure != UnitTypes::Protoss_Pylon)
-			{
-				vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-				for (size_t i = 0; i < agents.size(); i++)
-				{
+	// Check if any building is unpowered (Protoss only)
+	if (isProtoss()) {
+		if (!mBuildOrder.empty()) {
+			if (mBuildOrder[0].structure != UnitTypes::Protoss_Pylon) {
+				vector<BaseAgent*> agents = mAgentManager->getAgents();
+				for (size_t i = 0; i < agents.size(); i++) {
 					BaseAgent* agent = agents[i];
-					if (agent->isAlive())
-					{
+					if (agent->isAlive()) {
 						Unit* cUnit = agent->getUnit();
-						if (cUnit->isUnpowered())
-						{
+						if (cUnit->isUnpowered()) {
 							return true;
 						}
 					}
@@ -257,86 +249,65 @@ bool BuildPlanner::shallBuildSupply() const{
 		}
 	}
 
-	//3. Check if we need supplies
-	int supplyTotal = Broodwar->self()->supplyTotal() / 2;
-	int supplyUsed = Broodwar->self()->supplyUsed() / 2;
-	if (supplyTotal - supplyUsed > 8)
-	{
+	// Check if there is a supply already in the list
+	if (nextIsOfType(supply)) {
 		return false;
 	}
 
-	if (supplyTotal >= 200)
-	{
-		//Reached max supply
+	// Get current supply difference
+	int supplyTotal = Broodwar->self()->supplyTotal();
+	int supplyUsed = Broodwar->self()->supplyUsed();
+	int supplyDiff = supplyTotal - supplyUsed;
+
+	//Reached max supply
+	if (supplyTotal >= 400) {
 		return false;
 	}
 
-	//4. Check if there is a supply already in the list
-	if (nextIsOfType(supply))
-	{
+	// Get number of supplies difference we should have before beginning building
+	int cUnitProducingStructures = mAgentManager->getUnitProducingStructureCount();
+	int supplyDiffShouldHave = SUPPLIES_BEGIN + (cUnitProducingStructures * SUPPLIES_INCREMENT);
+
+	// Decrease with the number of current supplies we have in production
+	supplyDiffShouldHave -= getSuppliesBeingBuiltCount() * SUPPLIES_PROVIDED;
+
+	if (supplyDiffShouldHave - supplyDiff <= 0) {
 		return false;
 	}
-
-	//5. Check if we are already building a supply
-	if (supplyBeingBuilt())
-	{
-		return false;
-	}
-
-	//Broodwar->printf("Supplies: %d/%d. Adding supply to buildorder", supplyUsed, supplyTotal);
 
 	return true;
 }
 
-bool BuildPlanner::supplyBeingBuilt() const{
+int BuildPlanner::getSuppliesBeingBuiltCount() const {
 	//Zerg
-	if (isZerg())
-	{
-		if (countInProduction(UnitTypes::Zerg_Overlord) > 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+	if (isZerg()) {
+		return countInProduction(UnitTypes::Zerg_Overlord) > 0;
 	}
 	
-	//Terran and Protoss
-	UnitType supply = Broodwar->self()->getRace().getSupplyProvider();
+	// Terran and Protoss
+	UnitType supplyType = Broodwar->self()->getRace().getSupplyProvider();
+	int cSupplies = 0; 
 
-	//1. Check if we have a supply in build queue
-	for (size_t i = 0; i < mBuildQueue.size(); i++)
-	{
-		if (mBuildQueue[i].structure == supply)
-		{
-			return true;
+	// Check if we have a supply in build queue
+	for (size_t i = 0; i < mBuildQueue.size(); i++) {
+		if (mBuildQueue[i].structure == supplyType) {
+			++cSupplies;
 		}
 	}
 
-	//2. Check if we are already building a supply
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (size_t i = 0; i < agents.size(); i++)
-	{
-		BaseAgent* agent = agents.at(i);
-		if (agent->isAlive())
-		{
-			if (agent->getUnitType() == supply)
-			{
-				if (!agent->getUnit()->isCompleted())
-				{
-					//Found one that is being constructed
-					return true;
-				}
-			}
+	// Check agent manager for those under construction
+	const vector<BaseAgent*>& agents = mAgentManager->getAgents();
+	for (size_t i = 0; i < agents.size(); ++i) {
+		if (agents[i]->getUnitType() == supplyType && agents[i]->isBeingBuilt()) {
+			++cSupplies;
 		}
 	}
 
-	return false;
+	return cSupplies;
 }
 
 void BuildPlanner::moveToQueue(int buildOrderIndex, int builderId){
-	BuildItem item = mBuildOrder.at(buildOrderIndex);
+	BuildItem item = mBuildOrder[buildOrderIndex];
 	mBuildOrder.erase(mBuildOrder.begin() + buildOrderIndex);
 
 	item.assignedBuilderId = builderId;
@@ -385,7 +356,7 @@ void BuildPlanner::handleWorkerDestroyed(const UnitType& type, int workerID){
 }
 
 bool BuildPlanner::executeMorph(const UnitType& target, const UnitType& evolved){
-	BaseAgent* agent = AgentManager::getInstance()->getClosestAgent(Broodwar->self()->getStartLocation(), target);
+	BaseAgent* agent = mAgentManager->getClosestAgent(Broodwar->self()->getStartLocation(), target);
 	if (agent != NULL)
 	{
 		StructureAgent* sAgent = (StructureAgent*)agent;
@@ -414,7 +385,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 			}
 
 			// Find a agent that can build the upgrade
-			const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+			const vector<BaseAgent*>& agents = mAgentManager->getAgents();
 			for (size_t i = 0; i < agents.size(); ++i) {
 				if (canResearch(item.tech, agents[i]->getUnit())) {
 					bool researchOk = agents[i]->getUnit()->research(item.tech);
@@ -439,7 +410,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 			}
 
 			// Find a agent that can build the upgrade
-			const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+			const vector<BaseAgent*>& agents = mAgentManager->getAgents();
 			for (size_t i = 0; i < agents.size(); ++i) {
 				if (canUpgrade(item.upgrade, agents[i]->getUnit())) {
 					bool upgradeOk = agents[i]->getUnit()->upgrade(item.upgrade);
@@ -464,29 +435,29 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		//	return false;
 		//}
 		
-		/// @todo Remove when BuildPlanner can handle addons
+		/// @todo Handle addons
 		if (item.structure.isAddon()) {
 			removeFirstOf(item);
 			return false;
 		}
 
 		//Hold if we are to build a new base
-		if (!mBuildQueue.empty()) {
-			if (mBuildQueue.at(0).structure.isResourceDepot()) {
-				return false;
-			}
+		//if (!mBuildQueue.empty()) {
+		//	if (mBuildQueue.at(0).structure.isResourceDepot()) {
+		//		return false;
+		//	}
 
-			vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-			for (size_t i = 0; i < agents.size(); i++) {
-				if (agents.at(i)->getUnitType().isResourceDepot() &&
-					agents.at(i)->getUnit()->isBeingConstructed())
-				{
-					return false;
-				}
-			}
-		}
+		//	vector<BaseAgent*> agents = mAgentManager->getAgents();
+		//	for (size_t i = 0; i < agents.size(); i++) {
+		//		if (agents.at(i)->getUnitType().isResourceDepot() &&
+		//			agents.at(i)->getUnit()->isBeingConstructed())
+		//		{
+		//			return false;
+		//		}
+		//	}
+		//}
 
-		else if (item.structure.isResourceDepot()) {
+		if (item.structure.isResourceDepot()) {
 			TilePosition pos = mCoverMap->findExpansionSite();
 			if (pos == TilePositions::Invalid) {
 				//No expansion site found.
@@ -651,7 +622,7 @@ void BuildPlanner::handleNoBuildspotFound(const UnitType& toBuild){
 
 	if (!removeOrder)
 	{
-		if (isProtoss() && !supplyBeingBuilt())
+		if (isProtoss() && getSuppliesBeingBuiltCount() <= 0)
 		{
 			//Insert a pylon to increase PSI coverage
 			if (!nextIsOfType(UnitTypes::Protoss_Pylon))
@@ -693,7 +664,7 @@ bool BuildPlanner::containsType(const UnitType& type) const {
 }
 
 bool BuildPlanner::coveredByDetector(const TilePosition& pos) {
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+	const vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
 	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);
@@ -754,7 +725,7 @@ bool BuildPlanner::isExpansionAvailable() const {
 int BuildPlanner::countInProduction(const UnitType& type) const {
 	int count = 0;
 	
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
+	vector<BaseAgent*> agents = mAgentManager->getAgents();
 	for (size_t i = 0; i < agents.size(); i++)
 	{
 		BaseAgent* agent = agents.at(i);

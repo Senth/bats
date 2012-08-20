@@ -76,7 +76,9 @@ void BatsModule::onStart() {
 
 	Broodwar->enableFlag(BWAPI::Flag::UserInput);
 	// Set default speed
-	Broodwar->setLocalSpeed(config::game::SPEED);
+	std::string speed = "speed ";
+	speed += utilities::string::toString(config::game::SPEED);
+	Broodwar->sendText(speed.c_str());
 
 	BWTA::readMap();
 	BWTA::analyze();

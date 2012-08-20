@@ -200,7 +200,7 @@ public:
 	bool isAlive() const;
 
 	/** Returns true if the specified unit is the same unit assigned to this agent. */
-	bool matches(BWAPI::Unit* mUnit) const;
+	bool matches(const BWAPI::Unit* mUnit) const;
 
 	/** Returns true if the agent is of the specified type. */
 	bool isOfType(BWAPI::UnitType type) const;

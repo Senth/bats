@@ -158,64 +158,67 @@ BWAPI::TilePosition AttackCoordinator::calculateAttackPosition(bool useDefendedW
 
 	highestWeight.distanceWeight = 0.0;
 	highestWeight.calculateTotalWeight();
-
-
-	// Get all expansions that haven't been checked for the last X seconds
-	vector<BWAPI::TilePosition> notScoutedExpansions = mpExplorationManager->findNotCheckedExpansions();
-	mpExplorationManager->removeOccupiedExpansions(notScoutedExpansions);
-
-	// Add and calculate expansions
-	for (size_t i = 0; i < notScoutedExpansions.size(); ++i) {
-		WeightedPosition weightedPosition(notScoutedExpansions[i]);
-
-		// Distance
-		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
-
-		// Type
-		weightedPosition.typeWeight = config::attack_coordinator::weights::EXPANSION_NOT_CHECKED;
-
-		// Defended
-		if (useDefendedWeight) {
-			weightedPosition.defendedWeight = calculateDefendedWeight(weightedPosition.position);
-		}
-
-		// Total
-		weightedPosition.calculateTotalWeight();
-
-		// New highest weighted position
-		if (highestWeight < weightedPosition) {
-			highestWeight = weightedPosition;
-		}
-	}
-
 	
 	// Calculate weight for all spotted building positions
 	const vector<shared_ptr<SpottedObject>>& spottedObjects = mpExplorationManager->getSpottedBuildings();
-	for (size_t i = 0; i < spottedObjects.size(); ++i) {
-		WeightedPosition weightedPosition(spottedObjects[i]->getTilePosition());
+
+	if (!spottedObjects.empty()) {
+		for (size_t i = 0; i < spottedObjects.size(); ++i) {
+			WeightedPosition weightedPosition(spottedObjects[i]->getTilePosition());
 		
-		// Distance
-		weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
+			// Distance
+			weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
 
-		// Type
-		weightedPosition.typeWeight = calculateStructureTypeWeight(*spottedObjects[i]);
+			// Type
+			weightedPosition.typeWeight = calculateStructureTypeWeight(*spottedObjects[i]);
 
-		// Defended
-		if (useDefendedWeight) {
-			weightedPosition.defendedWeight = calculateDefendedWeight(weightedPosition.position);
+			// Defended
+			if (useDefendedWeight) {
+				weightedPosition.defendedWeight = calculateDefendedWeight(weightedPosition.position);
+			}
+
+			// Total
+			weightedPosition.calculateTotalWeight();
+
+			// New highest weighted position
+			if (highestWeight < weightedPosition) {
+				highestWeight = weightedPosition;
+			}
 		}
+	}
+	// No spotted objects, use expansion positions instead
+	else {
+		// Get all expansions that haven't been checked for the last X seconds
+		vector<BWAPI::TilePosition> notScoutedExpansions = mpExplorationManager->findNotCheckedExpansions();
+		mpExplorationManager->removeOccupiedExpansions(notScoutedExpansions);
 
-		// Total
-		weightedPosition.calculateTotalWeight();
+		// Add and calculate expansions
+		for (size_t i = 0; i < notScoutedExpansions.size(); ++i) {
+			WeightedPosition weightedPosition(notScoutedExpansions[i]);
 
-		// New highest weighted position
-		if (highestWeight < weightedPosition) {
-			highestWeight = weightedPosition;
+			// Distance
+			weightedPosition.distanceWeight = calculateDistanceWeight(weightedPosition.position, squad);
+
+			// Type
+			weightedPosition.typeWeight = config::attack_coordinator::weights::EXPANSION_NOT_CHECKED;
+
+			// Defended
+			if (useDefendedWeight) {
+				weightedPosition.defendedWeight = calculateDefendedWeight(weightedPosition.position);
+			}
+
+			// Total
+			weightedPosition.calculateTotalWeight();
+
+			// New highest weighted position
+			if (highestWeight < weightedPosition) {
+				highestWeight = weightedPosition;
+			}
 		}
 	}
 
 
-	/// @todo Implement Overlord functionality.
+	/// @todo Implement Overlord functionality, i.e. to attack overlords.
 
 
 	return highestWeight.position;

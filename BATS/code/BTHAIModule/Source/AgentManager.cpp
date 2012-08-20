@@ -4,13 +4,14 @@
 #include "ResourceManager.h"
 #include "WorkerAgent.h"
 #include "Profiler.h"
+#include "BaseAgent.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/Commander.h"
 using namespace BWAPI;
 using namespace std;
 
 int AgentManager::StartFrame = 0;
-AgentManager* AgentManager::mpsInstance = NULL;
+AgentManager* AgentManager::msInstance = NULL;
 
 AgentManager::AgentManager()
 {
@@ -24,21 +25,24 @@ AgentManager::~AgentManager()
 		delete mAgents.at(i);
 	}
 
-	mpsInstance = NULL;
+	msInstance = NULL;
 }
 
 AgentManager* AgentManager::getInstance()
 {
-	if (mpsInstance == NULL)
+	if (msInstance == NULL)
 	{
-		mpsInstance = new AgentManager();
+		msInstance = new AgentManager();
 	}
-	return mpsInstance;
+	return msInstance;
 }
 
-vector<BaseAgent*> AgentManager::getAgents()
-{
+const vector<BaseAgent*>& AgentManager::getAgents() {
 	return mAgents;
+}
+
+const vector<const BaseAgent*>& AgentManager::getAgents() const {
+	return *reinterpret_cast<const vector<const BaseAgent*>*>(&mAgents);
 }
 
 vector<BaseAgent*> AgentManager::getAgents(const UnitType& unitType) {
@@ -59,7 +63,7 @@ vector<const BaseAgent*> AgentManager::getAgents(const UnitType& unitType) const
 	return agents;
 }
 
-int AgentManager::size()
+int AgentManager::size() const
 {
 	return mAgents.size();
 }
@@ -80,7 +84,7 @@ BaseAgent* AgentManager::getAgent(int unitID)
 	return agent;
 }
 
-void AgentManager::requestOverlord(TilePosition pos)
+void AgentManager::requestOverlord(const TilePosition& pos)
 {
 	for (size_t i = 0; i < mAgents.size(); i++)
 	{
@@ -95,7 +99,7 @@ void AgentManager::requestOverlord(TilePosition pos)
 	}
 }
 
-BaseAgent* AgentManager::getAgent(UnitType type)
+BaseAgent* AgentManager::getAgent(const UnitType& type)
 {
 	for (size_t i = 0; i < mAgents.size(); i++)
 	{
@@ -107,7 +111,7 @@ BaseAgent* AgentManager::getAgent(UnitType type)
 	return NULL;
 }
 
-BaseAgent* AgentManager::getClosestBase(TilePosition pos)
+BaseAgent* AgentManager::getClosestBase(const TilePosition& pos)
 {
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
@@ -127,7 +131,7 @@ BaseAgent* AgentManager::getClosestBase(TilePosition pos)
 	return agent;
 }
 
-BaseAgent* AgentManager::getClosestAgent(TilePosition pos, UnitType type)
+BaseAgent* AgentManager::getClosestAgent(const TilePosition& pos, const UnitType& type)
 {
 	BaseAgent* agent = NULL;
 	double bestDist = 100000;
@@ -198,7 +202,7 @@ void AgentManager::onAgentCreated(BaseAgent* newAgent) {
 	}
 }
 
-void AgentManager::removeAgent(Unit* unit)
+void AgentManager::removeAgent(const Unit* unit)
 {
 	for (size_t i = 0; i < mAgents.size(); i++)
 	{
@@ -333,7 +337,7 @@ int AgentManager::getMiningWorkerCount() const
 	return cnt;
 }
 
-BaseAgent* AgentManager::findClosestFreeWorker(TilePosition pos)
+BaseAgent* AgentManager::findClosestFreeWorker(const TilePosition& pos)
 {
 	BaseAgent* bestAgent = NULL;
 	double bestDist = 10000;
@@ -354,7 +358,7 @@ BaseAgent* AgentManager::findClosestFreeWorker(TilePosition pos)
 	return bestAgent;
 }
 
-bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
+bool AgentManager::isAnyAgentRepairingThisAgent(const BaseAgent* repairedAgent) const
 {
 	for (size_t i = 0; i < mAgents.size(); i++)
 	{
@@ -372,7 +376,7 @@ bool AgentManager::isAnyAgentRepairingThisAgent(BaseAgent* repairedAgent)
 	return false;
 }
 
-int AgentManager::noInProduction(UnitType type)
+int AgentManager::noInProduction(const UnitType& type) const
 {
 	int cnt = 0;
 	for (size_t i = 0; i < mAgents.size(); i++)
@@ -388,7 +392,7 @@ int AgentManager::noInProduction(UnitType type)
 	return cnt;
 }
 
-int AgentManager::countNoUnits(UnitType type)
+int AgentManager::countNoUnits(const UnitType& type) const
 {
 	int cnt = 0;
 	for (size_t i = 0; i < mAgents.size(); i++)
@@ -404,7 +408,7 @@ int AgentManager::countNoUnits(UnitType type)
 	return cnt;
 }
 
-int AgentManager::countNoBases()
+int AgentManager::countNoBases() const
 {
 	int cnt = 0;
 	for (size_t i = 0; i < mAgents.size(); i++)
@@ -420,7 +424,7 @@ int AgentManager::countNoBases()
 	return cnt;
 }
 
-bool AgentManager::unitsInArea(TilePosition pos, int tileWidth, int tileHeight, int unitID)
+bool AgentManager::unitsInArea(const TilePosition& pos, int tileWidth, int tileHeight, int unitID) const
 {
 	for (size_t i = 0; i < mAgents.size(); i++)
 	{
@@ -439,7 +443,7 @@ bool AgentManager::unitsInArea(TilePosition pos, int tileWidth, int tileHeight, 
 	return false;
 }
 
-TilePosition AgentManager::getClosestDetector(TilePosition startPos)
+TilePosition AgentManager::getClosestDetector(const TilePosition& startPos) const
 {
 	TilePosition pos = TilePositions::Invalid;
 	double bestDist = 10000;
@@ -468,4 +472,17 @@ void AgentManager::printGraphicDebugInfo() {
 	for (size_t i = 0; i < mAgents.size(); ++i) {
 		mAgents[i]->printGraphicDebugInfo();
 	}
+}
+
+int AgentManager::getUnitProducingStructureCount() const {
+	int cStructures = 0;
+	bool buildingWorkers = ResourceManager::getInstance()->needWorker();
+	for (size_t i = 0; i < mAgents.size(); ++i) {
+		UnitType agentType = mAgents[i]->getUnitType();
+		if (agentType.canProduce() && agentType.isBuilding() && mAgents[i]->getUnit()->isCompleted()) {
+			++cStructures;
+		}
+	}
+
+	return cStructures;
 }

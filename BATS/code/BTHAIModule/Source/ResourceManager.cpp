@@ -1,6 +1,7 @@
 #include "ResourceManager.h"
-#include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
+#include "BaseAgent.h"
+#include "BatsModule/include/BuildPlanner.h"
 
 using namespace BWAPI;
 using namespace std;

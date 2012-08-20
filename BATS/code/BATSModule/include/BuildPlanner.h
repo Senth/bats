@@ -6,6 +6,7 @@
 // Forward declarations
 class ResourceManager;
 class CoverMap;
+class AgentManager;
 
 // Namespace for the project
 namespace bats {
@@ -147,8 +148,9 @@ public:
 	/** Called on user command to switch phase. */
 	void switchToPhase(const std::string& fileName);
 
-	/** Returns the number of units of the specified type currently being produced. */
-	int countInProduction(const BWAPI::UnitType& type) const;
+	/** Returns the number of units of the specified type currently being produced.
+	 * @deprecated This function should be in AgentManager instead */
+	__declspec(deprecated) int countInProduction(const BWAPI::UnitType& type) const;
 
 	/** Called each update to issue orders. */
 	void computeActions();
@@ -185,8 +187,11 @@ public:
 	/** Checks if more supply buildings are needed. */
 	bool shallBuildSupply() const;
 
-	/** Checks if a supply is under construction. */
-	bool supplyBeingBuilt() const;
+	/**
+	 * Returns how many supplies that's currently being under construction
+	 * @return number of supplies currently under construction
+	 */
+	int getSuppliesBeingBuiltCount() const;
 
 	/**
 	 * Checks if the next structure in the build order is of this type.
@@ -260,6 +265,7 @@ private:
 	 */
 	void checkUpgradeDone();
 
+
 	std::vector<BuildItem> mBuildOrder;
 	std::vector<BuildItem> mBuildQueue;
 	int mLastCallFrame;
@@ -268,6 +274,7 @@ private:
 
 	ResourceManager* mResourceManager;
 	CoverMap* mCoverMap;
+	AgentManager* mAgentManager;
 
 	static BuildPlanner* msInstance;
 };

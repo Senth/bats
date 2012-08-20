@@ -126,7 +126,7 @@ void AttackSquad::handleNormalBehavior() {
 			}
 		} else {
 			setTemporaryGoalPosition(getCenter());
-		} 
+		}
 	}
 }
 

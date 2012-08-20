@@ -1,6 +1,7 @@
 #include "UnitCreator.h"
 #include "BuildPlanner.h"
 #include "Config.h"
+#include "BTHAIModule/Source/BaseAgent.h"
 #include "BTHAIModule/Source/ResourceManager.h"
 #include "BTHAIModule/Source/AgentManager.h"
 #include "Utilities/Logger.h"

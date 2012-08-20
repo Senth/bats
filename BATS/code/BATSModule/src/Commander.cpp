@@ -103,6 +103,8 @@ void Commander::computeOwnReactions() {
 			issueCommand(Command_Expand, false, Reason_BotExpansionsSaturated);
 		} else if (mSelfClassifier->isAnExpansionLowOnMinerals()) {
 			issueCommand(Command_Expand, false, Reason_BotExpansionRunningLow);
+		} else if (mSelfClassifier->isHighOnMinerals()) {
+			issueCommand(Command_Expand, false, Reason_BotHighOnResources);
 		}
 	}
 

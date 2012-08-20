@@ -81,7 +81,7 @@ const Unit* BaseAgent::getUnit() const
 	return unit;
 }
 
-bool BaseAgent::matches(Unit *mUnit) const
+bool BaseAgent::matches(const Unit *mUnit) const
 {
 	if (isAlive())
 	{

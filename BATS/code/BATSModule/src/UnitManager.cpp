@@ -21,10 +21,10 @@ UnitManager::~UnitManager() {
 }
 
 UnitManager* UnitManager::getInstance() {
-	if (mpsInstance == NULL) {
-		mpsInstance = new UnitManager();
+	if (msInstance == NULL) {
+		msInstance = new UnitManager();
 	}
-	UnitManager* unitManager = dynamic_cast<UnitManager*>(mpsInstance);
+	UnitManager* unitManager = dynamic_cast<UnitManager*>(msInstance);
 	
 	// assert: Forgot to call UnitManager::getInstance() before AgentManager::getInstance().
 	assert(unitManager != NULL);
