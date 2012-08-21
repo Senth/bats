@@ -225,6 +225,9 @@ namespace squad {
 }
 
 namespace unit {
+	
+	bool set(const utilities::VariableInfo& variableInfo);
+	
 	namespace medic {
 		int HEAL_SEARCH_DISTANCE = 0;
 		int HEAL_SEARCH_DISTANCE_SQUARED = HEAL_SEARCH_DISTANCE * HEAL_SEARCH_DISTANCE;
@@ -232,7 +235,11 @@ namespace unit {
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
 
-	bool set(const utilities::VariableInfo& variableInfo);
+	namespace scv {
+		int REPAIR_SEARCH_DISTANCE = 0;
+
+		bool set(const utilities::VariableInfo& variableInfo);
+	}
 }
 
 namespace wait_goals {
@@ -804,6 +811,8 @@ bool squad::drop::set(const utilities::VariableInfo& variableInfo) {
 bool unit::set(const utilities::VariableInfo& variableInfo) {
 	if (variableInfo.subsection == "medic") {
 		return medic::set(variableInfo);
+	} else if (variableInfo.subsection == "scv") {
+		return scv::set(variableInfo);
 	} else {
 		ERROR_MESSAGE(false, "Unknown subsection '" << variableInfo.section << "." <<
 			variableInfo.subsection << "' in " << variableInfo.file << ".ini");
@@ -818,6 +827,18 @@ bool unit::medic::set(const utilities::VariableInfo& variableInfo) {
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(HEAL_SEARCH_DISTANCE));
 		HEAL_SEARCH_DISTANCE = variableInfo;
 		HEAL_SEARCH_DISTANCE_SQUARED = HEAL_SEARCH_DISTANCE * HEAL_SEARCH_DISTANCE;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+bool unit::scv::set(const utilities::VariableInfo& variableInfo) {
+	if (variableInfo.name == "repair_search_distance") {
+		gOldValue = toString(REPAIR_SEARCH_DISTANCE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_SEARCH_DISTANCE));
+		REPAIR_SEARCH_DISTANCE = variableInfo;
 	} else {
 		return false;
 	}

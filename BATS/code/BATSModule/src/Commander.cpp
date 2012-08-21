@@ -286,8 +286,15 @@ void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 	// Get free units
 	std::vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
-	// Only add if we have free units
-	if (mSelfClassifier->canFrontalAttack(freeUnits)) {
+	bool canAttack;
+	// Allied ordered Only add if we have free units
+	if (alliedOrdered) {
+		canAttack = !freeUnits.empty();
+	} else {
+		canAttack = mSelfClassifier->canFrontalAttack(freeUnits);
+	}
+
+	if (canAttack) {
 		// Add the units to the old attack squad if it exists
 		AttackSquadPtr oldSquad = mSquadManager->getFrontalAttack();
 
@@ -360,7 +367,14 @@ void Commander::orderJoin(bool alliedOrdered, Reasons reason) {
 		if (!mSelfClassifier->isUnderAttack()) {
 			const std::vector<UnitAgent*>& freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
 
-			if (mSelfClassifier->canFrontalAttack(freeUnits)) {
+			bool canAttack;
+			if (alliedOrdered) {
+				canAttack = !freeUnits.empty();
+			} else {
+				canAttack = mSelfClassifier->canFrontalAttack(freeUnits);
+			}
+
+			if (canAttack) {
 				AlliedSquadCstPtr alliedSquad = mAlliedArmyManager->getAlliedFrontalSquad();
 
 				if (NULL != alliedSquad) {

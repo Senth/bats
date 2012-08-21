@@ -49,7 +49,7 @@ public:
 	bool canBuild(BWAPI::UnitType type) const;
 
 	/** Assigns the agent to repair a building or tank. */
-	bool assignToRepair(BWAPI::Unit* building);
+	bool assignToRepair(const BWAPI::Unit* building);
 
 	/** Assigns the unit to construct a building of the specified type. */
 	bool assignToBuild(BWAPI::UnitType type);
@@ -75,17 +75,24 @@ public:
 	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None) const;
 
 private:
-	void handleKitingWorker();
-	BWAPI::Unit* getEnemyUnit();
-	BWAPI::Unit* getEnemyBuilding();
-	BWAPI::Unit* getEnemyWorker();
+	__declspec(deprecated) void handleKitingWorker();
+	__declspec(deprecated) BWAPI::Unit* getEnemyUnit();
+	__declspec(deprecated) BWAPI::Unit* getEnemyBuilding();
+	__declspec(deprecated) BWAPI::Unit* getEnemyWorker();
 	bool buildSpotExplored() const;
 	bool areaFree() const;
+
 	/**
 	 * If the unit has completed building the assigned building.
 	 * @return true if the worker completed building the assigned building.
 	 */
 	bool hasCompletedBuilding() const;
+
+	/**
+	 * Finds a close building to repair, prioritizes the building with
+	 * least % health left
+	 */
+	const BWAPI::Unit* findRepairUnit() const;
 
 	States mCurrentState;
 	BWAPI::UnitType mToBuild;

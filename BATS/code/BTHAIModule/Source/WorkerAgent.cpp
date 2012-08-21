@@ -9,6 +9,7 @@
 #include "BatsModule/include/Squad.h"
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/DefenseManager.h"
+#include "BatsModule/include/Helper.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
@@ -267,6 +268,10 @@ void WorkerAgent::computeActions()
 			}
 
 			// Find units to repair
+			const Unit* unitToRepair = findRepairUnit();
+			if (NULL != unitToRepair) {
+				assignToRepair(unitToRepair);
+			}
 		}
 
 		if (mCurrentState == FIND_BUILDSPOT)
@@ -402,12 +407,12 @@ void WorkerAgent::setState(States state)
 	}
 }
 
-bool WorkerAgent::assignToRepair(Unit* building)
+bool WorkerAgent::assignToRepair(const Unit* building)
 {
 	if (unit->isIdle() || (unit->isGatheringMinerals() && !unit->isCarryingMinerals()))
 	{
 		setState(REPAIRING);
-		unit->repair(building);
+		unit->repair(const_cast<Unit*>(building));
 		return true;
 	}
 	return false;
@@ -522,4 +527,27 @@ string WorkerAgent::getStateAsText() const
 		break;
 	};
 	return strReturn;
+}
+
+const BWAPI::Unit* WorkerAgent::findRepairUnit() const {
+	const Unit* bestUnit = NULL;
+	double bestFractionHealth = 0.0;
+
+	const std::vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+	for (size_t i = 0; i < agents.size(); ++i) {
+		if (agents[i]->getUnitType().isBuilding() || agents[i]->getUnitType().isMechanical()) {
+			if (bats::isWithinRange(agents[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition(), bats::config::unit::scv::REPAIR_SEARCH_DISTANCE)) {
+				// Calculate fraction of health
+				if (agents[i]->getUnit()->getHitPoints() < agents[i]->getUnitType().maxHitPoints()) {
+					double healthFractionLeft = static_cast<double>(agents[i]->getUnit()->getHitPoints()) / agents[i]->getUnitType().maxHitPoints();
+					if (healthFractionLeft > bestFractionHealth) {
+						bestUnit = agents[i]->getUnit();
+						bestFractionHealth = healthFractionLeft;
+					}
+				}
+			}
+		}
+	}
+
+	return bestUnit;
 }

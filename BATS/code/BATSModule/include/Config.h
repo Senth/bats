@@ -430,6 +430,14 @@ namespace bats {
 				 * @see HEAL_SEARCH_DISTANCE_SQUARED */
 				extern int HEAL_SEARCH_DISTANCE_SQUARED;
 			}
+
+			/**
+			 * SCV Units
+			 */
+			namespace scv {
+				/** How close SCVs should search for units (when not in a squad) to heal */
+				extern int REPAIR_SEARCH_DISTANCE;
+			}
 		}
 
 		/**

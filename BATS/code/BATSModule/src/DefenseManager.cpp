@@ -124,6 +124,12 @@ void DefenseManager::updateHoldSquads() {
 			// @todo Prioritize bot's defense points.
 			DefendSet::const_iterator defendIt;
 			for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
+				// Skip player's defense points
+				if (!defendIt->isOur) {
+					++defendIt;
+					continue;
+				}
+
 				bool defended = false;
 				size_t squadIndex = 0;
 				while (!defended && squadIndex < holdSquads.size()) {
