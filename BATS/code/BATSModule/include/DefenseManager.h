@@ -212,6 +212,8 @@ private:
 			underAttack = rhs.underAttack;
 			isOur = rhs.isOur;
 			isAllied = rhs.isAllied;
+
+			return *this;
 		}
 
 		/**

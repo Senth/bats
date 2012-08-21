@@ -87,84 +87,111 @@ void DefenseManager::updateHoldSquads() {
 	}
 
 
-	// Need free units from the patrol squad.
-	vector<PatrolSquadPtr> patrolSquads = mSquadManager->getSquads<PatrolSquad>();
-	if (!patrolSquads.empty()) {
-		PatrolSquadPtr pPatrolSquad = patrolSquads.front();
-
-
-		// Is any defense point undefended, create DefenseHoldSquad for that position
-		// @todo Prioritize bot's defense points.
-		DefendSet::const_iterator defendIt;
-		for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
-			bool defended = false;
-			size_t squadIndex = 0;
-			while (!defended && squadIndex < holdSquads.size()) {
-				if (holdSquads[squadIndex]->getDefendPosition() == defendIt->position) {
-					defended = true;
-				}
-				++squadIndex;
+	// Under attack, don't create new hold squads, maybe even remove?
+	if (isUnderAttack()) {
+		// Check which location is under attack
+		DefendPosition defendPositionUnderAttack;
+		DefendSet::const_iterator defendIt = mDefendPositions.begin();
+		while (NULL == defendPositionUnderAttack.pChokepoint && defendIt != mDefendPositions.end()) {
+			if (defendIt->underAttack) {
+				defendPositionUnderAttack = *defendIt;
 			}
-
-			if (!defended) {
-				// Copy units, else the vector will be corrupt when adding units
-				const vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
-				const vector<UnitComposition>& unitCompositions =
-					mUnitCompositionFactory->getUnitCompositionsByType(patrolUnits, UnitComposition_Defend);
-
-				// Create a new defense squad
-				if (!unitCompositions.empty()) {
-					const TilePosition& roamPosition = findRoamPosition(defendIt->position);
-					new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->position, roamPosition);
-					DEBUG_MESSAGE(utilities::LogLevel_Finer,
-						"DefenseManager: Found an undefended area, created a new Hold Squad, " <<
-						"Composition: " << unitCompositions.front().getName() << ", defend: " <<
-						defendIt->position << ", roam: " << roamPosition
-					);
-				}
-			}
+			++defendIt;
 		}
-	
 
-		// Create higher priority composition for any defended area, if possible
-		holdIt = holdSquads.begin();
+		/// @todo test if it needs help
+		
+		// Remove all other hold positions
+		vector<HoldSquadPtr>::iterator holdIt = holdSquads.begin();
 		while (holdIt != holdSquads.end()) {
-			vector<UnitAgent*> units = pPatrolSquad->getUnits();
-			// Add units from the existing hold squad too.
-			units.insert(units.end(), (*holdIt)->getUnits().begin(), (*holdIt)->getUnits().end());
-			const vector<UnitComposition>& unitCompositions =
-				mUnitCompositionFactory->getUnitCompositionsByType(units, UnitComposition_Defend);
-
-			if (!unitCompositions.empty() &&
-				unitCompositions.front().getPriority() > (*holdIt)->getUnitComposition().getPriority())
-			{
-				// Create new roam position, maybe a better one exist now?
-				const BWAPI::TilePosition& roamPosition = findRoamPosition((*holdIt)->getDefendPosition());
-				new HoldSquad(units, unitCompositions.front(), (*holdIt)->getDefendPosition(), roamPosition);
-				DEBUG_MESSAGE(utilities::LogLevel_Finer,
-					"DefenseManager: Upgraded hold squad, from composition '" <<
-					(*holdIt)->getUnitComposition().getName() << "' to '" <<
-					unitCompositions.front().getName() << "' in defend: " <<
-					(*holdIt)->getDefendPosition()
-				);
-
-				// Disband and delete squad
+			if ((*holdIt)->getDefendPosition() != defendPositionUnderAttack.position) {
 				(*holdIt)->tryDisband();
 				holdIt = holdSquads.erase(holdIt);
 			} else {
 				++holdIt;
 			}
 		}
+	}
+	// Not under attack, create new hold squads
+	else {
+		// Need free units from the patrol squad.
+		vector<PatrolSquadPtr> patrolSquads = mSquadManager->getSquads<PatrolSquad>();
+		if (!patrolSquads.empty()) {
+			PatrolSquadPtr pPatrolSquad = patrolSquads.front();
 
 
-		// Add more units to not full Hold Squads
-		for (size_t i = 0; i < holdSquads.size(); ++i) {
-			if (!holdSquads[i]->isFull()) {
-				// Copy units else the vector will be corrupt when adding units
-				vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
-				holdSquads[i]->addUnits(patrolUnits);
+			// Is any defense point undefended, create DefenseHoldSquad for that position
+			// @todo Prioritize bot's defense points.
+			DefendSet::const_iterator defendIt;
+			for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
+				bool defended = false;
+				size_t squadIndex = 0;
+				while (!defended && squadIndex < holdSquads.size()) {
+					if (holdSquads[squadIndex]->getDefendPosition() == defendIt->position) {
+						defended = true;
+					}
+					++squadIndex;
+				}
+
+				if (!defended) {
+					// Copy units, else the vector will be corrupt when adding units
+					const vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
+					const vector<UnitComposition>& unitCompositions =
+						mUnitCompositionFactory->getUnitCompositionsByType(patrolUnits, UnitComposition_Defend);
+
+					// Create a new defense squad
+					if (!unitCompositions.empty()) {
+						const TilePosition& roamPosition = findRoamPosition(defendIt->position);
+						new HoldSquad(patrolUnits, unitCompositions.front(), defendIt->position, roamPosition);
+						DEBUG_MESSAGE(utilities::LogLevel_Finer,
+							"DefenseManager: Found an undefended area, created a new Hold Squad, " <<
+							"Composition: " << unitCompositions.front().getName() << ", defend: " <<
+							defendIt->position << ", roam: " << roamPosition
+						);
+					}
+				}
 			}
-			
+	
+
+			// Create higher priority composition for any defended area, if possible
+			holdIt = holdSquads.begin();
+			while (holdIt != holdSquads.end()) {
+				vector<UnitAgent*> units = pPatrolSquad->getUnits();
+				// Add units from the existing hold squad too.
+				units.insert(units.end(), (*holdIt)->getUnits().begin(), (*holdIt)->getUnits().end());
+				const vector<UnitComposition>& unitCompositions =
+					mUnitCompositionFactory->getUnitCompositionsByType(units, UnitComposition_Defend);
+
+				if (!unitCompositions.empty() &&
+					unitCompositions.front().getPriority() > (*holdIt)->getUnitComposition().getPriority())
+				{
+					// Create new roam position, maybe a better one exist now?
+					const BWAPI::TilePosition& roamPosition = findRoamPosition((*holdIt)->getDefendPosition());
+					new HoldSquad(units, unitCompositions.front(), (*holdIt)->getDefendPosition(), roamPosition);
+					DEBUG_MESSAGE(utilities::LogLevel_Finer,
+						"DefenseManager: Upgraded hold squad, from composition '" <<
+						(*holdIt)->getUnitComposition().getName() << "' to '" <<
+						unitCompositions.front().getName() << "' in defend: " <<
+						(*holdIt)->getDefendPosition()
+					);
+
+					// Disband and delete squad
+					(*holdIt)->tryDisband();
+					holdIt = holdSquads.erase(holdIt);
+				} else {
+					++holdIt;
+				}
+			}
+
+
+			// Add more units to not full Hold Squads
+			for (size_t i = 0; i < holdSquads.size(); ++i) {
+				if (!holdSquads[i]->isFull()) {
+					// Copy units else the vector will be corrupt when adding units
+					vector<UnitAgent*> patrolUnits = pPatrolSquad->getUnits();
+					holdSquads[i]->addUnits(patrolUnits);
+				}
+			}
 		}
 	}
 }

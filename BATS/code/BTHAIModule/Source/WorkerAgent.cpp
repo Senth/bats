@@ -265,6 +265,8 @@ void WorkerAgent::computeActions()
 					unit->rightClick(mineral);
 				}
 			}
+
+			// Find units to repair
 		}
 
 		if (mCurrentState == FIND_BUILDSPOT)

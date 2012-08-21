@@ -15,8 +15,8 @@ Terran_Barracks
 Terran_Refinery
 Terran_Factory
 Terran_Machine_Shop
-TechType: Tank_Siege_Mode
 Terran_Command_Center
+TechType: Tank_Siege_Mode
 Terran_Factory
 Terran_Machine_Shop
 

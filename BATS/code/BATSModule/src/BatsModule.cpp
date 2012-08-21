@@ -78,6 +78,7 @@ void BatsModule::onStart() {
 	// Set default speed
 	std::string speed = "speed ";
 	speed += utilities::string::toString(config::game::SPEED);
+	Broodwar->setLocalSpeed(config::game::SPEED);
 	Broodwar->sendText(speed.c_str());
 
 	BWTA::readMap();
