@@ -169,6 +169,7 @@ void IntentionWriter::initStringToEnumWrappers() {
 	mIntentionStringToEnums["BotDropNot"] = Intention_BotDropNot;
 	mIntentionStringToEnums["BotExpand"] = Intention_BotExpand;
 	mIntentionStringToEnums["BotExpandNot"] = Intention_BotExpandNot;
+	mIntentionStringToEnums["BotNeedHelp"] = Intention_BotNeedHelp;
 	mIntentionStringToEnums["BotRetreat"] = Intention_BotRetreat;
 	mIntentionStringToEnums["BotScout"] = Intention_BotScout;
 	mIntentionStringToEnums["BotScoutNot"] = Intention_BotScoutNot;

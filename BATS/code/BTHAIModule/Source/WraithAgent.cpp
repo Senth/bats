@@ -49,7 +49,7 @@ bool WraithAgent::checkUseCloak()
 	{
 		if (!unit->isCloaked())
 		{
-			if (unit->getEnergy() >= 25 && !isDetectorWithinRange(unit->getTilePosition(), 192))
+			if (unit->getEnergy() >= 25 && !isDetectorWithinRange(192))
 			{
 				int range = 10 * 32;
 				int eCnt = enemyUnitsWithinRange(range);

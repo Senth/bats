@@ -38,14 +38,14 @@ namespace TextColors {
  * Protoss_Assimilator, Zerg_Extractor
  * @return true if the unit is a gas building.
  */
-bool isGasStructure(BWAPI::Unit* unit);
+bool isGasStructure(const BWAPI::Unit* unit);
 
 /**
  * A function to check if a unit belongs to us
  * @param unit unit to check if it belongs to us
  * @return true if the unit belongs to us, else false
  */
-inline bool isOurs(BWAPI::Unit* unit) {
+inline bool isOurs(const BWAPI::Unit* unit) {
 	return unit->getPlayer() == BWAPI::Broodwar->self();
 }
 
@@ -54,7 +54,7 @@ inline bool isOurs(BWAPI::Unit* unit) {
  * @param unit unit to check if it belongs to an ally
  * @return true if the unit belongs to an ally.
  */
-inline bool isAllied(BWAPI::Unit* unit) {
+inline bool isAllied(const BWAPI::Unit* unit) {
 	return BWAPI::Broodwar->self()->isAlly(unit->getPlayer()) &&
 		BWAPI::Broodwar->self() != unit->getPlayer();
 }
@@ -64,7 +64,7 @@ inline bool isAllied(BWAPI::Unit* unit) {
  * @param unit unit to check if it belongs to an enemy
  * @return true if the unit belongs to an enemy.
  */
-inline bool isEnemy(BWAPI::Unit* unit) {
+inline bool isEnemy(const BWAPI::Unit* unit) {
 	return BWAPI::Broodwar->self()->isEnemy(unit->getPlayer());
 }
 
@@ -75,6 +75,12 @@ inline bool isEnemy(BWAPI::Unit* unit) {
  * @return true if an enemy is found within the radius.
  */
 bool isEnemyWithinRadius(const BWAPI::TilePosition& center, int radius);
+
+/**
+ * Returns all enemy units (from all enemies)
+ * @return vector with all enemy units
+ */
+std::vector<BWAPI::Unit*> getEnemyUnits();
 
 /**
  * Searches for an enemy position within the specified radius. This version returns
@@ -114,12 +120,17 @@ inline int getSquaredDistance(const T& a, const T& b) {
  * @pre type T needs to have a function x() and y()
  * @param a the first point
  * @param b the second point
- * @param range the maximum distance between point a and b. Range shall not be squared.
+ * @param range the maximum distance between point a and b.
+ * @param squared if range is already squared, defaults to false
  * @return true if a and b is withing range, false otherwise.
  */
 template<typename T>
-inline bool isWithinRange(const T& a, const T& b, int range) {
-	return getSquaredDistance(a, b) <= range * range;
+inline bool isWithinRange(const T& a, const T& b, int range, bool squared = false) {
+	if (squared) {
+		return getSquaredDistance(a, b) <= range;
+	} else {
+		return getSquaredDistance(a, b) <= range * range;
+	}
 }
 
 /**

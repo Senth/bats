@@ -65,6 +65,10 @@ void DefenseManager::update() {
 	updateUnderAttackPositions();
 	updatePatrolSquad();
 	updateHoldSquads();
+
+	if (mUnderAttack) {
+		mIntentionWriter->writeIntention(Intention_BotNeedHelp, Reason_BotIsUnderAttack);
+	}
 }
 
 void DefenseManager::updateHoldSquads() {

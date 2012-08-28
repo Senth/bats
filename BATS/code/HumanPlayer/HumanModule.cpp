@@ -12,7 +12,7 @@ HumanModule::~HumanModule() {}
 void HumanModule::onStart() {
 	// Sleep, necessary for not crashing BATS bot
 #ifdef _DEBUG
-	Sleep(1000);
+	Sleep(2000);
 #endif
 }
 void HumanModule::onEnd(bool isWinner) {}

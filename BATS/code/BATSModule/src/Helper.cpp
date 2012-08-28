@@ -7,6 +7,7 @@
 
 using namespace BWAPI;
 using namespace bats;
+using namespace std;
 
 std::string bats::TextColors::LIGHT_BLUE = "\x02";
 std::string bats::TextColors::DARK_YELLOW = "\x03";
@@ -30,14 +31,14 @@ std::string bats::TextColors::GREY_GREEN = "\x1D";
 std::string bats::TextColors::GREY_BLUE = "\x1E";
 std::string bats::TextColors::CYAN = "\x1F";
 
-bool bats::isGasStructure(BWAPI::Unit* unit) {
+bool bats::isGasStructure(const BWAPI::Unit* unit) {
 	if (unit != NULL) {
-		const BWAPI::UnitType& unitType = unit->getType();
+		const UnitType& unitType = unit->getType();
 
-		if (unitType == BWAPI::UnitTypes::Resource_Vespene_Geyser ||
-			unitType == BWAPI::UnitTypes::Terran_Refinery ||
-			unitType == BWAPI::UnitTypes::Protoss_Assimilator ||
-			unitType == BWAPI::UnitTypes::Zerg_Extractor)
+		if (unitType == UnitTypes::Resource_Vespene_Geyser ||
+			unitType == UnitTypes::Terran_Refinery ||
+			unitType == UnitTypes::Protoss_Assimilator ||
+			unitType == UnitTypes::Zerg_Extractor)
 		{
 			return true;
 		}
@@ -56,6 +57,19 @@ bool bats::isEnemyWithinRadius(const BWAPI::TilePosition& center, int radius) {
 	}
 
 	return false;
+}
+
+vector<Unit*> bats::getEnemyUnits() {
+	vector<Unit*> enemyUnits;
+
+	const set<Player*>& players = Broodwar->enemies();
+	set<Player*>::const_iterator playerIt;
+	for (playerIt = players.begin(); playerIt != players.end(); ++playerIt) {
+		const set<Unit*>& units = (*playerIt)->getUnits();
+		enemyUnits.insert(enemyUnits.end(), units.begin(), units.end());
+	}
+
+	return enemyUnits;
 }
 
 BWAPI::TilePosition bats::findEnemyPositionWithinRadius(const BWAPI::TilePosition& center, int radius) {

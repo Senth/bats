@@ -14,22 +14,19 @@ SiegeTankAgent::SiegeTankAgent(Unit* mUnit) : UnitAgent(mUnit)
 void SiegeTankAgent::computeActions()
 {
 	// Only check the various siege modes if we actually have siege mode.
-	if (Broodwar->self()->hasResearched(TechTypes::Tank_Siege_Mode))
-	{
+	if (Broodwar->self()->hasResearched(TechTypes::Tank_Siege_Mode)) {
 		switch (mSiegeMode) {
 			case SiegeMode_None:
 				// Does nothing
 				break;
 
 			case SiegeMode_Auto: {
-				int eCnt = enemyGroundUnitsWithinRange(getGroundRange(UnitTypes::Terran_Siege_Tank_Siege_Mode));
-				if (eCnt > 0 && !unit->isSieged())
-				{
+				int cEnemies = enemyGroundUnitsWithinRange(getGroundRange(UnitTypes::Terran_Siege_Tank_Siege_Mode));
+				if (cEnemies > 0 && !unit->isSieged()) {
 					unit->siege();
 					return;
 				}
-				if (eCnt == 0 && unit->isSieged())
-				{
+				if (cEnemies == 0 && unit->isSieged()) {
 					unit->unsiege();
 					return;
 				}

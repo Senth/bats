@@ -12,12 +12,13 @@ GhostAgent::GhostAgent(Unit* mUnit) : UnitAgent(mUnit)
 
 void GhostAgent::computeActions()
 {
-	int eCnt = enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), 384) + enemyAirAttackingUnitsWithinRange(unit->getTilePosition(), 384); //384 = range of tank in siege mode
+	/// @todo use const variables instead of 384 and 192 (what does 192 mean?)
+	int eCnt = enemyGroundAttackingUnitsWithinRange(384) + enemyAirAttackingUnitsWithinRange(384); //384 = range of tank in siege mode
 	
 	TechType cloak = TechTypes::Personnel_Cloaking;
 	if (Broodwar->self()->hasResearched(cloak))
 	{
-		if (!unit->isCloaked() && eCnt > 0 && !isDetectorWithinRange(unit->getTilePosition(), 192))
+		if (!unit->isCloaked() && eCnt > 0 && !isDetectorWithinRange(192))
 		{
 			if (unit->getEnergy() > 25)
 			{

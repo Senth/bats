@@ -24,7 +24,7 @@ void VultureAgent::computeActions()
 	//	}
 	//}
 
-	int eCnt = enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), 320);
+	int eCnt = enemyGroundAttackingUnitsWithinRange(320);
 	if (eCnt > 0)
 	{
 		int framesSinceDrop = Broodwar->getFrameCount() - mineDropFrame;

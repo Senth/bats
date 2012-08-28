@@ -203,195 +203,142 @@ void UnitAgent::computeMoveAction(bool defensive, bool forceMove)
 	msPfManager->computeAttackingUnitActions(this, goal, defensive, forceMove);
 }
 
-int UnitAgent::enemyUnitsWithinRange(int maxRange) const
-{
-	int eCnt = 0;
-	int j = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if ((*i)->exists())
-		{
-			double dist = unit->getDistance((*i));
-			if (dist <= maxRange)
-			{
-				eCnt++;
+int UnitAgent::enemyUnitsWithinRange(int maxRange) const {
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->exists()) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
 			}
 		}
-
-		j++;
 	}
 
-	return eCnt;
+	return cEnemies;
 }
 
-int UnitAgent::enemyGroundUnitsWithinRange(int maxRange) const
-{
-	if (maxRange < 0)
-	{
+int UnitAgent::enemyGroundUnitsWithinRange(int maxRange) const {
+	if (maxRange < 0) {
 		return 0;
 	}
 
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if (!((*i)->getType().isFlyer()))
-		{
-			if ((*i)->exists())
-			{
-				double dist = unit->getDistance((*i));
-				if (dist <= maxRange)
-				{
-					eCnt++;
-				}
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (!enemyUnits[i]->getType().isFlyer()) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
 			}
 		}
-		
 	}
 
-	return eCnt;
+	return cEnemies;
 }
 
-int UnitAgent::enemySiegedTanksWithinRange(TilePosition center) const
-{
+int UnitAgent::enemySiegedTanksWithinRange() const {
 	int maxRange = 12 * 32 + 16;
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		if ((*i)->exists())
-		{
-			if ((*i)->getType().getID() == UnitTypes::Terran_Siege_Tank_Siege_Mode.getID())
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+
+	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
+			}
+		}
+	}
+
+	return cEnemies;
+}
+
+int UnitAgent::enemyGroundAttackingUnitsWithinRange(int maxRange) const {
+	if (maxRange < 0) {
+		return 0;
+	}
+
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (!enemyUnits[i]->getType().isFlyer() && canAttack(enemyUnits[i]->getType(), getUnitType())) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
+			}
+		}
+	}
+
+	return cEnemies;
+}
+
+int UnitAgent::enemyAirUnitsWithinRange(int maxRange) const {
+	if (maxRange < 0) {
+		return 0;
+	}
+
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->getType().isFlyer() || (enemyUnits[i]->getType().isFlyingBuilding() && enemyUnits[i]->isLifted())) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
+			}
+		}
+	}
+
+	return cEnemies;
+}
+
+int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange) const {
+	if (maxRange < 0) {
+		return 0;
+	}
+
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->getType().isFlyer()) {
+			if (enemyUnits[i]->getType().groundWeapon().targetsGround() ||
+				enemyUnits[i]->getType().airWeapon().targetsGround())
 			{
-				double dist = (*i)->getDistance(Position(center));
-				if (dist <= maxRange)
-				{
-					eCnt++;
+				if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+					++cEnemies;
 				}
 			}
 		}
 	}
 
-	return eCnt;
+	return cEnemies;
 }
 
-int UnitAgent::enemyGroundAttackingUnitsWithinRange(TilePosition center, int maxRange) const
-{
-	if (maxRange < 0)
-	{
+int UnitAgent::enemyAirAttackingUnitsWithinRange(int maxRange) const {
+	if (maxRange < 0) {
 		return 0;
 	}
 
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if ((*i)->exists())
-		{
-			if (!((*i)->getType().isFlyer() || (*i)->getType().isFlyingBuilding()))
-			{
-				if (canAttack((*i)->getType(), unit->getType()))
-				{
-					double dist = (*i)->getDistance(Position(center));
-					if (dist <= maxRange)
-				{
-						eCnt++;
-					}
-				}
+	int maxRangeSquared = maxRange * maxRange;
+	int cEnemies = 0;
+	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->getType().isFlyer() && canAttack(enemyUnits[i]->getType(), getUnitType())) {
+			if (bats::isWithinRange(getUnit()->getPosition(), enemyUnits[i]->getPosition(), maxRangeSquared, true)) {
+				++cEnemies;
 			}
 		}
 	}
 
-	return eCnt;
-}
-
-int UnitAgent::enemyAirUnitsWithinRange(int maxRange) const
-{
-	if (maxRange < 0)
-	{
-		return 0;
-	}
-
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if ((*i)->exists())
-		{
-			if ((*i)->getType().isFlyer() || (*i)->getType().isFlyingBuilding())
-			{
-				double dist = unit->getDistance((*i));
-				if (dist <= maxRange)
-				{
-					eCnt++;
-				}
-			}
-		}	
-	}
-
-	return eCnt;
-}
-
-int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange) const
-{
-	if (maxRange < 0)
-	{
-		return 0;
-	}
-
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if ((*i)->exists())
-		{
-			UnitType type = (*i)->getType();
-			if (type.groundWeapon().targetsGround() || type.airWeapon().targetsGround())
-			{
-				if ((*i)->getType().isFlyer() || (*i)->getType().isFlyingBuilding())
-				{
-					double dist = unit->getDistance((*i));
-					if (dist <= maxRange)
-					{
-						eCnt++;
-					}
-				}
-			}
-		}	
-	}
-
-	return eCnt;
-}
-
-int UnitAgent::enemyAirAttackingUnitsWithinRange(TilePosition center, int maxRange) const
-{
-	if (maxRange < 0)
-	{
-		return 0;
-	}
-
-	int eCnt = 0;
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		//Enemy seen
-		if ((*i)->exists())
-		{
-			if ((*i)->getType().isFlyer() || (*i)->getType().isFlyingBuilding())
-			{
-				if (canAttack((*i)->getType(), unit->getType()))
-				{
-					double dist = (*i)->getDistance(Position(center));
-					if (dist <= maxRange)
-				{
-						eCnt++;
-					}
-				}
-			}
-		}
-		
-	}
-
-	return eCnt;
+	return cEnemies;
 }
 
 bool UnitAgent::useDefensiveMode() const
@@ -408,21 +355,22 @@ bool UnitAgent::useDefensiveMode() const
 
 int UnitAgent::enemyAttackingUnitsWithinRange() const
 {
-	return enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), getGroundRange()) + enemyAirAttackingUnitsWithinRange(unit->getTilePosition(), getAirRange());
+	return enemyGroundAttackingUnitsWithinRange(getGroundRange()) + enemyAirAttackingUnitsWithinRange(getAirRange());
 }
 
-int UnitAgent::enemyAttackingUnitsWithinRange(int maxRange, TilePosition center) const
+int UnitAgent::enemyAttackingUnitsWithinRange(int maxRange) const
 {
-	return enemyGroundAttackingUnitsWithinRange(center, maxRange) + enemyAirAttackingUnitsWithinRange(center, maxRange);
+	return enemyGroundAttackingUnitsWithinRange(maxRange) + enemyAirAttackingUnitsWithinRange(maxRange);
 }
 
 int UnitAgent::enemyAttackingUnitsWithinRange(UnitType type) const
 {
-	return enemyGroundAttackingUnitsWithinRange(unit->getTilePosition(), getGroundRange(type)) + enemyAirAttackingUnitsWithinRange(unit->getTilePosition(), getAirRange(type));
+	return enemyGroundAttackingUnitsWithinRange(getGroundRange(type)) + enemyAirAttackingUnitsWithinRange(getAirRange(type));
 }
 
 Unit* UnitAgent::getClosestOrganicEnemy(int maxRange)
 {
+	/// @todo does not work, use bats::getEnemyUnits() instead
 	Unit* enemy = NULL;
 	double bestDist = -1;
 
@@ -447,6 +395,7 @@ Unit* UnitAgent::getClosestOrganicEnemy(int maxRange)
 
 Unit* UnitAgent::getClosestShieldedEnemy(int maxRange)
 {
+	/// @todo does not work, use bats::getEnemyUnits() instead
 	Unit* enemy = NULL;
 	double bestDist = -1;
 
@@ -471,6 +420,7 @@ Unit* UnitAgent::getClosestShieldedEnemy(int maxRange)
 
 Unit* UnitAgent::getClosestEnemyTurret(int maxRange)
 {
+	/// @todo does not work, use bats::getEnemyUnits() instead
 	Unit* enemy = NULL;
 	double bestDist = -1;
 
@@ -496,6 +446,7 @@ Unit* UnitAgent::getClosestEnemyTurret(int maxRange)
 
 Unit* UnitAgent::getClosestEnemyAirDefense(int maxRange)
 {
+	/// @todo does not work, use bats::getEnemyUnits() instead
 	Unit* enemy = NULL;
 	double bestDist = 100000;
 
@@ -549,25 +500,6 @@ int UnitAgent::friendlyUnitsWithinRange(int maxRange) const
 		if (agent->isUnit() && !agent->isOfType(UnitTypes::Terran_Medic))
 		{
 			double dist = unit->getDistance(agent->getUnit());
-			if (dist <= maxRange)
-			{
-				fCnt++;
-			}
-		}
-	}
-	return fCnt;
-}
-
-int UnitAgent::friendlyUnitsWithinRange(TilePosition tilePos, int maxRange) const
-{
-	int fCnt = 0;
-	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-		for (int i = 0; i < (int)agents.size(); i++)
-		{
-		BaseAgent* agent = agents.at(i);
-		if (agent->isUnit() && !agent->isOfType(UnitTypes::Terran_Medic))
-		{
-			double dist = agent->getUnit()->getDistance(Position(tilePos));
 			if (dist <= maxRange)
 			{
 				fCnt++;
@@ -706,9 +638,9 @@ bool UnitAgent::chargeShields()
 				if (dist <= 15)
 				{
 					//We have charger nearby. Check if we have enemies around
-					int eCnt = enemyAttackingUnitsWithinRange(12 * 32, unit->getTilePosition());
+					int eCnt = enemyAttackingUnitsWithinRange(12 * 32);
 					if (eCnt == 0)
-				{
+					{
 						unit->rightClick(charger->getUnit());
 						return true;
 					}

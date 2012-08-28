@@ -1,5 +1,4 @@
-#ifndef __UNITAGENT_H__
-#define __UNITAGENT_H__
+#pragma once
 
 #include <BWAPI.h>
 #include "BaseAgent.h"
@@ -83,14 +82,11 @@ public:
 	/** Returns the number of own units that are within maxRange of the agent. */
 	int friendlyUnitsWithinRange(int maxRange) const;
 
-	/** Returns the number of own units that are within maxRange of the specified tile. */
-	int friendlyUnitsWithinRange(BWAPI::TilePosition tilePos, int maxRange) const;
-
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the agent. */
 	int enemyAttackingUnitsWithinRange() const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within range of the center tile. */
-	int enemyAttackingUnitsWithinRange(int maxRange, BWAPI::TilePosition center) const;
+	int enemyAttackingUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the specified unit type. */
 	int enemyAttackingUnitsWithinRange(BWAPI::UnitType type) const;
@@ -102,10 +98,10 @@ public:
 	int enemyGroundUnitsWithinRange(int maxRange) const;
 
 	/** Calculates the number of enemy sieged Siege Tanks within Siege Tank range. */
-	int enemySiegedTanksWithinRange(BWAPI::TilePosition center) const;
+	int enemySiegedTanksWithinRange() const;
 
 	/** Returns the number of enemy ground units and buildings that are within maxRange of the center tile, and can attack the agent. */
-	int enemyGroundAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange) const;
+	int enemyGroundAttackingUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of flying units that are within maxRange of the agent. */
 	int enemyAirUnitsWithinRange(int maxRange) const;
@@ -118,7 +114,7 @@ public:
 	int enemyAirToGroundUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of flying unit that are within maxRange of the center tile, and can attack the agent. */
-	int enemyAirAttackingUnitsWithinRange(BWAPI::TilePosition center, int maxRange) const;
+	int enemyAirAttackingUnitsWithinRange(int maxRange) const;
 
 	/** Returns the max firerange of the ground weapon this agent has, or -1 if it cannot attack ground. */
 	int getGroundRange() const;
@@ -163,5 +159,3 @@ protected:
 private:
 	static PFManager* msPfManager;
 };
-
-#endif

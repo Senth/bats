@@ -210,7 +210,7 @@ public:
 
 	/** Checks if there are any enemy detector units withing range of the
 	 * specified position. True if there is, false if not. */
-	bool isDetectorWithinRange(BWAPI::TilePosition pos, int range) const;
+	bool isDetectorWithinRange(int range) const;
 
 	/** Returns true if this agent is a building. */
 	bool isBuilding() const;

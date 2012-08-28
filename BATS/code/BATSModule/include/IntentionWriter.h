@@ -32,6 +32,7 @@ enum Intentions {
 	Intention_BotDropNot, /**< Can't create a drop */
 	Intention_BotExpand, /**< The bot is about to expand */
 	Intention_BotExpandNot, /**< Can't create an expansion */
+	Intention_BotNeedHelp, /**< Bot needs help with something */
 	Intention_BotRetreat, /**< The bot retreats from a battle */
 	Intention_BotScout, /**< Creates a scout */
 	Intention_BotScoutNot, /**< Could not create a scout */

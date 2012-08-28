@@ -1,12 +1,13 @@
 #include "BaseAgent.h"
-#include "BatsModule/include/BuildPlanner.h"
 #include "AgentManager.h"
 #include "ResourceManager.h"
 #include "BATSModule/include/ExplorationManager.h"
-#include "Utilities/Logger.h"
+#include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/Config.h"
+#include "BatsModule/include/Helper.h"
 #include "BatsModule/include/SquadDefs.h"
 #include "BatsModule/include/DefenseManager.h"
+#include "Utilities/Logger.h"
 #include <BWAPI/Unit.h>
 
 using namespace BWAPI;
@@ -210,19 +211,18 @@ bool BaseAgent::isDamaged() const
 	return false;
 }
 
-bool BaseAgent::isDetectorWithinRange(TilePosition pos, int range) const
-{
-	for(set<Unit*>::const_iterator i=Broodwar->enemy()->getUnits().begin();i!=Broodwar->enemy()->getUnits().end();i++)
-	{
-		if ((*i)->getType().isDetector())
-		{
-			double dist = (*i)->getDistance(Position(pos));
-			if (dist <= range)
-			{
+bool BaseAgent::isDetectorWithinRange(int range) const {
+	int rangeSquared = range * range;
+	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+
+	for (size_t i = 0; i < enemyUnits.size(); ++i) {
+		if (enemyUnits[i]->getType().isDetector()) {
+			if (bats::isWithinRange(unit->getPosition(), enemyUnits[i]->getPosition(), rangeSquared, true)) {
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
