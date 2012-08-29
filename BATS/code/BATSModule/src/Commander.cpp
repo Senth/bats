@@ -506,6 +506,7 @@ void Commander::initStringToEnums() {
 	mCommandStringToEnums["drop"] = Command_Drop;
 	mCommandStringToEnums["expand"] = Command_Expand;
 	mCommandStringToEnums["join"] = Command_Join;
+	mCommandStringToEnums["follow"] = Command_Join; // Follow is synonym to join
 	mCommandStringToEnums["scout"] = Command_Scout;
 	mCommandStringToEnums["transition"] = Command_Transition;
 
