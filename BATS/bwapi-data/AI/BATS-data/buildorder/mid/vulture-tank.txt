@@ -8,16 +8,16 @@ Focuses on attacking with vultures and tanks
 tank-drops
 
 <build-order>
+Terran_Starport
+Terran_Control_Tower
 TechType: Tank_Siege_Mode
-Terran_Armory
 Terran_Factory
 Terran_Machine_Shop
+Terran_Armory
 TechType: Spider_Mines
 UpgradeType: Ion_Thrusters
 UpgradeType: Terran_Vehicle_Weapons 1
 Terran_Armory
-Terran_Starport
-Terran_Control_Tower
 Terran_Science_Facility
 TechType: Cloaking_Field
 UpgradeType: Apollo_Reactor

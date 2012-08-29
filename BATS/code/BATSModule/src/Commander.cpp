@@ -502,15 +502,18 @@ void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
 }
 
 void Commander::initStringToEnums() {
+	size_t duplicates = 0;
+
 	mCommandStringToEnums["attack"] = Command_Attack;
 	mCommandStringToEnums["drop"] = Command_Drop;
 	mCommandStringToEnums["expand"] = Command_Expand;
 	mCommandStringToEnums["join"] = Command_Join;
 	mCommandStringToEnums["follow"] = Command_Join; // Follow is synonym to join
+	duplicates++;
 	mCommandStringToEnums["scout"] = Command_Scout;
 	mCommandStringToEnums["transition"] = Command_Transition;
 
-	if (mCommandStringToEnums.size() != Command_Lim) {
+	if (mCommandStringToEnums.size() != Command_Lim + duplicates) {
 		ERROR_MESSAGE(false, "Commander: Command String to enum does not have same size as enumerations!");
 	}
 }

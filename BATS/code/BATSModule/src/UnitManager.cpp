@@ -61,10 +61,7 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 				// Only add free workers (in no squad and not building)
 				if (filter & UnitFilter_WorkersFree) {
 					WorkerAgent* pWorkerAgent = dynamic_cast<WorkerAgent*>(unitAgent);
-					if (NULL != pWorkerAgent &&
-						!pWorkerAgent->isConstructing() &&
-						pWorkerAgent->getSquadId().isInvalid())
-					{
+					if (NULL != pWorkerAgent && pWorkerAgent->isFreeWorker()) {
 						addUnit = true;
 					}
 				}

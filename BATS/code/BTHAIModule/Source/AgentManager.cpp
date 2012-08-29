@@ -7,6 +7,7 @@
 #include "BaseAgent.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/Commander.h"
+#include "BatsModule/include/Helper.h"
 using namespace BWAPI;
 using namespace std;
 
@@ -337,25 +338,22 @@ int AgentManager::getMiningWorkerCount() const
 	return cnt;
 }
 
-BaseAgent* AgentManager::findClosestFreeWorker(const TilePosition& pos)
-{
-	BaseAgent* bestAgent = NULL;
-	double bestDist = 10000;
+BaseAgent* AgentManager::findClosestFreeWorker(const TilePosition& pos) {
+	BaseAgent* bestWorker = NULL;
+	int bestDist = INT_MAX;
 
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
-	for (size_t i = 0; i < agents.size(); i++)
-	{
-		if (agents.at(i)->isFreeWorker())
-		{
-			double cDist = agents.at(i)->getUnit()->getDistance(Position(pos));
-			if (cDist < bestDist)
-			{
-				bestDist = cDist;
-				bestAgent = agents.at(i);
+	for (size_t i = 0; i < agents.size(); i++) {
+		if (agents[i]->isFreeWorker()) {
+			int dist = bats::getSquaredDistance(agents[i]->getUnit()->getTilePosition(), pos);
+			if (dist < bestDist) {
+				bestDist = dist;
+				bestWorker = agents[i];
 			}
 		}
 	}
-	return bestAgent;
+
+	return bestWorker;
 }
 
 bool AgentManager::isAnyAgentRepairingThisAgent(const BaseAgent* repairedAgent) const

@@ -89,7 +89,7 @@ public:
 	int enemyAttackingUnitsWithinRange(int maxRange) const;
 
 	/** Returns the number of enemy units and buildings that can attack and are within firerange of the specified unit type. */
-	int enemyAttackingUnitsWithinRange(BWAPI::UnitType type) const;
+	int enemyAttackingUnitsWithinRange(const BWAPI::UnitType& type) const;
 
 	/** Returns the number of enemy units and buildings that are within maxRange of the agent. */
 	int enemyUnitsWithinRange(int maxRange) const;
@@ -120,16 +120,16 @@ public:
 	int getGroundRange() const;
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack ground. */
-	static int getGroundRange(BWAPI::UnitType type);
+	static int getGroundRange(const BWAPI::UnitType& type);
 
 	/** Returns true if the attacker UnitType can attack target UnitType. Note: Does not take spells into account, only weapons. */
-	static bool canAttack(BWAPI::UnitType attacker, BWAPI::UnitType target);
+	static bool canAttack(const BWAPI::UnitType& attacker, const BWAPI::UnitType& target);
 
 	/** Returns the max firerange of the air weapon this agent has, or -1 if it cannot attack air. */
 	int getAirRange() const;
 
 	/** Returns the max firerange of the ground weapon a unit of the specified type has, or -1 if it cannot attack air. */
-	static int getAirRange(BWAPI::UnitType type);
+	static int getAirRange(const BWAPI::UnitType& type);
 	
 	/** Returns the closest organic enemy unit within maxRange, or NULL if not found. */
 	BWAPI::Unit* getClosestOrganicEnemy(int maxRange);

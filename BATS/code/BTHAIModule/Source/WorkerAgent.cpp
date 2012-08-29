@@ -34,7 +34,7 @@ WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
 
 void WorkerAgent::destroyed()
 {
-	if (mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT || mCurrentState == FIND_BUILDSPOT)
+	if (mCurrentState == MOVE_TO_SPOT || mCurrentState == FIND_BUILDSPOT)
 	{
 		if (!bats::BuildPlanner::isZerg())
 		{
@@ -44,6 +44,15 @@ void WorkerAgent::destroyed()
 			setState(GATHER_MINERALS);
 		}
 	}
+	// For Terran, send another SCV to continue building if we have started to build
+	else if (mCurrentState == CONSTRUCT && Broodwar->self()->getRace() == Races::Terran) {
+		const Unit* targetBuilding = unit->getOrderTarget();
+		if (NULL != targetBuilding) {
+			bats::BuildPlanner::getInstance()->findAnotherBuilder(targetBuilding);
+		}
+	}
+	
+
 }
 
 Unit* WorkerAgent::getEnemyUnit()
@@ -433,18 +442,17 @@ bool WorkerAgent::assignToRepair(const Unit* building)
 	return false;
 }
 
-bool WorkerAgent::assignToFinishBuild(Unit* building)
+bool WorkerAgent::assignToFinishBuild(const Unit* building)
 {
-	if (unit->isIdle() || (unit->isGatheringMinerals() && !unit->isCarryingMinerals()))
-	{
+	if (isFreeWorker()) {
 		setState(REPAIRING);
-		unit->rightClick(building);
+		unit->rightClick(const_cast<Unit*>(building));
 		return true;
 	}
 	return false;
 }
 
-bool WorkerAgent::canBuild(UnitType type) const
+bool WorkerAgent::canBuild(const UnitType& type) const
 {
 	//Make sure we have some spare resources so we dont drain
 	//required minerals for our units.
@@ -464,7 +472,7 @@ bool WorkerAgent::canBuild(UnitType type) const
 	return false;
 }
 
-bool WorkerAgent::assignToBuild(UnitType type)
+bool WorkerAgent::assignToBuild(const UnitType& type)
 {
 	mToBuild = type;
 	mBuildSpot = msCoverMap->findBuildSpot(mToBuild, getUnitID());
@@ -512,7 +520,7 @@ void WorkerAgent::reset()
 	}
 }
 
-bool WorkerAgent::isConstructing(UnitType type) const
+bool WorkerAgent::isConstructing(const UnitType& type) const
 {
 	if (mCurrentState == FIND_BUILDSPOT || mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT)
 	{

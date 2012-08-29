@@ -353,6 +353,23 @@ void BuildPlanner::handleWorkerDestroyed(const UnitType& type, int workerID){
 	}
 }
 
+void BuildPlanner::findAnotherBuilder(const BWAPI::Unit* structure) {
+	if (NULL == structure) {
+		return;
+	}
+
+	WorkerAgent* freeWorker = dynamic_cast<WorkerAgent*>(mAgentManager->findClosestFreeWorker(structure->getTilePosition()));
+
+	if (NULL != freeWorker) {
+		freeWorker->assignToFinishBuild(structure);
+	} else {
+		DEBUG_MESSAGE(utilities::LogLevel_Warning,
+			"BuildPlanner, did not find a free worker for an abandoned structure"
+		);
+	}
+
+}
+
 bool BuildPlanner::executeMorph(const UnitType& target, const UnitType& evolved){
 	BaseAgent* agent = mAgentManager->getClosestAgent(Broodwar->self()->getStartLocation(), target);
 	if (agent != NULL)

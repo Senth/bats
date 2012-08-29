@@ -52,8 +52,8 @@ void Button::update() {
 
 	// Test keyboard instead
 	if (!pressedThisTurn) {
-		// hotkeys only work if Ctrl is down
-		if (Broodwar->getKeyState(K_CONTROL) && Broodwar->getKeyState(mHotkey)) {
+		// hotkeys only work if Ctrl & Shift is down
+		if (Broodwar->getKeyState(K_CONTROL) && Broodwar->getKeyState(K_SHIFT) && Broodwar->getKeyState(mHotkey)) {
 			if (!mPressed) {
 				Broodwar->sendTextEx(true, "%s", mSendText.c_str());
 			}

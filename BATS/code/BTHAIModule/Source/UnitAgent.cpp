@@ -373,7 +373,7 @@ int UnitAgent::enemyAttackingUnitsWithinRange(int maxRange) const
 	return enemyGroundAttackingUnitsWithinRange(maxRange) + enemyAirAttackingUnitsWithinRange(maxRange);
 }
 
-int UnitAgent::enemyAttackingUnitsWithinRange(UnitType type) const
+int UnitAgent::enemyAttackingUnitsWithinRange(const UnitType& type) const
 {
 	return enemyGroundAttackingUnitsWithinRange(getGroundRange(type)) + enemyAirAttackingUnitsWithinRange(getAirRange(type));
 }
@@ -525,7 +525,7 @@ int UnitAgent::getGroundRange() const
 	return getGroundRange(unit->getType());
 }
 
-int UnitAgent::getGroundRange(UnitType type)
+int UnitAgent::getGroundRange(const UnitType& type)
 {
 	WeaponType wep1 = type.groundWeapon();
 	WeaponType wep2 = type.airWeapon();
@@ -551,7 +551,7 @@ int UnitAgent::getAirRange() const
 	return getAirRange(unit->getType());
 }
 
-int UnitAgent::getAirRange(UnitType type)
+int UnitAgent::getAirRange(const UnitType& type)
 {
 	WeaponType wep1 = type.groundWeapon();
 	WeaponType wep2 = type.airWeapon();
@@ -572,7 +572,7 @@ int UnitAgent::getAirRange(UnitType type)
 	return maxRange;
 }
 
-bool UnitAgent::canAttack(UnitType attacker, UnitType target)
+bool UnitAgent::canAttack(const UnitType& attacker, const UnitType& target)
 {
 	if (!attacker.canAttack())
 	{

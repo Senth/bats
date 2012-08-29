@@ -99,14 +99,14 @@ public:
 	int noUnitsInWeaponRange() const;
 
 	/** Checks if this unit can attack the specified target unit. */
-	bool canAttack(BWAPI::Unit* target) const;
+	bool canAttack(const BWAPI::Unit* target) const;
 
 	/** Checks if this unit can attack the specified unit type. */
-	bool canAttack(BWAPI::UnitType type) const;
+	bool canAttack(const BWAPI::UnitType& type) const;
 
 	/** Sets the goal for this unit. Goals are set from either the SquadCommander for attacking
 	 * or defending units, or from ExplorationManager for explore units. */
-	virtual void setGoal(BWAPI::TilePosition goal);
+	virtual void setGoal(const BWAPI::TilePosition& goal);
 
 	/** Clears the goal for this unit. */
 	virtual void clearGoal();
@@ -126,19 +126,19 @@ public:
 #pragma warning (push)
 #pragma warning (disable:4100)
 	/** Assigns the agent to build the specified type of unit. */
-	virtual bool assignToBuild(BWAPI::UnitType type)
+	virtual bool assignToBuild(const BWAPI::UnitType& type)
 	{
 		return false;
 	}
 
 	/** Assigns the agent to repair a unit. */
-	virtual bool assignToRepair(BWAPI::Unit* building)
+	virtual bool assignToRepair(const BWAPI::Unit* building)
 	{
 		return false;
 	}
 
 	/** Assigns the agent to continue building a non-finished building. */
-	virtual bool assignToFinishBuild(BWAPI::Unit* building)
+	virtual bool assignToFinishBuild(const BWAPI::Unit* building)
 	{
 		return false;
 	}
@@ -187,7 +187,7 @@ public:
 	bool isCompleted() const;
 
 	/** Returns true if this agent can build units of the specified type. */
-	virtual bool canBuild(BWAPI::UnitType type) const;
+	virtual bool canBuild(const BWAPI::UnitType& type) const;
 
 	/** Returns the unique id for this agent. Agent id is the same as the id of the unit
 	 * assigned to the agent. */
@@ -214,10 +214,10 @@ public:
 	bool matches(const BWAPI::Unit* mUnit) const;
 
 	/** Returns true if the agent is of the specified type. */
-	bool isOfType(BWAPI::UnitType type) const;
+	bool isOfType(const BWAPI::UnitType& type) const;
 
 	/** Returns true if the unit is of the specified type. */
-	static bool isOfType(const BWAPI::Unit* mUnit, BWAPI::UnitType type);
+	static bool isOfType(const BWAPI::Unit* mUnit, const BWAPI::UnitType& type);
 
 	/** Checks if there are any enemy detector units withing range of the
 	 * specified position. True if there is, false if not. */
@@ -242,8 +242,8 @@ public:
 	bool isDamaged() const;
 
 	/** Orders the Terran Comsat Station to do a Scanner Sweep at the specified area. */
-	bool doScannerSweep(BWAPI::TilePosition pos);
+	bool doScannerSweep(const BWAPI::TilePosition& pos);
 
 	/** Orders the Zerg Queen to do an Ensnare at the specified area. */
-	static bool doEnsnare(BWAPI::TilePosition pos);
+	static bool doEnsnare(const BWAPI::TilePosition& pos);
 };

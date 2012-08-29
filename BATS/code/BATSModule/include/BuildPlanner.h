@@ -233,22 +233,31 @@ public:
 
 	/** Returns true if the player is Terran.
 	 * @deprecated should not be here */
-	static bool isTerran();
+	__declspec(deprecated) static bool isTerran();
 
 	/** Returns true if the player is Protoss.
 	 * @deprecated should not be here */
-	static bool isProtoss();
+	__declspec(deprecated) static bool isProtoss();
 
 	/** Returns true if the player is Zerg. 
 	 * @deprecated should not be here */
-	static bool isZerg();
+	__declspec(deprecated) static bool isZerg();
+
+	/**
+	 * Finds a free worker to continue building on the specified building.
+	 * Used when the assigned worker abandons its building or the worker was killed
+	 * @param structure the structure to find another worker for
+	 * @note only applicable for Terran
+	 */
+	void findAnotherBuilder(const BWAPI::Unit* structure);
 
 private:
 	BuildPlanner();
 	/**
 	 * @todo rework moveToQueue, a bit dangerous use at the moment when executing from
 	 * executeOrder() as we don't know the index we just assume its 0. Better
-	 * would be to move an BuildItem and then search for it instead.
+	 * would be to either move an BuildItem and then search for it or to always for the
+	 * first index to be moved.
 	 */
 	void moveToQueue(int buildOrderIndex, int unitId);
 	bool executeOrder(const BuildItem& type);

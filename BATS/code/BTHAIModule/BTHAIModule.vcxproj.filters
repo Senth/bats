@@ -427,9 +427,6 @@
     <ClInclude Include="Source\TargetingAgent.h">
       <Filter>Header Files\MainAgents</Filter>
     </ClInclude>
-    <ClInclude Include="Source\WorkerAgent.h">
-      <Filter>Header Files\MainAgents</Filter>
-    </ClInclude>
     <ClInclude Include="Source\AgentManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
@@ -471,6 +468,9 @@
     </ClInclude>
     <ClInclude Include="Source\CoverMap.h">
       <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WorkerAgent.h">
+      <Filter>Header Files\UnitAgents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

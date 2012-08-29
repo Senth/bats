@@ -15,10 +15,10 @@ Terran_Barracks
 Terran_Refinery
 Terran_Factory
 Terran_Machine_Shop
-Terran_Command_Center
-TechType: Tank_Siege_Mode
 Terran_Factory
 Terran_Machine_Shop
+TechType: Tank_Siege_Mode
+Terran_Command_Center
 
 <units>
 60% Terran_Siege_Tank_Tank_Mode

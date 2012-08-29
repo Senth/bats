@@ -174,17 +174,17 @@ void StructureAgent::computeActions()
 	}
 }
 
-bool StructureAgent::canBuildUnit(UnitType type) const
+bool StructureAgent::canBuildUnit(const UnitType& type) const
 {
 	//1. Check if race matches
-	if (type.getRace().getID() != Broodwar->self()->getRace().getID())
+	if (type.getRace() != Broodwar->self()->getRace())
 	{
 		return false;
 	}
 
 	//2. Check if this unit can construct the unit
 	pair<UnitType, int> builder = type.whatBuilds();
-	if (builder.first.getID() != unit->getType().getID())
+	if (builder.first != unit->getType())
 	{
 		return false;
 	}
@@ -240,7 +240,7 @@ void StructureAgent::sendWorkers()
 	}
 }
 
-bool StructureAgent::canMorphInto(UnitType type) const
+bool StructureAgent::canMorphInto(const UnitType& type) const
 {
 	//1. Check canBuild
 	if (!Broodwar->canMake(unit, type))
@@ -264,7 +264,7 @@ bool StructureAgent::canMorphInto(UnitType type) const
 	return true;
 }
 
-bool StructureAgent::canEvolveUnit(UnitType type) const
+bool StructureAgent::canEvolveUnit(const UnitType& type) const
 {
 	//1. Check if we need the unit in a squad
 	//if (!Commander::getInstance()->needUnit(type))

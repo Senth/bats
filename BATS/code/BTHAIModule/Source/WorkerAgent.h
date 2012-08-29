@@ -46,16 +46,16 @@ public:
 	States getState() const;
 
 	/** Returns true if the Worker agent can create units of the specified type. */
-	bool canBuild(BWAPI::UnitType type) const;
+	bool canBuild(const BWAPI::UnitType& type) const;
 
 	/** Assigns the agent to repair a building or tank. */
 	bool assignToRepair(const BWAPI::Unit* building);
 
 	/** Assigns the unit to construct a building of the specified type. */
-	bool assignToBuild(BWAPI::UnitType type);
+	bool assignToBuild(const BWAPI::UnitType& type);
 
 	/** Assigns the agent to continue building a non-finished building. */
-	bool assignToFinishBuild(BWAPI::Unit* building);
+	bool assignToFinishBuild(const BWAPI::Unit* building);
 
 	/** Returns the state of the agent as text. Good for printouts. */
 	std::string getStateAsText() const;
@@ -72,7 +72,7 @@ public:
 	 * will check if it's constructing anything, defaults to UnitTypes::None
 	 * @return true if the worker is building the specified type, or building anything if
 	 * type was set to UnitTypes::None. */
-	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None) const;
+	bool isConstructing(const BWAPI::UnitType& type = BWAPI::UnitTypes::None) const;
 
 protected:
 	virtual std::string getDebugString() const;

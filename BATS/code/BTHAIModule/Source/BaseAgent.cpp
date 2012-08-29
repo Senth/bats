@@ -97,7 +97,7 @@ bool BaseAgent::matches(const Unit *mUnit) const
 	return false;
 }
 
-bool BaseAgent::isOfType(UnitType type) const
+bool BaseAgent::isOfType(const UnitType& type) const
 {
 	if (unit->getType() == type)
 	{
@@ -106,7 +106,7 @@ bool BaseAgent::isOfType(UnitType type) const
 	return false;
 }
 
-bool BaseAgent::isOfType(const Unit* mUnit, UnitType type)
+bool BaseAgent::isOfType(const Unit* mUnit, const UnitType& type)
 {
 	if (mUnit->getType() == type)
 	{
@@ -115,7 +115,7 @@ bool BaseAgent::isOfType(const Unit* mUnit, UnitType type)
 	return false;
 }
 
-bool BaseAgent::canBuild(UnitType type) const
+bool BaseAgent::canBuild(const UnitType& type) const
 {
 	//1. Check if building is being constructed
 	if (unit->isBeingConstructed())
@@ -161,9 +161,9 @@ bool BaseAgent::isFreeWorker() const
 {
 	if (unit->getType().isWorker())
 	{
-		if (unit->isIdle() || unit->isGatheringMinerals())
+		if (unit->isIdle() || (unit->isGatheringMinerals() && !unit->isCarryingMinerals()))
 		{
-			if (getSquadId() == bats::SquadId::INVALID_KEY)
+			if (getSquadId().isInvalid())
 			{
 				return true;
 			}
@@ -229,7 +229,7 @@ bool BaseAgent::isDetectorWithinRange(int range) const {
 	return false;
 }
 
-bool BaseAgent::doScannerSweep(TilePosition pos)
+bool BaseAgent::doScannerSweep(const TilePosition& pos)
 {
 	if (!bats::BuildPlanner::isTerran())
 	{
@@ -253,7 +253,7 @@ bool BaseAgent::doScannerSweep(TilePosition pos)
 	return false;
 }
 
-bool BaseAgent::doEnsnare(TilePosition pos)
+bool BaseAgent::doEnsnare(const TilePosition& pos)
 {
 	if (!bats::BuildPlanner::isZerg())
 	{
@@ -302,12 +302,12 @@ int BaseAgent::getLastActionFrame() const
 	return lastActionFrame;
 }
 
-bool BaseAgent::canAttack(Unit* target) const
+bool BaseAgent::canAttack(const Unit* target) const
 {
 	return canAttack(target->getType());
 }
 
-bool BaseAgent::canAttack(UnitType type) const
+bool BaseAgent::canAttack(const UnitType& type) const
 {
 	if (!type.isFlyer())
 	{
@@ -335,7 +335,7 @@ int BaseAgent::noUnitsInWeaponRange() const
 	return eCnt;
 }
 
-void BaseAgent::setGoal(TilePosition goal)
+void BaseAgent::setGoal(const TilePosition& goal)
 {
 	if (unit->getType().isFlyer() || unit->getType().isFlyingBuilding())
 	{

@@ -1,5 +1,4 @@
-#ifndef __STRUCTUREAGENT_H__
-#define __STRUCTUREAGENT_H__
+#pragma once
 
 #include "BaseAgent.h"
 
@@ -8,7 +7,7 @@
  * agents without logic, for example supply depots. To add logic to a building, for example Terran Academy researching
  * stim packs, an agent implementation for that unit type must be created.
  *
- * @ Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
  */
 class StructureAgent : public BaseAgent {
 
@@ -17,8 +16,8 @@ private:
 protected:
 	bool repairing;
 	
-	bool canBuildUnit(BWAPI::UnitType type) const;
-	bool canEvolveUnit(BWAPI::UnitType type) const;
+	bool canBuildUnit(const BWAPI::UnitType& type) const;
+	bool canEvolveUnit(const BWAPI::UnitType& type) const;
 
 	/**
 	 * Checks if the structure is under attack and handles that by sending
@@ -36,10 +35,8 @@ public:
 	virtual void printGraphicDebugInfo() const;
 
 	/** Checks if the agent can morph into the specified type. Zerg only. */
-	bool canMorphInto(BWAPI::UnitType type) const;
+	bool canMorphInto(const BWAPI::UnitType& type) const;
 
 	/** Sends a number of workers to a newly constructed base. */
 	void sendWorkers();
 };
-
-#endif
