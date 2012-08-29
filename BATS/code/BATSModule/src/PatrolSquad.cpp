@@ -1,6 +1,6 @@
 #include "PatrolSquad.h"
 #include "Config.h"
-#include "Helper.h"
+#include "UnitHelper.h"
 
 using namespace bats;
 using namespace BWAPI;
@@ -104,7 +104,7 @@ void PatrolSquad::handleDefend() {
 		}
 
 		const BWAPI::TilePosition& attackPosition =
-				findEnemyPositionWithinRadius(mDefendPosition, enemyRadius);
+				UnitHelper::findEnemyPositionWithinRadius(mDefendPosition, enemyRadius);
 
 		// No enemy position found with perimeter
 		if (!attackPosition.isValid()) {
@@ -144,7 +144,7 @@ bool PatrolSquad::isWithinDefendPerimeter() const {
 }
 
 bool PatrolSquad::isEnemyWithinOffensivePerimeter() const {
-	return isEnemyWithinRadius(mDefendPosition, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER);
+	return UnitHelper::isEnemyWithinRadius(mDefendPosition, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER);
 }
 
 void PatrolSquad::goToNextPatrolPosition() {

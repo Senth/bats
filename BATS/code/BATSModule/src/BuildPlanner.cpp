@@ -180,10 +180,8 @@ void BuildPlanner::computeActions(){
 	}
 
 	//Check if we need more supply buildings
-	if (isTerran() || isProtoss())
-	{
-		if (shallBuildSupply())
-		{
+	if (isTerran() || isProtoss()) {
+		if (shallBuildSupply()) {
 			addItemFirst(Broodwar->self()->getRace().getSupplyProvider());
 		}
 	}
@@ -212,7 +210,7 @@ bool BuildPlanner::hasResourcesLeft() const{
 int BuildPlanner::mineralsNearby(const TilePosition& center) const{
 	int mineralCnt = 0;
 
-	for(set<Unit*>::iterator m = Broodwar->getMinerals().begin(); m != Broodwar->getMinerals().end(); m++)
+	for(set<Unit*>::iterator m = Broodwar->getMinerals().begin(); m != Broodwar->getMinerals().end(); ++m)
 	{
 		if ((*m)->exists())
 		{
@@ -467,7 +465,7 @@ bool BuildPlanner::executeOrder(const BuildItem& item){
 		}
 
 		else if (item.structure.isRefinery()) {
-			TilePosition rSpot = mCoverMap->findBuildSpot(item.structure);
+			TilePosition rSpot = mCoverMap->findBuildSpot(item.structure, -1);
 			if (rSpot == TilePositions::Invalid) {
 				//No build spot found
 				if (mBuildOrder.size() > 0) mBuildOrder.erase(mBuildOrder.begin());

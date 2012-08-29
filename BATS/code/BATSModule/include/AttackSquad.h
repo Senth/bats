@@ -107,7 +107,7 @@ public:
 	AttackSquadPtr getThis() const;
 
 	virtual std::string getName() const;
-	virtual std::string getDebugInfo() const;
+	virtual std::string getDebugString() const;
 
 protected:
 	/**

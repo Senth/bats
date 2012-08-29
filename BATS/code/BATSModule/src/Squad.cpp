@@ -888,7 +888,7 @@ void Squad::printGraphicDebugInfo() const {
 	// Low
 	// Print type, id, number of units, number of supplies of squad
 	if (config::debug::GRAPHICS_VERBOSITY >= config::debug::GraphicsVerbosity_Low) {
-		const string& info = getDebugInfo();
+		const string& info = getDebugString();
 
 		const Position squadCenter = Position(getCenter());
 
@@ -927,7 +927,7 @@ void Squad::printGraphicDebugInfo() const {
 	}
 }
 
-string Squad::getDebugInfo() const {
+string Squad::getDebugString() const {
 	stringstream ss;
 	ss << TextColors::ROYAL_BLUE << left <<
 		setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << mId << "\n" <<

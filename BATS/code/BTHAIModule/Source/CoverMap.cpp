@@ -6,6 +6,7 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ExplorationManager.h"
 #include "BatsModule/include/Config.h"
+#include "BatsModule/include/UnitHelper.h"
 #include "BatsModule/include/Helper.h"
 #include "utilities/Logger.h"
 #include <cassert>
@@ -87,22 +88,21 @@ void CoverMap::initCoverMap() {
 	for(set<Unit*>::iterator mineralIt = Broodwar->getMinerals().begin(); mineralIt != Broodwar->getMinerals().end(); ++mineralIt) {
 		Corners corners;
 		const TilePosition& mineralPos = (*mineralIt)->getTilePosition();
-		corners.x1 = mineralPos.x() - 1;
-		corners.y1 = mineralPos.y() - 1;
-		corners.x2 = mineralPos.x() + 2;
-		corners.y2 = mineralPos.y() + 1;
+		corners.xMin = mineralPos.x() - 1;
+		corners.yMin = mineralPos.y() - 1;
+		corners.xMax = mineralPos.x() + 2;
+		corners.yMax = mineralPos.y() + 1;
 		fill(corners, TileState_Mineral);
 	}
 
 	//Fill from gas
-	for(set<Unit*>::iterator gasIt = Broodwar->getGeysers().begin(); gasIt != Broodwar->getGeysers().end(); ++gasIt)
-	{
+	for(set<Unit*>::iterator gasIt = Broodwar->getGeysers().begin(); gasIt != Broodwar->getGeysers().end(); ++gasIt) {
 		Corners corners;
 		const TilePosition& gasPos = (*gasIt)->getTilePosition();
-		corners.x1 = gasPos.x() - 1;
-		corners.y1 = gasPos.y() - 1;
-		corners.x2 = gasPos.x() + 4;
-		corners.y2 = gasPos.y() + 2;
+		corners.xMin = gasPos.x() - 1;
+		corners.yMin = gasPos.y() - 1;
+		corners.xMax = gasPos.x() + 4;
+		corners.yMax = gasPos.y() + 2;
 		fill(corners, TileState_Blocked);
 		mCoverMap[gasPos.x()][gasPos.y()] = TileState_Gas;
 	}
@@ -153,8 +153,8 @@ void CoverMap::initTilePositionRegions() {
 }
 
 bool CoverMap::isAreaFree(const Corners& corners) const {
-	for (int x = corners.x1; x <= corners.x2; ++x) {
-		for (int y = corners.y1; y <= corners.y2; ++y) {
+	for (int x = corners.xMin; x <= corners.xMax; ++x) {
+		for (int y = corners.yMin; y <= corners.yMax; ++y) {
 			if (!isPositionFree(TilePosition(x,y))) {
 				return false;
 			}
@@ -181,14 +181,14 @@ void CoverMap::blockPosition(const TilePosition& buildSpot) {
 	mCoverMap[buildSpot.x()][buildSpot.y()] = TileState_Blocked;
 }
 
-bool CoverMap::canBuild(const UnitType& toBuild, const TilePosition& buildSpot) const
+bool CoverMap::canBuildAt(const UnitType& toBuild, const TilePosition& buildSpot, int builderId) const
 {
 	const Corners& corners = getCorners(toBuild, buildSpot);
 
-	//Step 1: Check cover map.
-	for (int x = corners.x1; x <= corners.x2; x++) {
+	// Check cover map.
+	for (int x = corners.xMin; x <= corners.xMax; x++) {
 		if (x >= 0 && x < mMapWidth ) {
-			for (int y = corners.y1; y <= corners.y2; y++) {
+			for (int y = corners.yMin; y <= corners.yMax; y++) {
 				if (x >= 0 && x < mMapWidth && y >= 0 && y < mMapHeight) {
 					//Cant build here.
 					if (mCoverMap[x][y] != TileState_Buildable) {
@@ -210,28 +210,33 @@ bool CoverMap::canBuild(const UnitType& toBuild, const TilePosition& buildSpot) 
 		}
 	}
 
-	//Step 2: Check if path is available
+
+	// Is the build spot in an allied region (but not in our region)
+	const BWTA::Region* region = BWTA::getRegion(buildSpot);
+	if (isRegionOccupiedByOurTeam(region, false, true) && !isRegionOccupiedByOurTeam(region, true, false)) {
+		return false;
+	}
+
+
+	// Check if path is available
 	if (!mExplorationManager->canReach(Broodwar->self()->getStartLocation(), buildSpot))
 	{
 		return false;
 	}
 
-	////Step 3: Check canBuild
-	//Unit* worker = findWorker();
-	//if (worker == NULL)
-	//{
-	//	//No worker available
-	//	return false;
-	//}
 
-	//Step 4: Check any units on tile
-	/// @todo fix
-	if (AgentManager::getInstance()->unitsInArea(buildSpot, toBuild.tileWidth(), toBuild.tileHeight(), -1))
+	// Check any units on tile (only check the actual build tiles and not the entire cover area).
+	const vector<Unit*> teamUnits = bats::UnitHelper::getTeamUnits();
+	TilePosition maxPos = buildSpot;
+	maxPos.x() += toBuild.tileWidth() - 1;
+	maxPos.y() += toBuild.tileHeight() - 1;
+	if (bats::UnitHelper::unitsInArea(teamUnits, buildSpot, maxPos, builderId))
 	{
 		return false;
 	}
 
-	//Step 5: If Protoss, check PSI coverage
+
+	// If Protoss, check PSI coverage
 	if (bats::BuildPlanner::isProtoss())
 	{
 		if (toBuild.requiresPsi())
@@ -243,7 +248,8 @@ bool CoverMap::canBuild(const UnitType& toBuild, const TilePosition& buildSpot) 
 		}
 	}
 
-	//Step 6: If Zerg, check creep
+
+	// If Zerg, check creep
 	if (bats::BuildPlanner::isZerg())
 	{
 		if (toBuild == UnitTypes::Zerg_Hatchery)
@@ -263,20 +269,11 @@ bool CoverMap::canBuild(const UnitType& toBuild, const TilePosition& buildSpot) 
 		}
 	}
 
-	//Step 7: If detector, check if spot is already covered by a detector
-	/*if (toBuild.isDetector())
-	{
-		if (!suitableForDetector(buildSpot))
-		{
-			return false;
-		}
-	}*/
-
 	//All passed. It is possible to build here.
 	return true;
 }
 
-TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
+TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, int builderId) const
 {
 	//Refinery
 	if (toBuild.isRefinery())
@@ -298,7 +295,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 				if (cUnit->isUnpowered())
 				{
 					//Broodwar->printf("Build pylon at unpowered building %s", cUnit->getType().getName().c_str());
-					return findBuildSpot(toBuild, cUnit->getTilePosition());
+					return findBuildSpot(toBuild, cUnit->getTilePosition(), builderId);
 				}
 			}
 		}
@@ -312,7 +309,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 				{
 					if (AgentManager::getInstance()->noInProduction(UnitTypes::Protoss_Pylon) == 0)
 					{
-						TilePosition spot = findBuildSpot(toBuild, cp);
+						TilePosition spot = findBuildSpot(toBuild, cp, builderId);
 						return spot;
 					}
 				}
@@ -329,7 +326,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 	{
 		TilePosition chokepoint = findChokepoint();
 		if (chokepoint != TilePositions::Invalid) {
-			TilePosition spot = findBuildSpot(toBuild, chokepoint);
+			TilePosition spot = findBuildSpot(toBuild, chokepoint, builderId);
 			return spot;
 		}
 	}
@@ -339,7 +336,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 	if (toBuild.isResourceDepot()) {
 		TilePosition start = findExpansionSite();
 		if (start != TilePositions::Invalid) {
-			return findBuildSpot(toBuild, start);
+			return findBuildSpot(toBuild, start, builderId);
 		}
 		else {
 			//No expansion site found.
@@ -353,7 +350,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 	set<BWTA::Region*>::const_iterator regionIt;
 	for (regionIt = regions.begin(); regionIt != regions.end(); ++regionIt) {
 		if (isRegionOccupiedByOurTeam(*regionIt, true, false)) {
-			const TilePosition& buildSpot = findBuildSpotInRegion(toBuild, *regionIt);
+			const TilePosition& buildSpot = findBuildSpotInRegion(toBuild, *regionIt, builderId);
 			if (buildSpot != TilePositions::Invalid) {
 				return buildSpot;
 			}
@@ -367,13 +364,9 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 		BaseAgent* agent = agents[i];
 		if (agent->isAlive() && agent->isBuilding()) {
 			TilePosition start = agent->getUnit()->getTilePosition();
-			TilePosition buildSpot = findBuildSpot(toBuild, start);
+			TilePosition buildSpot = findBuildSpot(toBuild, start, builderId);
 			if (buildSpot != TilePositions::Invalid) {
-				// Is the build spot not in an allied region
-				const BWTA::Region* region = BWTA::getRegion(buildSpot);
-				if (!isRegionOccupiedByOurTeam(region, false, true)) {
-					return buildSpot;
-				}
+				return buildSpot;
 			}
 		}
 	}
@@ -381,12 +374,12 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild) const
 	return TilePositions::Invalid;
 }
 
-TilePosition CoverMap::findBuildSpotInRegion(const BWAPI::UnitType unitType, const BWTA::Region* region) const {
+TilePosition CoverMap::findBuildSpotInRegion(const BWAPI::UnitType& unitType, const BWTA::Region* region, int builderId) const {
 	TilePosition buildSpot = TilePositions::Invalid;
 	pair<RegionTileMap::const_iterator, RegionTileMap::const_iterator> tileRange = mRegionTiles.equal_range(region);
 	RegionTileMap::const_iterator tileIt = tileRange.first;
 	while (buildSpot == TilePositions::Invalid && tileIt != tileRange.second) {
-		if (canBuild(unitType, tileIt->second)) {
+		if (canBuildAt(unitType, tileIt->second, builderId)) {
 			buildSpot = tileIt->second;
 		}
 
@@ -396,7 +389,7 @@ TilePosition CoverMap::findBuildSpotInRegion(const BWAPI::UnitType unitType, con
 	return buildSpot;
 }
 
-TilePosition CoverMap::findSpotAtSide(const UnitType& toBuild, const TilePosition& start, const TilePosition& end) const
+TilePosition CoverMap::findSpotAtSide(const UnitType& toBuild, const TilePosition& start, const TilePosition& end, int builderId) const
 {
 	int dX = end.x() - start.x();
 	if (dX != 0) dX = 1;
@@ -406,7 +399,7 @@ TilePosition CoverMap::findSpotAtSide(const UnitType& toBuild, const TilePositio
 	TilePosition cPos = start;
 	bool done = false;
 	while (!done) {
-		if (canBuildAt(toBuild, cPos)) {
+		if (canBuildAt(toBuild, cPos, builderId)) {
 			return cPos;
 		}
 		int cX = cPos.x() + dX;
@@ -601,26 +594,10 @@ bool CoverMap::isRegionOccupiedByOurTeam(const BWTA::Region* region, bool includ
 	return false;
 }
 
-bool CoverMap::canBuildAt(const UnitType& toBuild, const TilePosition& pos) const
-{
-	int maxW = mMapWidth - toBuild.tileWidth() - 1;
-	int maxH = mMapHeight - toBuild.tileHeight() - 1;
-
-	//Out of bounds check
-	if (pos != TilePositions::Invalid && pos.x() < maxW && pos.y() >= 0 && pos.y() < maxH)
-	{
-		if (canBuild(toBuild, pos))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition& start) const
+TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition& start, int builderId) const
 {
 	//Check start pos
-	if (canBuildAt(toBuild, start)) return start;
+	if (canBuildAt(toBuild, start, builderId)) return start;
 
 	//Search outwards
 	int cDiff = 1;
@@ -630,7 +607,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition
 		//Top
 		TilePosition s = TilePosition(start.x() - cDiff, start.y() - cDiff);
 		TilePosition e = TilePosition(start.x() + cDiff, start.y() - cDiff);
-		spot = findSpotAtSide(toBuild, s, e);
+		spot = findSpotAtSide(toBuild, s, e, builderId);
 		if (spot != TilePositions::Invalid)
 		{
 			break;
@@ -639,7 +616,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition
 		//Bottom
 		s = TilePosition(start.x() - cDiff, start.y() + cDiff);
 		e = TilePosition(start.x() + cDiff, start.y() + cDiff);
-		spot = findSpotAtSide(toBuild, s, e);
+		spot = findSpotAtSide(toBuild, s, e, builderId);
 		if (spot != TilePositions::Invalid)
 		{
 			break;
@@ -648,7 +625,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition
 		//Left
 		s = TilePosition(start.x() - cDiff, start.y() - cDiff);
 		e = TilePosition(start.x() - cDiff, start.y() + cDiff);
-		spot = findSpotAtSide(toBuild, s, e);
+		spot = findSpotAtSide(toBuild, s, e, builderId);
 		if (spot != TilePositions::Invalid)
 		{
 			break;
@@ -657,7 +634,7 @@ TilePosition CoverMap::findBuildSpot(const UnitType& toBuild, const TilePosition
 		//Right
 		s = TilePosition(start.x() + cDiff, start.y() - cDiff);
 		e = TilePosition(start.x() + cDiff, start.y() + cDiff);
-		spot = findSpotAtSide(toBuild, s, e);
+		spot = findSpotAtSide(toBuild, s, e, builderId);
 		if (spot != TilePositions::Invalid)
 		{
 			break;
@@ -697,8 +674,8 @@ void CoverMap::buildingDestroyed(const Unit* unit)
 }
 
 void CoverMap::fill(const Corners& corners, TileStates tileState) {
-	for (int x = corners.x1; x <= corners.x2; x++) {
-		for (int y = corners.y1; y <= corners.y2; y++) {
+	for (int x = corners.xMin; x <= corners.xMax; x++) {
+		for (int y = corners.yMin; y <= corners.yMax; y++) {
 			if (x >= 0 && x < mMapWidth && y >= 0 && y < mMapHeight) {
 				mCoverMap[x][y] = tileState;
 			}
@@ -709,8 +686,8 @@ void CoverMap::fill(const Corners& corners, TileStates tileState) {
 void CoverMap::fillTemp(const UnitType& toBuild, const TilePosition& buildSpot) {
 	const Corners& corners = getCorners(toBuild, buildSpot);
 
-	for (int x = corners.x1; x <= corners.x2; x++) {
-		for (int y = corners.y1; y <= corners.y2; y++) {
+	for (int x = corners.xMin; x <= corners.xMax; x++) {
+		for (int y = corners.yMin; y <= corners.yMax; y++) {
 			if (x >= 0 && x < mMapWidth && y >= 0 && y < mMapHeight) {
 				if (mCoverMap[x][y] == TileState_Buildable) {
 					mCoverMap[x][y] = TileState_TempBlocked;
@@ -732,8 +709,8 @@ void CoverMap::clearTemp(const UnitType& toBuild, const TilePosition& buildSpot)
 
 	const Corners& corners = getCorners(toBuild, buildSpot);
 
-	for (int x = corners.x1; x <= corners.x2; x++) {
-		for (int y = corners.y1; y <= corners.y2; y++) {
+	for (int x = corners.xMin; x <= corners.xMax; x++) {
+		for (int y = corners.yMin; y <= corners.yMax; y++) {
 			if (x >= 0 && x < mMapWidth && y >= 0 && y < mMapHeight) {
 				if (mCoverMap[x][y] == TileState_TempBlocked) {
 					mCoverMap[x][y] = TileState_Buildable;
@@ -783,10 +760,10 @@ Corners CoverMap::getCorners(const UnitType& type, const TilePosition& center) c
 	}
 
 	Corners c;
-	c.x1 = x1;
-	c.y1 = y1;
-	c.x2 = x2;
-	c.y2 = y2;
+	c.xMin = x1;
+	c.yMin = y1;
+	c.xMax = x2;
+	c.yMax = y2;
 
 	return c;
 }
@@ -836,6 +813,7 @@ TilePosition CoverMap::findClosestGasWithoutRefinery() const {
 						}
 					}
 				}
+
 				if (ok) {
 					if (mExplorationManager->canReach(home, cPos)) {
 						BaseAgent* agent = AgentManager::getInstance()->getClosestBase(cPos);
@@ -1031,8 +1009,19 @@ void CoverMap::printGraphicDebugInfo()
 					drawColor = Colors::Yellow;
 					break;
 
+				// Test for units on the tile
+				//case TileState_Buildable: {
+				//	const vector<Unit*>& teamUnits = bats::UnitHelper::getTeamUnits();
+				//	TilePosition currentPos(x,y);
+				//	if (bats::UnitHelper::unitsInArea(teamUnits, currentPos, currentPos)) {
+				//		drawBox = true;
+				//		drawColor = Colors::Purple;
+				//	}
+				//	break;
+				//}
+
 				default:
-					// Does nothing
+					// Does nothing					
 					break;
 				}
 

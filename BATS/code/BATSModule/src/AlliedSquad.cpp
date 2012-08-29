@@ -1,5 +1,5 @@
 #include "AlliedSquad.h"
-#include "Helper.h"
+#include "UnitHelper.h"
 #include "ExplorationManager.h"
 //#include "AlliedArmyManager.h"
 #include "GameTime.h"
@@ -121,7 +121,7 @@ bool AlliedSquad::isMovingToAttack() const {
 	// Target at least away_distance from allied structures
 	TilePosition targetPosition = getTargetPosition();
 	if (targetPosition != TilePositions::Invalid) {
-		pair<BWAPI::Unit*, int> closestAlliedStructure = getClosestAlliedStructure(targetPosition);
+		pair<BWAPI::Unit*, int> closestAlliedStructure = UnitHelper::getClosestAlliedStructure(targetPosition);
 		if (closestAlliedStructure.second < config::classification::squad::AWAY_DISTANCE_SQUARED)
 		{
 			return false;
@@ -297,7 +297,7 @@ bool AlliedSquad::hasAttackHalted() const {
 void AlliedSquad::updateClosestDistances() {
 	// Save distances from closest allied and enemy structures
 	pair<TilePosition, int> enemyStructure = mpsExplorationManager->getClosestSpottedBuilding(getCenter());
-	pair<Unit*, int> alliedStructure = getClosestAlliedStructure(getCenter());
+	pair<Unit*, int> alliedStructure = UnitHelper::getClosestAlliedStructure(getCenter());
 
 	DEBUG_MESSAGE(utilities::LogLevel_Finest, "AlliedSquad::updateClosestDistance() | id: " <<
 		getId() << ", center: " << getCenter() << ", Enemy: " << enemyStructure.first <<

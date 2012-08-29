@@ -134,6 +134,8 @@ namespace debug {
 	int GRAPHICS_VERBOSITY = 0;
 	int GRAPHICS_COLUMN_WIDTH = 0;
 
+	bool set(const utilities::VariableInfo& variableInfo);
+
 	namespace modules {
 		bool ENEMY_SQUAD = false;
 		bool ALLIED_SQUAD = false;
@@ -141,6 +143,7 @@ namespace debug {
 		bool AGENT_UNIT = false;
 		bool AGENT_STRUCTURE = false;
 		bool AGENT_WORKER = false;
+		bool AGENT_SELECTED = false;
 		bool TERRAIN = false;
 		bool COVER_MAP = false;
 		bool DEFENSE = false;
@@ -149,8 +152,6 @@ namespace debug {
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
-
-	bool set(const utilities::VariableInfo& variableInfo);
 }
 
 namespace frame_distribution {
@@ -594,6 +595,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(AGENT_WORKER);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_WORKER));
 		AGENT_WORKER = variableInfo;
+	} else if (variableInfo.name == "agent_selected") {
+		gOldValue = toString(AGENT_SELECTED);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(AGENT_SELECTED));
+		AGENT_SELECTED = variableInfo;
 	} else if (variableInfo.name == "terrain") {
 		gOldValue = toString(TERRAIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(TERRAIN));

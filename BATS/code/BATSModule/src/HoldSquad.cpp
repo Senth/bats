@@ -1,5 +1,6 @@
 #include "HoldSquad.h"
 #include "Config.h"
+#include "UnitHelper.h"
 #include "Helper.h"
 #include "BTHAIModule/Source/SiegeTankAgent.h"
 #include <sstream>
@@ -44,7 +45,7 @@ void HoldSquad::updateDerived() {
 
 	// Find enemies within perimeter -> Set attack position
 	const TilePosition& enemyPos =
-		findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
+		UnitHelper::findEnemyPositionWithinRadius(mDefendPosition, config::squad::defend::DEFEND_PERIMETER);
 	setTemporaryGoalPosition(enemyPos);
 
 	/// @todo Check if a unit is outside perimeter -> make it retreat.
@@ -55,11 +56,11 @@ std::string HoldSquad::getName() const {
 	return HOLD_SQUAD_NAME;
 }
 
-std::string HoldSquad::getDebugInfo() const {
+std::string HoldSquad::getDebugString() const {
 	std::stringstream ss;
 	ss << std::setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Comp.: " << getUnitComposition().getName() << "\n";
 
-	return Squad::getDebugInfo() + ss.str();
+	return Squad::getDebugString() + ss.str();
 }
 
 const TilePosition& HoldSquad::getDefendPosition() const {

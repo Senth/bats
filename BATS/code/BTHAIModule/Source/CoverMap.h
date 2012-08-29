@@ -15,11 +15,16 @@ namespace bats {
 	class ExplorationManager;
 }
 
+/**
+ * Defines a rectangular area
+ * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Matteus Magnusson (matteus.magnusson@gmail.com)
+ */
 struct Corners {
-	int x1;
-	int y1;
-	int x2;
-	int y2;
+	int xMin;
+	int yMin;
+	int xMax;
+	int yMax;
 
 	/**
 	 * Default constructor with optional parameters to set position and size
@@ -28,10 +33,10 @@ struct Corners {
 	 * means one tile, 1 means 3x3 tiles (1 tile outwards from the center). Defaults to 0
 	 */
 	Corners(const BWAPI::TilePosition& position = BWAPI::TilePosition(0,0), int size = 0) :
-		x1(position.x() - size),
-		x2(position.x() + size),
-		y1(position.y() - size),
-		y2(position.y() + size)
+		xMin(position.x() - size),
+		xMax(position.x() + size),
+		yMin(position.y() - size),
+		yMax(position.y() + size)
 	{}
 
 	/**
@@ -51,10 +56,10 @@ struct Corners {
 	 */
 	inline Corners operator+(const BWAPI::TilePosition& position) const {
 		Corners newCorners = *this;
-		newCorners.x1 += position.x();
-		newCorners.x2 += position.x();
-		newCorners.y1 += position.y();
-		newCorners.y2 += position.y();
+		newCorners.xMin += position.x();
+		newCorners.xMax += position.x();
+		newCorners.yMin += position.y();
+		newCorners.yMax += position.y();
 		return newCorners;
 	}
 };
@@ -110,7 +115,7 @@ public:
 
 	/** Checks if the specified building type can be built at the buildSpot. True if it can,
 	 * false otherwise. */
-	bool canBuild(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& buildSpot) const;
+	bool canBuildAt(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& buildSpot, int builderId) const;
 
 	/** Checks if a position is free. */
 	bool isPositionFree(const BWAPI::TilePosition& pos) const;
@@ -121,7 +126,7 @@ public:
 
 	/** Finds and returns a buildSpot for the specified building type.
 	 * If no buildspot is found, a BWAPI::TilePositions::Invalid is returned. */
-	BWAPI::TilePosition findBuildSpot(const BWAPI::UnitType& toBuild) const;
+	BWAPI::TilePosition findBuildSpot(const BWAPI::UnitType& toBuild, int builderId) const;
 
 	/** Searches for the closest vespene gas that is not in use. If no gas is sighted,
 	 * the ExplorationManager is queried. */
@@ -137,7 +142,9 @@ public:
 	/** Finds a mineral to gather from. */
 	BWAPI::Unit* findClosestMineral(const BWAPI::TilePosition& workerPos) const;
 
-	/** Shows debug info on screen. */
+	/**
+	 * Shows debug info on screen.
+	 */
 	void printGraphicDebugInfo();
 
 	/**
@@ -176,9 +183,10 @@ private:
 	BWAPI::TilePosition findSpotAtSide(
 		const BWAPI::UnitType& toBuild,
 		const BWAPI::TilePosition& start,
-		const BWAPI::TilePosition& end
+		const BWAPI::TilePosition& end,
+		int builderId
 	) const;
-	bool canBuildAt(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& pos) const;
+	
 	/**
 	 * Fills the areas defined by the corners to the specified tile state. Default TileState is
 	 * TileState_Blocked
@@ -186,9 +194,10 @@ private:
 	 * @param tileState which state to fill the area with, defaults to TileState_Blocked
 	 */
 	void fill(const Corners& corners, TileStates tileState = TileState_Blocked);
+
 	void clear(const Corners& corners);
 	bool suitableForDetector(const BWAPI::TilePosition& pos) const;
-	BWAPI::TilePosition findBuildSpot(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& start) const;
+	BWAPI::TilePosition findBuildSpot(const BWAPI::UnitType& toBuild, const BWAPI::TilePosition& start, int builderId) const;
 	BWAPI::Unit* hasMineralNear(const BWAPI::TilePosition& pos) const;
 	BWAPI::TilePosition findDefensePos(const BWTA::Chokepoint* choke) const;
 	bool isOccupied(const BWTA::Region* region) const;
@@ -217,10 +226,11 @@ private:
 	 * Tries to find a build spot in the specified region
 	 * @param unitType the structure to find a build spot for
 	 * @param region the region to search the build spot in
+	 * @param builderId id of the unit (worker) that will build the structure
 	 * @return a valid build position for the structure, if no build spot was
 	 * found TilePositions::Invalid will be returned.
 	 */
-	BWAPI::TilePosition findBuildSpotInRegion(const BWAPI::UnitType unitType, const BWTA::Region* region) const;
+	BWAPI::TilePosition findBuildSpotInRegion(const BWAPI::UnitType& unitType, const BWTA::Region* region, int builderId) const;
 
 	MapDataReader mapData;
 	bats::ExplorationManager* mExplorationManager;

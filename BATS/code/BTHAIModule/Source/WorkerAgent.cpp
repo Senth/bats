@@ -10,10 +10,12 @@
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/DefenseManager.h"
 #include "BatsModule/include/Helper.h"
+#include "BatsModule/include/UnitHelper.h"
 #include "ResourceManager.h"
 #include "PathFinder.h"
 #include "Profiler.h"
 #include <sstream>
+#include <iomanip>
 
 using namespace BWAPI;
 using namespace std;
@@ -109,76 +111,90 @@ void WorkerAgent::handleKitingWorker()
 
 void WorkerAgent::printGraphicDebugInfo() const
 {
-	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
-		bats::config::debug::modules::AGENT_WORKER == false)
-	{
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off) {
 		return;
 	}
 
 	if (!isAlive()) return;
 	if (!unit->isCompleted()) return;
 
+	BaseAgent::printGraphicDebugSelectedUnits();
 
+	if (bats::config::debug::modules::AGENT_WORKER) {
+		const Position& unitPos = unit->getPosition();
+		Position goalPos = Position(goal);
 
-	const Position& unitPos = unit->getPosition();
-	Position goalPos = Position(goal);
-
-	// Low
-	// Draw boxes when building stuff
-	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
-		if (mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT)
-		{
-			if (mBuildSpot.x() > 0)
+		// Low
+		// Draw boxes when building stuff
+		if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
+			if (mCurrentState == MOVE_TO_SPOT || mCurrentState == CONSTRUCT)
 			{
-				int w = mToBuild.tileWidth() * 32;
-				int h = mToBuild.tileHeight() * 32;
+				if (mBuildSpot.x() > 0)
+				{
+					int w = mToBuild.tileWidth() * TILE_SIZE;
+					int h = mToBuild.tileHeight() * TILE_SIZE;
 
-				Position b = Position(mBuildSpot.x()*32 + w/2, mBuildSpot.y()*32 + h/2);
-				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+					Position b = Position(mBuildSpot.x()*TILE_SIZE + w/2, mBuildSpot.y()*TILE_SIZE + h/2);
+					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), b.x(), b.y(), Colors::Teal);
 
-				Broodwar->drawBoxMap(mBuildSpot.x()*32,mBuildSpot.y()*32,mBuildSpot.x()*32+w,mBuildSpot.y()*32+h,Colors::Blue,false);
+					Broodwar->drawBoxMap(mBuildSpot.x()*TILE_SIZE, mBuildSpot.y()*TILE_SIZE, mBuildSpot.x()*TILE_SIZE+w, mBuildSpot.y()*TILE_SIZE+h, Colors::Blue);
+				}
+			}
+		}
+
+
+		// Medium
+		// Draw line to mineral/gas unit is mining from
+		if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
+			if (mCurrentState == GATHER_MINERALS || mCurrentState == GATHER_GAS)
+			{
+				Unit* target = unit->getTarget();
+				if (target != NULL)
+				{
+					const Position& targetPos = target->getPosition();
+					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), targetPos.x(), targetPos.y(), Colors::Teal);
+				}
+			}
+			
+			else if (unit->isRepairing())
+			{
+				Unit* target = unit->getOrderTarget();
+				if (target != NULL)
+				{
+					Position b = Position(target->getPosition());
+					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), b.x() ,b.y(), Colors::Green);
+					Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "Repairing %s", target->getType().getName().c_str());
+				}
+			}
+			
+			else if (unit->isConstructing())
+			{
+				Unit* target = unit->getOrderTarget();
+				if (target != NULL)
+				{
+					Position b = target->getPosition();
+					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), b.x(), b.y(), Colors::Green);
+					Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "Constructing %s", target->getType().getName().c_str());
+				}
+			}
+
+			// Does something arbitrary, draw goal
+			else {
+				Broodwar->drawLineMap(unitPos.x(), unitPos.y(), goalPos.x(), goalPos.y(), Colors::White);
 			}
 		}
 	}
+}
 
-
-	// Medium
-	// Draw line to mineral/gas unit is mining from
+string WorkerAgent::getDebugString() const {
+	stringstream ss;
+	
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
-		if (mCurrentState == GATHER_MINERALS || mCurrentState == GATHER_GAS)
-		{
-			Unit* target = unit->getTarget();
-			if (target != NULL)
-			{
-				const Position& targetPos = target->getPosition();
-				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),targetPos.x(),targetPos.y(),Colors::Teal);
-			}
-		}
-
-		if (unit->isRepairing())
-		{
-			Unit* target = unit->getOrderTarget();
-			if (target != NULL)
-			{
-				Position a = Position(unit->getPosition());
-				Position b = Position(target->getPosition());
-				Broodwar->drawLine(CoordinateType::Map,a.x(),a.y(),b.x(),b.y(),Colors::Green);
-
-				Broodwar->drawText(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), "Repairing %s", target->getType().getName().c_str());
-			}
-		}
-		else if (unit->isConstructing())
-		{
-			Unit* target = unit->getOrderTarget();
-			if (target != NULL)
-			{
-				Position b = target->getPosition();
-				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
-
-				Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "Constructing %s", target->getType().getName().c_str());
-			}
-		}
+		string state = getStateAsText() + ": ";
+		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << state << goal << "\n";
 	}
+
+	return BaseAgent::getDebugString() + ss.str();
 }
 
 void WorkerAgent::computeActions()
@@ -277,11 +293,11 @@ void WorkerAgent::computeActions()
 		if (mCurrentState == FIND_BUILDSPOT)
 		{
 			if (mBuildSpot == TilePositions::Invalid) {
-				mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
-				msCoverMap->fillTemp(mToBuild, mBuildSpot);
+				mBuildSpot = msCoverMap->findBuildSpot(mToBuild, getUnitID());
 			}
 			if (mBuildSpot != TilePositions::Invalid)
 			{
+				msCoverMap->fillTemp(mToBuild, mBuildSpot);
 				setState(MOVE_TO_SPOT);
 			}
 		}
@@ -295,20 +311,13 @@ void WorkerAgent::computeActions()
 
 			if (buildSpotExplored() && !unit->isConstructing())
 			{
-				if (areaFree())
-				{
-					bool ok = unit->build(mBuildSpot, mToBuild);
-					if (!ok)
-					{
-						//msCoverMap->blockPosition(mBuildSpot);
-						//Cant build at selected spot, get a new one.
-						setState(FIND_BUILDSPOT);
-					}
-				}
-				else
-				{
-					//Cant build at selected spot, get a new one.
+				bool startedBuilding = unit->build(mBuildSpot, mToBuild);
+				
+				// Can't build at selected spot, get a new one.
+				if (!startedBuilding) {
 					setState(FIND_BUILDSPOT);
+					msCoverMap->clearTemp(mToBuild, mBuildSpot);
+					mBuildSpot = TilePositions::Invalid;
 				}
 			}
 
@@ -329,6 +338,11 @@ void WorkerAgent::computeActions()
 					unit->rightClick(agent->getUnit()->getPosition());
 				}
 				setState(GATHER_MINERALS);
+			}
+			else if (!getUnit()->isConstructing()) {
+				setState(FIND_BUILDSPOT);
+				msCoverMap->clearTemp(mToBuild, mBuildSpot);
+				mBuildSpot = TilePositions::Invalid;
 			}
 		}
 	}
@@ -355,15 +369,16 @@ bool WorkerAgent::hasCompletedBuilding() const
 	return false;
 }
 
-bool WorkerAgent::areaFree() const
-{
-	if (mToBuild.isRefinery())
-	{
+bool WorkerAgent::areaFree() const {
+	if (mToBuild.isRefinery()) {
 		return true;
 	}
 
-	if (AgentManager::getInstance()->unitsInArea(mBuildSpot, mToBuild.tileWidth(), mToBuild.tileHeight(), unit->getID()))
-	{
+	const vector<Unit*>& teamUnits = bats::UnitHelper::getTeamUnits();
+	TilePosition maxPos = mBuildSpot;
+	maxPos.x() += mToBuild.tileWidth() - 1;
+	maxPos.y() += mToBuild.tileHeight() - 1;
+	if (bats::UnitHelper::unitsInArea(teamUnits, mBuildSpot, maxPos, getUnitID())) {
 		return false;
 	}
 	
@@ -452,9 +467,10 @@ bool WorkerAgent::canBuild(UnitType type) const
 bool WorkerAgent::assignToBuild(UnitType type)
 {
 	mToBuild = type;
-	mBuildSpot = msCoverMap->findBuildSpot(mToBuild);
+	mBuildSpot = msCoverMap->findBuildSpot(mToBuild, getUnitID());
 	if (mBuildSpot != TilePositions::Invalid)
 	{
+		msCoverMap->fillTemp(mToBuild, mBuildSpot);
 		ResourceManager::getInstance()->lockResources(mToBuild);
 		setState(FIND_BUILDSPOT);
 		return true;
@@ -469,7 +485,18 @@ bool WorkerAgent::assignToBuild(UnitType type)
 void WorkerAgent::reset()
 {
 	// Reset build spot
-	msCoverMap->clearTemp(mToBuild, mBuildSpot);
+	if (mToBuild != UnitTypes::None) {
+		if (mBuildSpot != TilePositions::Invalid) {
+			msCoverMap->clearTemp(mToBuild, mBuildSpot);
+			mBuildSpot = TilePositions::Invalid;
+		}
+		ResourceManager::getInstance()->unlockResources(mToBuild);
+		mToBuild = UnitTypes::None;
+		
+	}
+
+	
+	
 
 	if (unit->isConstructing())
 	{
@@ -508,22 +535,22 @@ string WorkerAgent::getStateAsText() const
 	switch(mCurrentState)
 	{
 	case GATHER_MINERALS:
-		strReturn = "GATHER_MINERALS";
+		strReturn = "Minerals";
 		break;
 	case GATHER_GAS:
-		strReturn = "GATHER_GAS";
+		strReturn = "Gas";
 		break;
 	case FIND_BUILDSPOT:
-		strReturn = "FIND_BUILDSPOT";
+		strReturn = "FindBuild";
 		break;
 	case MOVE_TO_SPOT:
-		strReturn = "MOVE_TO_SPOT";
+		strReturn = "MoveToSpot";
 		break;
 	case CONSTRUCT:
-		strReturn = "CONSTRUCT";
+		strReturn = "Construct";
 		break;
 	case REPAIRING:
-		strReturn = "REPAIRING";
+		strReturn = "Repair";
 		break;
 	};
 	return strReturn;

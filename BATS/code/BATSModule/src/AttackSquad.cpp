@@ -393,7 +393,7 @@ bool AttackSquad::finishedAlliedRegrouping() const {
 	}
 }
 
-string AttackSquad::getDebugInfo() const {
+string AttackSquad::getDebugString() const {
 	stringstream ss;
 	ss << left << setw(config::debug::GRAPHICS_COLUMN_WIDTH) << "Follow: ";
 
@@ -405,7 +405,7 @@ string AttackSquad::getDebugInfo() const {
 
 	ss << "\n";
 
-	return Squad::getDebugInfo() + ss.str();
+	return Squad::getDebugString() + ss.str();
 }
 
 bool AttackSquad::isTargetingEnemyStructure() const {

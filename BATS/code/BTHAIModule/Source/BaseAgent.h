@@ -51,6 +51,17 @@ protected:
 	 */
 	bool isWeaponCooldown() const;
 
+	/**
+	 * Shows debug information for selected units, i.e. units selected by the user
+	 */
+	void printGraphicDebugSelectedUnits() const;
+
+	/**
+	 * Returns a string with debug information including derived classes
+	 * @return string with debug information to print
+	 */
+	virtual std::string getDebugString() const;
+
 public:
 	/**
 	 * Constructor.

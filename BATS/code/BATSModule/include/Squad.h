@@ -555,7 +555,7 @@ protected:
 	 * Returns extra graphical debug information about the squad.
 	 * @return formatted text for debugging purposes.
 	 */
-	virtual std::string getDebugInfo() const;
+	virtual std::string getDebugString() const;
 
 	/**
 	 * Returns true if a unit is standing still and not attacking.

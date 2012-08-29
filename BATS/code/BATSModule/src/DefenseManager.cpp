@@ -5,6 +5,7 @@
 #include "PatrolSquad.h"
 #include "HoldSquad.h"
 #include "Helper.h"
+#include "UnitHelper.h"
 #include "Config.h"
 #include "ExplorationManager.h"
 #include "GameTime.h"
@@ -130,7 +131,6 @@ void DefenseManager::updateHoldSquads() {
 			for (defendIt = mDefendPositions.begin(); defendIt != mDefendPositions.end(); ++defendIt) {
 				// Skip player's defense points
 				if (!defendIt->isOur) {
-					++defendIt;
 					continue;
 				}
 
@@ -364,7 +364,7 @@ TilePosition DefenseManager::findRoamPosition(const BWAPI::TilePosition& defendP
 
 	// Closest our closest structure. Used for calculating in which direction of the choke point
 	// we shall be.
-	const std::pair<Unit*, int>& closestStructure = getClosestAlliedStructure(defendPosition);
+	const std::pair<Unit*, int>& closestStructure = UnitHelper::getClosestAlliedStructure(defendPosition);
 	const TilePosition& structurePos = closestStructure.first->getTilePosition();
 
 	int bestDist = INT_MAX;
@@ -543,7 +543,7 @@ void DefenseManager::updateUnderAttackPositions() {
 	// Hold choke points
 	DefendSet::iterator defendPosIt;
 	for (defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
-		if (isEnemyWithinRadius(defendPosIt->position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
+		if (UnitHelper::isEnemyWithinRadius(defendPosIt->position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
 			mUnderAttack = true;
 			defendPosIt->underAttack = true;
 

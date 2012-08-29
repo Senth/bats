@@ -120,6 +120,7 @@
     <ClCompile Include="src\SelfClassifier.cpp" />
     <ClCompile Include="src\TerranProductionBuilding.cpp" />
     <ClCompile Include="src\UnitCreator.cpp" />
+    <ClCompile Include="src\UnitHelper.cpp" />
     <ClCompile Include="src\UnitManager.cpp" />
     <ClCompile Include="src\WaitGoal.cpp" />
     <ClCompile Include="src\WaitGoalManager.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="include\UnitComposition.h" />
     <ClInclude Include="include\UnitCompositionFactory.h" />
     <ClInclude Include="include\UnitCreator.h" />
+    <ClInclude Include="include\UnitHelper.h" />
     <ClInclude Include="include\UnitManager.h" />
     <ClInclude Include="include\UnitSet.h" />
     <ClInclude Include="include\WaitGoal.h" />

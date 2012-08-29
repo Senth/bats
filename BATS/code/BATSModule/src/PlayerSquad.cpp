@@ -4,6 +4,8 @@
 #include "Helper.h"
 #include <iomanip>
 #include <sstream>
+#include <BWAPI/Unit.h>
+#include <BWAPI/Game.h>
 
 using namespace bats;
 using namespace BWAPI;

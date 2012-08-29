@@ -74,6 +74,9 @@ public:
 	 * type was set to UnitTypes::None. */
 	bool isConstructing(BWAPI::UnitType type = BWAPI::UnitTypes::None) const;
 
+protected:
+	virtual std::string getDebugString() const;
+
 private:
 	__declspec(deprecated) void handleKitingWorker();
 	__declspec(deprecated) BWAPI::Unit* getEnemyUnit();

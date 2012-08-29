@@ -3,9 +3,6 @@
 #include <ostream>
 #include <BWAPI/Position.h>
 #include <BWAPI/TilePosition.h>
-#include <BWAPI/Unit.h>
-#include <BWAPI/Game.h>
-#include <BWAPI/Player.h>
 
 namespace bats {
 
@@ -32,71 +29,6 @@ namespace TextColors {
 	extern std::string GREY_BLUE;
 	extern std::string CYAN;
 }
-
-/**
- * Checks if a unit is a gas building. This includes Resource_Vespene_Geyser, Terran_Refinery,
- * Protoss_Assimilator, Zerg_Extractor
- * @return true if the unit is a gas building.
- */
-bool isGasStructure(const BWAPI::Unit* unit);
-
-/**
- * A function to check if a unit belongs to us
- * @param unit unit to check if it belongs to us
- * @return true if the unit belongs to us, else false
- */
-inline bool isOurs(const BWAPI::Unit* unit) {
-	return unit->getPlayer() == BWAPI::Broodwar->self();
-}
-
-/**
- * Check if a unit belongs to an ally
- * @param unit unit to check if it belongs to an ally
- * @return true if the unit belongs to an ally.
- */
-inline bool isAllied(const BWAPI::Unit* unit) {
-	return BWAPI::Broodwar->self()->isAlly(unit->getPlayer()) &&
-		BWAPI::Broodwar->self() != unit->getPlayer();
-}
-
-/**
- * Checks if a unit belongs to an enemy
- * @param unit unit to check if it belongs to an enemy
- * @return true if the unit belongs to an enemy.
- */
-inline bool isEnemy(const BWAPI::Unit* unit) {
-	return BWAPI::Broodwar->self()->isEnemy(unit->getPlayer());
-}
-
-/**
- * Returns true if an enemy is within the specified radius from the position.
- * @param center the position to check from.
- * @param radius maximum range from the position the enemy can be, in tile size.
- * @return true if an enemy is found within the radius.
- */
-bool isEnemyWithinRadius(const BWAPI::TilePosition& center, int radius);
-
-/**
- * Returns all enemy units (from all enemies)
- * @return vector with all enemy units
- */
-std::vector<BWAPI::Unit*> getEnemyUnits();
-
-/**
- * Searches for an enemy position within the specified radius. This version returns
- * the first available position and the enemies are not sorted in any way.
- * @param center the position to check from.
- * @param radius maximum range from the center the enemy shall be, in tile size.
- * @return position of an enemy within the radius, TilePositions::Invalid if none was found.
- */
-BWAPI::TilePosition findEnemyPositionWithinRadius(const BWAPI::TilePosition& center, int radius);
-
-/**
-* Returns the closest allied structure (including our structures).
-* @param[in] position where we measure from
-* @return closest allied structure including the <strong>squared</strong> distance.
-*/
-std::pair<BWAPI::Unit*,int> getClosestAlliedStructure(const BWAPI::TilePosition& position);
 
 /**
  * Returns the squared distance between two points. This function is faster

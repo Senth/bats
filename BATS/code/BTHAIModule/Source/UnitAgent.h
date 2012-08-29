@@ -154,8 +154,9 @@ public:
 	virtual void resetToDefaultBehavior();
 
 protected:
-	static bats::SquadManager* msSquadManager;
+	virtual std::string getDebugString() const;
 
+	static bats::SquadManager* msSquadManager;
 private:
 	static PFManager* msPfManager;
 };

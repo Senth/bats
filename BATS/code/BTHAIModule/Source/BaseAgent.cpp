@@ -5,10 +5,13 @@
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/Config.h"
 #include "BatsModule/include/Helper.h"
+#include "BatsModule/include/UnitHelper.h"
 #include "BatsModule/include/SquadDefs.h"
 #include "BatsModule/include/DefenseManager.h"
 #include "Utilities/Logger.h"
 #include <BWAPI/Unit.h>
+#include <sstream>
+#include <iomanip>
 
 using namespace BWAPI;
 using namespace std;
@@ -213,7 +216,7 @@ bool BaseAgent::isDamaged() const
 
 bool BaseAgent::isDetectorWithinRange(int range) const {
 	int rangeSquared = range * range;
-	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->getType().isDetector()) {
@@ -361,4 +364,38 @@ const TilePosition& BaseAgent::getGoal() const
 
 bool BaseAgent::isWeaponCooldown() const {
 	return unit->getGroundWeaponCooldown() > 0 || unit->getAirWeaponCooldown() > 0;
+}
+
+void BaseAgent::printGraphicDebugSelectedUnits() const {
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
+		bats::config::debug::modules::AGENT_SELECTED == false)
+	{
+		return;
+	}
+
+	// Only print debug info if the unit is selected
+	if (unit->isSelected()) {
+		const string& info = getDebugString();
+		const Position& unitPos = unit->getPosition();
+		Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "%s", info.c_str());
+	}
+}
+
+string BaseAgent::getDebugString() const {
+	stringstream ss;
+	ss << bats::TextColors::LIGHT_GREY << left;
+
+	// Low
+	// Id
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Low) {
+		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << unitID << "\n";
+	}
+
+	// High
+	// Position
+	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
+		ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Pos: " << unit->getTilePosition() << "\n";
+	}
+	
+	return ss.str();
 }

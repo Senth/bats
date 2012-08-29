@@ -51,7 +51,7 @@ public:
 
 protected:
 	virtual void updateDerived();
-	virtual std::string getDebugInfo() const;
+	virtual std::string getDebugString() const;
 
 private:
 	BWAPI::TilePosition mDefendPosition;

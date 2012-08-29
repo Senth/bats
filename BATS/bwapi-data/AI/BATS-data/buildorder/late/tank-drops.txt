@@ -12,7 +12,7 @@ Terran_Factory
 Terran_Machine_Shop
 Terran_Machine_Shop
 Terran_Starport
-UpgradeType: Terran_Vehcle_Plating 3
+UpgradeType: Terran_Vehicle_Plating 3
 UpgradeType: Charon_Boosters
 Terran_Factory
 Terran_Machine_Shop

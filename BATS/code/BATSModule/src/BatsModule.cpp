@@ -2,6 +2,7 @@
 #include "BuildPlanner.h"
 #include "UnitCreator.h"
 #include "Commander.h"
+#include "UnitHelper.h"
 #include "Helper.h"
 #include "SquadManager.h"
 #include "UnitManager.h"
@@ -270,17 +271,17 @@ void BatsModule::onUnitDiscover(BWAPI::Unit* unit) {
 
 	if (areWePlaying()) {
 
-		if (isOurs(unit)) {
+		if (UnitHelper::isOurs(unit)) {
 			mUnitManager->addAgent(unit);
 
 			// Remove from build order if it's a building
 			if (unit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->removeFromQueue(unit->getType());
 			}
-		} else if (isEnemy(unit)) {
+		} else if (UnitHelper::isEnemy(unit)) {
 			mExplorationManager->addSpottedUnit(unit);
 			mPlayerArmyManager->addUnit(unit);
-		} else if (isAllied(unit)) {
+		} else if (UnitHelper::isAllied(unit)) {
 			mPlayerArmyManager->addUnit(unit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit showed: " <<
@@ -294,7 +295,7 @@ void BatsModule::onUnitEvade(BWAPI::Unit* unit) {
 
 	if (areWePlaying()) {
 
-		if (isOurs(unit)) {
+		if (UnitHelper::isOurs(unit)) {
 			mUnitManager->removeAgent(unit);			
 			if (unit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(unit);
@@ -309,11 +310,11 @@ void BatsModule::onUnitEvade(BWAPI::Unit* unit) {
 			mUnitManager->cleanup();
 		}
 		// Enemies
-		else if (isEnemy(unit)) {
+		else if (UnitHelper::isEnemy(unit)) {
 			mPlayerArmyManager->removeUnit(unit);
 		}
 		// Allied
-		else if (isAllied(unit)) {
+		else if (UnitHelper::isAllied(unit)) {
 			mPlayerArmyManager->removeUnit(unit);
 
 			DEBUG_MESSAGE(utilities::LogLevel_Finer, "Allied unit destroyed: " <<
@@ -340,7 +341,7 @@ void BatsModule::onUnitCreate(BWAPI::Unit* unit) {
 void BatsModule::onUnitDestroy(BWAPI::Unit* unit) {
 	TEST_SELF();
 
-	if (isEnemy(unit)) {
+	if (UnitHelper::isEnemy(unit)) {
 		mExplorationManager->unitDestroyed(unit);
 	}
 }
@@ -349,7 +350,7 @@ void BatsModule::onUnitMorph(BWAPI::Unit* unit) {
 	TEST_SELF();
 
 	if (areWePlaying()) {
-		if (isOurs(unit)) {
+		if (UnitHelper::isOurs(unit)) {
 			if (BuildPlanner::isZerg()) {
 				mUnitManager->morphDrone(unit);
 				BuildPlanner::getInstance()->removeFromQueue(unit->getType());

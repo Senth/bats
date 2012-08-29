@@ -3,6 +3,7 @@
 #include "AgentManager.h"
 #include "TargetingAgent.h"
 #include "SpottedObject.h"
+#include "BATSModule/include/UnitHelper.h"
 #include "BATSModule/include/Helper.h"
 #include "BATSModule/include/SquadManager.h"
 #include "BATSModule/include/Squad.h"
@@ -30,9 +31,7 @@ UnitAgent::UnitAgent(Unit* mUnit) : BaseAgent(mUnit)
 
 void UnitAgent::printGraphicDebugInfo() const
 {
-	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off ||
-		bats::config::debug::modules::AGENT_UNIT == false)
-	{
+	if (bats::config::debug::GRAPHICS_VERBOSITY == bats::config::debug::GraphicsVerbosity_Off) {
 		return;
 	}
 
@@ -43,60 +42,83 @@ void UnitAgent::printGraphicDebugInfo() const
 	
 
 	msPfManager->displayPF(this);
+	printGraphicDebugSelectedUnits();
 
+	if (bats::config::debug::modules::AGENT_UNIT) {
+		// Medium
+		if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
+			const Position& unitPos = unit->getPosition();
+			const TilePosition& unitTilePos = unit->getTilePosition();
 
-	// Medium
+			if (goal != TilePositions::Invalid) {
+				if (unit->isMoving())
+				{
+					Position b = Position(goal);
+					Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+				}
+				if(unit->isIdle()){
+					Position b = Position(goal);		
+					Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+				}
+				if (!unit->isIdle())
+				{
+					Unit* targ = unit->getOrderTarget();
+					if (targ != NULL && targ->exists())
+					{
+						Position b = Position(targ->getPosition());
+
+						if (targ->getPlayer()->isEnemy(Broodwar->self()))
+						{
+							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Red);
+						}
+						else
+						{
+							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
+						}
+					}
+				}
+			}
+
+			if (unit->isBeingHealed())
+			{
+				Broodwar->drawCircleMap(unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White);
+			}
+
+			if (unit->getType().isDetector())
+			{
+				double range = unit->getType().sightRange();
+				Broodwar->drawCircleMap(unitPos.x(),unitPos.y(),(int)range, Colors::Red);
+			}
+		}
+	}
+}
+
+string UnitAgent::getDebugString() const {
+	stringstream ss;
+
+	// Medium - state
 	if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_Medium) {
 		const Position& unitPos = unit->getPosition();
 		const TilePosition& unitTilePos = unit->getTilePosition();
-
-		stringstream ss;
-		ss << bats::TextColors::LIGHT_GREY <<
-			setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Id: " << getUnitID() << "\n";
-
-		// High
-		if (bats::config::debug::GRAPHICS_VERBOSITY >= bats::config::debug::GraphicsVerbosity_High) {
-			ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << "Pos: " << unitTilePos << "\n";
-		}
-
 		if (goal != TilePositions::Invalid) {
 
 			string state = "Unknown";
 
-			if (unit->isMoving())
-			{
-				Position b = Position(goal);
-				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
-
+			if (unit->isMoving()) {
 				state = "Move";
 			}
-			if(unit->isIdle()){
-				Position b = Position(goal);		
-				Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Teal);
+			else if(unit->isIdle()){
 				state = "Idle";
 			}
-			if (!unit->isIdle())
-			{
-				Unit* targ = unit->getOrderTarget();
-				if (targ != NULL)
-				{
-					Position b = Position(targ->getPosition());
-
-					if (targ->getPlayer()->isEnemy(Broodwar->self()))
-					{
-						if (targ->exists())
-						{
-							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Red);
-							state = "Attack";
-						}
+		
+			if (!unit->isIdle()) {
+				Unit* target = unit->getOrderTarget();
+				if (target != NULL && target->exists()) {
+					if (target->getPlayer()->isEnemy(Broodwar->self())) {
+						state = "Attack";
 					}
-					else
-					{
-						if (targ->exists())
-						{
-							Broodwar->drawLineMap(unitPos.x(),unitPos.y(),b.x(),b.y(),Colors::Green);
-							state = "Support";
-						}
+					else {
+						state = "Support";
 					}
 				}
 			}
@@ -105,21 +127,9 @@ void UnitAgent::printGraphicDebugInfo() const
 
 			ss << setw(bats::config::debug::GRAPHICS_COLUMN_WIDTH) << state << goal << "\n";
 		}
-
-		if (unit->isBeingHealed())
-		{
-			Broodwar->drawCircleMap(unit->getPosition().x(), unit->getPosition().y(), 32, Colors::White);
-		}
-
-		if (unit->getType().isDetector())
-		{
-			double range = unit->getType().sightRange();
-			Broodwar->drawCircleMap(unitPos.x(),unitPos.y(),(int)range, Colors::Red);
-		}
-
-		// Draw info text
-		Broodwar->drawTextMap(unitPos.x(), unitPos.y()-10, "%s", ss.str().c_str());
 	}
+
+	return BaseAgent::getDebugString() + ss.str();
 }
 
 void UnitAgent::computeActions()
@@ -206,7 +216,7 @@ void UnitAgent::computeMoveAction(bool defensive, bool forceMove)
 int UnitAgent::enemyUnitsWithinRange(int maxRange) const {
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->exists()) {
@@ -226,7 +236,7 @@ int UnitAgent::enemyGroundUnitsWithinRange(int maxRange) const {
 
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (!enemyUnits[i]->getType().isFlyer()) {
@@ -244,7 +254,7 @@ int UnitAgent::enemySiegedTanksWithinRange() const {
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
 
-	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) {
@@ -264,7 +274,7 @@ int UnitAgent::enemyGroundAttackingUnitsWithinRange(int maxRange) const {
 
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (!enemyUnits[i]->getType().isFlyer() && canAttack(enemyUnits[i]->getType(), getUnitType())) {
@@ -284,7 +294,7 @@ int UnitAgent::enemyAirUnitsWithinRange(int maxRange) const {
 
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<BWAPI::Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->getType().isFlyer() || (enemyUnits[i]->getType().isFlyingBuilding() && enemyUnits[i]->isLifted())) {
@@ -304,7 +314,7 @@ int UnitAgent::enemyAirToGroundUnitsWithinRange(int maxRange) const {
 
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<BWAPI::Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->getType().isFlyer()) {
@@ -328,7 +338,7 @@ int UnitAgent::enemyAirAttackingUnitsWithinRange(int maxRange) const {
 
 	int maxRangeSquared = maxRange * maxRange;
 	int cEnemies = 0;
-	const vector<BWAPI::Unit*>& enemyUnits = bats::getEnemyUnits();
+	const vector<BWAPI::Unit*>& enemyUnits = bats::UnitHelper::getEnemyUnits();
 
 	for (size_t i = 0; i < enemyUnits.size(); ++i) {
 		if (enemyUnits[i]->getType().isFlyer() && canAttack(enemyUnits[i]->getType(), getUnitType())) {
@@ -492,6 +502,7 @@ int UnitAgent::friendlyUnitsWithinRange() const
 
 int UnitAgent::friendlyUnitsWithinRange(int maxRange) const
 {
+	/// @todo include allied units
 	int fCnt = 0;
 	vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (int i = 0; i < (int)agents.size(); i++)
