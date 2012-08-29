@@ -14,12 +14,31 @@ void HumanModule::onStart() {
 #ifdef _DEBUG
 	Sleep(2000);
 #endif
+	
+	if (!Broodwar->isFlagEnabled(Flag::UserInput)) {
+		Broodwar->enableFlag(Flag::UserInput);
+	}
+
+	// Init all buttons
+	int offsetXMin = 580;
+	int offsetXMax = offsetXMin + 50;
+	int ySize = 28;
+	int ySpacing = 2;
+	int yGroupSpacing = 10;
+
+	int yOffset = 132;
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Attack", 4, K_A, "attack")); yOffset += ySize + ySpacing;
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Follow", 8, K_F, "follow")); yOffset += ySize + ySpacing;
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Drop", 10, K_D, "drop")); yOffset += ySize + ySpacing + yGroupSpacing;
+
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Scout", 6, K_S, "scout")); yOffset += ySize + ySpacing;
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Expand", 4, K_E, "expand")); yOffset += ySize + ySpacing;
+	mButtons.push_back(Button(Position(offsetXMin, yOffset), Position(offsetXMax, yOffset+ySize), "Trans.", 4, K_T, "transition")); yOffset += ySize + ySpacing;
 }
 void HumanModule::onEnd(bool isWinner) {}
 void HumanModule::onFrame() {
-	if (!Broodwar->isFlagEnabled(Flag::UserInput)) {
-		Broodwar->enableFlag(Flag::UserInput);
-		Broodwar->printf("Hello");
+	for (size_t i = 0; i < mButtons.size(); ++i) {
+		mButtons[i].update();
 	}
 }
 void HumanModule::onSendText(std::string text) {

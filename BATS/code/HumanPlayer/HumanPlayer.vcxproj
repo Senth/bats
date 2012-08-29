@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="HumanDll.cpp" />
     <ClCompile Include="HumanModule.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="HumanModule.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

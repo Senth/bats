@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Button.h"
 #include <BWAPI.h>
 #include <string>
+#include <vector>
 
 // Namespace for the project
 namespace human {
@@ -44,5 +46,7 @@ public:
 private:
 
 	bool startsWith(const std::string& text,const std::string& token);
+
+	std::vector<Button> mButtons;
 };
 }

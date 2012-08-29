@@ -4,6 +4,9 @@
     <Filter Include="Main">
       <UniqueIdentifier>{333d79ca-6cc3-4ed1-803b-e998d307a5d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{76a57cc8-8589-4d41-bdc3-5d27f1812fcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HumanDll.cpp">
@@ -12,10 +15,16 @@
     <ClCompile Include="HumanModule.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HumanModule.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
