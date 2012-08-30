@@ -70,7 +70,7 @@ UnitCreator* UnitCreator::getInstance(){
 }
 
 void UnitCreator::updateProductionQueue(){
-	//TODO check if we have building to construct other units in the queue, else update the count
+	// check if we have building to construct other units in the queue, else update the count
 	for(int i=0; i < (int)mProductionQueue.size();i++){
 		if(mProductionQueue.at(i).mustHave)
 			continue;
@@ -93,16 +93,16 @@ void UnitCreator::updateProductionQueue(){
 	}
 }
 
-void UnitCreator::updatePopulation(BWAPI::UnitType unitType){	
+void UnitCreator::updatePopulation(BWAPI::UnitType unitType){
 	for(int i=0; i < (int)mProductionQueue.size();i++){
 		if(mProductionQueue.at(i).unit == unitType){
 			if(mProductionQueue.at(i).mustHave){
 				//check the overall unit population
 				int total = AgentManager::getInstance()->countNoUnits(unitType);
 				if(total < mProductionQueue.at(i).quantity)
-				mProductionQueue.at(i).remainingLeft = mProductionQueue.at(i).remainingLeft + (mProductionQueue.at(i).quantity - total);
+				mProductionQueue.at(i).remainingLeft = mProductionQueue.at(i).quantity - total;
 				return;
-			}			
+			}
 			mProductionQueue.at(i).remainingLeft++;
 			return;
 		}
@@ -114,9 +114,9 @@ bool UnitCreator::compareByPriority(ProductionQueueItem &a, ProductionQueueItem 
 	float p1,p2;
 	p1 = (float) a.remainingLeft / a.quantity;
 	p2 = (float) b.remainingLeft / b.quantity;
-	if(canProceedToNextUnit(a.unit))
-		return false;
-	else
+	//if(canProceedToNextUnit(a.unit))
+		//return false;
+	//else
 		return p1 > p2;
 }
 
@@ -141,6 +141,7 @@ BWAPI::UnitType UnitCreator::getNextProducableUnit(BWAPI::Unit* builder){
 		}
 			
 		type = mProductionQueue.at(i).unit;
+		// TODO check for all the iteration when we reach maximum factor on the resources (minerals, gas and supply)
 		if(!canProceedToNextUnit(type))
 		if (!ResourceManager::getInstance()->hasResources(type)){
 			sLockForQueue = false;
@@ -164,18 +165,44 @@ BWAPI::UnitType UnitCreator::getNextProducableUnit(BWAPI::Unit* builder){
 			sLockForQueue = false;
 			return UnitTypes::None;
 		}
+
+		//check if we need to put hold on the queue, in scenario where no units can be build
+		int noOfUnitsCannotBeBuild = 0;
+		for(int j=0; j < (int)mProductionQueue.size(); j++){
+			if(mProductionQueue.at(j).mustHave)
+				if(mProductionQueue.at(j).remainingLeft == 0){
+					noOfUnitsCannotBeBuild ++;
+					continue;
+				}
+			if(canProceedToNextUnit(mProductionQueue.at(j).unit))
+				noOfUnitsCannotBeBuild ++;
+		}
+		if(noOfUnitsCannotBeBuild == (int)mProductionQueue.size()){
+			sLockForQueue = false;
+			//if number of units cannot be build is same as the size of the queue, then we know that no units can be build
+			return UnitTypes::None;
+		}
+
 		// skipping to the low priority unit since no suitable building is found to produce this unit, also increase the remaining left count
-		if(!mProductionQueue.at(i).mustHave)
-			mProductionQueue.at(i).remainingLeft += mProductionQueue.at(i).quantity;
+		//if(!mProductionQueue.at(i).mustHave)
+			//mProductionQueue.at(i).remainingLeft += mProductionQueue.at(i).quantity;
 	}
 	sLockForQueue = false;
 	return UnitTypes::None;
 }
+
+/*
+* check if this unit "unitType" can be built by any other building
+* @return false if this unit is buildable by any other building (unit creator wont proceed to next unit in queue)
+* @return true if there is a building that can build this unit
+*/
 bool UnitCreator::canProceedToNextUnit(BWAPI::UnitType unitType){	
 	std::vector<BaseAgent*> agents = AgentManager::getInstance()->getAgents();
 	for (int i = 0; i < (int)agents.size(); i++){
-		if (agents.at(i)->isAlive() && agents.at(i)->canBuild(unitType))
+		if (agents.at(i)->isAlive() && agents.at(i)->getUnit()->isIdle() && agents.at(i)->canBuild(unitType)){
+			//agents.at(i)->getUnit()->isIdle();
 			return false;
+		}
 	}
 	return true;
 }

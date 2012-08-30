@@ -300,7 +300,8 @@ void BatsModule::onUnitEvade(BWAPI::Unit* unit) {
 			if (unit->getType().isBuilding()) {
 				BuildPlanner::getInstance()->buildingDestroyed(unit);
 			}
-			UnitCreator::getInstance()->updatePopulation(unit->getType());
+			else
+				UnitCreator::getInstance()->updatePopulation(unit->getType());
 			// Assist workers under attack
 			if (unit->getType().isWorker()) {
 				/// @todo assist worker.
