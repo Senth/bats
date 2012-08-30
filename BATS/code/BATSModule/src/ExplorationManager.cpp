@@ -222,23 +222,28 @@ void ExplorationManager::calcEnemyForceData() {
 	}
 }
 
-void ExplorationManager::printGraphicDebugInfo() const
-{
-	//Uncomment this if you want to draw a mark at detected enemy buildings.
-	/*for (int i = 0; i < (int)spottedBuildings.size(); i++)
+void ExplorationManager::printGraphicDebugInfo() const {
+	if (config::debug::GRAPHICS_VERBOSITY == config::debug::GraphicsVerbosity_Off ||
+		config::debug::modules::EXPLORATION_MANAGER == false)
 	{
-		if (spottedBuildings[i]->isActive())
+		return;
+	}
+
+	// Medium
+	// Draw detected building locations
+	for (size_t i = 0; i < mSpottedStructures.size(); i++)
+	{
+		if (mSpottedStructures[i]->isActive())
 		{
-			int x1 = spottedBuildings[i]->getTilePosition().x() * 32;
-			int y1 = spottedBuildings[i]->getTilePosition().y() * 32;
-			int x2 = x1 + 32;
-			int y2 = y1 + 32;
+			int x1 = mSpottedStructures[i]->getTilePosition().x() * TILE_SIZE;
+			int y1 = mSpottedStructures[i]->getTilePosition().y() * TILE_SIZE;
+			int x2 = x1 + mSpottedStructures[i]->getType().tileWidth() * TILE_SIZE;
+			int y2 = y1 + mSpottedStructures[i]->getType().tileHeight() * TILE_SIZE;
 
-			Broodwar->drawBox(CoordinateType::Map,x1,y1,x2,y2,Colors::Blue,true);
+			Broodwar->drawBoxMap(x1, y1, x2, y2, Colors::Blue);
+			Broodwar->drawBoxMap(x1+1, y1+1, x2-1, y2-1, Colors::Blue);
 		}
-	}*/
-
-	//Draw a circle around detectors
+	}
 }
 
 void ExplorationManager::addSpottedUnit(const BWAPI::Unit* unit) {

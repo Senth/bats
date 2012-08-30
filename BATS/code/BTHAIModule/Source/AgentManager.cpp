@@ -222,8 +222,6 @@ void AgentManager::onAgentDestroyed(BaseAgent* destroyedAgent) {
 
 	destroyedAgent->destroyed();
 
-	//Commander::getInstance()->unitDestroyed(agents.at(i));
-
 	return;
 }
 

@@ -53,15 +53,8 @@ void MarineAgent::computeActions()
 	}
 
 
-	if (isWeaponCooldown())
-	{
-		computeMoveAction(true);
-	}
-	else
-	{
-		bool attackingEnemy = findAndTryAttack();
-		if (!attackingEnemy) {
-			computeMoveAction();
-		}
+	bool attackingEnemy = findAndTryAttack();
+	if (!attackingEnemy) {
+		computeMoveAction();
 	}
 }

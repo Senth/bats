@@ -406,7 +406,7 @@ void Commander::orderDrop(bool alliedOrdered, Reasons reason) {
 	/// @todo get defensive squad units for a counter-attack drop, even when we're under attack
 
 	// Get available unit compositions
-	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_WorkersFree);
+	vector<UnitAgent*> freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free | UnitFilter_Transportation | UnitFilter_WorkersFree);
 	vector<UnitComposition> availableUnitCompositions;
 	availableUnitCompositions = mUnitCompositionFactory->getUnitCompositionsByType(freeUnits, UnitComposition_Drop);
 

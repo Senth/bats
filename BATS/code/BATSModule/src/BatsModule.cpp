@@ -342,7 +342,8 @@ void BatsModule::onUnitCreate(BWAPI::Unit* unit) {
 void BatsModule::onUnitDestroy(BWAPI::Unit* unit) {
 	TEST_SELF();
 
-	if (UnitHelper::isEnemy(unit)) {
+	// Addons are neutral
+	if (UnitHelper::isEnemy(unit) || UnitHelper::isNeutral(unit)) {
 		mExplorationManager->unitDestroyed(unit);
 	}
 }
@@ -365,7 +366,11 @@ void BatsModule::onUnitMorph(BWAPI::Unit* unit) {
 #pragma warning(push)
 #pragma warning(disable:4100)
 void BatsModule::onUnitRenegade(BWAPI::Unit* unit) {
-	// Does nothing
+	// Remove renegade units that became neutral, e.g. could be addons too when loosing the main structure
+	if (UnitHelper::isNeutral(unit)) {
+		mExplorationManager->unitDestroyed(unit);
+		mUnitManager->removeAgent(unit);
+	}
 }
 #pragma warning(pop)
 
@@ -475,6 +480,7 @@ void BatsModule::showDebug() const {
 		mSquadManager->printGraphicDebugInfo();
 		mUnitManager->printGraphicDebugInfo();
 		mDefenseManager->printGraphicDebugInfo();
+		mExplorationManager->printGraphicDebugInfo();
 		UnitCreator::getInstance()->printGraphicDebugInfo();
 		drawTerrainData();
 		CoverMap::getInstance()->printGraphicDebugInfo();

@@ -113,33 +113,67 @@ void AttackSquad::handleNormalBehavior() {
 
 	// We're under attack, but we're not close to the goal, make all units in the squad attack
 	// the unit that is either attacking or under attack
-	if (!isRetreating() && !isInPosition()) {
-		if (isAttacking()) {
-			bool foundAttacker = false;
-			size_t i = 0;
-			const std::vector<UnitAgent*>& units = getUnits();
-			while (!foundAttacker && i < units.size()) {
-				if (units[i]->isUnderAttack() || units[i]->getUnit()->isAttacking()) {
-					Unit* enemyTarget = units[i]->getUnit()->getOrderTarget();
+	if (!isInPosition()) {
+		if (!isRetreating()) {
+			if (isAttacking()) {
+				bool foundAttacker = false;
+				size_t i = 0;
+				const std::vector<UnitAgent*>& units = getUnits();
+				while (!foundAttacker && i < units.size()) {
+					if (units[i]->isUnderAttack() || units[i]->getUnit()->isAttacking()) {
+						Unit* enemyTarget = units[i]->getUnit()->getOrderTarget();
 
-					if (NULL != enemyTarget && bats::UnitHelper::isEnemy(enemyTarget)) {
-						const TilePosition& enemyPos = enemyTarget->getTilePosition();
+						if (NULL != enemyTarget && bats::UnitHelper::isEnemy(enemyTarget)) {
+							const TilePosition& enemyPos = enemyTarget->getTilePosition();
 
-						if (enemyPos != TilePositions::Invalid) {
-							foundAttacker = true;
+							if (enemyPos != TilePositions::Invalid) {
+								foundAttacker = true;
 
-							// make all units go and attack that position
-							setTemporaryGoalPosition(enemyPos);
+								// make all units go and attack that position
+								setTemporaryGoalPosition(enemyPos);
+							}
 						}
 					}
-				}
 
-				++i;
+					++i;
+				}
+			}
+			// Not attacking anymore, remove the temporary goal position.
+			else {
+				setTemporaryGoalPosition(TilePositions::Invalid);
 			}
 		}
-		// Not attacking anymore, remove the temporary goal position.
+	}
+	// Else we're in position
+	else {
+		// Create a wait position when we're in position, if we shall wait that is.
+		if (mWaitInPosition) {
+			if (hasTemporaryGoalPosition()) {
+				// All wait goals done, continue to goal
+				if (!hasWaitGoals()) {
+					mWaitInPosition = false;
+					setTemporaryGoalPosition(BWAPI::TilePositions::Invalid);
+				}
+			} else {
+				setTemporaryGoalPosition(getCenter());
+			}
+		}
+
+		// We are either done waiting or shall not wait, find temporary structures to attack
+		// when in the area
 		else {
-			setTemporaryGoalPosition(TilePositions::Invalid);
+			const pair<TilePosition, int>& enemyStructure = msExplorationManager->getClosestSpottedBuilding(getGoalPosition());
+
+			// Found structure
+			if (enemyStructure.first != TilePositions::Invalid) {
+				// Is it within the goal destroy distance?
+				int destroyDistance = config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE * config::squad::attack::STRUCTURES_DESTROYED_GOAL_DISTANCE;
+				if (enemyStructure.second <= destroyDistance) {
+					setTemporaryGoalPosition(enemyStructure.first);
+				} else {
+					setTemporaryGoalPosition(TilePositions::Invalid);
+				}
+			}
 		}
 	}
 
@@ -150,18 +184,7 @@ void AttackSquad::handleNormalBehavior() {
 	}
 
 
-	// Create a wait position when we're in position, if we shall wait that is.
-	if (mWaitInPosition && isInPosition()) {
-		if (hasTemporaryGoalPosition()) {
-			// All wait goals done, continue to goal
-			if (!hasWaitGoals()) {
-				mWaitInPosition = false;
-				setTemporaryGoalPosition(BWAPI::TilePositions::Invalid);
-			}
-		} else {
-			setTemporaryGoalPosition(getCenter());
-		}
-	}
+
 }
 
 void AttackSquad::handleFollowAllied() {

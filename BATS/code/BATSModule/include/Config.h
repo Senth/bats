@@ -261,6 +261,7 @@ namespace bats {
 				extern bool AGENT_SELECTED;
 				extern bool TERRAIN;
 				extern bool COVER_MAP;
+				extern bool EXPLORATION_MANAGER;
 				extern bool DEFENSE;
 				extern bool HOLD_SQUAD;
 				extern bool POTENTIAL_FIELDS;
@@ -436,8 +437,12 @@ namespace bats {
 			 * SCV Units
 			 */
 			namespace scv {
-				/** How close SCVs should search for units (when not in a squad) to heal */
+				/** How close SCVs should search for units (when not in a squad) to repair */
 				extern int REPAIR_SEARCH_DISTANCE;
+				/** How much health the structure needs to have lost before it will get repaired */
+				extern int REPAIR_STRUCTURE_HEALTH_LOST;
+				/** Maximum number of SCVs per unit/structure */
+				extern int REPAIRERS_PER_UNIT_MAX;
 			}
 		}
 

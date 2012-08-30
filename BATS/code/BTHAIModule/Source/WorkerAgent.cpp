@@ -20,6 +20,7 @@
 using namespace BWAPI;
 using namespace std;
 
+map<const BWAPI::Unit*, int> WorkerAgent::msRepairUnits; 
 CoverMap* WorkerAgent::msCoverMap = NULL;
 
 WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
@@ -32,12 +33,9 @@ WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
 	}
 }
 
-void WorkerAgent::destroyed()
-{
-	if (mCurrentState == MOVE_TO_SPOT || mCurrentState == FIND_BUILDSPOT)
-	{
-		if (!bats::BuildPlanner::isZerg())
-		{
+void WorkerAgent::destroyed() {
+	if (mCurrentState == MOVE_TO_SPOT || mCurrentState == FIND_BUILDSPOT) {
+		if (!bats::BuildPlanner::isZerg()) {
 			//Broodwar->printf("Worker building %s destroyed", toBuild.getName().c_str());
 			bats::BuildPlanner::getInstance()->handleWorkerDestroyed(mToBuild, unitID);
 			msCoverMap->clearTemp(mToBuild, mBuildSpot);
@@ -46,13 +44,18 @@ void WorkerAgent::destroyed()
 	}
 	// For Terran, send another SCV to continue building if we have started to build
 	else if (mCurrentState == CONSTRUCT && Broodwar->self()->getRace() == Races::Terran) {
-		const Unit* targetBuilding = unit->getOrderTarget();
+		const Unit* targetBuilding = getUnit()->getOrderTarget();
 		if (NULL != targetBuilding) {
 			bats::BuildPlanner::getInstance()->findAnotherBuilder(targetBuilding);
 		}
 	}
-	
-
+	// For Terran, remove repair scv from the unit it is repairing
+	else if (mCurrentState == REPAIRING && Broodwar->self()->getRace() == Races::Terran) {
+		const Unit* repairUnit = getUnit()->getOrderTarget();
+		if (NULL != repairUnit) {
+			decreaseRepairScvs(repairUnit);
+		}
+	}
 }
 
 Unit* WorkerAgent::getEnemyUnit()
@@ -145,7 +148,6 @@ void WorkerAgent::printGraphicDebugInfo() const
 
 					Position b = Position(mBuildSpot.x()*TILE_SIZE + w/2, mBuildSpot.y()*TILE_SIZE + h/2);
 					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), b.x(), b.y(), Colors::Teal);
-
 					Broodwar->drawBoxMap(mBuildSpot.x()*TILE_SIZE, mBuildSpot.y()*TILE_SIZE, mBuildSpot.x()*TILE_SIZE+w, mBuildSpot.y()*TILE_SIZE+h, Colors::Blue);
 				}
 			}
@@ -165,7 +167,7 @@ void WorkerAgent::printGraphicDebugInfo() const
 				}
 			}
 			
-			else if (unit->isRepairing())
+			else if (mCurrentState == REPAIRING)
 			{
 				Unit* target = unit->getOrderTarget();
 				if (target != NULL)
@@ -176,19 +178,18 @@ void WorkerAgent::printGraphicDebugInfo() const
 				}
 			}
 			
-			else if (unit->isConstructing())
+			else if (mCurrentState == CONSTRUCT)
 			{
 				Unit* target = unit->getOrderTarget();
 				if (target != NULL)
 				{
 					Position b = target->getPosition();
-					Broodwar->drawLineMap(unitPos.x(), unitPos.y(), b.x(), b.y(), Colors::Green);
 					Broodwar->drawTextMap(unitPos.x(), unitPos.y(), "Constructing %s", target->getType().getName().c_str());
 				}
 			}
 
 			// Does something arbitrary, draw goal
-			else {
+			else if (mCurrentState != MOVE_TO_SPOT && mCurrentState != FIND_BUILDSPOT) {
 				Broodwar->drawLineMap(unitPos.x(), unitPos.y(), goalPos.x(), goalPos.y(), Colors::White);
 			}
 		}
@@ -283,20 +284,20 @@ void WorkerAgent::computeActions()
 
 		if (mCurrentState == GATHER_MINERALS)
 		{
-			if (unit->isIdle())
-			{
-				Unit* mineral = msCoverMap->findClosestMineral(unit->getTilePosition());
-				if (mineral != NULL)
-				{
-					unit->rightClick(mineral);
-				}
-			}
-
 			// Find units to repair
 			const Unit* unitToRepair = findRepairUnit();
 			if (NULL != unitToRepair) {
 				assignToRepair(unitToRepair);
 			}
+			// If idle -> find a mineral to mine from
+			else if (unit->isIdle()) {
+				Unit* mineral = msCoverMap->findClosestMineral(unit->getTilePosition());
+				if (mineral != NULL) {
+					unit->rightClick(mineral);
+				}
+			}
+
+
 		}
 
 		if (mCurrentState == FIND_BUILDSPOT)
@@ -437,6 +438,7 @@ bool WorkerAgent::assignToRepair(const Unit* building)
 	{
 		setState(REPAIRING);
 		unit->repair(const_cast<Unit*>(building));
+		increaseRepairScvs(building);
 		return true;
 	}
 	return false;
@@ -570,10 +572,16 @@ const BWAPI::Unit* WorkerAgent::findRepairUnit() const {
 
 	const std::vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
 	for (size_t i = 0; i < agents.size(); ++i) {
-		if (agents[i]->getUnitType().isBuilding() || agents[i]->getUnitType().isMechanical()) {
-			if (bats::isWithinRange(agents[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition(), bats::config::unit::scv::REPAIR_SEARCH_DISTANCE)) {
-				// Calculate fraction of health
-				if (agents[i]->getUnit()->getHitPoints() < agents[i]->getUnitType().maxHitPoints()) {
+		if ((agents[i]->getUnitType().isBuilding() ||
+			agents[i]->getUnitType().isMechanical()) &&
+			agents[i]->isCompleted() &&
+			canMoreScvsRepairThisUnit(agents[i]->getUnit()))
+		{
+			
+			int healthWhenToRepair = agents[i]->getUnitType().maxHitPoints() - bats::config::unit::scv::REPAIR_STRUCTURE_HEALTH_LOST;
+			if (agents[i]->getUnit()->getHitPoints() <= healthWhenToRepair) {
+				if (bats::isWithinRange(agents[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition(), bats::config::unit::scv::REPAIR_SEARCH_DISTANCE)) {
+					// Calculate fraction of health
 					double healthFractionLeft = static_cast<double>(agents[i]->getUnit()->getHitPoints()) / agents[i]->getUnitType().maxHitPoints();
 					if (healthFractionLeft > bestFractionHealth) {
 						bestUnit = agents[i]->getUnit();
@@ -585,4 +593,28 @@ const BWAPI::Unit* WorkerAgent::findRepairUnit() const {
 	}
 
 	return bestUnit;
+}
+
+bool WorkerAgent::canMoreScvsRepairThisUnit(const BWAPI::Unit* unit) {
+	map<const BWAPI::Unit*, int>::const_iterator repairIt = msRepairUnits.find(unit);
+
+	// True if not found or less than max
+	return repairIt == msRepairUnits.end() || repairIt->second < bats::config::unit::scv::REPAIRERS_PER_UNIT_MAX;
+}
+
+void WorkerAgent::decreaseRepairScvs(const BWAPI::Unit* unit) {
+	map<const BWAPI::Unit*, int>::iterator repairIt = msRepairUnits.find(unit);
+
+	if (repairIt != msRepairUnits.end()) {
+		repairIt->second--;
+
+		// Remove if no repairers
+		if (repairIt->second == 0) {
+			msRepairUnits.erase(repairIt);
+		}
+	}
+}
+
+void WorkerAgent::increaseRepairScvs(const BWAPI::Unit* unit) {
+	msRepairUnits[unit]++;
 }

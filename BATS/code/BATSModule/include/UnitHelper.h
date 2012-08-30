@@ -45,6 +45,15 @@ inline bool isEnemy(const BWAPI::Unit* unit) {
 }
 
 /**
+ * Checks if a unit is neutral
+ * @param unit unit to check if it is neutral
+ * @return true if the unit is neutral
+ */
+inline bool isNeutral(const BWAPI::Unit* unit) {
+	return unit->getPlayer()->isNeutral();
+}
+
+/**
  * Returns true if an enemy is within the specified radius from the position.
  * @param center the position to check from.
  * @param radius maximum range from the position the enemy can be, in tile size.

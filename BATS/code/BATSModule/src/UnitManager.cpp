@@ -88,6 +88,11 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 				if (filter & UnitFilter_UnitsAll) {
 					addUnit = true;
 				}
+
+				// Don't add transportations unless the filter was specified
+				if (addUnit && !(filter & UnitFilter_Transportation) && unitAgent->isTransport()) {
+					addUnit = false;
+				}
 			}
 
 			if (filter == UnitFilter_NoFilter) {
@@ -101,6 +106,8 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 	}
 
 	// Add free units from defense manager
+	/// @note does not check if workers, and transportations are in the defensive units. They should
+	// never be so no idea to check, but this might change in the future, be sure to fix this then.
 	if (filter & UnitFilter_Free) {
 		const std::vector<UnitAgent*>& defenseUnits = DefenseManager::getInstance()->getFreeUnits();
 		foundUnits.insert(foundUnits.end(), defenseUnits.begin(), defenseUnits.end());

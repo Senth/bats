@@ -146,6 +146,7 @@ namespace debug {
 		bool AGENT_SELECTED = false;
 		bool TERRAIN = false;
 		bool COVER_MAP = false;
+		bool EXPLORATION_MANAGER = false;
 		bool DEFENSE = false;
 		bool HOLD_SQUAD = false;
 		bool POTENTIAL_FIELDS = false;
@@ -238,6 +239,8 @@ namespace unit {
 
 	namespace scv {
 		int REPAIR_SEARCH_DISTANCE = 0;
+		int REPAIR_STRUCTURE_HEALTH_LOST = 0;
+		int REPAIRERS_PER_UNIT_MAX = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -607,6 +610,10 @@ bool debug::modules::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(COVER_MAP);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(COVER_MAP));
 		COVER_MAP = variableInfo;
+	} else if (variableInfo.name == "exploration_manager") {
+		gOldValue = toString(EXPLORATION_MANAGER);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(EXPLORATION_MANAGER));
+		EXPLORATION_MANAGER = variableInfo;
 	} else if (variableInfo.name == "defense") {
 		gOldValue = toString(DEFENSE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(DEFENSE));
@@ -844,6 +851,14 @@ bool unit::scv::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(REPAIR_SEARCH_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_SEARCH_DISTANCE));
 		REPAIR_SEARCH_DISTANCE = variableInfo;
+	} else if (variableInfo.name == "repair_structure_health_lost") {
+		gOldValue = toString(REPAIR_STRUCTURE_HEALTH_LOST);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_STRUCTURE_HEALTH_LOST));
+		REPAIR_STRUCTURE_HEALTH_LOST = variableInfo;
+	} else if (variableInfo.name == "repairers_per_unit_max") {
+		gOldValue = toString(REPAIRERS_PER_UNIT_MAX);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIRERS_PER_UNIT_MAX));
+		REPAIRERS_PER_UNIT_MAX = variableInfo;
 	} else {
 		return false;
 	}

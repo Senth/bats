@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UnitAgent.h"
+#include <map>
 
 // Forward declarations
 class CoverMap;
@@ -92,14 +93,35 @@ private:
 	bool hasCompletedBuilding() const;
 
 	/**
-	 * Finds a close building to repair, prioritizes the building with
-	 * least % health left
+	 * Finds a close structures and mechanical units to repair, prioritizes the unit with
+	 * least % health left. Does not return a unit that is already being repaired.
+	 * @return unit that needs a repairer
 	 */
 	const BWAPI::Unit* findRepairUnit() const;
+
+	/**
+	 * Checks if the unit already has the maximum number of repairers
+	 * @param unit the unit to check
+	 * @return true if more repair workers can be added to repair this unit
+	 */
+	static bool canMoreScvsRepairThisUnit(const BWAPI::Unit* unit);
+
+	/**
+	 * Decreases the number of repair SCVs this unit has
+	 * @param unit the unit to decrease the number of repair SCVs
+	 */
+	static void decreaseRepairScvs(const BWAPI::Unit* unit);
+
+	/**
+	 * Increases the number of repair SCVs this unit has
+	 * @param unit the unit to increase the number of repair SCVs
+	 */
+	static void increaseRepairScvs(const BWAPI::Unit* unit);
 
 	States mCurrentState;
 	BWAPI::UnitType mToBuild;
 	BWAPI::TilePosition mBuildSpot;
 
+	static std::map<const BWAPI::Unit*, int> msRepairUnits;
 	static CoverMap* msCoverMap;
 };
