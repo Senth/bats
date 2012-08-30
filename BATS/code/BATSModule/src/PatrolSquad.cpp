@@ -123,9 +123,14 @@ void PatrolSquad::handleDefend() {
 	}
 }
 
-PatrolSquadPtr PatrolSquad::getThis() const {
+PatrolSquadCstPtr PatrolSquad::getThis() const {
+	return std::tr1::static_pointer_cast<const PatrolSquad>(Squad::getThis());
+}
+
+PatrolSquadPtr PatrolSquad::getThis() {
 	return std::tr1::static_pointer_cast<PatrolSquad>(Squad::getThis());
 }
+
 
 std::string PatrolSquad::getName() const {
 	return PATROL_SQUAD_NAME;

@@ -461,7 +461,11 @@ const BWAPI::TilePosition& Squad::getGoalPosition() const {
 	return mGoalPosition;
 }
 
-shared_ptr<Squad> Squad::getThis() const {
+SquadCstPtr Squad::getThis() const {
+	return mThis.lock();
+}
+
+SquadPtr Squad::getThis() {
 	return mThis.lock();
 }
 

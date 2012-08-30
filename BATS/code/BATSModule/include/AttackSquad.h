@@ -104,7 +104,12 @@ public:
 	 * right pointer for an attackSquad.
 	 * @return shared_ptr to this AttackSquad
 	 */
-	AttackSquadPtr getThis() const;
+	AttackSquadCstPtr getThis() const;
+
+	/**
+	 * \copydoc getThis const
+	 */
+	AttackSquadPtr getThis();
 
 	virtual std::string getName() const;
 	virtual std::string getDebugString() const;

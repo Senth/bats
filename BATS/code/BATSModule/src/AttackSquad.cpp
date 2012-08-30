@@ -6,6 +6,7 @@
 #include "EnemySquad.h"
 #include "PlayerArmyManager.h"
 #include "Helper.h"
+#include "UnitHelper.h"
 #include "SquadDefs.h"
 #include "DefenseManager.h"
 #include "IntentionWriter.h"
@@ -107,6 +108,39 @@ void AttackSquad::handleNormalBehavior() {
 		setCanRegroup(false);
 	} else {
 		setCanRegroup(true);
+	}
+
+
+	// We're under attack, but we're not close to the goal, make all units in the squad attack
+	// the unit that is either attacking or under attack
+	if (!isRetreating() && !isInPosition()) {
+		if (isAttacking()) {
+			bool foundAttacker = false;
+			size_t i = 0;
+			const std::vector<UnitAgent*>& units = getUnits();
+			while (!foundAttacker && i < units.size()) {
+				if (units[i]->isUnderAttack() || units[i]->getUnit()->isAttacking()) {
+					Unit* enemyTarget = units[i]->getUnit()->getOrderTarget();
+
+					if (NULL != enemyTarget && bats::UnitHelper::isEnemy(enemyTarget)) {
+						const TilePosition& enemyPos = enemyTarget->getTilePosition();
+
+						if (enemyPos != TilePositions::Invalid) {
+							foundAttacker = true;
+
+							// make all units go and attack that position
+							setTemporaryGoalPosition(enemyPos);
+						}
+					}
+				}
+
+				++i;
+			}
+		}
+		// Not attacking anymore, remove the temporary goal position.
+		else {
+			setTemporaryGoalPosition(TilePositions::Invalid);
+		}
 	}
 
 
@@ -358,7 +392,11 @@ std::string AttackSquad::getName() const {
 	return ATTACK_SQUAD_NAME;
 }
 
-AttackSquadPtr AttackSquad::getThis() const {
+AttackSquadCstPtr AttackSquad::getThis() const {
+	return static_pointer_cast<const AttackSquad>(Squad::getThis());
+}
+
+AttackSquadPtr AttackSquad::getThis() {
 	return static_pointer_cast<AttackSquad>(Squad::getThis());
 }
 

@@ -233,7 +233,12 @@ public:
 	 * Returns this pointer to the squad as an shared_ptr instead of just this
 	 * @return shared_ptr to this squad
 	 */
-	std::tr1::shared_ptr<Squad> getThis() const;
+	SquadCstPtr getThis() const;
+
+	/**
+	 * \copydoc getThis() const
+	 */
+	SquadPtr getThis();
 
 	/**
 	 * States of the squad
