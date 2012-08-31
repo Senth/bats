@@ -94,8 +94,20 @@ void UnitCreator::updateProductionQueue(){
 }
 
 void UnitCreator::updatePopulation(BWAPI::UnitType unitType){
+	bool checkTerranTankSpecialCase = false;
+	if(unitType == UnitTypes::Terran_Siege_Tank_Siege_Mode || unitType == UnitTypes::Terran_Siege_Tank_Tank_Mode)
+		checkTerranTankSpecialCase = true;
 	for(int i=0; i < (int)mProductionQueue.size();i++){
-		if(mProductionQueue.at(i).unit == unitType){
+		bool unitMatches = false;
+		if(checkTerranTankSpecialCase){
+			if(mProductionQueue.at(i).unit == UnitTypes::Terran_Siege_Tank_Siege_Mode 
+				|| mProductionQueue.at(i).unit == UnitTypes::Terran_Siege_Tank_Tank_Mode){
+				unitMatches = true;
+				checkTerranTankSpecialCase = false;
+			}
+		}
+
+		if(mProductionQueue.at(i).unit == unitType || unitMatches){
 			if(mProductionQueue.at(i).mustHave){
 				//check the overall unit population
 				int total = AgentManager::getInstance()->countNoUnits(unitType);
