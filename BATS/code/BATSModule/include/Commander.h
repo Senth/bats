@@ -191,6 +191,12 @@ private:
 	 */
 	bool isAlliedCreatingCommand() const;
 
+	/**
+	 * Adds repair workers (SCVs) to an existing attack squad
+	 * @param attackSquad the attack squad to add repair workers to
+	 */
+	void addRepairWorkersToSquad(AttackSquadPtr attackSquad);
+
 	SquadPtr mAlliedSquadCommand;
 	SquadManager* mSquadManager;
 	UnitManager* mUnitManager;

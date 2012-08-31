@@ -516,3 +516,27 @@ void AttackSquad::followAlliedSquad(AlliedSquadCstPtr alliedSquad) {
 		setCanRegroup(false);
 	}
 }
+
+size_t AttackSquad::getRepairWorkersMissingCount() const {
+	if (hasMechanicalUnits()) {
+		// If MECH_UNITS_PER_SCV is 5, we want one SCV in the range of 1-5. Because of
+		// the integer division we would get 0 workers in the 1-4 range and 1 worker if
+		// 5 mechanical workers. Therefore the range is shifted to include 0-4 as we
+		// decrease the number of workers by 1, this produces the correct algorithm,
+		// except it will always generate one less worker, so we add another worker
+		// afterwards.
+		int cWorkersMax = (getMechanicalUnitCount() - 1) / config::squad::attack::MECH_UNITS_PER_SCV;
+		cWorkersMax += 1;
+
+		// Decrease with current number of workers
+		cWorkersMax -= getWorkerCount();
+
+		if (cWorkersMax < 0) {
+			return 0;
+		} else {
+			return static_cast<size_t>(cWorkersMax);
+		}
+	} else {
+		return 0;
+	}
+}

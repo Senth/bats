@@ -342,8 +342,7 @@ void BatsModule::onUnitCreate(BWAPI::Unit* unit) {
 void BatsModule::onUnitDestroy(BWAPI::Unit* unit) {
 	TEST_SELF();
 
-	// Addons are neutral
-	if (UnitHelper::isEnemy(unit) || UnitHelper::isNeutral(unit)) {
+	if (UnitHelper::isEnemy(unit)) {
 		mExplorationManager->unitDestroyed(unit);
 	}
 }

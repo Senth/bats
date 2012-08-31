@@ -36,5 +36,7 @@ protected:
 
 private:
 	bool mHasSentWorkers;
+	bool mHasBuiltRefinery;
+	const BWAPI::Unit* mGeyser;
 	bats::ResourceGroupCstPtr mResourceGroup;
 };

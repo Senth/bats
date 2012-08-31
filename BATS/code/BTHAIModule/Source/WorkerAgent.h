@@ -50,7 +50,7 @@ public:
 	bool canBuild(const BWAPI::UnitType& type) const;
 
 	/** Assigns the agent to repair a building or tank. */
-	bool assignToRepair(const BWAPI::Unit* building);
+	bool assignToRepair(const BWAPI::Unit* unit);
 
 	/** Assigns the unit to construct a building of the specified type. */
 	bool assignToBuild(const BWAPI::UnitType& type);
@@ -118,9 +118,19 @@ private:
 	 */
 	static void increaseRepairScvs(const BWAPI::Unit* unit);
 
+	/**
+	 * Tests if the repairing is of the current unit it is repairing.
+	 * If the repairing is done it will automatically remove the unit and decrease
+	 * the number of scvs repairing it.
+	 * @return true if either the repairing is done or this unit isn't repairing anything
+	 * at the moment
+	 */
+	bool testRepairDone();
+
 	States mCurrentState;
 	BWAPI::UnitType mToBuild;
 	BWAPI::TilePosition mBuildSpot;
+	const BWAPI::Unit* mRepairUnit;
 
 	static std::map<const BWAPI::Unit*, int> msRepairUnits;
 	static CoverMap* msCoverMap;

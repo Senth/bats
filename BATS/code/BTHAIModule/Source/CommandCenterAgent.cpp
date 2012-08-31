@@ -5,6 +5,9 @@
 #include "ResourceManager.h"
 #include "BatsModule/include/BuildPlanner.h"
 #include "BatsModule/include/ResourceCounter.h"
+#include "BatsModule/include/UnitHelper.h"
+#include "BatsModule/include/SelfClassifier.h"
+#include "BatsModule/include/ResourceGroup.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -13,6 +16,8 @@ bats::ResourceCounter* CommandCenterAgent::msResourceCounter = NULL;
 
 CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
+	mGeyser = NULL;
+
 	mHasSentWorkers = false;
 	if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Command_Center) == 0)
 	{
@@ -28,6 +33,17 @@ CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 
 	// Find closest resource group
 	mResourceGroup = msResourceCounter->getClosestResourceGroup(getUnit()->getTilePosition());
+
+	// Check if this expansion can hold a refinery
+	const set<BWAPI::Unit*>& geysers = Broodwar->getStaticGeysers();
+	set<BWAPI::Unit*>::const_iterator geyserIt = geysers.begin();
+	while (NULL == mGeyser && geyserIt != geysers.end()) {
+		if ((*geyserIt)->getResourceGroup() == mResourceGroup->getId()) {
+			mGeyser = *geyserIt;
+		}
+
+		++geyserIt;
+	}
 }
 
 bats::ResourceGroupCstPtr CommandCenterAgent::getResourceGroup() const {
@@ -44,20 +60,13 @@ void CommandCenterAgent::computeActions()
 		{
 			sendWorkers();
 			mHasSentWorkers = true;
+		}
+	}
 
-			/// @todo check if refinery should be built, depending on our current gas and if this expansion
-			/// can hold a refinery.
+	// Check if we shall build a Refinery
+	if (NULL != mGeyser && mGeyser->getType() == UnitTypes::Resource_Vespene_Geyser) {
+		if (!bats::SelfClassifier::getInstance()->isHighOnGas()) {
 			bats::BuildPlanner::getInstance()->addRefinery();
-
-			// Defense manager should handle the adding of bunkers etc.
-			//if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Barracks) > 0)
-			//{
-			//	bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Bunker);
-			//}
-			//if (AgentManager::getInstance()->countNoUnits(UnitTypes::Terran_Engineering_Bay) > 0)
-			//{
-			//	bats::BuildPlanner::getInstance()->addBuildingFirst(UnitTypes::Terran_Missile_Turret);
-			//}
 		}
 	}
 

@@ -27,6 +27,7 @@ WorkerAgent::WorkerAgent(Unit* mUnit) : UnitAgent(mUnit)
 {
 	setState(GATHER_MINERALS);
 	agentType = "WorkerAgent";
+	mRepairUnit = NULL;
 
 	if (NULL == msCoverMap) {
 		msCoverMap = CoverMap::getInstance();
@@ -210,15 +211,36 @@ string WorkerAgent::getDebugString() const {
 void WorkerAgent::computeActions()
 {
 	// @author Suresh K. Balsasubramaniyan (suresh.draco@gmail.com)
-	if (getSquadId() != bats::SquadId::INVALID_KEY)
+	if (getSquadId().isValid())
 	{
 		//Worker is in a squad
 
 		bats::SquadPtr squad = msSquadManager->getSquad(getSquadId());
 		if (NULL != squad) {
-			computeMoveAction();
 
-			/// @todo repair something?
+			// Terran
+			if (Broodwar->self()->getRace() == Races::Terran) {
+				if (NULL == mRepairUnit) {
+					// Find unit to repair
+					mRepairUnit = findRepairUnit();
+					if (NULL != mRepairUnit) {
+						getUnit()->repair(const_cast<Unit*>(mRepairUnit));
+						increaseRepairScvs(mRepairUnit);
+					}
+					// No unit to repair, just follow
+					else {
+						computeMoveAction();
+					}
+				}
+				// Already repairing, check when repair is done
+				else {
+					testRepairDone();
+				}
+			} else {
+				computeMoveAction();
+			}
+
+			
 		} else {
 			ERROR_MESSAGE(false, "Squad is null for WorkerAgent, why is it this?");
 		}
@@ -266,8 +288,7 @@ void WorkerAgent::computeActions()
 	
 		if (mCurrentState == REPAIRING)
 		{
-			if (!unit->isRepairing())
-			{
+			if (testRepairDone()) {
 				setState(GATHER_MINERALS);
 				BaseAgent* base = AgentManager::getInstance()->getClosestBase(unit->getTilePosition());
 				if (base != NULL)
@@ -275,10 +296,6 @@ void WorkerAgent::computeActions()
 					unit->rightClick(base->getUnit());
 					return;
 				}
-			}
-			else
-			{
-				return;
 			}
 		}
 
@@ -432,16 +449,22 @@ void WorkerAgent::setState(States state)
 	}
 }
 
-bool WorkerAgent::assignToRepair(const Unit* building)
+bool WorkerAgent::assignToRepair(const Unit* repairUnit)
 {
+	if (NULL == repairUnit) {
+		return false;
+	}
+
 	if (unit->isIdle() || (unit->isGatheringMinerals() && !unit->isCarryingMinerals()))
 	{
 		setState(REPAIRING);
-		unit->repair(const_cast<Unit*>(building));
-		increaseRepairScvs(building);
+		mRepairUnit = repairUnit;
+		unit->repair(const_cast<Unit*>(repairUnit));
+		increaseRepairScvs(repairUnit);
 		return true;
+	} else {
+		return false;
 	}
-	return false;
 }
 
 bool WorkerAgent::assignToFinishBuild(const Unit* building)
@@ -505,9 +528,6 @@ void WorkerAgent::reset()
 		
 	}
 
-	
-	
-
 	if (unit->isConstructing())
 	{
 		unit->cancelConstruction();
@@ -538,7 +558,6 @@ bool WorkerAgent::isConstructing(const UnitType& type) const
 	return false;
 }
 
-/** Returns the state of the agent as text. Good for printouts. */
 string WorkerAgent::getStateAsText() const
 {
 	string strReturn;
@@ -570,17 +589,31 @@ const BWAPI::Unit* WorkerAgent::findRepairUnit() const {
 	const Unit* bestUnit = NULL;
 	double bestFractionHealth = 0.0;
 
-	const std::vector<BaseAgent*>& agents = AgentManager::getInstance()->getAgents();
+	bool inSquad = getSquadId().isValid();
+
+	// Is worker in a squad or not?
+	std::vector<const BaseAgent*> agents;
+	if (inSquad) {
+		bats::SquadCstPtr squad = msSquadManager->getSquad(getSquadId());
+		if (NULL != squad) {
+			const vector<const UnitAgent*>& squadUnits = squad->getUnits();
+			agents = *reinterpret_cast<const vector<const BaseAgent*>*>(&squadUnits);
+		}
+	} else {
+		agents = const_cast<const AgentManager*>(AgentManager::getInstance())->getAgents();
+	}
+
 	for (size_t i = 0; i < agents.size(); ++i) {
 		if ((agents[i]->getUnitType().isBuilding() ||
 			agents[i]->getUnitType().isMechanical()) &&
 			agents[i]->isCompleted() &&
 			canMoreScvsRepairThisUnit(agents[i]->getUnit()))
 		{
-			
-			int healthWhenToRepair = agents[i]->getUnitType().maxHitPoints() - bats::config::unit::scv::REPAIR_STRUCTURE_HEALTH_LOST;
+
+			int healthWhenToRepair = agents[i]->getUnitType().maxHitPoints() - bats::config::unit::scv::REPAIR_UNIT_HEALTH_LOST;
 			if (agents[i]->getUnit()->getHitPoints() <= healthWhenToRepair) {
-				if (bats::isWithinRange(agents[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition(), bats::config::unit::scv::REPAIR_SEARCH_DISTANCE)) {
+				// Only test range if not in a squad
+				if (inSquad || bats::isWithinRange(agents[i]->getUnit()->getTilePosition(), getUnit()->getTilePosition(), bats::config::unit::scv::REPAIR_SEARCH_DISTANCE)) {
 					// Calculate fraction of health
 					double healthFractionLeft = static_cast<double>(agents[i]->getUnit()->getHitPoints()) / agents[i]->getUnitType().maxHitPoints();
 					if (healthFractionLeft > bestFractionHealth) {
@@ -617,4 +650,24 @@ void WorkerAgent::decreaseRepairScvs(const BWAPI::Unit* unit) {
 
 void WorkerAgent::increaseRepairScvs(const BWAPI::Unit* unit) {
 	msRepairUnits[unit]++;
+}
+
+bool WorkerAgent::testRepairDone() {
+	if (NULL == mRepairUnit) {
+		return true;
+	}
+
+	// Repair unit died
+	if (!mRepairUnit->exists()) {
+		decreaseRepairScvs(mRepairUnit);
+		mRepairUnit = NULL;
+	}
+
+	// Full health, done
+	else if (mRepairUnit->getHitPoints() >= mRepairUnit->getType().maxHitPoints()) {
+		decreaseRepairScvs(mRepairUnit);
+		mRepairUnit = NULL;
+	}
+
+	return NULL == mRepairUnit;
 }

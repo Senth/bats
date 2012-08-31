@@ -49,6 +49,11 @@ std::vector<UnitAgent*> UnitManager::getUnitsByFilter(int filter) {
 				continue;
 			}
 
+			// Skip spider mines
+			if (unitAgent->getUnitType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine) {
+				continue;
+			}
+
 			bool addUnit = false;
 
 			// Worker units

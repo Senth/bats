@@ -315,6 +315,30 @@ public:
 	bool hasGround() const;
 
 	/**
+	 * Checks if this squad has mechanical units
+	 * @return true if the squad has mechanical units in it
+	 */
+	bool hasMechanicalUnits() const;
+
+	/**
+	 * Checks if this squad has biological units, units that can be healed by medics
+	 * @return true if the squad has biological units
+	 */
+	bool hasOrganicUnits() const;
+
+	/**
+	 * Returns the number of mechanical units in the squad
+	 * @return number of mechanical units in the squad
+	 */
+	size_t getMechanicalUnitCount() const;
+
+	/**
+	 * Returns the number of organic units in the squad
+	 * @return number of organic units in the squad
+	 */
+	size_t getOrganicUnitCount() const;
+
+	/**
 	 * Checks whether the squad is currently retreating or not. This is not the same as disband
 	 * @return true if the squad is retreating.
 	 */
@@ -329,7 +353,7 @@ public:
 	 * Returns the number of units in the squad
 	 * @return number of units in the squad
 	 */
-	int getUnitCount() const;
+	size_t getUnitCount() const;
 
 	/**
 	 * Returns the supply count of all units in the squad
@@ -348,6 +372,12 @@ public:
 	 * @see getSupplyCount()
 	 */
 	int getDeltaSupplyCount() const;
+
+	/**
+	 * Returns the number of workers in the squad
+	 * @return number of workers in the squad
+	 */
+	size_t getWorkerCount() const;
 
 	virtual void onConstantChanged(config::ConstantName constantName);
 	
@@ -725,6 +755,9 @@ private:
 	bool mDisbanded;
 	bool mHasAirUnits;
 	bool mHasGroundUnits;
+	size_t mcMechanicalUnits;
+	size_t mcOrganicUnits;
+	size_t mcWorkers;
 	bool mAvoidEnemyUnits;
 	bool mInitialized;
 	States mState;

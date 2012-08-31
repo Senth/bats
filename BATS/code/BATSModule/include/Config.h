@@ -375,6 +375,11 @@ namespace bats {
 				extern int ALLIED_REGROUP_BEGIN;
 				/** Distance away from allied squad when regrouping is finished. */
 				extern int ALLIED_REGROUP_END;
+				/** Number of mechanical units per repairing SCV. E.g. if set to 5 max one SCV
+				 * will be added to the attack squad to repair units if the number of mechanical
+				 * units are in the range of [1, 5], if the number of units are six, max 2 SCVs
+				 * will be assigned. */
+				extern size_t MECH_UNITS_PER_SCV;
 			}
 
 			/**
@@ -439,8 +444,8 @@ namespace bats {
 			namespace scv {
 				/** How close SCVs should search for units (when not in a squad) to repair */
 				extern int REPAIR_SEARCH_DISTANCE;
-				/** How much health the structure needs to have lost before it will get repaired */
-				extern int REPAIR_STRUCTURE_HEALTH_LOST;
+				/** How much health the unit needs to have lost before it will get repaired */
+				extern int REPAIR_UNIT_HEALTH_LOST;
 				/** Maximum number of SCVs per unit/structure */
 				extern int REPAIRERS_PER_UNIT_MAX;
 			}

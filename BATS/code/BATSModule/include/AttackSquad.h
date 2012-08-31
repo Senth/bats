@@ -111,6 +111,12 @@ public:
 	 */
 	AttackSquadPtr getThis();
 
+	/**
+	 * Returns the number of repair workers the squad needs to fill the quota.
+	 * @return number of repair workers (SCVs) the squad needs to be full.
+	 */
+	size_t getRepairWorkersMissingCount() const;
+
 	virtual std::string getName() const;
 	virtual std::string getDebugString() const;
 

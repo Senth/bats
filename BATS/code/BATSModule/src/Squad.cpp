@@ -54,7 +54,10 @@ Squad::Squad(
 	mState(State_Initializing),
 	mCanRegroup(true),
 	mUpdateLast(0.0),
-	mInitialized(false)
+	mInitialized(false),
+	mcMechanicalUnits(0),
+	mcOrganicUnits(0),
+	mcWorkers(0)
 {
 	// Generate new key for the squad
 	if (mscInstances == 0) {
@@ -376,6 +379,17 @@ void Squad::addUnit(UnitAgent* unit) {
 			mHasGroundUnits = true;
 		}
 
+		// Set mechanical or biological
+		if (unit->getUnitType().isMechanical()) {
+			mcMechanicalUnits++;
+		} else if (unit->getUnitType().isOrganic()) {
+			mcOrganicUnits++;
+		}
+
+		if (unit->getUnitType().isWorker()) {
+			mcWorkers++;
+		}
+
 		// Send event only if the class has been initialized (otherwise derived classes doesn't exist)
 		if (mInitialized) {
 			onUnitAdded(unit);
@@ -403,7 +417,7 @@ void Squad::removeUnit(UnitAgent* unit) {
 
 		// Update has air and has ground
 		if (unit->isAir()) {
-			mHasAirUnits = false;	// testing
+			mHasAirUnits = false;
 
 			// Look for air units
 			size_t i = 0;
@@ -424,6 +438,17 @@ void Squad::removeUnit(UnitAgent* unit) {
 				}
 				++i;
 			}
+		}
+
+		// Update mechanical and biological
+		if (unit->getUnitType().isMechanical()) {
+			mcMechanicalUnits--;
+		} else if (unit->getUnitType().isOrganic()) {
+			mcOrganicUnits--;
+		}
+
+		if (unit->getUnitType().isWorker()) {
+			mcWorkers--;
 		}
 
 		unit->setSquadId(bats::SquadId::INVALID_KEY);
@@ -942,8 +967,8 @@ string Squad::getDebugString() const {
 	return ss.str();
 }
 
-int Squad::getUnitCount() const {
-	return static_cast<int>(mUnits.size());
+size_t Squad::getUnitCount() const {
+	return mUnits.size();
 }
 
 int Squad::getSupplyCount() const {
@@ -1019,4 +1044,24 @@ BWAPI::TilePosition Squad::findRegroupPosition() const {
 	}
 
 	return bestRegroup;
+}
+
+bool Squad::hasMechanicalUnits() const {
+	return mcMechanicalUnits > 0;
+}
+
+bool Squad::hasOrganicUnits() const {
+	return mcOrganicUnits > 0;
+}
+
+size_t Squad::getMechanicalUnitCount() const {
+	return mcMechanicalUnits;
+}
+
+size_t Squad::getOrganicUnitCount() const {
+	return mcOrganicUnits;
+}
+
+size_t Squad::getWorkerCount() const {
+	return mcWorkers;
 }

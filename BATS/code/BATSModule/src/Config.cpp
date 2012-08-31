@@ -204,6 +204,7 @@ namespace squad {
 		int FIND_ALLIED_SQUAD_DISTANCE = 0;
 		int ALLIED_REGROUP_BEGIN = 0;
 		int ALLIED_REGROUP_END = 0;
+		size_t MECH_UNITS_PER_SCV = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
 	}
@@ -239,7 +240,7 @@ namespace unit {
 
 	namespace scv {
 		int REPAIR_SEARCH_DISTANCE = 0;
-		int REPAIR_STRUCTURE_HEALTH_LOST = 0;
+		int REPAIR_UNIT_HEALTH_LOST = 0;
 		int REPAIRERS_PER_UNIT_MAX = 0;
 
 		bool set(const utilities::VariableInfo& variableInfo);
@@ -765,10 +766,14 @@ bool squad::attack::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(ALLIED_REGROUP_BEGIN);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_BEGIN));
 		ALLIED_REGROUP_BEGIN = variableInfo;
-	} else  if (variableInfo.name == "allied_regroup_end") {
+	} else if (variableInfo.name == "allied_regroup_end") {
 		gOldValue = toString(ALLIED_REGROUP_END);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(ALLIED_REGROUP_END));
 		ALLIED_REGROUP_END = variableInfo;
+	} else if (variableInfo.name == "mech_units_per_scv") {
+		gOldValue = toString(MECH_UNITS_PER_SCV);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(MECH_UNITS_PER_SCV));
+		MECH_UNITS_PER_SCV = variableInfo;
 	} else {
 		return false;
 	}
@@ -851,10 +856,10 @@ bool unit::scv::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(REPAIR_SEARCH_DISTANCE);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_SEARCH_DISTANCE));
 		REPAIR_SEARCH_DISTANCE = variableInfo;
-	} else if (variableInfo.name == "repair_structure_health_lost") {
-		gOldValue = toString(REPAIR_STRUCTURE_HEALTH_LOST);
-		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_STRUCTURE_HEALTH_LOST));
-		REPAIR_STRUCTURE_HEALTH_LOST = variableInfo;
+	} else if (variableInfo.name == "repair_unit_health_lost") {
+		gOldValue = toString(REPAIR_UNIT_HEALTH_LOST);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIR_UNIT_HEALTH_LOST));
+		REPAIR_UNIT_HEALTH_LOST = variableInfo;
 	} else if (variableInfo.name == "repairers_per_unit_max") {
 		gOldValue = toString(REPAIRERS_PER_UNIT_MAX);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(REPAIRERS_PER_UNIT_MAX));

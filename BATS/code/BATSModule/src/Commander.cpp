@@ -300,10 +300,22 @@ void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
+
+			if (Broodwar->self()->getRace() == Races::Terran) {
+				addRepairWorkersToSquad(oldSquad);
+			}
+
 			mIntentionWriter->writeIntention(Intention_BotAttackMerged, reason);
 		} else {
 			AttackSquad* attackSquad = new AttackSquad(freeUnits);
 			const TilePosition attackPos = attackSquad->getGoalPosition();
+
+			// Terran - Add SCVs if the attack has mechanical units
+			if (Broodwar->self()->getRace() == Races::Terran) {
+				addRepairWorkersToSquad(attackSquad->getThis());
+			}
+
+
 			mIntentionWriter->writeIntention(Intention_BotAttack, reason, attackPos);
 		}
 	} else {
@@ -520,4 +532,19 @@ void Commander::initStringToEnums() {
 
 bool Commander::isAlliedCreatingCommand() const {
 	return NULL != mAlliedSquadCommand;
+}
+
+void Commander::addRepairWorkersToSquad(AttackSquadPtr attackSquad) {
+	size_t cWorkersMax = attackSquad->getRepairWorkersMissingCount();
+
+	if (cWorkersMax > 0) {
+		std::vector<UnitAgent*> workers = mUnitManager->getUnitsByFilter(UnitFilter_WorkersFree);
+
+		// Resize if too big
+		if (workers.size() > cWorkersMax) {
+			workers.resize(cWorkersMax);
+		}
+
+		attackSquad->addUnits(workers);
+	}
 }
