@@ -104,6 +104,13 @@ void BatsModule::onStart() {
 		}
 	}
 
+	// Send message to allied players to enable control GUI if
+	// the bot can be controlled
+	if (config::module::CONTROLLABLE) {
+		Broodwar->sendTextEx(true, "gui control on");
+	}
+
+
 	DEBUG_MESSAGE(utilities::LogLevel_Info, "BATS bot running!");
 
 	running = true;

@@ -447,14 +447,14 @@ void DefenseManager::updatePatrolSquad() {
 		activePatrolSquad->setPatrolPositions(patrolPositions);
 
 		// Defend - if a position needs defending and the squad isn't defending an area
-		if (!activePatrolSquad->isDefending() && mUnderAttack) {
+		if (!activePatrolSquad->isDefending() && (mUnderAttack || mAlliedUnderAttack)) {
 			DefendSet::iterator defendIt = mDefendPositions.begin();
 			while (defendIt != mDefendPositions.end() && !activePatrolSquad->isDefending()) {
 				if (defendIt->underAttack) {
 					activePatrolSquad->defendPosition(defendIt->position);
 
 					// Defending player? Tell him that
-					if (defendIt->isAllied && !defendIt->isOur) {
+					if (defendIt->isAllied) {
 						mIntentionWriter->writeIntention(Intention_BotComingToAid);
 						mDefendingAllied = true;
 					}
@@ -532,7 +532,6 @@ void DefenseManager::updateUnderAttackPositions() {
 	// Allied defend unit
 	if (NULL != mDefendAlliedUnit) {
 		if (mDefendAlliedUnit->isUnderAttack()) {
-			mUnderAttack = true;
 			mAlliedUnderAttack = true;
 		} else {
 			mDefendAlliedUnit = NULL;
@@ -544,10 +543,13 @@ void DefenseManager::updateUnderAttackPositions() {
 	DefendSet::iterator defendPosIt;
 	for (defendPosIt = mDefendPositions.begin(); defendPosIt != mDefendPositions.end(); ++defendPosIt) {
 		if (UnitHelper::isEnemyWithinRadius(defendPosIt->position, config::squad::defend::ENEMY_OFFENSIVE_PERIMETER)) {
-			mUnderAttack = true;
+			if (defendPosIt->isOur) {
+				mUnderAttack = true;
+			}
+			
 			defendPosIt->underAttack = true;
 
-			if (defendPosIt->isAllied && !defendPosIt->isOur) {
+			if (defendPosIt->isAllied) {
 				mAlliedUnderAttack = true;
 			}
 

@@ -668,13 +668,20 @@ bool BuildPlanner::nextIsOfType(const UnitType& type) const {
 }
 
 bool BuildPlanner::containsType(const UnitType& type) const {
-	for (size_t i = 0; i < mBuildOrder.size(); i++)
-	{
-		if (mBuildOrder[i].structure == type)
-		{
+	// Order
+	for (size_t i = 0; i < mBuildOrder.size(); i++) {
+		if (mBuildOrder[i].structure == type) {
 			return true;
 		}
 	}
+
+	// Queue
+	for (size_t i = 0; i < mBuildQueue.size(); ++i) {
+		if (mBuildQueue[i].structure == type) {
+			return true;
+		}
+	}
+
 	return false;
 }
 

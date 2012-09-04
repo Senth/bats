@@ -202,21 +202,21 @@ void AttackSquad::handleFollowAllied() {
 	if(mAlliedSquadFollow->isEmpty()) {
 		mAlliedSquadFollow.reset();
 
-		vector<pair<AlliedSquadCstPtr, int>> foundSquads =
+		const vector<pair<AlliedSquadCstPtr, int>>& foundSquads =
 			msPlayerArmyManager->getSquadsWithin<AlliedSquad>(
 			getCenter(),
 			config::squad::attack::FIND_ALLIED_SQUAD_DISTANCE,
-			true
+			false
 			);
 
-		// Chose the closest squad that is outside home (not idle)
-		vector<pair<AlliedSquadCstPtr, int>>::const_iterator squadIt = foundSquads.begin();
-		while (NULL == mAlliedSquadFollow && squadIt != foundSquads.end()) {
-			if (squadIt->first->getState() != AlliedSquad::State_IdleInBase) {
-				mAlliedSquadFollow = squadIt->first;
+		// Choose the largest squad
+		vector<pair<AlliedSquadCstPtr, int>>::const_iterator alliedIt;
+		int largestSupply = 0;
+		for (alliedIt = foundSquads.begin(); alliedIt != foundSquads.end(); ++alliedIt) {
+			if (alliedIt->first->getSupplyCount() > largestSupply) {
+				largestSupply = alliedIt->first->getSupplyCount();
+				mAlliedSquadFollow = alliedIt->first;
 			}
-
-			++squadIt;
 		}
 	}
 

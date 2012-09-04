@@ -11,6 +11,7 @@ class CoverMap;
  * and if Terran SCV, repair a building or tank.
  *
  * @author Johan Hagelback (johan.hagelback@gmail.com)
+ * @author Matteus Magnusson (matteus.magnusson@gmail.com)
  * @todo doxygen
  * @todo variable names
  * @todo const and references

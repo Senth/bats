@@ -212,9 +212,12 @@ bool CoverMap::canBuildAt(const UnitType& toBuild, const TilePosition& buildSpot
 
 
 	// Is the build spot in an allied region (but not in our region)
+	// Do not use for bases
 	const BWTA::Region* region = BWTA::getRegion(buildSpot);
-	if (isRegionOccupiedByOurTeam(region, false, true) && !isRegionOccupiedByOurTeam(region, true, false)) {
-		return false;
+	if (!toBuild.isResourceDepot()) {
+		if (isRegionOccupiedByOurTeam(region, false, true) && !isRegionOccupiedByOurTeam(region, true, false)) {
+			return false;
+		}
 	}
 
 

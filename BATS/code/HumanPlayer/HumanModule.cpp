@@ -15,6 +15,8 @@ void HumanModule::onStart() {
 	Sleep(2000);
 #endif
 	
+	mDisplayGui = false;
+
 	if (!Broodwar->isFlagEnabled(Flag::UserInput)) {
 		Broodwar->enableFlag(Flag::UserInput);
 	}
@@ -37,8 +39,11 @@ void HumanModule::onStart() {
 }
 void HumanModule::onEnd(bool isWinner) {}
 void HumanModule::onFrame() {
-	for (size_t i = 0; i < mButtons.size(); ++i) {
-		mButtons[i].update();
+	// draw GUI
+	if (mDisplayGui) {
+		for (size_t i = 0; i < mButtons.size(); ++i) {
+			mButtons[i].update();
+		}
 	}
 }
 void HumanModule::onSendText(std::string text) {
@@ -68,6 +73,12 @@ void HumanModule::onReceiveText(BWAPI::Player* player, std::string text) {
 
 		Broodwar->setLocalSpeed(speed);
 		Broodwar->printf("Speed set to: %i", speed);
+	}
+	else if (text == "gui control on") {
+		mDisplayGui = true;
+	}
+	else if (text == "gui control off") {
+		mDisplayGui = false;
 	}
 }
 void HumanModule::onPlayerLeft(BWAPI::Player* player) {}

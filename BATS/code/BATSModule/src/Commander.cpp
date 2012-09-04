@@ -120,6 +120,10 @@ void Commander::computeOwnReactions() {
 			if (mSelfClassifier->isUpgradeSoonDone(freeUnits)) {
 				issueCommand(Command_Attack, false, Reason_BotUpgradeSoonDone);
 			}
+			// Attack whenever more than 140 supplies (280 in BWAPI)
+			else if (Broodwar->self()->supplyUsed() >= 280) {
+				issueCommand(Command_Attack, false);
+			}
 		}
 	}
 
@@ -199,6 +203,11 @@ void Commander::computeAlliedReactions() {
 }
 
 void Commander::issueCommand(const std::string& command) {
+	// Can't be controlled if not controllable is enabled
+	if (config::module::CONTROLLABLE == false) {
+		return;
+	}
+
 	if (isCommandAvailable(command)) {
 		issueCommand(mCommandStringToEnums[command], true);
 	}
@@ -297,6 +306,13 @@ void Commander::orderAttack(bool alliedOrdered, Reasons reason) {
 	if (canAttack) {
 		// Add the units to the old attack squad if it exists
 		AttackSquadPtr oldSquad = mSquadManager->getFrontalAttack();
+
+		if (oldSquad != NULL && oldSquad->isRetreating()) {
+			oldSquad->tryDisband();
+			oldSquad.reset();
+
+			freeUnits = mUnitManager->getUnitsByFilter(UnitFilter_Free);
+		}
 
 		if (oldSquad != NULL) {
 			oldSquad->addUnits(freeUnits);
@@ -506,9 +522,8 @@ void Commander::orderExpand(bool alliedOrdered, Reasons reason) {
 		mExpansionTimeLast;
 	} else {
 		DEBUG_MESSAGE(utilities::LogLevel_Info, "Expansion not available yet");
-		/// @todo write the reason why we can't expand
 		if (alliedOrdered) {
-			mIntentionWriter->writeIntention(Intention_BotExpandNot);
+			mIntentionWriter->writeIntention(Intention_BotExpandNot, reason);
 		}
 	}
 }

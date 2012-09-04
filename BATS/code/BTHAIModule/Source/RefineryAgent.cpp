@@ -1,6 +1,7 @@
 #include "RefineryAgent.h"
 #include "WorkerAgent.h"
 #include "AgentManager.h"
+#include "BATSModule/include/SelfClassifier.h"
 #include <BWAPI/Unit.h>
 
 using namespace BWAPI;
@@ -29,7 +30,24 @@ void RefineryAgent::computeActions()
 		}
 	}
 
-	if (assignedWorkers.size() <= 3)
+	size_t maxSize;
+	if (AgentManager::getInstance()->getWorkerCount() < 8) {
+		maxSize = 0;
+	}
+	else if (bats::SelfClassifier::getInstance()->isHighOnGas()) {
+		maxSize = 3;
+	}
+	else {
+		maxSize = 4;
+	}
+
+	// Remove assigned worker if too big
+	if (assignedWorkers.size() > maxSize) {
+		assignedWorkers.back()->setState(WorkerAgent::GATHER_MINERALS);
+		assignedWorkers.erase(assignedWorkers.begin() + assignedWorkers.size() - 1);
+	}
+
+	if (assignedWorkers.size() < maxSize)
 	{
 		if (!unit->isBeingConstructed() && unit->getPlayer() == Broodwar->self())
 		{

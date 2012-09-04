@@ -215,7 +215,7 @@ bool SelfClassifier::isUnderAttack() const {
 }
 
 double SelfClassifier::getLastExpansionStartTime() const {
-	double lastExpansionFrame = 0;
+	int lastExpansionFrame = 0;
 
 	// Get all expansions
 	const vector<const BaseAgent*>& agents = mAgentManager->getAgents(Broodwar->self()->getRace().getCenter());

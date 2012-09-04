@@ -13,6 +13,7 @@ using namespace BWAPI;
 using namespace std;
 
 bats::ResourceCounter* CommandCenterAgent::msResourceCounter = NULL;
+bats::BuildPlanner* CommandCenterAgent::msBuildPlanner = NULL;
 
 CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 {
@@ -29,6 +30,7 @@ CommandCenterAgent::CommandCenterAgent(Unit* mUnit) : StructureAgent(mUnit)
 
 	if (msResourceCounter == NULL) {
 		msResourceCounter = bats::ResourceCounter::getInstance();
+		msBuildPlanner = bats::BuildPlanner::getInstance();
 	}
 
 	// Find closest resource group
@@ -65,8 +67,12 @@ void CommandCenterAgent::computeActions()
 
 	// Check if we shall build a Refinery
 	if (NULL != mGeyser && mGeyser->getType() == UnitTypes::Resource_Vespene_Geyser) {
-		if (!bats::SelfClassifier::getInstance()->isHighOnGas()) {
-			bats::BuildPlanner::getInstance()->addRefinery();
+		if (!bats::SelfClassifier::getInstance()->isHighOnGas() &&
+			bats::SelfClassifier::getInstance()->isHighOnMinerals() &&
+			!msBuildPlanner->containsType(UnitTypes::Terran_Refinery) &&
+			msBuildPlanner->countInProduction(UnitTypes::Terran_Refinery) == 0)
+		{
+			msBuildPlanner->addRefinery();
 		}
 	}
 

@@ -309,6 +309,8 @@ namespace bats {
 			extern bool OWN_REACT;
 			/** If the bot shall write out the intention and reason behind its actions */
 			extern bool WRITE_INTENTION;
+			/** If the the bot can be controlled by allied players */
+			extern bool CONTROLLABLE;
 		}
 
 		/**

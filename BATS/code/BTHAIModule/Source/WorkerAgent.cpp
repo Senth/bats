@@ -307,7 +307,7 @@ void WorkerAgent::computeActions()
 				assignToRepair(unitToRepair);
 			}
 			// If idle -> find a mineral to mine from
-			else if (unit->isIdle()) {
+			else if (unit->isIdle() || !unit->isGatheringMinerals()) {
 				Unit* mineral = msCoverMap->findClosestMineral(unit->getTilePosition());
 				if (mineral != NULL) {
 					unit->rightClick(mineral);
@@ -586,6 +586,11 @@ string WorkerAgent::getStateAsText() const
 }
 
 const BWAPI::Unit* WorkerAgent::findRepairUnit() const {
+	// No minerals / gas, can't repair
+	if (Broodwar->self()->minerals() == 0 || Broodwar->self()->gas() == 0) {
+		return NULL;
+	}
+
 	const Unit* bestUnit = NULL;
 	double bestFractionHealth = 0.0;
 
@@ -657,14 +662,29 @@ bool WorkerAgent::testRepairDone() {
 		return true;
 	}
 
+	bool repairDone = false;
+
 	// Repair unit died
 	if (!mRepairUnit->exists()) {
-		decreaseRepairScvs(mRepairUnit);
-		mRepairUnit = NULL;
+		repairDone = true;
 	}
 
 	// Full health, done
 	else if (mRepairUnit->getHitPoints() >= mRepairUnit->getType().maxHitPoints()) {
+		repairDone = true;
+	}
+
+	// No minerals or gas
+	else if (Broodwar->self()->minerals() == 0 || Broodwar->self()->gas() == 0) {
+		repairDone = true;
+	}
+
+	// Worker idle
+	else if (getUnit()->isIdle()) {
+		repairDone = true;
+	}
+
+	if (repairDone) {
 		decreaseRepairScvs(mRepairUnit);
 		mRepairUnit = NULL;
 	}

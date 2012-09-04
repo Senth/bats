@@ -10,6 +10,7 @@ tank-drops
 <build-order>
 Terran_Starport
 Terran_Control_Tower
+Terran_Academy
 TechType: Tank_Siege_Mode
 Terran_Factory
 Terran_Machine_Shop

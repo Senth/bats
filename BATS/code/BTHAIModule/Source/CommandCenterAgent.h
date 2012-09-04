@@ -6,6 +6,7 @@
 // forward declarations
 namespace bats {
 	class ResourceCounter;
+	class BuildPlanner;
 }
 
 /** The CommandCenterAgent handles Terran Command Center buildings.
@@ -33,6 +34,7 @@ public:
 
 protected:
 	static bats::ResourceCounter* msResourceCounter;
+	static bats::BuildPlanner* msBuildPlanner;
 
 private:
 	bool mHasSentWorkers;

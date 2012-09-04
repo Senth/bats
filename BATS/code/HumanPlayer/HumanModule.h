@@ -48,5 +48,7 @@ private:
 	bool startsWith(const std::string& text,const std::string& token);
 
 	std::vector<Button> mButtons;
+
+	bool mDisplayGui;
 };
 }

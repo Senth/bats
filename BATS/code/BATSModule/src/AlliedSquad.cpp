@@ -245,8 +245,7 @@ bool AlliedSquad::isAttackingFrame() const {
 	const vector<const Unit*>& units = getUnits();
 	size_t i = 0;
 	while (!isAttacking && i < units.size()) {
-		if (units[i]->isAttacking() &&
-			units[i]->getOrderTarget() != NULL &&
+		if (units[i]->getOrderTarget() != NULL &&
 			BWAPI::Broodwar->self()->isEnemy(units[i]->getOrderTarget()->getPlayer()))
 		{
 			isAttacking = true;

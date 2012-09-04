@@ -180,6 +180,7 @@ namespace module {
 	bool ALLIED_REACT = true;
 	bool OWN_REACT = true;
 	bool WRITE_INTENTION = true;
+	bool CONTROLLABLE = true;
 
 	bool set(const utilities::VariableInfo& variableInfo);
 }
@@ -687,6 +688,10 @@ bool module::set(const utilities::VariableInfo& variableInfo) {
 		gOldValue = toString(WRITE_INTENTION);
 		gTriggerQueue.push_back(TO_CONSTANT_NAME(WRITE_INTENTION));
 		WRITE_INTENTION = variableInfo;
+	} else if (variableInfo.name == "controllable") {
+		gOldValue = toString(CONTROLLABLE);
+		gTriggerQueue.push_back(TO_CONSTANT_NAME(CONTROLLABLE));
+		CONTROLLABLE = variableInfo;
 	} else {
 		return false;
 	}
