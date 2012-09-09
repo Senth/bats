@@ -1,5 +1,5 @@
 % !TEX root = ../../main.tex
-
+% !TEX spellcheck = en_US
 We begin by describing the main features, behaviors, and goals of our bot; these features have been selected by either what players wanted, 0what we think would be a good feature, or both and then testing what works and what does not. We then give a brief overview of the system and how the different components/classes work and communicate with each other to get a quick grasp how everything is connected.
 
 After the overview we will give a detailed description of all the important features of the classes, giving motivations of our design choices. The design choices were selected by either research, common knowledge in the StarCraft community, what we think would be good, or a mix of any and then testing what works and what does not, first on ourselves and then, close to the end, on our test players to find weird and non-acceptable behaviors.
@@ -14,6 +14,7 @@ There are a couple of words that needs to be explained before digging into the d
 	\item[Region \& choke point] A typical map from StarCraft contains many regions, the regions are (often) big open spaces divided by choke points—narrow paths, e.g. paths moving up or down a cliff. A region could be fully isolated, this means it can only be reached by air—BATS does not work on these kind of maps, all regions must be connected in one way or the other. Regions and choke points are illustrated in figure \ref{fig:region_and_choke_points}—this is also the map we used for all our tests.
 	\item[Squad] Units grouped together with a common goal or behavior, such as attack squad or scout squad.
 	\item[Allied/enemy squad] A virtual squad used to group close allied or enemy units together.
+	\item[Expanding] The time when from one want to build another base (to mine minerals and gas from) until the base has completed.
 \end{description}
 \begin{figure}[htb]
 	\centering

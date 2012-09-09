@@ -174,6 +174,18 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \newcommand{\attackCoordinatorWeightsUpgradeStructure}{0.3\conf}
 \newcommand{\attackCoordinatorWeightsUnitProducingStructure}{0.2\conf}
 \newcommand{\attackCoordinatorWeightsOtherStructure}{0.1\conf}
+% classification
+\newcommand{\classificationHighOnMinerals}{550\conf}
+\newcommand{\classificationHighOnGas}{500\conf}
+\newcommand{\classificationUpgradeSoonDone}{60\conf seconds}
+\newcommand{\classificationFrontalAttackUnitsMin}{12\conf units}
+% classification - expansion
+\newcommand{\classificationExpansionWorkersPerMineralSaturation}{2.5\conf}
+\newcommand{\classificationExpansionExpansionMineralsLow}{15\%\conf}
+% commander
+\newcommand{\commanderExpansionActiveMax}{3\conf}
+\newcommand{\commanderExpansionIntervalMin}{150\conf seconds}
+\newcommand{\commanderScoutOnWorkerCount}{15\conf workers}
 % squad
 \newcommand{\squadRegroupDistanceBegin}{12\conf tiles}
 \newcommand{\squadRegroupDistanceEnd}{10\conf tiles}
@@ -188,17 +200,18 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 % squad - defend
 \newcommand{\squadDefendRoamDistanceMinMax}{[5, 8]\conf tiles}
 \newcommand{\squadDefendRoamPerimeter}{4\conf tiles}
-\newcommand{\squadDefendDefendPerimeter}{7\conf tiles}
+\newcommand{\squadDefendDefendPerimeter}{10\conf tiles}
 \newcommand{\squadDefendEnemyOffensivePerimeter}{12\conf tiles}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%					DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 \pagenumbering{alph}
 
 \pagestyle{plain}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%  \include the `front matter'
 
