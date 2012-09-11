@@ -23,6 +23,7 @@
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{float}
+\usepackage{soul}
 \usepackage[usenames,dvipsnames]{xcolor}
 %\usepackage{a4wide}
 \usepackage{longtable} %table spanning pages
@@ -58,18 +59,17 @@
 
 \newcommand{\rbracket}{]}
 
-% *** GRAPHICS RELATED PACKAGES ***
-%
-\usepackage{graphicx}
-% declare the path(s) where your graphic files are
-\graphicspath{{figures/}}
-% and their extensions so you won't have to specify these with
-% every instance of \includegraphics
-\DeclareGraphicsExtensions{.pdf,.png}
-\usetikzlibrary{automata,shapes,arrows,chains,positioning,calc,backgrounds}
-
+%%%%%%%%%%%%%%%%%%% COLORS %%%%%%%%%%%%%%%%%%%%%
 \definecolor{GoldMetallic}{HTML}{D4AF37}
 \definecolor{GoldenBrown}{HTML}{996515}
+\sethlcolor{yellow}
+
+%%%%%%%%%%%%% GRAPHICS RELATED PACKAGES %%%%%%%%%%%%%%%
+
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\DeclareGraphicsExtensions{.pdf,.png}
+\usetikzlibrary{automata,shapes,arrows,chains,positioning,calc,backgrounds}
 
 \usepackage[bookmarks=true,%
 bookmarksopen=true,%
@@ -86,6 +86,21 @@ plainpages=false,%
 %TODO set title
 pdftitle={TITLE},%
 pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
+
+%%%%%%%%%%%%%%%% COMMANDS %%%%%%%%%%%%%%%%%
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+%%%%%%%%%%%%%% ENVIRONMENTS %%%%%%%%%%%%%%%%%
+\newenvironment{function_description}
+{\begin{description}
+	\setlength{\itemsep}{-0.2em}}
+{\end{description}}
 
 %%%%%%%%%%%%%%%% LISTINGS %%%%%%%%%%%%%%%%%%%
 \lstset{ %
@@ -163,8 +178,8 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 \newcommand{\conf}{\textsuperscript{*}}
 % attack coordinator
-\newcommand{\attackCoordinatorExpansionNotCheckedTime}{150\conf seconds}
-\newcommand{\attackCoordinatorWaitGoalTimeout}{30\conf seconds}
+\newcommand{\attackCoordinatorExpansionNotCheckedTime}{150\conf~seconds}
+\newcommand{\attackCoordinatorWaitGoalTimeout}{30\conf~seconds}
 % attack coordinator - weights
 \newcommand{\attackCoordinatorWeightsExpansionNotChecked}{1.0\conf}
 \newcommand{\attackCoordinatorWeightsExpansionMinMax}{[0.0, 1.0]\conf}
@@ -177,31 +192,35 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 % classification
 \newcommand{\classificationHighOnMinerals}{550\conf}
 \newcommand{\classificationHighOnGas}{500\conf}
-\newcommand{\classificationUpgradeSoonDone}{60\conf seconds}
-\newcommand{\classificationFrontalAttackUnitsMin}{12\conf units}
+\newcommand{\classificationUpgradeSoonDone}{60\conf~seconds}
+\newcommand{\classificationFrontalAttackUnitsMin}{12\conf~units}
 % classification - expansion
 \newcommand{\classificationExpansionWorkersPerMineralSaturation}{2.5\conf}
 \newcommand{\classificationExpansionExpansionMineralsLow}{15\%\conf}
+% classification - squad
+\newcommand{\classificationMeasureTimeTotal}{5\conf~seconds}
+\newcommand{\classificationSquadIncludeDistance}{6\conf~tiles}
+\newcommand{\classificationSquadExcludeDistance}{8\conf~tiles}
 % commander
 \newcommand{\commanderExpansionActiveMax}{3\conf}
-\newcommand{\commanderExpansionIntervalMin}{150\conf seconds}
-\newcommand{\commanderScoutOnWorkerCount}{15\conf workers}
+\newcommand{\commanderExpansionIntervalMin}{150\conf~seconds}
+\newcommand{\commanderScoutOnWorkerCount}{15\conf~workers}
 % squad
-\newcommand{\squadRegroupDistanceBegin}{12\conf tiles}
-\newcommand{\squadRegroupDistanceEnd}{10\conf tiles}
+\newcommand{\squadRegroupDistanceBegin}{12\conf~tiles}
+\newcommand{\squadRegroupDistanceEnd}{10\conf~tiles}
 % squad - attack
-\newcommand{\squadAttackWaitingPositionDistanceFromGoal}{25\conf tiles}
-\newcommand{\squadAttackStructuresDestroyedGoalDistance}{15\conf tiles}
-\newcommand{\squadAttackFindAlliedSquadDistance}{30\conf tiles}
-\newcommand{\squadAttackAlliedRegroupBegin}{15\conf tiles}
-\newcommand{\squadAttackAlliedRegroupEnd}{10\conf tiles}
+\newcommand{\squadAttackWaitingPositionDistanceFromGoal}{25\conf~tiles}
+\newcommand{\squadAttackStructuresDestroyedGoalDistance}{15\conf~tiles}
+\newcommand{\squadAttackFindAlliedSquadDistance}{30\conf~tiles}
+\newcommand{\squadAttackAlliedRegroupBegin}{15\conf~tiles}
+\newcommand{\squadAttackAlliedRegroupEnd}{10\conf~tiles}
 % squad - drop
-\newcommand{\squadDropAttackTimeout}{90\conf seconds}
+\newcommand{\squadDropAttackTimeout}{90\conf~seconds}
 % squad - defend
-\newcommand{\squadDefendRoamDistanceMinMax}{[5, 8]\conf tiles}
-\newcommand{\squadDefendRoamPerimeter}{4\conf tiles}
-\newcommand{\squadDefendDefendPerimeter}{10\conf tiles}
-\newcommand{\squadDefendEnemyOffensivePerimeter}{12\conf tiles}
+\newcommand{\squadDefendRoamDistanceMinMax}{[5, 8]\conf~tiles}
+\newcommand{\squadDefendRoamPerimeter}{4\conf~tiles}
+\newcommand{\squadDefendDefendPerimeter}{10\conf~tiles}
+\newcommand{\squadDefendEnemyOffensivePerimeter}{12\conf~tiles}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %					DOCUMENT
@@ -236,7 +255,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \input{chapters/results}
 \input{chapters/related_work}
 \input{chapters/conclusions}
-%\appendix
+\input{chapters/appendix}
 
 %%  \include the `end matter'
 
@@ -245,7 +264,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 % http://amath.colorado.edu/documentation/LaTeX/reference/faq/bibstyles.html
 %
 \bibliographystyle{plain}	% (uses file "IEEE.bst")
-\bibliography{bibliography}	% expects file "thesis.bib"
+\bibliography{bibliography}
 %
 %\input{glossary}
 %\input{index}
@@ -258,6 +277,6 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 %\include{bthcsdissertations} %PERSONALIZE that is: make sure you have the
 %latest list.
 %\include{guide_back1} % for a thesis with a back-flap summary
-%\include{guide_back} %or take this one for a fairly plain back cover
+\include{guide_back} %or take this one for a fairly plain back cover
  
 \end{document}

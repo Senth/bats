@@ -8,4 +8,13 @@ In their article\cite{abraham10} Abraham and McGee mentions four teammate models
 	\item \textbf{Clone model:} This requires that all teammate have equal abilities and roles; the main reason is to complete the goal faster, i.e. the more teammates the faster it goes. E.g. almost like fetching water 100 buckets of water from a distant well, you can manage it yourself but it goes faster with more people.
 	\item \textbf{“Buddy” model:} Both player and bot has comparable weaknesses and the bot does not act just as the player’s slave.
 \end{itemize}
-We would like to add another one, semi-autonomous model, which is how our bot works.
+We would like to add another one, semi-autonomous model, which is how BATS works, i.e. acts autonomously and it can take commands, but does not always listen to them, e.g. when BATS is under attack and the teammate orders BATS to attack it will not attack, it will stay and defend its base; this means that BATS is not a slave (by their definition).
+
+While the autonomous behavior of BATS is described throughout the rest of this chapter, a brief description will first be given.
+
+\paragraph{Brief behavior description}
+Expansions can be created through build orders, or added autonomously to the build order when BATS's resources are getting high. It can also expand when it has launched an attack or vice versa, attack because it expands. Instead of doing random attacks, it will try to create attacks when it expands, so the attack covers the expansion which is a common (among professionals) and good strategy in StarCraft\cite{day9}. It can also launch an attack if an upgrade will finish soon, or if the teammate is moving out to attack. Scouting is done all the time, except the first couple of minutes in the game and when BATS is under attack. Section \ref{sec:commander} \nameref{sec:commander} describes the triggers to expand, attack, and scout in more detail.
+
+For defensive measures BATS places units, good at defending choke points, near its own choke points that abuts to an undefended region; the rest of the units will patrol between the choke points. BATS will however help the teammate player when s/he is under attack, but will not have any stationary units there. Section \ref{sec:defense_manager} \nameref{sec:defense_manager} describes BATS's defense in more detail.
+
+Attack squads finds a place to attack depending on the structure type and distance from other attacks. It prioritizes important buildings, such as newly created Expansions. The squad will retreat when the enemy squad is too strong, or if it destroyed all structures near the attack location. Section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} further describes where the attack squads finds their location and \ref{sec:attack_squad} \nameref{sec:attack_squad} describes more in detail how attack squads work.

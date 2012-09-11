@@ -3,7 +3,7 @@ def_graphic_ext=pdf
 img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
-kileversion=2.1.0
+kileversion=2.1.2
 lastDocument=chapters/fronts.tex
 masterDocument=
 name=BATS Thesis
@@ -43,6 +43,8 @@ ReadWrite=true
 [document-settings,item:chapters/abstract.tex]
 Bookmarks=
 Encoding=UTF-8
+FoldedColumns=
+FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=cstyle
 Mode=LaTeX
@@ -51,6 +53,8 @@ ReadWrite=true
 [document-settings,item:chapters/fronts.tex]
 Bookmarks=
 Encoding=UTF-8
+FoldedColumns=
+FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=cstyle
 Mode=LaTeX
@@ -59,6 +63,8 @@ ReadWrite=true
 [document-settings,item:chapters/introduction.tex]
 Bookmarks=
 Encoding=UTF-8
+FoldedColumns=
+FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=cstyle
 Mode=LaTeX
@@ -67,6 +73,8 @@ ReadWrite=true
 [document-settings,item:main.tex]
 Bookmarks=
 Encoding=UTF-8
+FoldedColumns=
+FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=cstyle
 Mode=LaTeX
@@ -167,15 +175,23 @@ CursorLine=78
 [view-settings,view=0,item:chapters/abstract.tex]
 CursorColumn=16
 CursorLine=29
+JumpList=
+ViMarks=
 
 [view-settings,view=0,item:chapters/fronts.tex]
 CursorColumn=23
 CursorLine=14
+JumpList=
+ViMarks=
 
 [view-settings,view=0,item:chapters/introduction.tex]
 CursorColumn=22
 CursorLine=0
+JumpList=
+ViMarks=
 
 [view-settings,view=0,item:main.tex]
 CursorColumn=28
 CursorLine=16
+JumpList=
+ViMarks=

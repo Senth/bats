@@ -22,9 +22,11 @@ There is no real standard for RTS games, they all work a bit different from each
 The AI is implemented in an RTS game: StarCraft, more specifically StarCraft: Brood War—an expansion to StarCraft that introduced new units. Henceforth StarCraft: Brood War will be referenced as StarCraft for simplicity. The StarCraft description below was gathered both from the StarCraft manual, StarCraft wiki, and the our observations in gameplay. E.g. to test whether Protoss shields regenerated in battle, we created a single player game a probe was sent to attack another probe and we observed that shields were regenerating since the probe’s shield points did regenerate (increase) in battle.
 
 %: Reference SC manual etc
+\marginpar{cite SC manual}
 
 
 %: Import a StarCraft image
+\marginpar{add SC image}
 
 \subsubsection{Gameplay}
 StarCraft has three races—Terran, Protoss, and Zerg—which the player can choose from. Each of these races have their own unique type of units and their play styles vary, especially Zerg.
@@ -50,6 +52,7 @@ Terran and Protoss function in basically the same way: they both have separate u
 Zerg on the other hand only has one unit producing structure, the Hatchery, that pops out larvae in a certain time interval—one Hatchery can maximum have three larvae. These larvae are then morphed into the unit of choice. To build other units than Drones and Overlords one must build the structure needed for the unit, e.g. building a Spawning Pool to be able to build Zerglings from a Hatchery, in a similar way Acadamy is needed for building Firebats from a Barracks. This makes Zerg good for creating lots of better units with a minimum extra cost, since it only needs one extra building and some Hatcheries. E.g. if Zerg has 3 Hatcheries it can save its larva and when the new building is complete it can directly start producing 9 of the new units. Whereas Terran needs to build 9 Barracks, Factories, or Starports (depending on the unit) to have the same rate of production.
 
 %: Mention acyclic graph
+\marginpar{Mention acyclic graph}
 While it seems most obvious to build “the best” units at the beginning, this is not possible. The “best” units, although there is no such thing as best as all units are good depending on the situation, require certain structures, that in turn require other structures. For example, to build a Carrier one requires a Fleet Becon (for the Carrier tech) and a Stargate (to build the unit), the Stargate then requires a Cybernetics core, the Cybernetics core requires a Gateway and a Gateway requires a Nexus. As you might conclude, you need a lot of resources and time to be able to build a Carrier; if you go straight for Carriers your enemy can just waltz into the base with any number of units and kill the entire base.
 
 \paragraph{Unit Health}
@@ -65,6 +68,7 @@ Why choose StarCraft and not another RTS game? Other games, or engines, the AI c
 
 \paragraph{Carefully balanced}
 Blizzard Entertainment released StarCraft: Brood War in 1998 and continued to patch it until beginning of 2009.
+\marginpar{Cite patching}
 %: Cite patching
 The other games have neither had the time nor the amount of players to carefully balance the game. One factor might be because StarCraft has become a huge sport in South Korea\cite{scKotakuKorea}.
 

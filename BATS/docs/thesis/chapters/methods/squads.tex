@@ -154,13 +154,14 @@ The drop squad uses the same method as attack squad to check if its goal has com
 Now you know how it works, but which units will be used for the drop, as drops should not just use random units and hope for the best? It uses \nameref{sec:unit_composition}s for this—section \ref{sec:unit_composition} describes the unit composition. 
 
 %: Write which drops are available in the current version of BATS
+\marginpar{Write which drops are available in BATS}
 
 \paragraph{Squad movement}
 The target location to drop is, as mentioned, required by the attack coordinator, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map illustrated in figure \ref{fig:drop_squad_movement}.
 \begin{figure}[htb]
-%: Insert image of drop movement path
-%: Add color to the caption
-\caption[Drop squad movement]{Drop squad movement. GREEN The starting location of the drop. BLUE Path to the drop target. ORANGE Where the squad waits, if it has wait goals. YELLOW where the squad starts to unload. RED target location.}
+\centering
+\includegraphics[width=0.75\textwidth]{space_atoll_(co-op)_drop_path}
+\caption[Example of drop squad movement]{Example of drop squad movement. \colorbox{green}{Start location} where the transportation loads the units. \colorbox{cyan}{Path to the drop target}. Squad \colorbox{Orange}{waits here}, if it has wait goals. Where the squad \colorbox{yellow}{starts to unload}. \colorbox{red}{Target location} to attack.}
 \label{fig:drop_squad_movement}
 \end{figure}
 
@@ -171,6 +172,7 @@ Patrols units between a set of locations, in the current version of BATS it only
 The patrol squad will never succeed with its goal, as the goal is to patrol between the specified locations for all the game— although the locations can changed during the game.
 
 %: Write about patrol movement, when no more features are being implemented.
+\marginpar{Write about patrol movement}
 
 \subsection{Hold squad}
 \label{sec:hold_squad}
@@ -205,7 +207,7 @@ When another unit visits the target location the squad will not complete its goa
 In a nutshell, the unit composition is a feature for the squads to require specific types of units. E.g. hold squads require specific unit groups (compositions) as was explained above in section \ref{sec:hold_squad}. Below in listing \ref{lst:unit_composition_defense} the unit composition file for the hold squad is listed.
 
 %: Move unit composition listing to appendix
-%\marginpar{Move example to appendix}
+\marginpar{Move example to appendix}
 
 \begin{lstlisting}[caption={Hold squad unit compositions},label={lst:unit_composition_defense},language=ini]
 ; ---------- Marine Spotter ----------

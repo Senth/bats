@@ -1,14 +1,15 @@
 % !TEX root = ../../main.tex
 % !TEX spellcheck = en_US
 \section{Commander}
+\label{sec:commander}
 The Commander creates all orders for BATS, except defenses as the \nameref{sec:defense_manager} does that. This means that it orders attacks, drops, expansions, scouts, and when to transition to the next phase.
 
 \subsection{Orders/Commands}
-Below all orders are described and how they work depending on the current state of BATS. In addition some orders can have a slightly different behavior depending if it was BATS or the teammate who ordered it. Because of all tests and different behaviors in the command these are described with mostly pseudo-code. Common for all order functions are the two parameters: \texttt{alliedOrdered} and \texttt{reason}; alliedOrdered is set to true if the teammate ordered the command, reason is the reason to print out if the command is successful, this is only used when BATS ordered the command—e.g. expand because BATS expands.
+Below all orders are described and how they work depending on the current state of BATS. In addition some orders can have a slightly different behavior depending if it was BATS or the teammate who ordered it. Because of all tests and different behaviors in the command these are described with mostly pseudo-code. Common for all order functions are the two parameters: \texttt{alliedOrdered} and \texttt{reason}; alliedOrdered is set to true if the teammate ordered the command, reason is the reason to print out if the command is successful, this is only used when BATS ordered the command—e.g. expand because BATS expands. In additions all commands write out the intention (and possibly reason) of the command, this is done through IntentionWriter \texttt{mIntentionWriter}; how IntentionWriter works is described in section \ref{sec:communication}
 
 \paragraph{Attack}
-Has in general three behaviors: Creates a new frontal attack, reinforces the existing frontal attack, or does nothing.
-\begin{lstlisting}[label={lst:order_attack},caption={Pseudo-code of the attack command}]
+Has in general three behaviors: Creates a new frontal attack, reinforces the existing frontal attack, or does nothing. Listing \ref{lst:order_attack} displays the pseudo-code for the attack command.
+\begin{lstlisting}[label={lst:order_attack},caption={Pseudo-code for the attack command}]
 // Never do a frontal attack when under attack
 if (isUnderAttack()) {
 	if (alliedOrdered) {
@@ -44,14 +45,53 @@ if (canAttack) {
 \end{lstlisting}
 
 \paragraph{Follow}
+Follow almost behaves as the attack command, but instead of creating a regular attack squad, it will instead follow the largest teammate plalyer’s squad. In addition to the attack’s three bevarios—create new frontal attack (that follows teammate), reinforce the frontal attack, or does nothing—it has one additional behavior: If BATS already has a frontal attack, that is not following a teammate, it will abandon its goal and instead follow the teammate.
 
 \paragraph{Drop}
+Drop will try to create a drop from any of the unit compositions that are available.
+\begin{lstlisting}[label={lst:order_drop},caption={Pseudo-code for the drop command}]
+availableCompositions = getUnitCompositionByType(freeUnits, Drop);
+
+// Create drop
+if (!availableCompositions.empty()) {
+	randomId = rand() \% availableCompositions.size();
+	chosenComposition = availableCompositions[randomId];
+
+	dropSquad = new DropSquad(freeUnits, chosenComposition);
+	mIntentionWriter->write(BotDrop, reason, dropSquad->getDropPosition());
+}
+// No drops available
+else {
+	if (alliedOrdered) {
+		mIntentionWriter->write(BotDropNot, BotNotEnoughUnits);
+	}
+}
+\end{lstlisting}
 
 \paragraph{Scout}
+As with drop, scout uses available unit composition; it does however not choose a random composition but uses the composition with highest priority—i.e. the first composition, as UnitCompositionFactory’s getUnitCompositionByType() returns composition sorted by priority, where the highest priority is first.
 
 \paragraph{Expand}
+Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions avaialble it will append a command center (or equivalent for other races) to the build planner, which in turn will build an expansions when it has resources for it.
 
 \paragraph{Transition}
+Transition transitions to the next phase in the game—there are three phases: early, mid, and late game.
+\begin{lstlisting}[label={lst:order_transition},caption={Pseudo-code for transition command}]
+// Only transition if not in late game already
+if (mBuildPlanner->canTransition()) {
+	if (mBuildPlanner->getCurrentPhase() == "early") {
+		intention = BotTransitionMid;
+	else if (mBuildPlanner->getCurrentPhase() == "mid") {
+		intention = BotTransitionLate;
+	}
+
+	mBuildPlanner->switchToNextPhase();
+} else {
+	if (alliedOrdered) {
+		mIntentionWriter->write(BotTransitionNot, BotTransitionNoMore);
+	}
+}
+\end{lstlisting}
 
 \subsection{Order creation rules}
 The Commander can create orders either from its own actions and states, or what the allied player is doing. Examples of this is it might attack when it is expanding, and it might expand if it has high amount of minerals, for reaction to allied actions it attack if the allied player is expanding.
