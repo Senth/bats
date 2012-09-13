@@ -10,7 +10,6 @@ The defense locations are defended by \nameref{sec:hold_squad}s and a \nameref{s
 
 Figure \ref{fig:defense_locations} displays an example of defend locations, how regions are interpreted, and so forth.
 
-%: Add picture with locations that are defended, including roam positions
 \marginpar{Will change to a legend instead.}
 \begin{figure}[htb]
 \centering
@@ -20,7 +19,6 @@ Figure \ref{fig:defense_locations} displays an example of defend locations, how 
 \end{figure}
 
 Patrol squads on the other hand contains all free units, these will patrol between the defense locations. If enemy units enter the enemy offensive perimeter (\squadDefendEnemyOffensivePerimeter~in radius) in a defense location all squad units will move to the defend location to defend it, all other hold squads will disband to join the defense in the patrol squad. The idea was first to only disband the other hold squads if the enemy is too strong, but the calculation proved difficult and we focused work on other more improtant areas. This strategy was tested and it works good against one StarCraft default AI, as it only attacks from one location at a time. Two default AIs can however attack from different locations, but usually attacked from one location, but was in general too strong for BATS to defend by itself. Although it worked against the default AI it would not work against other AIs or humans that can attack two different locations simultaneously.
-
 
 Both hold squads and patrol squads roam or patrol between BATS’s defense location so the bot won’t disturb the allied player with its units.
 

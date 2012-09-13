@@ -4,7 +4,11 @@
 First we go through our conclusions on the bot, what...\marginpar{elaborate}. Then we go through some lessons we have learned during the project we thought was worth mentioning, and last future work for researchers focusing on three different areas, teammate bot behavior, communication and control.
 
 \section{Bot conclusions}
-We conclude that a teammate bot for RTS games that communicates its intentions and reasons is indeed more fun to play with, just as according to our hypothesis. What surprised us was that some players prefered when the bot only communicated. This was later identified to depend on the player's skill where more experienced players liked the ability to control the bot whereas beginners tended to get overwhelmed by all the existing game action and thus did not want to focus on yet another task: controlling the bot.
+We conclude that a teammate bot for RTS games that communicates its intentions and reasons is indeed more fun to play with, just as according to our hypothesis. What surprised us was that some players prefered when the bot only communicated. This was later identified to depend on the player's skill where more experienced players liked the ability to control the bot whereas beginners tended to get overwhelmed by all the existing game action and thus did not want to focus on yet another task: controlling the bot. This is an interesting question on how to balance the control so that beginners aren't overwhelmed but at the same time meets the needs of a more skillfull player. We talk more about this in Future work \ref{sec:future_control}.
+
+The most liked feature was the abilty for the bot to communicate its intentions and reasons to the player. The most reasons were ``it was fun to know what the bot is doing'' and ``easier to plan because he told me his plans''. This aligns with what Norman states, humans want to know what the AI is doing\cite{norman07}.
+
+An important aspected BATS missed was point 5 from McGee's and Abraham's definition\cite{mcgee10} of a real-time teammate bot, ``whenever possible, prioritizing the player experience''—for the full list see section \ref{sec:teammate_bots}. When the player either ordered BATS to attack or follow him/her, BATS almost always ended up blocking the path for the player close to the attack, here BATS did not prioritize the player experience as it should have let the player through. Disrispecting this ``rule'' probably made ``The army halted in choke points and made it impossible for me to come through'' the top disliked feature.
 
 \section{Project conclusions}
 \paragraph{Magnusson's notes}
@@ -14,7 +18,7 @@ In addition I tweaked and fixed small thing that ``it will only take two hours''
 
 In essense what I learned was that task prioritization is a must if one wants to finish a project, and then only work on those assigned tasks, if new tasks were found one shall not do them directly but either put them in the right priority or put them in a bag of things to do if there is time left.
 
-\section{Future Work}
+\section{Future work}
 We will split the section in three parts, first discussing future work for the behavior of a teammate bot, then improvements on the communication, and finally the control of a teammate bot. While these are RTS game specific topics many of the Communication and Control topics can be slighty changed to match another game genre.
 
 \subsection{Teammate bot behavior}
@@ -28,6 +32,7 @@ The messages from BATS are very simple and aimed to feel like less auto-generate
 There is also the possibilty to either synthesize the message or record own messages to see if the player prefer messages that are read to him/her. Reading messages out loud might be good but cannot be processed as quickly by the player and it can be hard if the computer want to send messages very often, meaning some research needs to be done on how often  and what type of messages shall be sent for the player not to be overwhelmed by messages—this type of research can also be done on text messages.
 
 \subsection{Control}
+\label{sec:future_control}
 We concluded that not all commands were used and players prefered control depending on their skill. One could research which type of commands are prefered and how often they are issued. This could then serve as another research where more control functionality is either displayed for a player depending on his/her skill level, this could for example be used in campaigns where plalyers get introduced to new functionality in the teammate continously during the campaign, just as s/he is with new units.
 
 Another experiment could be made how much level of detail the player wants over the commands. E.g. shall attack make the bot attack at some place (as it does now), shall the player have the ability to specify where it shall attack, shall the player have the ability to specify which path the attack shall use, or where the attack shall wait before it reaches its destination for a simultaneous attack? This level of degree probably depends on the skill of the player, but as you might have thought of now this can cause the player to simply play two players, but s/he only needs to control one bot. This leads to yet another research for a new genre
