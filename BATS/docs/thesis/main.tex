@@ -63,13 +63,15 @@
 %%%%%%%%%%%%%%%%%%% COLORS %%%%%%%%%%%%%%%%%%%%%
 \definecolor{GoldMetallic}{HTML}{D4AF37}
 \definecolor{GoldenBrown}{HTML}{996515}
+\definecolor{LightGreen}{HTML}{6BF95D}
+\definecolor{LightBlue}{HTML}{5D7EF9}
 \sethlcolor{yellow}
 
 %%%%%%%%%%%%% GRAPHICS RELATED PACKAGES %%%%%%%%%%%%%%%
 
 \usepackage{graphicx}
 \graphicspath{{figures/}}
-\DeclareGraphicsExtensions{.pdf,.png}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
 \usetikzlibrary{automata,shapes,arrows,chains,positioning,calc,backgrounds,patterns}
 \pgfplotsset{width=7cm,compat=1.3}
 
@@ -155,6 +157,9 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 		->,draw, -latex', very thick%
 	}
 }
+\tikzstyle{inheritArrow}=[->, >=open triangle 90, thick]
+\tikzstyle{uniDirectional}=[->, >=angle 60, thick]
+\tikzstyle{biDirectional}=[-, thick]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%and then my shortcuts
 

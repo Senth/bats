@@ -19,6 +19,7 @@ A simple description of the algorithm would be that it starts with creating a vi
 
 Testing the distance between so many units were too computational heavy, even when using the squared distance version—enough when comparing distances and uses no square roots. Instead units are inserted in a grid with a width of half the exclude distance. Using half the exclude distance decreased the number of distance computations further. Figure \ref{fig:player_squad_group_grid} shown an example of the grid with outlined include and exclude distances. To further increase the computation spee, instead of computing which grid the unit shall be placed in a lookup table is used instead.
 
+\marginpar{Although it's not consistent, these colors worked better as dark}
 \begin{figure}[htb]
 \centering
 \begin{tikzpicture}[scale=2]

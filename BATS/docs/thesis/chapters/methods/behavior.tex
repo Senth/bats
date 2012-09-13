@@ -1,20 +1,82 @@
 % !TEX root = ../../main.tex
 % !TEX spellcheck = en_US
-\section{Behavior}
+\section{Behavior and system overview}
 In their article\cite{abraham10} Abraham and McGee mentions four teammate models.
-\begin{itemize}
-	\item \textbf{Master-slave model:} The player commands the teammate bot fully, and the bot has little or no artificial behavior.
-	\item \textbf{Semi-autonomous slave model:} The player commands the teammate bot when s/he desires. When no command is active the bots behave autonomously. Although bots can behave autonomously they will still always act as a slave.
-	\item \textbf{Clone model:} This requires that all teammate have equal abilities and roles; the main reason is to complete the goal faster, i.e. the more teammates the faster it goes. E.g. almost like fetching water 100 buckets of water from a distant well, you can manage it yourself but it goes faster with more people.
-	\item \textbf{“Buddy” model:} Both player and bot has comparable weaknesses and the bot does not act just as the player’s slave.
-\end{itemize}
-We would like to add another one, semi-autonomous model, which is how BATS works, i.e. acts autonomously and it can take commands, but does not always listen to them, e.g. when BATS is under attack and the teammate orders BATS to attack it will not attack, it will stay and defend its base; this means that BATS is not a slave (by their definition).
+\begin{description}
+	\item[Master-slave model] The player commands the teammate bot fully, and the bot has little or no artificial behavior.
+	\item[Semi-autonomous slave model] The player commands the teammate bot when s/he desires. When no command is active the bots behave autonomously. Although bots can behave autonomously they will still always act as a slave.
+	\item[Clone model] This requires that all teammate have equal abilities and roles; the main reason is to complete the goal faster, i.e. the more teammates the faster it goes. E.g. almost like fetching water 100 buckets of water from a distant well, you can manage it yourself but it goes faster with more people.
+	\item[“Buddy” model] Both player and bot has comparable weaknesses and the bot does not act just as the player’s slave.
+\end{description}
+We would like to add another one, semi-autonomous model, which is how BATS works, i.e. acts autonomously and it can take commands, but does not always listen to them, e.g. when BATS is under attack and the teammate orders it to attack, BATS will rebel and ignore the command and instead stay and defend its base; this means that BATS is not a slave (by their definition).
 
-While the autonomous behavior of BATS is described throughout the rest of this chapter, a brief description will first be given.
+While the autonomous behavior of BATS is described throughout the rest of this chapter, an overview will first be given.
 
-\paragraph{Brief behavior description}
+The goal of BATS was to behave more like a human, i.e. use strategies that humans use, communicate more like humans, and so forth, as it has been shown that at least enemy bots are more fun when they behave like humans\cite{soni08}.
+
+
+
 Expansions can be created through build orders, or added autonomously to the build order when BATS's resources are getting high. It can also expand when it has launched an attack or vice versa, attack because it expands. Instead of doing random attacks, it will try to create attacks when it expands, so the attack covers the expansion which is a common (among professionals) and good strategy in StarCraft\cite{day9}. It can also launch an attack if an upgrade will finish soon, or if the teammate is moving out to attack. Scouting is done all the time, except the first couple of minutes in the game and when BATS is under attack. Section \ref{sec:commander} \nameref{sec:commander} describes the triggers to expand, attack, and scout in more detail.
 
-For defensive measures BATS places units, good at defending choke points, near its own choke points that abuts to an undefended region; the rest of the units will patrol between the choke points. BATS will however help the teammate player when s/he is under attack, but will not have any stationary units there. Section \ref{sec:defense_manager} \nameref{sec:defense_manager} describes BATS's defense in more detail.
+For defensive measures BATS places units good at defending choke points near its own choke points that abuts to an undefended region; the rest of the units will patrol between the choke points. BATS will however help the teammate player when s/he is under attack, but will never have any stationary units there. Section \ref{sec:defense_manager} \nameref{sec:defense_manager} describes BATS's defense in more detail.
 
-Attack squads finds a place to attack depending on the structure type and distance from other attacks. It prioritizes important buildings, such as newly created Expansions. The squad will retreat when the enemy squad is too strong, or if it destroyed all structures near the attack location. Section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} further describes where the attack squads finds their location and \ref{sec:attack_squad} \nameref{sec:attack_squad} describes more in detail how attack squads work.
+Attack squads finds a place to attack depending on the structure type and distance from other attacks. It prioritizes important structures, such as newly created Expansions. The squad will retreat when the enemy squad is too strong, or if it destroyed all structures near the attack location. Section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} further describes where the attack squads finds their location and \ref{sec:attack_squad} \nameref{sec:attack_squad} describes attack squads in more detail.
+
+\paragraph{System overview}
+Figure \ref{fig:system_overview} shows a high level overview of the most important classes of BATS. Although the figure is a bit cluttered 7 of the 15 associations either go to the Squad or IntentionWriter. The \emph{Commander} will order an expand when the resources are getting high, or when BATS moves out to attack—this causes the attack to cover the expansion which is a common (among professionals) strategy in StarCraft\cite{day9}. The \emph{Commander} uses the \emph{SelfClassifier} when ordering commands due to BATS's current state. The \emph{Commander} will attack when expanding, an upgrade will finish soon, or use \emph{PlayerArmyManager} to check if the teammate moves out to attack.
+
+\emph{AttackCoordinator} uses squad information from \emph{PlayerArmyManager} together with spotted structures from \emph{ExplorationManager} to find a good place for the attack. The \emph{DefenseManager} is in charge of the defense and will place units good at defending near its own chokep points that abuts to an undefended region; the rest of the units will patrol between these choke points.
+
+The \emph{Build Planner} creates structures from a build order, the build order is not fixed at supply counts but is instead listed in order and the first (not built) structure in the build order will be build directly when BATS has enough resources. BATS will, however, prioritize unit production over all structures.
+
+The \emph{Commander}, \emph{DefenseManager}, and \emph{AttackSquad} uses \emph{IntentionWriter} to write messages; messages are sent by intention and an optional reason, the same intention will however not be sent again if it is sent within the timeout limit.
+
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}[auto,node distance=3.8cm]
+		\node [block] (player_army) {PlayerArmy\-Manager};
+		\node [block, right of=player_army] (scout) {ScoutSquad};
+		\node [block, right of=scout] (exploration) {Exploration\-Manager};
+		\node [block, below of=player_army] (commander) {Commander};
+		\node [block, right of=commander] (squad) {Squad};
+		\node [block, right of=squad] (attack) {Attack\-Squad};
+		\node [block, right of=attack] (attack_coordinator) {Attack\-Coordinator};
+		\node [block, below of=commander] (self_classifier) {Self\-Classifier};
+		\node [block, below of=self_classifier] (build_planner) {Build\-Planner};
+		\node [block, right of=build_planner] (defense) {Defense\-Manager};
+		\node [block, right of=defense] (intention_writer) {Intention\-Writer};
+		
+		% Paths
+		% From commander
+		\draw [uniDirectional] (commander) -- (player_army);
+		\draw [uniDirectional] (commander) -- (squad);
+		\draw [uniDirectional] (commander) -- (intention_writer);
+		\draw [uniDirectional] (commander) -- (self_classifier);
+		
+		% From defense manager
+		\draw [uniDirectional] (defense) -- (squad);
+		\draw [biDirectional] ([xshift=-0.5cm]defense.north) |- (self_classifier);
+		\draw [uniDirectional] (defense) -- (intention_writer);
+		
+		% From squad
+		%\draw [uniDirectional] ([xshift=0.5cm]squad.south) |- (5, -7.6) -| (intention_writer.north);
+		
+		% From scout
+		\draw [inheritArrow] (scout) -- (squad);
+		\draw [uniDirectional] (scout) -- (exploration);
+		
+		% From attack
+		\draw [inheritArrow] (attack) -- (squad);
+		\draw [biDirectional] (attack) -- (attack_coordinator);
+		\draw [uniDirectional] (attack) -- (intention_writer);
+		
+		% From attack coordinator
+		\draw [uniDirectional] (attack_coordinator) |- (exploration);
+		\draw [uniDirectional] ([xshift=-0.5cm]attack_coordinator.north) |- (5,-1.9) -| ([xshift=0.5cm]player_army.south);
+		
+		% From self classifier
+		\draw [uniDirectional] (self_classifier) -- (build_planner);
+	\end{tikzpicture}
+	\caption{System overview of BATS}
+	\label{fig:system_overview}
+\end{figure}

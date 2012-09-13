@@ -8,13 +8,14 @@ The defense locations are calculated from choke points that abut either BATS’s
 
 The defense locations are defended by \nameref{sec:hold_squad}s and a \nameref{sec:patrol_squad}. The hold squads, described fully in section \ref{sec:hold_squad}, are stationary and defend the choke point from a certain roaming perimeter, where the center is calculated by finding a position in the range \squadDefendRoamDistanceMinMax~closest to one of BATS’s or the allied’s buildings and the radius being \squadDefendRoamPerimeter. Units from the hold squad will stay in the roaming perimeter until enemy units enter the defense perimeter (\squadDefendDefendPerimeter~in radius), they will then start to attack the enemy. 
 
-Figure \ref{fig:defense_locations} displays an example of where Defend locations can be, how regions are interpreted, and so forth.
+Figure \ref{fig:defense_locations} displays an example of defend locations, how regions are interpreted, and so forth.
 
 %: Add picture with locations that are defended, including roam positions
-\marginpar{Add picture with defend locations}
+\marginpar{Will change to a legend instead.}
 \begin{figure}[htb]
 \centering
-\caption{Example of defense locations. Green outlined regions are BATS’s regions, blue outlines are allied’s regions, regions outlined with both green and blue belong to both. Yellow regions are non-defended as they abut only BATS or allied regions. Defense locations are outlined with}
+\includegraphics[width=\textwidth]{space_atoll_(co-op)_defense_locations}
+\caption{Example of defense locations. \colorbox{LightGreen}{BATS’s regions}, \colorbox{LightBlue}{allied’s regions}, regions outlined with both green and blue belong to \fcolorbox{LightBlue}{LightGreen}{both}. \colorbox{Yellow}{Non-defended} as they abut only BATS or allied regions. \colorbox{Red}{Defense locations} are both the dot and the smallest circle is the \colorbox{Red}{defend perimeter} whereas the outer circle is the \colorbox{Brown}{\textcolor{white}{enemy offensive perimeter}}. The orange dot is the \colorbox{Orange}{teammate's defense location}.}
 \label{fig:defense_locations}
 \end{figure}
 
