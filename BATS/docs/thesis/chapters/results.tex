@@ -1,17 +1,17 @@
 % !TEX root = ../main.tex
 % !TEX spellcheck = en_US
 \chapter{Results}
-These are the results from testing the bot on 12 people, 11 male and 1 female, ages 21–26, with skills varying from beginners who only had played StarCraft few times to those who have played more than 20 hours skirmishes in either StarCraft: Brood War or StarCraft 2.
+These are the results from testing the bot on 14 people, 12 males and 2 females, ages 21–26, with skills varying from beginners who only had played StarCraft few times to those who have played more than 20 hours skirmishes in either StarCraft: Brood War or StarCraft 2.
 
 \subsection{RQ 1 Which type of bot is most fun to play with?}
 ``Which is most fun to play with, communicating bot, controllable bot, both communicating and controllable bot, or none?''
-Figure \ref{fig:results_fun} shows the questionnaire results from the four questions, one for each scenario. It was interesting that there also existed people who prefered only communication over both control and communication. In addition we saw a correlation between player skill and control preference from the interviews. Players with higher skill wanted the control feature whereas players with lower skill did not want or use the control feature.
+Figure \ref{fig:results_fun} shows the questionnaire results from the four questions, one for each scenario. It was interesting that there also existed people who preferred only communication over both control and communication. In addition we saw a correlation between player skill and control preference from the interviews. Players with higher skill wanted the control feature whereas players with lower skill did not want or use the control feature.
 
 \begin{figure}[htb]
 \begin{tikzpicture}
 \begin{axis}[width=14cm,
 	ylabel=Votes,
-	ymin=-0.05,ymax=8,
+	ymin=-0.05,ymax=10,
 	xmin=0,xmax=7,
 	enlargelimits=false,
 	xtick=data,
@@ -23,31 +23,31 @@ Figure \ref{fig:results_fun} shows the questionnaire results from the four quest
 
 % no control, no communication
 \addplot
-	coordinates {(1,2) (2,3) (3,5) (4,2) (5,0) (6,0)};
+	coordinates {(1,3) (2,3) (3,6) (4,2) (5,0) (6,0)};
 
 % no control, with communication
 \addplot
-	coordinates {(1,0) (2,1) (3,3) (4,3) (5,3) (6,2)};
+	coordinates {(1,0) (2,1) (3,3) (4,3) (5,4) (6,3)};
 
 % with control, no communication
 \addplot
-	coordinates {(1,0) (2,2) (3,2) (4,7) (5,1) (6,1)};
+	coordinates {(1,0) (2,2) (3,2) (4,9) (5,1) (6,1)};
 
 % with control, with communication
 \addplot
-	coordinates {(1,0) (2,1) (3,1) (4,3) (5,6) (6,1)};
+	coordinates {(1,0) (2,1) (3,1) (4,3) (5,7) (6,2)};
 
 \legend{Nothing, Communication, Control, Both};
 \end{axis}
 \node at (1.75,-1) {Not fun};
 \node at (10.75,-1) {Very fun};
 \end{tikzpicture}
-\caption{How fun the 12 testers thought each scenario was.}
+\caption{Fun degree of the four scenarios}
 \label{fig:results_fun}
 \end{figure}
 
 \paragraph{Control \& communication}
-During the interiews 6 of 12 testers felt it was most fun to play with the bot when it had both communication and control on. One of the tester could not decide whether only communication or both communication and control was more fun, but mentioned that s/he would liked control and communication more than only communication if s/he had been better at the game. Testers' reasons why this scenario was most fun to play.
+During the interviews 8 of 14 testers felt it was most fun to play with the bot when it had both communication and control on. Two of the tester could not decide whether only communication or both communication and control was more fun, but one mentioned that s/he would liked control and communication more than only communication if s/he had been better at the game. Testers' reasons why this scenario was most fun to play.
 \begin{itemize}
 	\item Build up my army and order he to attack and attack with him.
 	\item Easier to plan because he told me his plans.
@@ -57,8 +57,8 @@ During the interiews 6 of 12 testers felt it was most fun to play with the bot w
 	\item Fun to see which strategies he uses.
 \end{itemize}
 
-\paragraph{Communicaion only}
-5 of 12 testers (including the tester already mentioned that could not decide on whether only communicaiton or both communicaiton and control was most fun) thought it was most fun to play with the bot when it only had communication on. Testers' reasons why this scenario was most fun to play.
+\paragraph{Communication only}
+6 of 14 testers (including the two testers already mentioned that could not decide on whether only communicaiton or both communicaiton and control was most fun) thought it was most fun to play with the bot when it only had communication on. Testers' reasons why this scenario was most fun to play.
 \begin{itemize}
 	\item I already had a lot on my mind, controlling him was a bit too much for me.	
 	\item Easier to plan because he told me his plans.
@@ -66,7 +66,7 @@ During the interiews 6 of 12 testers felt it was most fun to play with the bot w
 \end{itemize}
 
 \paragraph{Control only}
-2 of 12 testers thought it was most fun to play only with communication. Although these might not be credible as for one tester it was the only game s/he won in the test and s/he told us that it was only because of that it was most fun, otherwise s/he guessed it would be more fun with communication. The other tester only thought control was most fun as it was the first scenario s/he tested, otherwise s/he thought control and communication was most fun because it was easier to play when I (the tester) can send attacks at the same time his and it gets easier to see what the bot does, i.e. same reasons as other players who thought control and communication was most fun.
+2 of 14 testers thought it was most fun to play only with control. Although these might not be credible as for one tester it was the only game s/he won in the test and s/he told us that it was only because of that it was most fun, otherwise s/he guessed it would be more fun with communication. The other tester only thought control was most fun as it was the first scenario s/he tested, otherwise s/he thought control and communication was most fun because it was easier to play when I (the tester) can send attacks at the same time his and it gets easier to see what the bot does, i.e. same reasons as other players who thought control and communication was most fun.
 
 \subsection{RQ 1.1 Which features are most liked?}
 Below the most liked features are shown in two lists, one containing general features and the other specific commands they liked. Features mentioned by at least half (6) of the testers are marked as \textbf{bold}.
@@ -74,10 +74,10 @@ Below the most liked features are shown in two lists, one containing general fea
 \begin{itemize}
 	\item \textbf{Communication}
 	\begin{itemize}
-		\item He said why attacked, expandend, and so forth—I could learn from his strategies.
+		\item He said why attacked, expanded, and so forth—I could learn from his strategies.
 		\item \textbf{Fun to know what the bot is doing.}
 		\item \textbf{Easier to plan because he told me his plans.}
-		\item Feels more like teamplay when he is communicating.
+		\item Feels more like team play when he is communicating.
 		\item Direct response after ordering a command, then you knew if the bot would follow the command or not.
 		\item It had humor, e.g. Leeeeroooooooy Jenkins.
 		\item Almost like playing with a real player.
@@ -102,7 +102,7 @@ Below the most liked features are shown in two lists, one containing general fea
 	\item Follow
 	\begin{itemize}
 		\item Doubles the amount of army size at one place.
-		\item I do not like attacking by myself which the follow command explicity prevented.
+		\item I do not like attacking by myself which the follow command explicitly prevented.
 		\item Easier to coordinate where he should attack.
 	\end{itemize}
 	\item Attack
@@ -134,7 +134,7 @@ Instead of asking what features the testers disliked, we asked what they dislike
 	\item Bot asks for help when few units attack and he can easily handle it.
 	\item Felt like it changed how good it was during each scenarios.
 	\item He attacked cowardly, slow attack with siege tanks instead of just marching in and killing everything which he could do in most situations.
-	\item Sends to many messages at the same time, maybe queue up messages instead?—note: sometimes the bot will decide to retreat, but then it decides to attack directly after and then expand because it is attacking, thus 3 messages are printed directly after each other which can confuse the plalyer as it did in some cases.
+	\item Sends to many messages at the same time, maybe queue up messages instead?—note: sometimes the bot will decide to retreat, but then it decides to attack directly after and then expand because it is attacking, thus 3 messages are printed directly after each other which can confuse the player as it did in some cases.
 	\item Never had units for drops.
 	\item When it dropped it did not function very well.
 	\item A better scout that scouted bases and not random locations.
@@ -153,33 +153,34 @@ The testers were asked which features they missed during their scenarios, the fi
 	\item BATS could communicate what it think the player should do when s/he does not now what to do.
 	\item More variety of units, more detection units.
 	\item Scans in enemy base.
+	\item For the bot to play other races than Terran.
 \end{itemize}
 
 \paragraph{Missed commands, or improved existing commands}
 \begin{itemize}
 	\item A help button when the bot shall come and help me.
-	\item Using waypoints for attacks to direct from where he should attack so he did either did not block my path or to create a more advanced attack.
+	\item Using way points for attacks to direct from where he should attack so he did either did not block my path or to create a more advanced attack.
 	\item Drunken mode, random behavior.
 	\item Command buttons grayed out when player could not use them.
 	\item Retreat command.
-	\item Abort command to abort the last command if the player missclicked.
+	\item Abort command to abort the last command if the player misclicked.
 	\item Hold position.
 \end{itemize}
 
 \subsection{Other questions and comments}
 \paragraph{What surprised you in a positive way?}
-A common missperception was that the testers would play against the bot and not with it. They thought BATS was a good bot, that built up his army fast and that the tester did not need to babysit it. They tended to like the funny messages, especially Leeeeeerrooooooy Jenkins. Common for many testers were that the bot expanded just before they were going to send the expand command, which made them think the bot was good at expanding and had a good timing on expands. A tester liked the underlying reason behind each intention and not just the intention as s/he could learn from this. Another tester was surprised by that it worked so well to play with a bot as they can be quite stupid.
+A common misconception was that the testers would play against the bot and not with it. They thought BATS was a good bot, that built up his army fast and that the tester did not need to babysit it. They tended to like the funny messages, especially Leeeeeerrooooooy Jenkins. Common for many testers were that the bot expanded just before they were going to send the expand command, which made them think the bot was good at expanding and had a good timing on expands. A tester liked the underlying reason behind each intention and not just the intention as s/he could learn from this. Another tester was surprised by that it worked so well to play with a bot as they can be quite stupid.
 
 \paragraph{What surprised you in a negative way?}
-More than half of the testers thought BATS crowded the places he attacked and made it impossible to bypass unless you had air units, 2 testers even changed their strategy to only air units because of this. He did not clear the entire base as humans would do, but left the base when few buildings were left. Twice the bot expanded to a location the player already expanded to, i.e. build a command center beside their command center (or equal building). Sometimes the bot followed a small army concisting of 1-2 units, this surprised the player as s/he it would either retreat or continue attacking on its own.
+More than half of the testers thought BATS crowded the places he attacked and made it impossible to bypass unless you had air units, 2 testers even changed their strategy to only air units because of this. He did not clear the entire base as humans would do, but left the base when few buildings were left. Twice the bot expanded to a location the player already expanded to, i.e. build a command center beside their command center (or equal building). Sometimes the bot followed a small army consisting of 1-2 units, this surprised the player as s/he it would either retreat or continue attacking on its own.
 
 \paragraph{If you won or lost, did you think it was because of the you, BATS, or both?}
-This question was not asked until the 6th tester, thus only half the testers were asked this question. Three of the tester thought they won because of both, where one of these thought it was because of him/her in one of the four scenarios. Their reasons were that BATS was better at building units, but they themselves had a better idea of strategy, where and how to attack. Two of the testers thought it always because of them as they felt better than BATS, these two were amongst the better players and also prefered control—a side note, there were two other players just as good as them, one of them thought it was because of both and strangely the other thought it was because of the bot.
+This question was not asked until the 6th tester, thus only half the testers were asked this question. Three of the tester thought they won because of both, where one of these thought it was because of him/her in one of the four scenarios. Their reasons were that BATS was better at building units, but they themselves had a better idea of strategy, where and how to attack. Two of the testers thought it always because of them as they felt better than BATS, these two were amongst the better players and also preferred control—a side note, there were two other players just as good as them, one of them thought it was because of both and strangely the other thought it was because of the bot.
 
 There were only one loss for the last 6 tester. The tester who lost felt that it was entirely his/her fault as the bot had been attacked for 4 minutes and was defeated before the tester even noticed it, although s/he mentioned that if the bot had said it was under attack it would never have happened.
 
 \paragraph{Commands used}
-We noticed that many of the testers did not use all commands, no-one used the transition command as all felt the bot handled that fairly well. Only a few (2–3) used the drop, expand, and scout commands, with the same reason here as they felt the bot did a good job on this, except drop but they did not feel as a drop was needed.
+We noticed that many of the testers did not use all commands, no-one used the transition command as all felt the bot handled that fairly well. Only a few (2–4) used the drop, expand, and scout commands, with the same reason here as they felt the bot did a good job on this, except drop but they did not feel as a drop was needed.
 
 \paragraph{Other noteworthy comments}
 One tester mentioned the bot felt like Brother in Arms where you can control other units. Another tester mentioned that it was more fun to play with this bot than any other s/he had played with. A third tester thought BATS could be used either when one wanted to play a regular co-op game but did not have any friend to play with, or to fill an uneven team when playing with friends.

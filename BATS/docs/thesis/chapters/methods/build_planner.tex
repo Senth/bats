@@ -1,49 +1,47 @@
 % !TEX root = ../../main.tex
 \section{Build planner}
-\subsubsection{Purpose}
-Build planner is the core for planning Structure (Building) and Army creations. Here Building or Structure includes production, upgrade, add-on and resource gathering buildings and Army refers to all combat and non-combat (Medic) type units. The production process during the whole game is divided into three phases namely early, mid and late. BATS follows specific build order provided in the configuration file (/BATS-data/buildorder/) by the user. User can configure and keep more than one build order for a phase. The exact transition graph is configured using transition config file and the individual phase build order is configured using files in early, mid and late folders.
+\paragraph{Purpose}
+Build planner is the core for planning structure and army creations. Structure includes constructing structures, upgrades, add-ons and army refers to all combat and non-combat (e.g. Medic) units. The production process during the whole game is divided into three phases namely early, mid, and late. BATS follows specific build order provided in the configuration file (/BATS-data/buildorder/) and can be changed by the player, but was not during the experiments. The idea is that the player shall freely be able to change early, mid, and late game build orders to match his play during these phases, this can be done both before or within the match (but not in the experiments as stated, as we thought this would be too much to think of).
 
-\subsubsection{Commands used}
-The phase transition during the game is done by the command transition or transition FILE\_NAME. The configuration in the transition file is overriden by the command transition FILE\_NAME. BATS asks user for the permission to make transition in case if the user forget to do so.
+\paragraph{Commands used}
+The phase transition during the game is done by the command transition or transition BUILD\_NAME The configuration in the transition file is overridden by the command transition BUILD\_NAME.
 
-\subsubsection{How it works}
-The priority of the production is the order in which the units are placed in the configuration file. The Army is classified into Must Have and Percentage units for each phase. The priority of army production is done based on maintenance of percentage and higher priority is given to the Must Have units over Percentage units.
+\paragraph{How it works}
+The priority of the production is the order in which the units are placed in the configuration file. The army is classified into \emph{must have} and \emph{percentage} units for each phase; must have units are always prioritized and in the order they were entered, when no more must have units need to be build it will instead try to maintain the number of percentage units.
 
-\subsubsection{Example and Format}
-{\it
-\textless name\textgreater\newline
-early-x\newline
-\textless available-transitions\textgreater\newline
-mid-x\newline
-mid-Y\newline
-\textless build-order\textgreater\newline
-Terran\_Supply\_Depot\newline
-Terran\_Barracks\newline
-Terran\_Refinery\newline
-Terran\_Bunker\newline
-Terran\_Academy\newline
-Terran\_Factory\newline
-\textless units\textgreater\newline
-80\% Terran\_Marine\newline
-20\% Terran\_Medic\newline
-\textless must-have\textgreater\newline
-2 Terran\_Medic\newline
-1 Terran\_Vulture\newline}
+A short example of the format is given below in listing \ref{lst:build_order_example}. \marginpar{add all build orders to appendix}
 
-Above is the default configuration followed by the BATS for phase "early-x" which can be edited by the user. Separate configuration is available for separate phase namely "early", "mid" and "late". The configuration file has three parts name, available-transition, build-order, units and must-have. 
-\paragraph{\textless name\textgreater} has the phase name to which the configuration file applies to. 
-\paragraph{\textless available-transition\textgreater} has the possible phases to which the current phase can transit to. 
-\paragraph{\textless build-order\textgreater} has the list of structure or building names to be built for that phase. The structures are built in the order they are listed. 
-\paragraph{\textless units\textgreater} defines the Army that the current phase should have and is mentioned in percentage.
-It will always prioritize the unit that is furthest away from its goal.\newline\newline
-E.g. 60\% marines are at (56\%), 20\% tanks are at (18\%) will choose to prioritize a tank, why?\newline
-Marines: 56/60 = 0.933... meaning roughly 7\% from its goal.\newline
-Tanks: 18/20 = 0.9 meaning 10\% from its goal.\newline
-Tanks are then furthest away from its goal.\newline
-\textless must-have\textgreater lists the units that are compulsory to be available during a phase. Units are listed in decimal numbers. If the highest priority unit cannot be built because of:\newline
-- Low minerals -\textgreater Wait for minerals, do not build another unit\newline
-- No buildings are free (or does not exist) -\textgreater Build next unit in the priority list instead.\newline
-BATS maintains the production by considering the unit destruction and building availability to produce that unit. i.e. when a must have unit is destroyed, it is rebuilt again and when a percentage unit is destroyed, it is added again into the production queue.\newline
-BATS has pre-defined or default set of configuration for each phase and the transition.\newline 
-Following is the example or format how the transition config file should be.\newline
-E.g. {\it early-x\textgreater mid-y\textgreater late-z\newline}
+\begin{lstlisting}[label={lst:build_order_example},caption={Build order example file},language=ini]
+<name>
+Marine Medics
+<description>
+Builds marine and medics for a fast offense.
+<build-order>
+Terran_Supply_Depot
+Terran_Barracks
+Terran_Refinery
+Terran_Academy
+Terran_Factory
+<units>
+80\% Terran_Marine
+20\% Terran_Medics
+<must-have>
+2 Terran_Medics
+1 Terran_Vulture ; for scouting
+\end{lstlisting}
+
+\begin{function_description}
+	\item[\textless name\textgreater] Name of the build order and its strategy.
+	\item[\textless description\textgreater] Description of the strategy.
+	\item[\textless build-order\textgreater] List of structures to be built during this phase, the structures are built in the order they are listed.
+	\item[\textless units\textgreater] Defines the army the current phase shall have and is specified in percentage. It will always prioritize the unit that is furthest away from its goal. For example using the values from the example build order, the current army consists of 74\% marines and 18\% medics. This will prioritize the medics, why? Marines are $74/80 =  0.925$ (7.5\%) from their goal whereas medics are $18/20 = 0.9$ (10\%) from their goal.
+	\item[\textless must-have\textgreater] Compulsory units that are to be built during a phase.
+\end{function_description}
+
+If a unit with the highest priority cannot be built because of
+\begin{inparaenum}[a\upshape)]
+	\item low resources, wait for the resources to build and and do not build another unit; or
+	\item no structures are free to build the unit, build the next unit in the priority list instead.
+\end{inparaenum}
+
+Destroyed structures and units are automatically readded to the build order, meaning they would be built again.

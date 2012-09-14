@@ -13,7 +13,7 @@ In addition to these weights, if the squad is a frontal attack and follows an al
 
 Enemy armies are not included in the calculation, because one rarely gain anything on trading armies, one should find gaps in the defense instead\cite{day9}. It is still good engage a weaker enemy army and BATS will do that if the squad is close by, but it will not search for those small armies. In addition, because armies are mobile it would be hard to track them, i.e. time consuming to implement such a feature.
 
-The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an attack squad requesting an attack from attack coordinator. It can either get an weightened attack location or join the teammate's frontal attack, if s/he has one.
+The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an attack squad requesting an attack from attack coordinator. It can either get an weighted attack location or join the teammate's frontal attack, if s/he has one.
 \begin{figure}[htb]
 \centering
 	\begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=3.8cm]
@@ -40,7 +40,7 @@ The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an at
 		\path [line] (distance) -- (type);
 		\path [line] (type) -- (select);
 	\end{tikzpicture}
-	\caption{Flowchart of Attack Coordinator’s requestAttack() function.}
+	\caption{Flowchart of Attack Coordinator’s requestAttack() function}
 	\label{fig:AttackCoordinator::requestAttack()}
 \end{figure}
 
@@ -90,7 +90,7 @@ Addons are structures built in connection to another structure and only exist fo
 Supplies are structures that provide space (or food) for more units to be created, see section \ref{sec:starcraft_supply} for how supplies work. This supply priority only makes sense for Terran as they work differently for the other classes: Protoss also uses their supplies for powering buildings, i.e. a higher priority would be good here; for Zerg the supplies are increased by the Overlord unit, this would require an additional algorithm for searching for Overlords, the priority would be higher, maybe even higher for only air attacks.
 
 \paragraph{Upgrade structures \attackCoordinatorWeightsUpgradeStructure}
-Upgrade structures does not, decpite its name, include all structures that can upgrade, only structures that can upgrade general attack and defense bonuses are treated as upgrade structures. Meaning Terran Academy (which upgrades Stim packs for Marines) is not treated as an upgrade structure. The reason is because of simplicity; attack and defense upgrades come in three steps meaning there are 6–12 upgrades in total (depending on what structure) for that structure and is continued to be upgraded throughout the game. This means its a lot bigger chance that the structure still is useful (for the enemy) even when attacking it later in the game, as opposed to the Acadamy which upgrades are long done—although in this case medics and firebats could not be created by the enemy, but the enemy can simply prioritize marines in the meanwhile and not much harm would be done.
+Upgrade structures does not, despite its name, include all structures that can upgrade, only structures that can upgrade general attack and defense bonuses are treated as upgrade structures. Meaning Terran Academy (which upgrades Stim packs for Marines) is not treated as an upgrade structure. The reason is because of simplicity; attack and defense upgrades come in three steps meaning there are 6–12 upgrades in total (depending on what structure) for that structure and is continued to be upgraded throughout the game. This means its a lot bigger chance that the structure still is useful (for the enemy) even when attacking it later in the game, as opposed to the Academy which upgrades are long done—although in this case medics and firebats could not be created by the enemy, but the enemy can simply prioritize marines in the meanwhile and not much harm would be done.
 
 As an improvement BATS could keep track of which upgrades it has seen and then exclude these buildings. Attack and defense upgrades can be directly seen on the enemy while unit abilities, but stim, and other ability upgrades needs to be activated by the enemy for BATS to know about it.
 
@@ -98,7 +98,7 @@ As an improvement BATS could keep track of which upgrades it has seen and then e
 All structures that can produce units. These are not ordered in any specific order, not to say that it does not matter because it does, but it will always vary depending on the situation. If the enemy has 10 barracks and 1 Starport, it is probably best to destroy the Starport, whereas if the enemy has 1 barrack and 4 Starports it might be best to destroy the barracks.
 
 \paragraph{Other structures \attackCoordinatorWeightsOtherStructure}
-All other structures that have not been covered, such as Terran Acadamy.
+All other structures that have not been covered, such as Terran Academy.
 
 \subsubsection{Why this order?}
 Because StarCraft is mostly about managing expansions\cite{day9}, BATS tries to deny and kill fresh expansions as its first priority (the top two priorities). Targeting addons can both stop the production of an important upgrade (siege mode for tanks) and the ability to create tanks, ghosts, etc. Delaying late game units is usually good as they are generally better than early game units. Supply depots are almost always good to destroy since it halts all unit production, unless the enemy has stacked up lots of supplies—which almost always is a bad strategy—or lost many units in a recent battle. Stopping an upgrade is probably better than killing a unit producing structure, because if the upgrade finishes all existing units will get the upgrade, while if we kill a unit producing structure only 2–4 units will get stopped, but it depends on the type of unit producing structure, what upgrade structure etc; but this priority will do for now.

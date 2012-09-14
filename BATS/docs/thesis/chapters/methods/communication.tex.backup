@@ -4,7 +4,7 @@
 \label{sec:communication}
 For the bot to communicate with the teammate using sentences BATS uses IntentionWriter which can write an intention message together with an optional reason and an optional ping location. When BATS want to write out an intention (and maybe a reason) to the teammate it uses the writeIntention function. Each intention and reason has multiple messages and are picked at random and then put together to a final sentence with the intention first—if no reason is specified it will only use the intention as the whole message. The random function, however, is not entirely random, it will never pick the last used intention or reason message.
 
-For the bot not to spam the same intention all the time a default timeout is set to 30\conf~in-game seconds; if the bot tries to send another message with the same intention before it has timed out IntentionWriter will skip the message. The timeout can be overridden by each intention, for example warning that BATS is under attack has a timeout of 60\conf~in-game seconds.
+For the bot not to spam the same intention all the time a default timeout is set to 30\conf~in-game seconds; if the bot tries to send another message with the same intention before it has timed out IntentionWriter will skip the message. The timeout can be overriden by each intention, for example warning that BATS is under attack has a timeout of 60\conf~in-game seconds.
 
 All messages and timeout settings are read from an ini-file to easily add, change, or remove existing messages, and to reload messages during gameplay. See appendix \ref{sec:intention_and_reason_messages} for the full ini-file with all intention and reason messages.
 

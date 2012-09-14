@@ -1,7 +1,7 @@
 % !TEX root = ../../main.tex
 % !TEX spellcheck = en_US
 \section{Player classification}
-The player classification is split into two separate modules. One handles the grouping of teammate and enemy virtual squads. They are virtual as these are BATS estimations that they belong to the same squad. The other module groups common classifying tests for both teammate and BATS. 
+The player classificaiton is split into two separate modules. One handles the grouping of teammate and enemy virtual squads. They are virtual as these are BATS estimations that they belong to the same squad. The other module groups common classifying tests for both teammate and BATS. 
 
 \subsection{Player squads}
 The \texttt{PlayerArmyManager} creates and holds all the virtual squads, both teammate and enemy squads. Teammate and enemy squads derive from the PlayerSquad class which keeps a record of its own center position and supply count for the last \classificationMeasureTimeTotal; this enables more complex calculations, such as the direction of the squad and if it's increasing/decreasing in size. These are tho most important PlayerSquad function:
@@ -45,16 +45,16 @@ Testing the distance between so many units were too computational heavy, even wh
 	\draw[BrickRed,dashed] (2.5, 2.5) circle(2);
 	\draw[OliveGreen,dashed] (2.5, 2.5) circle(1.5);
 \end{tikzpicture}
-\caption[Minimizing distance calculation using grids]{Example of using grid to minimize distance calculations. The brown dot (and dashed circle) represents the \textcolor{Brown}{unit}; green circle the \textcolor{OliveGreen}{include distance}; red circle the \textcolor{BrickRed}{exclude distance}. The dashed circles represents another unit, its include and exclude distances from the middle of a grid square.}
+\caption{Example of using grid to minimize distance calculations. The brown dot (and dashed circle) represents the \textcolor{Brown}{unit}; green circle the \textcolor{OliveGreen}{include distance}; red circle the \textcolor{BrickRed}{exclude distance}. The dashed circles represents another unit, its include and exclude distances from the middle of a grid square.}
 \label{fig:player_squad_group_grid}
 \end{figure}
 \marginpar{Will change text colors}
 
-Only units within two grid units are used when calculating the distance, this generates a 5x5 grid just as figure \ref{fig:player_squad_group_grid}. As can be seen in the figure units further away than two grid units can never be within the exclude distance. Units in the same grid or to the left, top, right, or bottom are almost always within the exclude distance, an exception can be seen in the figure where small portion of the upper left corner at (2,3) is outside the solid exclude circle; for simplicity all units within these grid positions are seen as within the exclude distance (even though exceptions might exist).
+Only units within two grid units are used when calculating the distance, this generats a 5x5 grid just as figure \ref{fig:player_squad_group_grid}. As can be seen in the figure units further away than two grid units can never be within the exclude distance. Units in the same grid or to the left, top, right, or bottom are almost always within the exclude distance, an exception can be seen in the figure where small portion of the upper left corner at (2,3) is outside the solid exclude circle; for simplicity all units within these grid positions are seen as within the exclude distance (even though exceptions might exist).
 
 To make use of these calculation benefits, units in a squad are checked first (if they are further away than the exclude distance). A simplified pseudo-code example is shown in listing \ref{lst:player_squad_rearrange_squads} where high-level calculations are made and in listing \ref{lst:player_squad_add_close_units_to_squad} where calculations of close units to add to the squad—note that units are not excluded form the squad here, they are not excluded until they are added in another squad which happens at the end of \texttt{rearrangeSquads()}.
 
-\begin{lstlisting}[label={lst:player_squad_rearrange_squads},caption={Pseudo-code of \texttt{rearrangeSquads()}}]
+\begin{lstlisting}[label={lst:player_squad_rearrange_squads},caption={Pseudo-code of \texttt{rearrangeSquads()}.}]
 // Iterate through all squads, one unit each turn
 do {
 	foundUnit = false;
@@ -132,7 +132,7 @@ A common class uses the facade pattern to group both easy and complicated tests 
 All three classes (although an enemy classification was not implemented) were supposed to have a common interface to make it easier to use all three classes without having to learn three different interfaces. Due to lack of time and not being the most important aspect this feature was skipped in this version.
 
 \paragraph{Self classification}
-This classifier groups together common tests for BATS and might not be seen as a classifier. \nameref{sec:commander} and \nameref{sec:defense_manager} uses the self classifier to easier calculate their goals and decrease their coupling. Below all important functions are listed and described, although most of the names should be self-explanatory.
+This classifier groups together common tests for BATS and might not be seen as a classifier. \nameref{sec:commander} and \nameref{sec:defense_manager} uses the self classifier to easier calculate their goals and decrease their coupling. Below all important functions are listed and described, although most of the names should be self-exlanatory.
 
 \begin{function_description}
 	\item[\texttt{bool areExpansionsSaturated()}] Tests if there exists enough workers to saturate all mineral patches.

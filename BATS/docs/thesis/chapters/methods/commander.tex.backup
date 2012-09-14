@@ -72,7 +72,7 @@ else {
 As with drop, scout uses available unit composition; it does however not choose a random composition but uses the composition with highest priority—i.e. the first composition, as UnitCompositionFactory’s getUnitCompositionByType() returns composition sorted by priority, where the highest priority is first.
 
 \paragraph{Expand}
-Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions available it will append a command center (or equivalent for other races) to the build planner, which in turn will build an expansions when it has resources for it.
+Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions avaialble it will append a command center (or equivalent for other races) to the build planner, which in turn will build an expansions when it has resources for it.
 
 \paragraph{Transition}
 Transition transitions to the next phase in the game—there are three phases: early, mid, and late game.

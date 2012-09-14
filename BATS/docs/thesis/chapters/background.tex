@@ -1,10 +1,7 @@
 % !TEX root = ../main.tex
 % !TEX spellcheck = en_US
 \chapter{Background}
-While RTS games has been around since the 80s\cite{adams06, rtsHistory}, only a handful of scientific articles can be found on teammate bots for RTS games, and current big RTS titles have yet to implement a good teammate bot. In general little research has been done for teammate bots throughout all genres; RTS researchers have focused on enemy bots to either create a fun opponent
-%: cite!
-\marginpar{!!!CITE!!!}
-or to create the best bot to compete in RTS bot tournaments, such as  AIIDE's StarCraft AI Competinion\cite{scaiide} and CIG's StarCraft AI Competition\cite{sccig}.
+While RTS games has been around since the 80s\cite{adams06, rtsHistory}, only a handful of scientific articles can be found on teammate bots for RTS games, and current big RTS titles have yet to implement a good teammate bot. In general little research has been done for teammate bots throughout all genres; RTS researchers have focused on enemy bots to either create a fun opponent\cite{hagelback09} or to create the best bot to compete in RTS bot tournaments, such as  AIIDE's StarCraft AI Competition\cite{scaiide} and CIG's StarCraft AI Competition\cite{sccig}.
 
 %: change the paragraph later
 Next we will cover related research topics, beginning with teammate bots across all genres and asking what guidelines applies to RTS games; continuing with RTS enemy bots and asking, what implementation strategies exists, how a good bot shall play; and ending with communication between AI and humans including design choices to avoid player misinterpretation of the bot. After the research topics you will be updated with the current games across all genres using teammate bots and what current RTS games lack.
@@ -35,7 +32,7 @@ To beat an enemy in an RTS game, as a team or a single player, you need a strate
 To find the teammate’s and opponents’ weaknesses one can make use of simple classification rules, or make it more advanced and use a model. These weaknesses are used to either exploit the opponent's weaknesses or complementing the teammate's weaknesses; these techniques can be used for both purposes, although information gathering and bot action will, however, be different.
 
 \subparagraph{Teammate modeling}
-Jansen has created a player model using opponent-modeling for his RTS bot\cite{jansen07}. The bot actions are calculated from a  desicion tree computed with supervised learning and neural networks. The goal of the teammate bot is to
+Jansen has created a player model using opponent-modeling for his RTS bot\cite{jansen07}. The bot actions are calculated from a  decision tree computed with supervised learning and neural networks. The goal of the teammate bot is to
 \begin{inparaenum}[1\upshape)]
 	\item match the number of units and structures the player has, this includes the unit/structure type, e.g. aggressive, defensive;
 	\item be able to deduct when the player is under attack from the model;
@@ -43,18 +40,18 @@ Jansen has created a player model using opponent-modeling for his RTS bot\cite{j
 	\item for the bot to find when the player has either a whole in their defense or attack; and
 	\item when the player is switching from defensive to offensive mode, or vice versa.
 \end{inparaenum}
-He found that his bot could mimc the player; but two problems were identified, the bot could not identify which of the actions were the best one and in addition some players does not always know or do the best action thus the learned actions can use bad strategies.
+He found that his bot could mimic the player; but two problems were identified, the bot could not identify which of the actions were the best one and in addition some players does not always know or do the best action thus the learned actions can use bad strategies.
 
 In their paper\cite{pucheng11} Pucheng and Huiyan uses Q-learning, teammate modeling, and reward allotment for their teammate bot to faster learn which actions leads to a successful goal. Their experiment tested this new learning technique against traditional Q-learning where the bot does not take the teammate into account, and teammate Q-learning where the teammate is taken into account but the reward is not split between bots.
 
 For actually creating a player modeling system, Houlette presents a methodology for how to implement a player model in code\cite{houlette03}. He talks about what a player model is, what it contains, and what it is good at and used for. In addition he gives an simple code example and a description when to update the model and two possible update implementations.
 
 \subparagraph{Opponent modeling}
-Kabanza et. al has implemented an RTS bot, HICOR (Hostile Intent, Capability and Opportunited Recognizer). HICOR can, as specified by the name, infer the opponent's intention (i.e. its plan) and use these to analyze the enemy capabilities and opportunities for the bot. Put easy it can infer what build order the enemy is using, what tactic it is using and where it will attack and use this information to its advantage. The underlying system uses Hidden Markov Model to infer the enemy plan.
+Kabanza et. al has implemented an RTS bot, HICOR (Hostile Intent, Capability and Opportunity Recognizer). HICOR can, as specified by the name, infer the opponent's intention (i.e. its plan) and use these to analyze the enemy capabilities and opportunities for the bot. Put easy it can infer what build order the enemy is using, what tactic it is using and where it will attack and use this information to its advantage. The underlying system uses Hidden Markov Model to infer the enemy plan.
 
 For recognizing the behavior of the opponent, i.e. aggressive/defensive and what type of aggressive/defensive behavior Schadd et. al uses a hierarchical approach model with two classifiers for their RTS bot. A top level classifier uses fuzzy models to classify the opponent as aggressive vs. defensive, and a bottom level classifier for the type of aggressive/defensive behavior, e.g. the opponent uses mainly tanks or ships when aggressive, or techs when being defensive.
 
-Synnaeve and Bessière RTS bot uses a bayesian network to model enemy opening strategies\cite{synnaeve11}. The bot learns by watching replays manually label with the strategy of the players.
+Synnaeve and Bessière RTS bot uses Bayesian networks to model enemy opening strategies\cite{synnaeve11}. The bot learns by watching replays manually label with the strategy of the players.
 
 \section{Teammate Bot in Games}
 Teammate bots have been around for quite a while in sports game, such as FIFA\cite{fifa}, but have just started to make a breakthrough in other genres. In most games\cite{callofduty, brotherinarms, rainbow6} the teammate bots cannot be replaced by another player as they either are a part of the story, and thus might not be around all the time, die, or have something else happen to them. In games that are meant be played cooperatively with friends (or strangers), these can be replaced with bots\cite{residentevil5, lostplanet2}.
@@ -78,14 +75,14 @@ Today, only one RTS game, that we know of, allows to communicate with and contro
 
 The bot in the first StarCraft\cite{scbw} installment acts entirely on its own, and it does not feel as it behaves differently when playing together with it. In WarCraft 3: The Frozen Throne\cite{wc3ft} the bot reacts to the player coming to aid if s/he is under attack, and communicates its attack position—by pinging on the minimap—to the player when moving out to attack a target. it does this by coming to the players aid if s/he is under attack. Much like WarCraft 3, the bot in StarCraft 2: Wings of Liberty\footnote{First game in the StarCraft 2 trilogy.}\cite{sc2wol} aids the player when s/he is under attack, although it does not ping the minimap when it attacks. In Age of Empires 3\cite{ageofempires3} the bot acts almost entirely on its own; it can, however, request resources from the player and give the player hints.
 
-Red Alert 3\cite{redalert3} on the other hand has the most advanced teammate bot. The game’s campaign mode is played cooperatively with either another human player or bot. The bot can be given simple commands: move to specified position or strike a target; although these have some restrictions as the bot needs to to have the free units to execute the commands. In special missions, the bot will have superweapons that the player will have full control over. Like WarCraft 3 and StarCraft 2, the bot comes to aid the player when it is under attack.
+Red Alert 3\cite{redalert3} on the other hand has the most advanced teammate bot. The game’s campaign mode is played cooperatively with either another human player or bot. The bot can be given simple commands: move to specified position or strike a target; although these have some restrictions as the bot needs to to have the free units to execute the commands. In special missions, the bot will have super weapons that the player will have full control over. Like WarCraft 3 and StarCraft 2, the bot comes to aid the player when it is under attack.
 
 \section{Why StarCraft?}
 \label{sec:why_starcraft}	
 Why choose StarCraft and not another RTS game? Other games, or engines, the AI could be implemented in is SpringRTS\cite{springrts} which is an RTS game engine, it is by itself not a game and requires a game mod\footnote{A game mod in this case is the set of rules, units, graphics, to create a new RTS game.}, which there are plenty of. ORTS\cite{orts} is aimed for developers and researching, and finally, Wargus\cite{wargus}, a WarCraft II clone that allows for modifications and implementation of an AI. So why not choose one of these instead of StarCraft?
 
 \paragraph{Carefully balanced}
-Blizzard Entertainment released StarCraft: Brood War in 1998 and continued to patch it until beginning of 2009\footnote{No official note on this date can be found, the only inofficial page we found that mentioned the date was wikipedia at: \url{http://en.wikipedia.org/wiki/StarCraft:_Brood_War}, accessed 2012-09-13}. The other games have neither had the time nor the amount of players to carefully balance the game. One factor might be because StarCraft has become a huge E-sport in South Korea\cite{scKotakuKorea}.
+Blizzard Entertainment released StarCraft: Brood War in 1998 and continued to patch it until beginning of 2009\footnote{No official note on this date can be found, the only inofficial page we found that mentioned the date was Wikipedia at: \url{http://en.wikipedia.org/wiki/StarCraft:_Brood_War}, accessed 2012-09-13}. The other games have neither had the time nor the amount of players to carefully balance the game. One factor might be because StarCraft has become a huge E-sport in South Korea\cite{scKotakuKorea}.
 
 \paragraph{Easy to find experienced players}
 Because StarCraft have been around for so long and is a commercial successful game it is easy to find experienced players to test the game. By using experienced players as testers, the players do not have to learn the game mechanics and can focus on evaluating the bot instead of the game.

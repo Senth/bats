@@ -7,7 +7,7 @@ A squad, in BATS, are units grouped together acting in coordination. All squads 
 The squad manager updates and removing existing squads (but only from the squad manager); any class can create a squad and it adds itself automatically to the squad manager (via the squad's constructor). The squads are added as \texttt{shared\_ptr}, meaning they are automatically destroyed when no more references exist, i.e. no memory leaks. When a squad holds no units—achieved when all units died, units moved to another squad, or the squad disbands—the squad manager automatically removes it; but it can still be used if another class saved it before it was removed. Removed Squads have to be recreated to be inserted into the squad manager again.
 
 Squads can be retrieved using two (actually four) different functions, either by the squad's id (automatically set) or by squad type (template function), shown in listing \ref{lst:SquadManager::getSquads()}. The template function will also return all sub-classes to the specified class, meaning \texttt{getSquads<AttackSquad>();} would return both attack squads and drop squads because drop squad derives form attack squad. The last two functions are there for convenience, the first returns the current frontal attack (if one exist), and the other returns all distracting attacks.
-\begin{lstlisting}[caption={Template function to retrieve squads of the specified type},label={lst:SquadManager::getSquads()}]
+\begin{lstlisting}[caption={Template function to retrieve squads of the specified type.},label={lst:SquadManager::getSquads()}]
 template <typename T>
 vector<shared_ptr<T>> SquadManager::getSquads();
 \end{lstlisting}
@@ -41,14 +41,14 @@ The attack squad can both function on its own, but is also the base class for al
 
 For regular attacks the squad requests an attack from \nameref{sec:attack_coordinator} to get an attack location to move to and regroup when needed. When the squad is close to the attack location (\squadAttackWaitingPositionDistanceFromGoal), i.e. its wait location, it will wait here until all its wait goals are finished, then it will continue moving to its attack goal. This will sync the attack with other attacking squads as they wait until the squad either is in the wait location, under attack, or already attacking.
 
-If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation. For an attack to succeed with its mission all structures within the radius of \squadAttackStructuresDestroyedGoalDistance from the attack location needs to be destroyed. After succeeding with the mission the squad will retreat back to the base, disband the squad, and merge with the \nameref{sec:patrol_squad}.
+If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation—\hl{retreats are covered later in this section}\marginpar{Are they?}. For an attack to succeed with its mission all structures within the radius of \squadAttackStructuresDestroyedGoalDistance from the attack location needs to be destroyed. After succeeding with the mission the squad will retreat back to the base, disband the squad, and merge with the \nameref{sec:patrol_squad}.
 
 \paragraph{Following a teammate squad}
 To follow a teammate squad it can either be set directly when creating the attack squad or later by a call to \texttt{followTeammateSquad(teammateSquad)}, this converts the regular attack to follow the specified squad—attack squads can only convert to following a teammate and not from.
 
 When the squad follows an teammate squad it behaves differently, depending on the teammate squad's current state, described below in listing \ref{lst:attack_follow_allied}.
 
-\begin{lstlisting}[caption={Squad actions depending on the teammate squad's state},label={lst:attack_follow_allied}]
+\begin{lstlisting}[caption={Squad actions depending on the teammate squad's state.},label={lst:attack_follow_allied}]
 switch (mTeammateSquad->getState()) {
 	// Regroup if not close
 	case IdleOutsideBase:
@@ -104,7 +104,7 @@ In addition the squad need to cope with when the teammate squad splits or merges
 \subsection{Drop squad}
 \label{sec:drop_squad}
 The drop squad uses attack squad as its base class. Listing \ref{lst:drop_squad} shows the behavior of the squad.
-\begin{lstlisting}[caption={Drop squad behavior},label={lst:drop_squad}]
+\begin{lstlisting}[caption={Drop squad behavior.},label={lst:drop_squad}]
 switch(mState) {
 case LoadUnits:
 	if (isTransportDoneLoading()) {
@@ -161,7 +161,7 @@ The target location to drop is, as mentioned, required by the attack coordinator
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.75\textwidth]{space_atoll_(co-op)_drop_path}
-\caption[Drop squad movement example]{Example of drop squad movement. \colorbox{green}{Start location} where the transportation loads the units. \colorbox{cyan}{Path to the drop target}. Squad \colorbox{Orange}{waits here}, if it has wait goals. Where the squad \colorbox{yellow}{starts to unload}. \colorbox{red}{Target location} to attack.}
+\caption[Example of drop squad movement]{Example of drop squad movement. \colorbox{green}{Start location} where the transportation loads the units. \colorbox{cyan}{Path to the drop target}. Squad \colorbox{Orange}{waits here}, if it has wait goals. Where the squad \colorbox{yellow}{starts to unload}. \colorbox{red}{Target location} to attack.}
 \label{fig:drop_squad_movement}
 \end{figure}
 
@@ -211,4 +211,4 @@ Wait goals were created for simple one time trigger abilities. These can be adde
 To be updated wait goals shall be added to the wait goal manager which updates the goals, completed goals (succeeded, failed, timed out) will automatically be removed from the wait goal manager. When adding an wait goal to the manager an optional set type can be set, this allows all wait goals with the same set type to be easily extracted—\nameref{sec:attack coordinator} uses this when adding existing wait goals to a new attack squad.
 
 \paragraph{Existing wait goals}
-For now there is only one type of wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these, as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the enemy simultaneously from different locations. The wait goal will complete when the attack squad is in position, \squadAttackWaitingPositionDistanceFromGoal from the attack location, when the squad is under attack or attacks, or if the wait goal times out (\attackCoordinatorWaitGoalTimeout).
+For now there is only one type of wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these, as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the enemy simultaneously from diffent locations. The wait goal will complete when the attack squad is in position, \squadAttackWaitingPositionDistanceFromGoal from the attack location, when the squad is under attack or attacks, or if the wait goal times out (\attackCoordinatorWaitGoalTimeout).

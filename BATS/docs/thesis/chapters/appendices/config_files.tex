@@ -1,0 +1,21 @@
+% !TEX root = ../../main.tex
+% !TEX spellcheck = en_US
+\chapter{BATS configuration files}
+\section{Build orders used}
+\label{sec:build_orders_in_bats}
+These are the build orders that were used in the experiments.
+\lstinputlisting[label={lst:build_order_factory_siege_expand},caption={Early game build order},language=ini]{code/BuildOrders/factory-expand-siege.txt}
+\lstinputlisting[label={lst:build_order_vulture_tank},caption={Mid game build order},language=ini]{code/BuildOrders/vulture-tank.txt}
+\lstinputlisting[label={lst:build_order_tank_drops},caption={Late game build order},language=ini]{code/BuildOrders/tank-drops.txt}
+
+\section{Unit compositions}
+\label{sec:unit_compositons_in_bats}
+All the different unit compositions used in BATS.
+\lstinputlisting[label={lst:unit_comp_defend},caption={Unit compositions for hold squads},language=ini]{code/UnitCompositions/defend.ini}
+\lstinputlisting[label={lst:unit_comp_drop},caption={Unit compositions for drop squads},language=ini]{code/UnitCompositions/drop.ini}
+\lstinputlisting[label={lst:unit_comp_scout},caption={Unit compositions for scout squads},language=ini]{code/UnitCompositions/scout.ini}
+
+\section{Intention and reason messages}
+\label{sec:intention_and_reason_messages}
+All intention and reason messages that could be used during a game. Again, it will use a random message from intention and reason.
+\lstinputlisting[label={lst:messages},caption={Intention and reason messages ini-file},language=ini]{code/messages.ini}

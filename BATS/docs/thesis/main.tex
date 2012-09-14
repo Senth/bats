@@ -88,7 +88,7 @@ unicode,%
 breaklinks=true,%
 plainpages=false,%
 %TODO set title
-pdftitle={TITLE},%
+pdftitle={A Communicating and Controllable Teammate Bot for RTS Games},%
 pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
 
 %%%%%%%%%%%%%%%% COMMANDS %%%%%%%%%%%%%%%%%
@@ -136,6 +136,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 	sensitive=false,
 	morecomment=[l]{;},
 	morecomment=[s][\color{blue}]{[}{]},
+	morecomment=[s][\color{blue}]{<}{>},
 	morestring=[b]",
 }
 
@@ -249,6 +250,8 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 %\listoftables %in case you have them
 %\listofalgorithms %in case you have them
 \tableofcontents 
+\listoffigures
+\lstlistoflistings
 
 %%  now we can start with the real thing
 
@@ -260,7 +263,6 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \input{chapters/problem_description}
 \input{chapters/methods}
 \input{chapters/results}
-\input{chapters/related_work}
 \input{chapters/conclusions}
 \input{chapters/appendix}
 
