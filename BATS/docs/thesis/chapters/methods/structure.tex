@@ -16,10 +16,13 @@ There are a couple of words that needs to be explained before digging into the d
 	\item[Allied/enemy squad] A virtual squad used to group close allied or enemy units together.
 	\item[Expanding] The time from when one want to build another base (to mine minerals and gas from) until the base has completed.
 \end{description}
-\marginpar{Will change colors behind text to legend instead.}
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.8\textwidth]{space_atoll_(co-op)_regions_small}
-	\caption[Regions and choke points]{Regions and choke points. \colorbox{green}{Regions} are surrounded by green lines, \colorbox{Red}{choke points} are denoted by a red line, and the yellow areas are \colorbox{yellow}{unwalkable terrain}.}
+	\caption[Regions and choke points]{
+		Regions and choke points.
+		\usebox{\LegendLineLightGreen} Region borders;
+		\usebox{\LegendLineRed} choke points and splits regions; and
+		\usebox{\LegendBoxYellow} unwalkable terrain.}
 	\label{fig:region_and_choke_points}
 \end{figure}

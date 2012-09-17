@@ -36,19 +36,23 @@ Testing the distance between so many units were too computational heavy, even wh
 	}
 
 	% filled unit
-	\filldraw[Brown] (2.9, 2.1) circle(0.1);
-	\draw[BrickRed] (2.9, 2.1) circle(2);
-	\draw[OliveGreen] (2.9, 2.1) circle(1.5);
+	\filldraw[blue] (2.9, 2.1) circle(0.1);
+	\draw[red] (2.9, 2.1) circle(2);
+	\draw[green] (2.9, 2.1) circle(1.5);
 
 	% second dashed unit
-	\draw[Brown,very thick,dashed] (2.5, 2.5) circle(0.1);
-	\draw[BrickRed,dashed] (2.5, 2.5) circle(2);
-	\draw[OliveGreen,dashed] (2.5, 2.5) circle(1.5);
+	\draw[blue,very thick,dashed] (2.5, 2.5) circle(0.1);
+	\draw[red,dashed] (2.5, 2.5) circle(2);
+	\draw[green,dashed] (2.5, 2.5) circle(1.5);
 \end{tikzpicture}
-\caption[Minimizing distance calculation using grids]{Example of using grid to minimize distance calculations. The brown dot (and dashed circle) represents the \textcolor{Brown}{unit}; green circle the \textcolor{OliveGreen}{include distance}; red circle the \textcolor{BrickRed}{exclude distance}. The dashed circles represents another unit, its include and exclude distances from the middle of a grid square.}
+\caption[Minimizing distance calculation using grids]{
+	Example of using grid to minimize distance calculations.
+	\usebox{\LegendDotBlue} The unit.
+	\usebox{\LegendCircleGreen} include distance;
+	\usebox{\LegendCircleRed} exclude distance.
+	The dashed circles represents another unit, its include and exclude distances from the middle of a grid square.}
 \label{fig:player_squad_group_grid}
 \end{figure}
-\marginpar{Will change text colors}
 
 Only units within two grid units are used when calculating the distance, this generates a 5x5 grid just as figure \ref{fig:player_squad_group_grid}. As can be seen in the figure units further away than two grid units can never be within the exclude distance. Units in the same grid or to the left, top, right, or bottom are almost always within the exclude distance, an exception can be seen in the figure where small portion of the upper left corner at (2,3) is outside the solid exclude circle; for simplicity all units within these grid positions are seen as within the exclude distance (even though exceptions might exist).
 

@@ -1,0 +1,31 @@
+<name>
+Vulture and tanks
+
+<descriptions>
+Focuses on attacking with vultures and tanks.
+
+<build-order>
+Terran_Starport
+Terran_Control_Tower
+Terran_Academy
+TechType: Tank_Siege_Mode
+Terran_Factory
+Terran_Machine_Shop
+Terran_Armory
+TechType: Spider_Mines
+UpgradeType: Ion_Thrusters
+UpgradeType: Terran_Vehicle_Weapons 1
+Terran_Armory
+Terran_Science_Facility
+TechType: Cloaking_Field
+UpgradeType: Apollo_Reactor
+UpgradeType: Terran_Vehicle_Weapons 2
+UpgradeType: Terran_Vehicle_Plating 1
+
+<units>
+60% Terran_Vulture
+40% Terran_Siege_Tank_Tank_Mode
+
+<must-have>
+2 Terran_Wraith
+1 Terran_Dropship

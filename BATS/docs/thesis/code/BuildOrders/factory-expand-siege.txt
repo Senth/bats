@@ -1,0 +1,27 @@
+<name>
+One factory fast expand, siege mode
+
+<description>
+Starts building marines in the beginning and continues
+with building two factories, tanks and siege mode
+for the tanks. After siege mode has started it will
+build an expansion.
+
+<build-order>
+Terran_Supply_Depot
+Terran_Barracks
+Terran_Refinery
+Terran_Factory
+Terran_Machine_Shop
+Terran_Factory
+Terran_Machine_Shop
+TechType: Tank_Siege_Mode
+Terran_Command_Center
+
+<units>
+60% Terran_Siege_Tank_Tank_Mode
+40% Terran_Vulture
+
+<must-have>
+8 Terran_Marine
+2 Terran_Siege_Tank_Tank_Mode

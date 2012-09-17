@@ -6,11 +6,20 @@ The defense manager handles the defense of its own base and the player’s base.
 
 The hold squads, described fully in section \ref{sec:hold_squad}, are stationary and defend the choke point from a certain roaming perimeter (purple circle in the figure) where the center is calculated by finding a position in the range \squadDefendRoamDistanceMinMax~closest to one of BATS’s or the teammate’s buildings and the radius being \squadDefendRoamPerimeter. Units from the hold squad will stay in the roaming perimeter until enemy units enter the defense perimeter (\squadDefendDefendPerimeter~in radius), they will then start to attack the enemy. 
 
-\marginpar{Will change to a legend instead.}
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{space_atoll_(co-op)_defense_locations}
-\caption[Defense locations example]{Example of defense locations. \colorbox{LightGreen}{BATS’s regions}, \colorbox{LightBlue}{teammate’s regions}, regions outlined with both green and blue belong to \fcolorbox{LightBlue}{LightGreen}{both}. \colorbox{Yellow}{Non-defended} as they abut only BATS or teammate regions. \colorbox{Red}{Defense locations} are both the dot and the smallest circle is the \colorbox{Red}{defend perimeter} whereas the outer circle is the \colorbox{Brown}{\textcolor{white}{enemy offensive perimeter}}. The orange dot is the \colorbox{Orange}{teammate's defense location}.}
+\caption[Defense locations example]{
+	Example of defense locations.
+	\usebox{\LegendLineLightGreen} BATS’s regions;
+	\usebox{\LegendLineLightBlue} teammate’s regions;
+	\usebox{\LegendLineLightGreenLightBlue} belongs to both;
+	\usebox{\LegendLineYellow} non-defended as they abut only BATS or teammate regions;
+	\usebox{\LegendDotRed} defense locations;
+	\usebox{\LegendCircleRed} defend perimeter;
+	\usebox{\LegendCircleBrown} enemy offensive perimeter;
+	\usebox{\LegendCircleViolet} roam location for hold squads; and
+	\usebox{\LegendDotOrange} teammate's defense location.}
 \label{fig:defense_locations}
 \end{figure}
 

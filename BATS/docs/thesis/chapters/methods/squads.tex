@@ -161,7 +161,12 @@ The target location to drop is, as mentioned, required by the attack coordinator
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.75\textwidth]{space_atoll_(co-op)_drop_path}
-\caption[Drop squad movement example]{Example of drop squad movement. \colorbox{green}{Start location} where the transportation loads the units. \colorbox{cyan}{Path to the drop target}. Squad \colorbox{Orange}{waits here}, if it has wait goals. Where the squad \colorbox{yellow}{starts to unload}. \colorbox{red}{Target location} to attack.}
+\caption[Drop squad movement example]{Example of drop squad movement.
+\usebox{\LegendDotGreen}~Start location where the transportation loads the units.
+\usebox{\LegendLineCyan}~Path to the drop target.
+\usebox{\LegendDotOrange}Squad waits here, if it has wait goals.
+\usebox{\LegendDotYellow}Where the squad starts to unload.
+\usebox{\LegendDotRed}Target location to attack.}
 \label{fig:drop_squad_movement}
 \end{figure}
 
@@ -208,7 +213,7 @@ To use compositions one calls the unit composition factory which takes a composi
 \label{sec:wait_goals}
 Wait goals were created for simple one time trigger abilities. These can be added to any squad at the moment, but will only have an effect on the squad if the derived squad handles them, as the squad base class only checks if the wait goal has succeeded, failed, or timed out and send an event to the derived class.
 
-To be updated wait goals shall be added to the wait goal manager which updates the goals, completed goals (succeeded, failed, timed out) will automatically be removed from the wait goal manager. When adding an wait goal to the manager an optional set type can be set, this allows all wait goals with the same set type to be easily extracted—\nameref{sec:attack coordinator} uses this when adding existing wait goals to a new attack squad.
+To be updated wait goals shall be added to the wait goal manager which updates the goals, completed goals (succeeded, failed, timed out) will automatically be removed from the wait goal manager. When adding an wait goal to the manager an optional set type can be set, this allows all wait goals with the same set type to be easily extracted—\nameref{sec:attack_coordinator} uses this when adding existing wait goals to a new attack squad.
 
 \paragraph{Existing wait goals}
 For now there is only one type of wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these, as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the enemy simultaneously from different locations. The wait goal will complete when the attack squad is in position, \squadAttackWaitingPositionDistanceFromGoal from the attack location, when the squad is under attack or attacks, or if the wait goal times out (\attackCoordinatorWaitGoalTimeout).

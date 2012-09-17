@@ -23,7 +23,6 @@
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{float}
-\usepackage{soul}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{pgfplots}
 %\usepackage{a4wide}
@@ -51,7 +50,6 @@
 %\renewcommand*\familydefault{\sfdefault}
 
 \usepackage{soul, color} % this with the next one gives convenient colouring options for drafts, e.g. with a \hl{xxx}, the marking becomes ugly green.
-\sethlcolor{green} 
 %\setul{2pt}{0.5pt} % use this if you want to change spacing of the underling
 
 \usepackage[neveradjust]{paralist} %this one is handy if you are short on space or want to have a listing with bulletes, starts etc. e.g. use \begin{compactenum} \item ... \end{comactenum}
@@ -87,7 +85,6 @@ pdfstartview={FitV},%
 unicode,%
 breaklinks=true,%
 plainpages=false,%
-%TODO set title
 pdftitle={A Communicating and Controllable Teammate Bot for RTS Games},%
 pdfauthor={Matteus Magnusson and Suresh Balsasubramaniyan}]{hyperref}
 
@@ -161,6 +158,93 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \tikzstyle{inheritArrow}=[->, >=open triangle 90, thick]
 \tikzstyle{uniDirectional}=[->, >=angle 60, thick]
 \tikzstyle{biDirectional}=[-, thick]
+
+%%%%%%%%%%%%%%%%% LEGENDS %%%%%%%%%%%%%%%%%%%
+% Lines
+\newbox{\LegendLineCyan}
+\savebox{\LegendLineCyan}{
+	(\tikz[baseline=-0.65ex]{\draw[cyan,line width=2pt] (0,0) -- (0.5, 0); })
+}
+
+\newbox{\LegendLineLightGreen}
+\savebox{\LegendLineLightGreen}{
+	(\tikz[baseline=-0.65ex]{\draw[LightGreen,line width=2pt] (0,0) -- (0.5, 0); })
+}
+
+\newbox{\LegendLineLightBlue}
+\savebox{\LegendLineLightBlue}{
+	(\tikz[baseline=-0.65ex]{\draw[LightBlue,line width=2pt] (0,0) -- (0.5, 0); })
+}
+
+\newbox{\LegendLineLightGreenLightBlue}
+\savebox{\LegendLineLightGreenLightBlue}{
+	(\tikz[baseline=-0.65ex]{\draw[LightGreen,line width=2pt] (0,-0.05) -- (0.5, -0.05); 
+	\draw[LightBlue, line width=2pt] (0,0.05) -- (0.5, 0.05); })
+}
+
+\newbox{\LegendLineRed}
+\savebox{\LegendLineRed}{
+	(\tikz[baseline=-0.65ex]{\draw[Red,line width=2pt] (0,0) -- (0.5, 0); })
+}
+
+\newbox{\LegendLineYellow}
+\savebox{\LegendLineYellow}{
+	(\tikz[baseline=-0.65ex]{\draw[Yellow,line width=2pt] (0,0) -- (0.5, 0); })
+}
+
+% Dots
+\newbox{\LegendDotGreen}
+\savebox{\LegendDotGreen}{
+	(\tikz[baseline=-0.75ex]{\draw[green,fill] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendDotOrange}
+\savebox{\LegendDotOrange}{
+	(\tikz[baseline=-0.75ex]{\draw[Orange,fill] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendDotYellow}
+\savebox{\LegendDotYellow}{
+	(\tikz[baseline=-0.75ex]{\draw[Yellow,fill] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendDotRed}
+\savebox{\LegendDotRed}{
+	(\tikz[baseline=-0.75ex]{\draw[red,fill] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendDotBlue}
+\savebox{\LegendDotBlue}{
+	(\tikz[baseline=-0.75ex]{\draw[blue,fill] (0.25, 0.0) circle(0.12);})
+}
+
+% Circles
+\newbox{\LegendCircleRed}
+\savebox{\LegendCircleRed}{
+	(\tikz[baseline=-0.75ex,thick]{\draw[red] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendCircleBrown}
+\savebox{\LegendCircleBrown}{
+	(\tikz[baseline=-0.75ex,thick]{\draw[Brown] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendCircleViolet}
+\savebox{\LegendCircleViolet}{
+	(\tikz[baseline=-0.75ex,thick]{\draw[Violet] (0.25, 0.0) circle(0.12);})
+}
+
+\newbox{\LegendCircleGreen}
+\savebox{\LegendCircleGreen}{
+	(\tikz[baseline=-0.75ex,thick]{\draw[green] (0.25, 0.0) circle(0.12);})
+}
+
+% Boxes
+\newbox{\LegendBoxYellow}
+\savebox{\LegendBoxYellow}{
+	(\tikz[baseline=-0.65ex]{\node[minimum width=2em, draw=green, thick, fill=yellow!50, rectangle]	(0,0) {}; })
+}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%and then my shortcuts
 
