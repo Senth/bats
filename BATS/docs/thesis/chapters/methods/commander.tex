@@ -1,7 +1,7 @@
 % !TEX root = ../../main.tex
 % !TEX spellcheck = en_US
 \section{Commander}
-\label{sec:commander}
+\label{sec:Commander}
 The Commander creates all orders for BATS, except defenses as the \nameref{sec:defense_manager} does that. This means that it orders attacks, drops, expansions, scouts, and when to transition to the next phase.
 
 \subsection{Orders/Commands}
@@ -28,7 +28,7 @@ if (alliedOrdered) {
 if (canAttack) {
 	oldSquad = mSquadManager.getFrontalAttack();
 	
-	// Add free units to the old attack squad if it exists
+	// Add free units to the old Attack squad if it exists
 	if (oldSquad != NULL) {
 		oldSquad.addUnts(freeUnits);
 		mIntentionWriter.write(BotAttackMerged, reason);
@@ -45,7 +45,7 @@ if (canAttack) {
 \end{lstlisting}
 
 \paragraph{Follow}
-Follow almost behaves as the attack command, but instead of creating a regular attack squad, it will instead follow the largest teammate player’s squad. In addition to the attack’s three behaviors—create new frontal attack (that follows teammate), reinforce the frontal attack, or does nothing—it has one additional behavior: If BATS already has a frontal attack, that is not following a teammate, it will abandon its goal and instead follow the teammate.
+Follow almost behaves as the attack command, but instead of creating a regular Attack squad, it will instead follow the largest teammate player’s squad. In addition to the attack’s three behaviors—create new frontal attack (that follows teammate), reinforce the frontal attack, or does nothing—it has one additional behavior: If BATS already has a frontal attack, that is not following a teammate, it will abandon its goal and instead follow the teammate.
 
 \paragraph{Drop}
 Drop will try to create a drop from any of the unit compositions that are available.
@@ -72,11 +72,11 @@ else {
 As with drop, scout uses available unit composition; it does however not choose a random composition but uses the composition with highest priority—i.e. the first composition, as UnitCompositionFactory’s getUnitCompositionByType() returns composition sorted by priority, where the highest priority is first.
 
 \paragraph{Expand}
-Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions available it will append a command center (or equivalent for other races) to the build planner, which in turn will build an expansions when it has resources for it.
+Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions available it will append a command center (or equivalent for other races) to the Build planner, which in turn will build an expansions when it has resources for it.
 
 \paragraph{Transition}
 Transition transitions to the next phase in the game—there are three phases: early, mid, and late
-game. How the commander handles the transition command can be seen in listing
+game. How the Commander handles the transition command can be seen in listing
 \ref{lst:order_transition}.
 
 \subsection{Order creation rules}
@@ -107,11 +107,11 @@ In order to expand from own reactions BATS meet all conditions below.
   \item \textbf{Not be under attack.} Expanding when we are under attack will most likely kill the expansion
 	  directly
 	\item \textbf{Not already be expanding.} We do not want to spam expansions
-	\item \textbf{Less than \commanderExpansionActiveMax~active expansions.} Good number of
+	\item \textbf{Less than \CommanderExpansionActiveMax~active expansions.} Good number of
 	  active bases as it keeps a large and steady income to support many unit producing structures.
 	  Active expansions are expansions where at least
 	  \classificationExpansionExpansionMineralsLow~minerals left.
-	\item \textbf{No new expansion shall have been build in \commanderExpansionIntervalMin.} Again we do not
+	\item \textbf{No new expansion shall have been build in \CommanderExpansionIntervalMin.} Again we do not
 	  want to spam expansions and this seemed like a reasonable time, but has not been extensively
 	  tested.
 \end{itemize}
@@ -124,7 +124,7 @@ are an expansion will be added to the beginning of the build order.
 	  above \classificationExpansionWorkersPerMineralSaturation. Simply put, even if you add more
 	  workers to mine, they will have to wait longer for the mineral patch to be free, thus it will
 	  not increase your income. This rule will allow BATS to expand early in the game when it has
-	  less than \commanderExpansionActiveMax~expansions.
+	  less than \CommanderExpansionActiveMax~expansions.
 	\item \textbf{An expansion is running low on minerals.} Making sure we stay on the same number of active
 	  expansions. This is the same as an expansion that is not active (i.e. having less than
 	  \classificationExpansionExpansionMineralsLow~minerals left) but still having some minerals
@@ -160,7 +160,7 @@ are an attack will be created.
 
 \paragraph{Scout}
 The scout order conditions are much simpler than expand and attack. BATS will always send out a
-scout if it is not scouting, not under attack, and has \commanderScoutOnWorkerCount. The commander
+scout if it is not scouting, not under attack, and has \CommanderScoutOnWorkerCount. The Commander
 uses \ref{sec:unit_composition}s for the scout to get the best available scout unit. From lowest
 priority this is:
 \vspace{0.5em}
@@ -187,7 +187,7 @@ was implemented this way.
 
 \paragraph{Allied expands} If the allied player expands, BATS first want to create a distracting
 attack (for now only drops are available) to distract the enemy from the expansion, if no drops are
-available it will create a frontal attack. But before the commander creates any attack it checks so
+available it will create a frontal attack. But before the Commander creates any attack it checks so
 that we are not under attack or already attacking.
 
 \paragraph{Allied attacks} Depending on what type of attack the allied player has BATS behaves

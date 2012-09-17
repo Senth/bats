@@ -36,7 +36,7 @@ enemy army and BATS will do that if the squad is close by, but it will not searc
 armies. In addition, because armies are mobile it would be hard to track them, i.e. time consuming
 to implement such a feature.
 
-The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an attack squad
+The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an Attack squad
 requesting an attack from attack coordinator. It can either get an weighted attack location or join
 the teammate's frontal attack, if s/he has one. Attack coordinator uses a rule based system to
 decide the how and where the squad shall attack.
@@ -71,13 +71,13 @@ decide the how and where the squad shall attack.
 \end{figure}
 
 \paragraph{Coordinated attacks}
-To achieve a sense of coordinated attacks, attack squads have \nameref{sec:wait_goals} added by the attack coordinator—fully described in section \ref{sec:wait_goals}. The wait goal for attack squads is a wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out (\attackCoordinatorWaitGoalTimeout). The wait goal is added to all existing squads and the new squad gets the already existing wait goals, when all attacks are in position they will start their attack simultaneously.
+To achieve a sense of coordinated attacks, Attack squads have \nameref{sec:wait_goals} added by the attack coordinator—fully described in section \ref{sec:wait_goals}. The Wait goal for Attack squads is a Wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out (\attackCoordinatorWaitGoalTimeout). The Wait goal is added to all existing squads and the new squad gets the already existing Wait goals, when all attacks are in position they will start their attack simultaneously.
 
 \subsection{Calculation of distance weight}
-Distance weight is a simple calculation: if no other attack squads are present it defaults to 1.0. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
+Distance weight is a simple calculation: if no other Attack squads are present it defaults to 1.0. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
 \begin{equation}
 \label{eq:distance_weight}
-weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of attack squads}\right.
+weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of Attack squads}\right.
 \end{equation}
 Here \emph{weight} is the average distance from all other attacking squads. The weight is then normalized to [0.0, 1.0], shown in equation \ref{eq:distance_weight_normalized}—dividing the weight with the maximum map distance. As with most distance calculations, they use the squared version for faster calculation since no root calculations are needed.
 \begin{equation}
@@ -90,7 +90,7 @@ normalized\ weight = \frac{weight}{MAP\_WIDTH^2 + MAP\_HEIGHT^2}
 This weight prioritizes different structures and locations. Most of the values here are fixed and one type calculated between fixed values (expansions). The structures and locations are presented in priority order below with the current values assign to them. These values are rough estimates what might be good, thus one shall not think these are \emph{the} values. Because the weights are multiplied this will give a logarithmic behavior, i.e. the difference between 0.1 and 0.2 is greater than 0.2 and 0.3 (0.2 is the double of 0.1, whereas 0.3 is less than double of 0.2).
 
 \paragraph{Not scouted expansions \attackCoordinatorWeightsExpansionNotChecked}
-These are expansion that have not been visited for the last \attackCoordinatorExpansionNotCheckedTime. The idea is to check expansions when moving out to attack, although the current version does not work as expected; because the \nameref{sec:scout_squad} cannot cover all the areas quickly the attack squad will act more as a scout than attack squad because of visiting expansions in various location around the map. To fix this only the closest expansions to the enemy shall be checked and possibly only one with this squad, as this is roughly what Magnusson has observed when watching professional StarCraft players. This feature was therefore disabled during the experimentations.
+These are expansion that have not been visited for the last \attackCoordinatorExpansionNotCheckedTime. The idea is to check expansions when moving out to attack, although the current version does not work as expected; because the \nameref{sec:scout_squad} cannot cover all the areas quickly the Attack squad will act more as a scout than Attack squad because of visiting expansions in various location around the map. To fix this only the closest expansions to the enemy shall be checked and possibly only one with this squad, as this is roughly what Magnusson has observed when watching professional StarCraft players. This feature was therefore disabled during the experimentations.
 	
 \paragraph{Expansions \attackCoordinatorWeightsExpansionMinMax}
 Expansion weight for existing enemy expansions. The weight is higher for fresh expansions; fresh expansions being defined by the expansions current mineral amount (in fractions)—the \nameref{sec:resource_counter} tracks the amount of all mineral fields.

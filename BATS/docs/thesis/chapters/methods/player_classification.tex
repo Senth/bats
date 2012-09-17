@@ -179,7 +179,7 @@ this version.
 
 \paragraph{Self classification}
 This classifier groups together common tests for BATS and might not be seen as a classifier.
-\nameref{sec:commander} and \nameref{sec:defense_manager} uses the self classifier to easier
+\nameref{sec:Commander} and \nameref{sec:defense_manager} uses the Self classifier to easier
 calculate their goals and decrease their coupling. Below all important functions are listed and
 described, although most of the names should be self-explanatory.
 
@@ -191,14 +191,14 @@ described, although most of the names should be self-explanatory.
 	\item[\texttt{double getLastExpansionStartTime()}] How many game seconds ago the last expansion was started.
 	\item[\texttt{bool hasDrop()}] Checks if BATS has a drop.
 	\item[\texttt{bool isAnExpansionLowOnMinerals()}] Checks if an expansion has less than \classificationExpansionExpansionMineralsLow.
-	\item[\texttt{bool isAttacking()}] Checks if we have an attack squads that is not retreating.
+	\item[\texttt{bool isAttacking()}] Checks if we have an Attack squads that is not retreating.
 	\item[\texttt{bool isExpanding()}] Checks if BATS is either expanding or going to expand (expansions in build order).
 	\item[\texttt{bool isHighOnGas()}] BATS has more than \classificationHighOnGas~gas.
 	\item[\texttt{bool isHighOnMinerals()}] BATS has more than \classificationHighOnMinerals~minerals.
-	\item[\texttt{bool isScouting()}] If BATS has a scout squad out.
+	\item[\texttt{bool isScouting()}] If BATS has a Scout squad out.
 	\item[\texttt{bool isUnderAttack()}] Checks if BATS is under attack, uses Defense Manager's isUnderAttack().
 	\item[\texttt{bool isUpgradeSoonDone(affectedUnits)}] Checks if an upgrade, that will affect the specified units, completes within \classificationUpgradeSoonDone.
 \end{function_description}
 
 \paragraph{Teammate classification}
-The teammate classification works just as the self classifier described above, but at the moment only has one function, isExpanding(), as the squad functionality was implemented in PlayerArmyManager. isExpanding() checks if the teammate currently constructs a new base structure (e.g. Command Center).
+The teammate classification works just as the Self classifier described above, but at the moment only has one function, isExpanding(), as the squad functionality was implemented in PlayerArmyManager. isExpanding() checks if the teammate currently constructs a new base structure (e.g. Command Center).
