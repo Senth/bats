@@ -329,13 +329,12 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \input{chapters/fronts}
 \pagenumbering{roman}
 \input{chapters/abstract}
-%\include{acknowledgments} %OPTIONAL
-%\listoffigures %in case you have them
-%\listoftables %in case you have them
-%\listofalgorithms %in case you have them
+\input{chapters/acknowledgements}
 \tableofcontents 
 \listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
 \lstlistoflistings
+\addcontentsline{toc}{chapter}{List of Listings}
 
 %%  now we can start with the real thing
 
@@ -346,6 +345,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 \input{chapters/background}
 \input{chapters/problem_description}
 \input{chapters/methods}
+\input{chapters/methods/evaluation}
 \input{chapters/results}
 \input{chapters/conclusions}
 \input{chapters/appendix}
@@ -358,6 +358,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 %
 \bibliographystyle{plain}	% (uses file "IEEE.bst")
 \bibliography{bibliography}
+\addcontentsline{toc}{chapter}{Bibliograhpy}
 %
 %\input{glossary}
 %\input{index}

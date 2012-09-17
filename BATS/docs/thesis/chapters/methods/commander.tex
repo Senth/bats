@@ -13,7 +13,7 @@ Has in general three behaviors: Creates a new frontal attack, reinforces the exi
 // Never do a frontal attack when under attack
 if (isUnderAttack()) {
 	if (alliedOrdered) {
-		mIntentionWriter->write(BotAttackNot, BotIsUnderAttack);
+		mIntentionWriter.write(BotAttackNot, BotIsUnderAttack);
 	}
 	return;
 }
@@ -26,21 +26,21 @@ if (alliedOrdered) {
 }
 
 if (canAttack) {
-	oldSquad = mSquadManager->getFrontalAttack();
+	oldSquad = mSquadManager.getFrontalAttack();
 	
 	// Add free units to the old attack squad if it exists
 	if (oldSquad != NULL) {
-		oldSquad->addUnts(freeUnits);
-		mIntentionWriter->write(BotAttackMerged, reason);
+		oldSquad.addUnts(freeUnits);
+		mIntentionWriter.write(BotAttackMerged, reason);
 	}
 	// Create new attack and ping position
 	else {
-		attackSquad = newAttackSquad(freeUnits);
-		attackPos = attackSquad->getAttackPosition();
-		mIntentionWriter->write(BotAttack, reason, attackPos);
+		attackSquad = new AttackSquad(freeUnits);
+		attackPos = attackSquad.getAttackPosition();
+		mIntentionWriter.write(BotAttack, reason, attackPos);
 	}
 } else {
-	mIntentionWriter->write(BotAttackNot, BotNotEnoughUnits);
+	mIntentionWriter.write(BotAttackNot, BotNotEnoughUnits);
 }
 \end{lstlisting}
 
@@ -54,16 +54,16 @@ availableCompositions = getUnitCompositionByType(freeUnits, Drop);
 
 // Create drop
 if (!availableCompositions.empty()) {
-	randomId = rand() \% availableCompositions.size();
+	randomId = rand() % availableCompositions.size();
 	chosenComposition = availableCompositions[randomId];
 
 	dropSquad = new DropSquad(freeUnits, chosenComposition);
-	mIntentionWriter->write(BotDrop, reason, dropSquad->getDropPosition());
+	mIntentionWriter.write(BotDrop, reason, dropSquad.getDropPosition());
 }
 // No drops available
 else {
 	if (alliedOrdered) {
-		mIntentionWriter->write(BotDropNot, BotNotEnoughUnits);
+		mIntentionWriter.write(BotDropNot, BotNotEnoughUnits);
 	}
 }
 \end{lstlisting}
@@ -75,71 +75,126 @@ As with drop, scout uses available unit composition; it does however not choose 
 Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions available it will append a command center (or equivalent for other races) to the build planner, which in turn will build an expansions when it has resources for it.
 
 \paragraph{Transition}
-Transition transitions to the next phase in the game—there are three phases: early, mid, and late game.
-\begin{lstlisting}[label={lst:order_transition},caption={Pseudo-code for transition command}]
-// Only transition if not in late game already
-if (mBuildPlanner->canTransition()) {
-	if (mBuildPlanner->getCurrentPhase() == "early") {
-		intention = BotTransitionMid;
-	else if (mBuildPlanner->getCurrentPhase() == "mid") {
-		intention = BotTransitionLate;
-	}
-
-	mBuildPlanner->switchToNextPhase();
-} else {
-	if (alliedOrdered) {
-		mIntentionWriter->write(BotTransitionNot, BotTransitionNoMore);
-	}
-}
-\end{lstlisting}
+Transition transitions to the next phase in the game—there are three phases: early, mid, and late
+game. How the commander handles the transition command can be seen in listing
+\ref{lst:order_transition}.
 
 \subsection{Order creation rules}
 The Commander can create orders either from its own actions and states, or what the allied player is doing. Examples of this is it might attack when it is expanding, and it might expand if it has high amount of minerals, for reaction to allied actions it attack if the allied player is expanding.
+\begin{lstlisting}[label={lst:order_transition},caption={Pseudo-code for transition command}]
+// Only transition if not in late game already
+if (mBuildPlanner.canTransition()) {
+	if (mBuildPlanner.getCurrentPhase() == "early") {
+		intention = BotTransitionMid;
+	else if (mBuildPlanner.getCurrentPhase() == "mid") {
+		intention = BotTransitionLate;
+	}
+
+	mBuildPlanner.switchToNextPhase();
+} else {
+	if (alliedOrdered) {
+		mIntentionWriter.write(BotTransitionNot, BotTransitionNoMore);
+	}
+}
+\end{lstlisting}
 
 \subsubsection{Reacting on own actions and states}
 These are the reactions (commands) to BATS's own state.
 
 \paragraph{Expand}
 In order to expand from own reactions BATS meet all conditions below.
-\begin{enumerate}
-	\item Not be under attack—expanding when we are under attack will most likely kill the expansion directly
-	\item Not already be expanding—we do not want to spam expansions
-	\item Active expansion count needs to be less than \commanderExpansionActiveMax—good number of active bases as it keeps a large and steady income to support many unit producing structures. Active expansions are expansions where at least \classificationExpansionExpansionMineralsLow~minerals left.
-	\item No new expansion should have been build in \commanderExpansionIntervalMin—again we do not want to spam expansions and this seemed like a reasonable time, but has not been extensively tested.
-\end{enumerate}
-When all four conditions are met it will check if any of the following conditions are met, if they are an expansion will be added to the beginning of the build order.
-\begin{enumerate}
-	\item BATS has an attack—good idea to expand when attacking (or vice versa), distracts the enemy from the expansion long enough for the expansion to complete\cite{day9}.
-	\item Expansions are saturated—generic expansion rule to expand when low on expansions, i.e. below max active expansion count. Expansions are saturated tests if the number of workers per mineral patch (thus per expansion) is at or above \classificationExpansionWorkersPerMineralSaturation !!! CITE !!!\marginpar{CITE}. % Cite workers per mineral saturation from team liquid
-	\item An expansion is running low on minerals—making sure we stay on the same number of active expansions. This is the same as an expansion that is not active (i.e. having less than \classificationExpansionExpansionMineralsLow~minerals left) but still having some minerals left to be mined.
-	\item High on minerals—if we have too much minerals that means we cannot build enough structures or units, thus we can as well add another base and possibly increasing the amount of gas mined. Activates when the mineral count is above \classificationHighOnMinerals.
-\end{enumerate}
+\begin{itemize}
+  \item \textbf{Not be under attack.} Expanding when we are under attack will most likely kill the expansion
+	  directly
+	\item \textbf{Not already be expanding.} We do not want to spam expansions
+	\item \textbf{Less than \commanderExpansionActiveMax~active expansions.} Good number of
+	  active bases as it keeps a large and steady income to support many unit producing structures.
+	  Active expansions are expansions where at least
+	  \classificationExpansionExpansionMineralsLow~minerals left.
+	\item \textbf{No new expansion shall have been build in \commanderExpansionIntervalMin.} Again we do not
+	  want to spam expansions and this seemed like a reasonable time, but has not been extensively
+	  tested.
+\end{itemize}
+When all four conditions are met it will check if any of the following conditions are met, if they
+are an expansion will be added to the beginning of the build order.
+\begin{itemize}
+	\item \textbf{BATS is attacking.} It is good to expand when attacking (or vice versa) as this
+	  distracts the enemy from the expansion long enough for the expansion to complete\cite{day9}
+	\item \textbf{Expansions are saturated.} This tests if the number of workers per mineral patch is at or
+	  above \classificationExpansionWorkersPerMineralSaturation. Simply put, even if you add more
+	  workers to mine, they will have to wait longer for the mineral patch to be free, thus it will
+	  not increase your income. This rule will allow BATS to expand early in the game when it has
+	  less than \commanderExpansionActiveMax~expansions.
+	\item \textbf{An expansion is running low on minerals.} Making sure we stay on the same number of active
+	  expansions. This is the same as an expansion that is not active (i.e. having less than
+	  \classificationExpansionExpansionMineralsLow~minerals left) but still having some minerals
+	  left to be mined.
+	\item \textbf{High on minerals.} If we have too much minerals that means we cannot build enough structures
+	  or units, thus we can as well add another base and possibly increasing the amount of gas
+	  mined. Activates when the mineral count is above \classificationHighOnMinerals.
+\end{itemize}
 
 \paragraph{Attack}
 To attack from own reactions BATS shall meet all conditions below.
-\begin{enumerate}
-	\item Shall not be under attack—it is better to stay and defend and then possibly attack, although a small counter attack might be effective when the enemy army is small and BATS can spare some units for the attack, this functionality has not been implemented.
-	\item Not have a current attack—having one big army is easier to control and generally much stronger than splitting it into 2 smaller attacks for slower armies\cite{day9} as BATS will use in the experiment. Although ordering a second attack when we have a frontal attack will reinforce units, but we did not have enough time to implement and test when to reinforce the army.
-\end{enumerate}
-When all two conditions are met it will check if any of the following conditions are met, if they are an attack will be created.
-\begin{enumerate}
-	\item Expanding—as explained earlier under the expand, it is good to attack while expanding.
-	\item Upgrade soon done—when an upgrade will finish soon this means that the bot will get stronger and it might be possible that the enemy has either not caught up in upgrades, i.e. the longer we wait the less valuable the upgrade is\cite{day9}. Upgrade soon done checks if any of the free units that could be used for an attack will be affected with an upgrade that is currently upgrading and if the upgrade finishes within \classificationUpgradeSoonDone.
-\end{enumerate}
+\begin{itemize}
+  \item \textbf{Shall not be under attack.} It is better to stay and defend and then possibly
+	attack, although a small counter attack might be effective when the enemy army is small and BATS
+	can spare some units for the attack, this functionality has not been implemented.
+  \item \textbf{Not have a current attack.} aving one big army is easier to control and generally
+	much stronger than splitting it into 2 smaller attacks for slower armies\cite{day9} as BATS will
+	use in the experiment. Although ordering a second attack when we have a frontal attack will
+	reinforce units, but we did not have enough time to implement and test when to reinforce the
+	army.
+\end{itemize}
+When all two conditions are met it will check if any of the following conditions are met, if they
+are an attack will be created.
+\begin{itemize}
+	\item \textbf{Expanding.} As explained earlier under the expand, it is good to attack while
+		expanding.
+	\item \textbf{Upgrade soon done.} When an upgrade will finish soon this means that the bot will
+		get stronger and it might be possible that the enemy has either not caught up in upgrades, i.e.
+		the longer we wait the less valuable the upgrade is\cite{day9}. Upgrade soon done checks if any
+		of the free units that could be used for an attack will be affected with an upgrade that is
+		currently upgrading and if the upgrade finishes within \classificationUpgradeSoonDone.
+\end{itemize}
 
 \paragraph{Scout}
-The scout order conditions are much simpler than expand and attack. BATS will always send out a scout if it is not scouting, not under attack, and has \commanderScoutOnWorkerCount.
+The scout order conditions are much simpler than expand and attack. BATS will always send out a
+scout if it is not scouting, not under attack, and has \commanderScoutOnWorkerCount. The commander
+uses \ref{sec:unit_composition}s for the scout to get the best available scout unit. From lowest
+priority this is:
+\vspace{0.5em}
+\begin{compactenum}
+  \item SCV
+	\item Marine
+	\item Vulture
+	\item Wraith
+\end{compactenum}
+Wraiths are flying units with cloak ability (if researched) this make them an ideal scout as they
+fly over terrain, are quite fast, and can cloak if they get too close to the enemy. Vultures are on
+the other hand the fastest ground unit for Terran. See section \ref{sec:scout_squad} how squads
+work, listing \ref{lst:unit_comp_scout} for the unit composition config file, and
+\ref{sec:unit_composition} for how unit compositions work.
 
 \paragraph{Transition}
-The transition order conditions are just as simple as the scout. It will transition if it is not already in late game, no buildings in the build order, and is high on resources (higher or equal to \classificationHighOnMinerals~minerals and \classificationHighOnGas~gas).
+The transition order conditions are just as simple as the scout. It will transition if it is not
+already in late game, no buildings in the build order, and is high on resources (higher or equal to
+\classificationHighOnMinerals~minerals and \classificationHighOnGas~gas).
 
-\subsubsection{Reacting on allied actions}
-All orders here are grouped by allied actions instead of the commands (as opposed to reacting on own actions), this feels like a more intuitive approach and was implemented this way.
+\subsubsection{Reacting on allied actions} All orders here are grouped by allied actions instead of
+the commands (as opposed to reacting on own actions), this feels like a more intuitive approach and
+was implemented this way.
 
-\paragraph{Allied expands}
-If the allied player expands, BATS first want to create a distracting attack (for now only drops are available) to distract the enemy from the expansion, if no drops are available it will create a frontal attack. But before the commander creates any attack it checks so that we are not under attack or already attacking.
+\paragraph{Allied expands} If the allied player expands, BATS first want to create a distracting
+attack (for now only drops are available) to distract the enemy from the expansion, if no drops are
+available it will create a frontal attack. But before the commander creates any attack it checks so
+that we are not under attack or already attacking.
 
-\paragraph{Allied attacks}
-Depending on what type of attack the allied player has BATS behaves differently, but common for all types of attack, it will not do anything if it is under attack. If the allied attacks with a frontal attack BATS will first try to join it, if it already does not have a frontal attack and has enough units (\classificationFrontalAttackUnitsMin) for a frontal attack, otherwise it will try to drop if it does not have a drop out and has enough units for a drop.
+\paragraph{Allied attacks} Depending on what type of attack the allied player has BATS behaves
+differently, but common for all types of attack, it will not do anything if it is under attack. If
+the allied attacks with a frontal attack BATS will first try to join it, if it already does not have
+a frontal attack and has enough units (\classificationFrontalAttackUnitsMin) for a frontal attack,
+otherwise it will try to drop if it does not have a drop out and has enough units for a drop.
 
-When the allied player has a distracting attack out BATS will too try to create a distracting (drop) attack, but will only succeed if it has enough units.
+When the allied player has a distracting attack out BATS will try to create a distracting (drop)
+attack as well, but will only succeed if it has enough units.

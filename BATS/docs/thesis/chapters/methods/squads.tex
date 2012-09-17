@@ -36,17 +36,30 @@ The squad has four elements that can change the behavior of the squad.
 \end{description}
 
 \subsection{Attack squad}
-\label{sec:attack_squad}
-The attack squad can both function on its own, but is also the base class for all attacks—in the current version only drops derives attack squad. Used alone, it can either do a regular attack or follow a teammate squad—a regular attack or battle in this section is a synonym for an attack or battle where it not follows a teammate squad.
+\label{sec:attack_squad} The attack squad can both function on its own, but is also the base class
+for all attacks—in the current version only drops derives attack squad. Used alone, it can either do
+a regular attack or follow a teammate squad—a regular attack or battle in this section is a synonym
+for an attack or battle where it not follows a teammate squad.
 
-For regular attacks the squad requests an attack from \nameref{sec:attack_coordinator} to get an attack location to move to and regroup when needed. When the squad is close to the attack location (\squadAttackWaitingPositionDistanceFromGoal), i.e. its wait location, it will wait here until all its wait goals are finished, then it will continue moving to its attack goal. This will sync the attack with other attacking squads as they wait until the squad either is in the wait location, under attack, or already attacking.
+For regular attacks the squad requests an attack from \nameref{sec:attack_coordinator} to get an
+attack location to move to and regroup when needed. When the squad is close to the attack location
+(\squadAttackWaitingPositionDistanceFromGoal), i.e. its wait location, it will wait here until all
+its wait goals are finished, then it will continue moving to its attack goal. This will sync the
+attack with other attacking squads as they wait until the squad either is in the wait location,
+under attack, or already attacking.
 
-If it encounters any enemies on the road it will try to kill them, unless they are too strong where the squad will retreat instead; the squad can decide to retreat from any regular battle at any time, depending on the situation. For an attack to succeed with its mission all structures within the radius of \squadAttackStructuresDestroyedGoalDistance from the attack location needs to be destroyed. After succeeding with the mission the squad will retreat back to the base, disband the squad, and merge with the \nameref{sec:patrol_squad}.
+If it encounters any enemies on the road it will try to kill them, unless they are too strong where
+the squad will retreat instead; the squad can decide to retreat from any regular battle at any time,
+depending on the situation. For an attack to succeed with its mission all structures within the
+radius of \squadAttackStructuresDestroyedGoalDistance from the attack location needs to be
+destroyed. After succeeding with the mission the squad will retreat back to the base, disband the
+squad, and merge with the \nameref{sec:patrol_squad}.
 
 \paragraph{Following a teammate squad}
-To follow a teammate squad it can either be set directly when creating the attack squad or later by a call to \texttt{followTeammateSquad(teammateSquad)}, this converts the regular attack to follow the specified squad—attack squads can only convert to following a teammate and not from.
+To follow a teammate squad it can either be set directly when creating the attack squad or later by
+a call to \texttt{followTeammateSquad(teammateSquad)}, this converts the regular attack to follow
+the specified squad—attack squads can only convert to following a teammate and not from.
 
-When the squad follows an teammate squad it behaves differently, depending on the teammate squad's current state, described below in listing \ref{lst:attack_follow_allied}.
 
 \begin{lstlisting}[caption={Squad actions depending on the teammate squad's state},label={lst:attack_follow_allied}]
 switch (mTeammateSquad->getState()) {
@@ -90,7 +103,20 @@ switch (mTeammateSquad->getState()) {
 		break;
 }
 \end{lstlisting}
-While most of the code speaks for itself, some functions need extra clarification. \texttt{handleTeammateRegrouping()} checks if the distance to the teammate squad becomes to large (\squadAttackAlliedRegroupBegin), it both sets the regrouping location to the teammate's center location and the squad to avoid enemy units—the regrouping is considered done when the distance between the squads are less or equal to \squadAttackAlliedRegroupEnd~away. \texttt{setGoalPosition(mTeammateSquad->getTargetPosition())} sets the squad to move to the location where most of the teammate squad's units are moving to; thus it will meet up with the teammate's squad around that location. If handleTeammateRegrouping() was used it would try to chase after the squads current location—much like in football (soccer) you shall run where the ball is heading and not where its current location. This also allows the teammate to control where the bot shall attack as it will attack where the player decides to attack.
+When the squad follows an teammate squad it behaves differently, depending on the teammate squad's
+current state, described below in listing \ref{lst:attack_follow_allied}.
+
+While most of the code speaks for itself, some functions need extra clarification.
+\texttt{handleTeammateRegrouping()} checks if the distance to the teammate squad becomes to large
+(\squadAttackAlliedRegroupBegin), it both sets the regrouping location to the teammate's center
+location and the squad to avoid enemy units—the regrouping is considered done when the distance
+between the squads are less or equal to \squadAttackAlliedRegroupEnd~away.
+\texttt{setGoalPosition(mTeammateSquad->getTargetPosition())} sets the squad to move to the location
+where most of the teammate squad's units are moving to; thus it will meet up with the teammate's
+squad around that location. If handleTeammateRegrouping() was used it would try to chase after the
+squads current location—much like in football (soccer) you shall run where the ball is heading and
+not where its current location. This also allows the teammate to control where the bot shall attack
+as it will attack where the player decides to attack.
 
 \texttt{mpsAttackCoordinator->requestAttack(this)} uses \nameref{sec:attack_coordinator} to find a place to attack; as mentioned in section \ref{sec:attack_coordinator} it will find an attack location close to the teammate squad's target. Why not use the target as with MovingToAttack and have the AttackSquad create the attack location? Because
 \begin{inparaenum}[1\upshape)]
@@ -103,7 +129,16 @@ In addition the squad need to cope with when the teammate squad splits or merges
 
 \subsection{Drop squad}
 \label{sec:drop_squad}
+A drop squad is an attack containing a flying transportations along with some offensive units it
+carries. The goal of the drop is to attack the enemy base from an undefended angle (as flying units
+can fly over all terrain). In ideal situations the drop will unload its units and destroy either
+significant bases or workers, but the goal is rather to distract the enemy for various reasons—e.g.
+expanding and we do not want the enemy to attack, or the dropping player will attack from another
+location simultaneously.
+
 The drop squad uses attack squad as its base class. Listing \ref{lst:drop_squad} shows the behavior of the squad.
+
+\clearpage
 \begin{lstlisting}[caption={Drop squad behavior},label={lst:drop_squad}]
 switch(mState) {
 case LoadUnits:
@@ -151,10 +186,12 @@ While the code explains it self, setState() does not, as it changes the behavior
 
 The drop squad uses the same method as attack squad to check if its goal has completed, although it rarely does. Because the goal of the drop is not to destroy all buildings, merely to distract the enemy, it also has a timeout function which will make the drop retreat after \squadDropAttackTimeout, but only if it's not currently in the target region.
 
-Now you know how it works, but which units will be used for the drop, as drops should not just use random units and hope for the best? It uses \nameref{sec:unit_composition}s for this—section \ref{sec:unit_composition} describes the unit composition and the drop's unit compositions can be found in listing \ref{lst:unit_comp_drop}. 
+Now you know how it works, but which units will be used for the drop, as drops should not just use
+random units and hope for the best? It uses \nameref{sec:unit_composition}s for this—section
+\ref{sec:unit_composition} describes the unit composition and the drop's unit compositions, i.e. all
+available squads, can be found in listing \ref{lst:unit_comp_drop}. 
 
-%: Write which drops are available in the current version of BATS
-\marginpar{Write which drops are available in BATS}
+
 
 \paragraph{Drop squad movement}
 The target location to drop is, as mentioned, required by the attack coordinator, but the transport does not move in a direct path to the location (once the units are loaded), instead it will move along the edge of the map illustrated in figure \ref{fig:drop_squad_movement}.

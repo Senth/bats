@@ -2,18 +2,44 @@
 % !TEX spellcheck = en_US
 \section{Attack coordinator}
 \label{sec:attack_coordinator}
-Frontal attacks attack the enemy head on and usually use the majority of the player’s army, distracting attacks are small attacks either used to distract the enemy from one position where another attack will come (hence the name), or they can be used to try to deal some damage to the enemy, with heavy emphasis on try. These distracting attacks can be drops, harassment, counter-attacks\footnote{A drop when we are under attack can be called counter-attack, but our meaning of counter-attack is a frontal attack, but smaller}—BATS has, in time of this writing, only implemented the drop functionality. The distracting attacks are not suicide attacks, although exceptions exist; they are mostly distractions to pin the enemy at his base.
+Frontal attacks attack the enemy head on and usually use the majority of the player’s army,
+distracting attacks are small attacks either used to distract the enemy from one position where
+another attack will come (hence the name), or they can be used to try to deal some damage to the
+enemy, with heavy emphasis on try. These distracting attacks can be drops, harassment,
+counter-attacks\footnote{A drop when we are under attack can be called counter-attack, but our
+meaning of counter-attack is a frontal attack, but smaller}—BATS has, in time of this writing, only
+implemented the drop functionality. The distracting attacks are not suicide attacks, although
+exceptions exist; they are mostly distractions to pin the enemy at his base.
 
-\paragraph{Where to attack?}
-The attack coordinator uses two to three weights multiplied together to get the near optimal attack location—the attack location is not optimal and that the weights have not been extensively balanced, but the algorithm works good enough for these experiments. The attacking locations are derived from seen enemy structures and expansions that have not been scouted for \attackCoordinatorExpansionNotCheckedTime.
+\paragraph{Where to attack?} The attack coordinator uses two to three weights multiplied together to
+get the near optimal attack location—the attack location is not optimal and that the weights have
+not been extensively balanced, but the algorithm works good enough for these experiments. The
+attacking locations are derived from seen enemy structures and expansions that have not been scouted
+for \attackCoordinatorExpansionNotCheckedTime.
 
-The first weight, \emph{distance}, prioritizes structures (and location) far away from other existing attacks, not including allied attacks yet; as it is a good idea to spread out multiple attack to split up the enemy army—i.e. we are not implying that multiple armies are better than a big, only that when using multiple armies it is good for the armies to spread out. The second weight, \emph{type}, determines how important a structure or location is to attack, and the third weight, \emph{defended}, is how well defended an area is—the defended weight is not implemented yet, but distracting attacks will use it to get a location that can be attacked without taking the risk to die (such as drops dying to anti-air).
+The first weight, \emph{distance}, prioritizes structures (and location) far away from other
+existing attacks, not including allied attacks yet; as it is a good idea to spread out multiple
+attack to split up the enemy army—i.e. we are not implying that multiple armies are better than a
+big, only that when using multiple armies it is good for the armies to spread out. The second
+weight, \emph{type}, determines how important a structure or location is to attack, and the third
+weight, \emph{defended}, is how well defended an area is—the defended weight is not implemented yet,
+but distracting attacks will use it to get a location that can be attacked without taking the risk
+to die (such as drops dying to anti-air).
 
-In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will get an attack position near the allied squads target instead of using the weights. The attack position is still the same positions used for the regular algorithm.
+In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will
+get an attack position near the allied squads target instead of using the weights. The attack
+position is still the same positions used for the regular algorithm.
 
-Enemy armies are not included in the calculation, because one rarely gain anything on trading armies, one should find gaps in the defense instead\cite{day9}. It is still good engage a weaker enemy army and BATS will do that if the squad is close by, but it will not search for those small armies. In addition, because armies are mobile it would be hard to track them, i.e. time consuming to implement such a feature.
+Enemy armies are not included in the calculation, because one rarely gain anything on trading
+armies, one should find gaps in the defense instead\cite{day9}. It is still good engage a weaker
+enemy army and BATS will do that if the squad is close by, but it will not search for those small
+armies. In addition, because armies are mobile it would be hard to track them, i.e. time consuming
+to implement such a feature.
 
-The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an attack squad requesting an attack from attack coordinator. It can either get an weighted attack location or join the teammate's frontal attack, if s/he has one.
+The flowchart in figure \ref{fig:AttackCoordinator::requestAttack()} shows an attack squad
+requesting an attack from attack coordinator. It can either get an weighted attack location or join
+the teammate's frontal attack, if s/he has one. Attack coordinator uses a rule based system to
+decide the how and where the squad shall attack.
 \begin{figure}[htb]
 \centering
 	\begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=3.8cm]
@@ -98,7 +124,8 @@ As an improvement BATS could keep track of which upgrades it has seen and then e
 All structures that can produce units. These are not ordered in any specific order, not to say that it does not matter because it does, but it will always vary depending on the situation. If the enemy has 10 barracks and 1 Starport, it is probably best to destroy the Starport, whereas if the enemy has 1 barrack and 4 Starports it might be best to destroy the barracks.
 
 \paragraph{Other structures \attackCoordinatorWeightsOtherStructure}
-All other structures that have not been covered, such as Terran Academy.
+All other structures that have not been covered, this includes research structures, but defensive
+structures, such as bunkers and turrets.
 
 \subsubsection{Why this order?}
 Because StarCraft is mostly about managing expansions\cite{day9}, BATS tries to deny and kill fresh expansions as its first priority (the top two priorities). Targeting addons can both stop the production of an important upgrade (siege mode for tanks) and the ability to create tanks, ghosts, etc. Delaying late game units is usually good as they are generally better than early game units. Supply depots are almost always good to destroy since it halts all unit production, unless the enemy has stacked up lots of supplies—which almost always is a bad strategy—or lost many units in a recent battle. Stopping an upgrade is probably better than killing a unit producing structure, because if the upgrade finishes all existing units will get the upgrade, while if we kill a unit producing structure only 2–4 units will get stopped, but it depends on the type of unit producing structure, what upgrade structure etc; but this priority will do for now.

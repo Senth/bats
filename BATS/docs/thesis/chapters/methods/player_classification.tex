@@ -1,23 +1,42 @@
 % !TEX root = ../../main.tex
 % !TEX spellcheck = en_US
 \section{Player classification}
-The player classification is split into two separate modules. One handles the grouping of teammate and enemy virtual squads. They are virtual as these are BATS estimations that they belong to the same squad. The other module groups common classifying tests for both teammate and BATS. 
+The player classification is split into two separate modules. One handles the grouping of teammate
+and enemy virtual squads. They are virtual as these are BATS estimations that they belong to the
+same squad. The other module groups common classifying tests for both teammate and BATS. 
 
 \subsection{Player squads}
-The \texttt{PlayerArmyManager} creates and holds all the virtual squads, both teammate and enemy squads. Teammate and enemy squads derive from the PlayerSquad class which keeps a record of its own center position and supply count for the last \classificationMeasureTimeTotal; this enables more complex calculations, such as the direction of the squad and if it's increasing/decreasing in size. These are tho most important PlayerSquad function:
+The \texttt{PlayerArmyManager} creates and holds all the virtual squads, both teammate and enemy
+squads. Teammate and enemy squads derive from the PlayerSquad class which keeps a record of its own
+center position and supply count for the last \classificationMeasureTimeTotal; this enables more
+complex calculations, such as the direction of the squad and if it's increasing/decreasing in size.
+These are the most important PlayerSquad function:
 \begin{function_description}
 	\item[\texttt{TilePosition getCenter()}] Current center position of the squad.
-	\item[\texttt{int getDeltaSupplyCount()}] How many supplies have increased or decreased during the last \classificationMeasureTimeTotal.
-	\item[\texttt{TilePosition getDirection()}] Non-normalized direction between the center of the squad during the last \classificationMeasureTimeTotal.
+	\item[\texttt{int getDeltaSupplyCount()}] How many supplies have increased or decreased during the
+		last \classificationMeasureTimeTotal.
+	\item[\texttt{TilePosition getDirection()}] Non-normalized direction between the center of the
+		squad during the last \classificationMeasureTimeTotal.
 	\item[\texttt{int getSupplyCount()}] Current supply count.
-	\item[\texttt{TilePosition getTargetPosition()}] Calculates where the majority of the units has as a target position. Useful when wanting to know where the player is heading.
+	\item[\texttt{TilePosition getTargetPosition()}] Calculates where the majority of the units has as
+		a target position. Useful when wanting to know where the player is heading.
 	\item[\texttt{int getUnitCount()}] Number of units in the squad.	
 \end{function_description}
 
 \paragraph{Grouping algorithm}
-Simply put, player army manager starts creating a virtual squad for a teammate player and then searches for close units within the include distance (\classificationSquadIncludeDistance) to include in the squad. The next update it will start with a unit already in a squad and again try to include new units, but it will also remove units from the squad that are further away than the exclude distance (\classificationSquadExcludeDistance). Enemy squads are created the same way as teammate squads.
+Simply put, player army manager starts creating a virtual squad for a teammate player and then
+searches for close units within the include distance (\classificationSquadIncludeDistance) to
+include in the squad. The next update it will start with a unit already in a squad and again try to
+include new units, but it will also remove units from the squad that are further away than the
+exclude distance (\classificationSquadExcludeDistance). Enemy squads are created the same way as
+teammate squads.
 
-Testing the distance between so many units were too computational heavy, even when using the squared distance version with no square roots. Instead units are inserted in a grid with a width of half the exclude distance. Using half the exclude distance decreased the number of distance computations further. Figure \ref{fig:player_squad_group_grid} shown an example of the grid with outlined include and exclude distances. To further increase the computation speed, instead of computing which grid the unit shall be placed in a lookup table is used instead.
+Testing the distance between so many units were too computational heavy, even when using the squared
+distance version with no square roots. Instead units are inserted in a grid with a width of half the
+exclude distance. Using half the exclude distance decreased the number of distance computations
+further. Figure \ref{fig:player_squad_group_grid} shown an example of the grid with outlined include
+and exclude distances. To further increase the computation speed, instead of computing which grid
+the unit shall be placed in a lookup table is used instead.
 
 \begin{figure}[htb]
 \centering
@@ -54,16 +73,12 @@ Testing the distance between so many units were too computational heavy, even wh
 \label{fig:player_squad_group_grid}
 \end{figure}
 
-Only units within two grid units are used when calculating the distance, this generates a 5x5 grid just as figure \ref{fig:player_squad_group_grid}. As can be seen in the figure units further away than two grid units can never be within the exclude distance. Units in the same grid or to the left, top, right, or bottom are almost always within the exclude distance, an exception can be seen in the figure where small portion of the upper left corner at (2,3) is outside the solid exclude circle; for simplicity all units within these grid positions are seen as within the exclude distance (even though exceptions might exist).
-
-To make use of these calculation benefits, units in a squad are checked first (if they are further away than the exclude distance). A simplified pseudo-code example is shown in listing \ref{lst:player_squad_rearrange_squads} where high-level calculations are made and in listing \ref{lst:player_squad_add_close_units_to_squad} where calculations of close units to add to the squad—note that units are not excluded form the squad here, they are not excluded until they are added in another squad which happens at the end of \texttt{rearrangeSquads()}.
-
 \begin{lstlisting}[label={lst:player_squad_rearrange_squads},caption={Pseudo-code of \texttt{rearrangeSquads()}}]
 // Iterate through all squads, one unit each turn
 do {
 	foundUnit = false;
 	while (moreUnitsToCheck() && !foundUnit) {
-		if (unitSquad->isValid() && !squadChecked(unitSquad) {
+		if (unitSquad.isValid() && !squadChecked(unitSquad) {
 			currentUnit = unit;
 			foundUnit = true;
 		}
@@ -73,7 +88,7 @@ do {
 		setUnitAsChecked(currentUnit);
 		setSquadAsChecked(unitSquad);
 		
-		addCloseUnitsToSquad(currentUnit, unitSquad->getId());
+		addCloseUnitsToSquad(currentUnit, unitSquad.getId());
 	}
 } while (foundUnit);
 
@@ -83,9 +98,26 @@ while (moreUnitsToCheck()) {
 	setUnitAsChecked(unit);
 	newSquad = new PlayerSquad();
 	setSquadAsChecked(newSquad);
-	addCloseUnitsToSquad(unit, newSquad->getId());
+	addCloseUnitsToSquad(unit, newSquad.getId());
 }
 \end{lstlisting}
+
+Only units within two grid units are used when calculating the distance, this generates a 5x5 grid
+just as figure \ref{fig:player_squad_group_grid}. As can be seen in the figure units further away
+than two grid units can never be within the exclude distance. Units in the same grid or to the left,
+top, right, or bottom are almost always within the exclude distance, an exception can be seen in the
+figure where small portion of the upper left corner at (2,3) is outside the solid exclude circle;
+for simplicity all units within these grid positions are seen as within the exclude distance (even
+though exceptions might exist).
+
+To make use of these calculation benefits, units in a squad are checked first (if they are further
+away than the exclude distance). A simplified pseudo-code example is shown in listing
+\ref{lst:player_squad_rearrange_squads} where high-level calculations are made and in listing
+\ref{lst:player_squad_add_close_units_to_squad} where calculations of close units to add to the
+squad—note that units are not excluded form the squad here, they are not excluded until they are
+added in another squad which happens at the end of \texttt{rearrangeSquads()}.
+
+\clearpage
 
 \begin{lstlisting}[label={lst:player_squad_add_close_units_to_squad},caption={Pseudo-code of \texttt{addCloseUnitsToSquad()}}]
 // Add all units that are in the same square or the
@@ -131,12 +163,25 @@ foreach (other square) {
 
 
 \subsection{Grouped classifying tests}
-A common class uses the facade pattern to group both easy and complicated tests into one class to minimize the coupling between classes, reuse code, and have to have the code in one place if a tests was to change (instead of changing it in several places)—e.g. a simple test like \texttt{canFrontalAttack(units)} which returns true if the unit size is larger or equal to the minimum number of units BATS needs for a frontal attack, \texttt{\justify return units.size() >= FRONTAL\_ATTACK\_UNITS\_MIN;}. None of the classifying classes modifies any data, thus all functions are const.
-
-All three classes (although an enemy classification was not implemented) were supposed to have a common interface to make it easier to use all three classes without having to learn three different interfaces. Due to lack of time and not being the most important aspect this feature was skipped in this version.
+A common class uses the facade pattern to group both easy and complicated tests into one class to
+minimize the coupling between classes, reuse code, and have to have the code in one place if a tests
+was to change (instead of changing it in several places)—e.g. a simple test like
+\texttt{canFrontalAttack(units)} which returns true if the unit size is larger or equal to the
+minimum number of units BATS needs for a frontal attack:
+% \vspace{-1.5em}
+{\center{\texttt{\justify return units.size() >= FRONTAL\_ATTACK\_UNITS\_MIN;}}\\}
+\vspace{0.5em}
+None of the classifying classes modifies any data, thus all functions
+are const and all three classes (although an enemy classification was not implemented) were supposed to have a
+common interface to make it easier to use all three classes without having to learn three different
+interfaces. Due to lack of time and not being the most important aspect this feature was skipped in
+this version.
 
 \paragraph{Self classification}
-This classifier groups together common tests for BATS and might not be seen as a classifier. \nameref{sec:commander} and \nameref{sec:defense_manager} uses the self classifier to easier calculate their goals and decrease their coupling. Below all important functions are listed and described, although most of the names should be self-explanatory.
+This classifier groups together common tests for BATS and might not be seen as a classifier.
+\nameref{sec:commander} and \nameref{sec:defense_manager} uses the self classifier to easier
+calculate their goals and decrease their coupling. Below all important functions are listed and
+described, although most of the names should be self-explanatory.
 
 \begin{function_description}
 	\item[\texttt{bool areExpansionsSaturated()}] Tests if there exists enough workers to saturate all mineral patches.
