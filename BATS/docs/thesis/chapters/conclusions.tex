@@ -3,8 +3,8 @@
 \chapter{Conclusions and future work}
 First we go through our conclusions on the bot, what the players thought, liked and disliked about
 the bot and scenarios. Then we go through some lessons we have learned during the project we thought
-was worth mentioning, and last future work for researchers focusing on three different areas,
-teammate bot behavior, communication and control.
+was worth mentioning, and last future work for researchers where we focus on three different areas:
+teammate bot behavior, communication, and control.
 
 \section{Bot conclusions}
 We conclude that a teammate bot for RTS games that communicates its intentions and reasons is indeed
@@ -17,7 +17,7 @@ where more experienced players liked the ability to control the bot whereas begi
 overwhelmed by all the existing game action and thus did not want to focus on yet another task:
 controlling the bot. This is an interesting question on how to balance the control so that
 beginners aren't overwhelmed but at the same time meets the needs of a more skillful player. We talk
-more about this in Future work \ref{sec:future_control}.\\
+more about this below in section \ref{sec:future_control}.\\
 
 
 The most liked feature was the ability for the bot to communicate its intentions and reasons to the
@@ -31,14 +31,15 @@ see section \ref{sec:teammate_bots}. When the player either ordered BATS to atta
 him/her, BATS almost always ended up blocking the path for the player close to the attack location,
 not prioritizing the player experience as it should let the player through.
 Disrespecting this ``rule'' probably made ``The army halted in choke points and made it impossible
-for me to come through'' top the disliked features list.
+for me to come through'' the most disliked feature.
 
 \section{Project conclusions}
 \paragraph{Magnusson's notes}
 Being a perfectionist is not easy, this was one of the causes why we did not meet our first
 deadline. I implemented features that were never used but what I thought were nice to have, such as
-the Wait Goals, advanced drop mechanics, while we remove Wait goals and drops entirely and it would
-not affect the test results.  In addition to this I changed existing systems much more than
+the Wait Goals, advanced drop mechanics. If we remove Wait goals and drops entirely it would
+probably not affect the test results as Wait goals were never used and drops were barely used.
+In addition to this I changed existing systems much more than
 needed—instead of using the existing squad manager with squads I create a new squad manager, this
 was because the functionality differed quite much what we wanted to have in BATS, but maybe not
 needed. We would have saved some weeks on this task alone.
@@ -66,16 +67,16 @@ slightly changed to match another game genre.
 BATS behaves in ways that we thought would be good, both through own experience, research, and
 testing; but it still lacks a solid behavior to be used in a commercial game as its behavior does
 not change depending on the play style of the human player. More research needs to be done on what
-players want a teammate bot to do and how much initiative the bot shall have, if the bot has control
-the degree of initiative can depend on how much the player want to control the bot, i.e. the more
-control the player wants the less initiative the bot shall have, or does the players, independent of
-skill and play style, always want the same initiative?
+players want a teammate bot to do and how much initiative the bot shall have. If the bot can be
+controlled the degree of initiative can depend on how much the player want to control the bot, i.e.
+the more control the player wants the less initiative the bot shall have, or does the players,
+independent of skill and play style, always want the same initiative?
 
 A possibility for teammate bots can be either a full-time or temporarily replacement for a human
 player in online matches—temporarily when the player disconnects. But how shall the bot behave when
 it is used as a replacement for the entire game? It needs to be balanced so it either matches the
 human players' skills in its own team or by setting a predefined skill to either increase or
-decrease the entire team's total skill.  When it acts as a temporarily replacement the players might
+decrease the entire team's total skill. When it acts as a temporarily replacement the players might
 want it to continue using the same strategy as the player and not do any hasty actions that could
 make the player loose, the bot could use some learning algorithm that always is on when the player
 plays matches and then send out this information to the other clients if the player gets
@@ -101,9 +102,8 @@ messages.
 We concluded that not all commands were used and players preferred control depending on their skill.
 One could research which type of commands are preferred and how often they are issued. This could
 then serve as another research where more control functionality is either displayed for a player
-depending on his/her skill level, this could for example be used in campaigns where players get
-introduced to new functionality in the teammate continuously during the campaign, just as s/he is
-with new units.
+depending on his/her skill level, for example in campaigns the game introduces new units for each
+mission and could in a similar way introduce more commands throughout the entire campaign.
 
 Another experiment could be made how much level of detail the player wants over the commands. E.g.
 shall attack make the bot attack at some place (as it does now), shall the player have the ability
@@ -115,9 +115,9 @@ one bot. This leads to yet another research for a new genre.
 
 Research a new type of RTS genre where the player simply tell the bot what to do, i.e. the player
 control the bot entirely but has setup some rules what it should build and how it behaves. This
-would be more like a strategy/tactic game where the player neither need good macro or micro, but
+would be more like a strategy/tactic game where the player neither needs good macro nor good micro, but
 good strategy and tactics.
 
-As mentioned further research needs to be done when using the teammate bot as a replacement for
-human players in online matches. In regard to control it might be difficult to select who shall
-control the bot, or if everyone can control it?
+Mentioned in behavior, the possibility exists for acting as a player replacement in a team with more
+than 2 players. In regard to control, who shall control the bot, or can anyone in the team control
+the bot? Anytime?

@@ -327,7 +327,7 @@ marines are used for bunker, this strategy does not work with the current versio
 cannot bind a Hold squad to a specific location where there for example is a bunker. Marines and
 medics generally make a good composition, but these number are too low to hold of almost any attack,
 but they can still delay the attack until reinforcements can arrive, these are however not used in
-the experiment as none of the build orders build medics. Tanks are very good positional holders and
+the experiment as none of the build orders contain medics. Tanks are very good positional holders and
 can hold of almost anything coming through choke points\cite{day9}.
 
 \subsection{Scout squad}
@@ -336,7 +336,7 @@ Scouts regions and expansions that have not been scouted for a long time, to be 
 move to the region or expansion that our team visited the longest time ago. The
 \nameref{sec:exploration_manager} handles this and thus the Scout squad gets it target location from
 it. To avoid multiple scouts moving to the same location the scout location will set its last visit
-time when the squad gets the location, although it hasn't been visited at all.
+time when the squad gets the location, although it has not been visited at all.
 
 When an enemy is seen close to the scout it will abandon its current scout location and find another
 one, the idea is to save the scout from being killed by the enemy. This, however, does not work
@@ -389,5 +389,5 @@ existing Wait goals to a new Attack squad.
 For now there is only one type of Wait goal, WaitReadySquad. \nameref{sec:attack_squad}s uses these,
 as described in section \ref{sec:attack_squad}, to synchronize all its attacks—i.e. to attack the
 enemy simultaneously from different locations. The Wait goal will complete when the Attack squad is
-in position, \squadAttackWaitingPositionDistanceFromGoal from the attack location, when the squad is
+in position, \squadAttackWaitingPositionDistanceFromGoal~from the attack location, when the squad is
 under attack or attacks, or if the Wait goal times out (\attackCoordinatorWaitGoalTimeout).
