@@ -2,18 +2,33 @@
 % !TEX spellcheck = en_US
 \section{Commander}
 \label{sec:Commander}
-The Commander creates all orders for BATS, except defenses as the \nameref{sec:defense_manager} does that. This means that it orders attacks, drops, expansions, scouts, and when to transition to the next phase.
+The Commander creates all orders for BATS, except defenses as the \nameref{sec:defense_manager} does
+that. This means that it orders attacks, drops, expansions, scouts, and when to transition to the
+next phase.
 
 \subsection{Orders/Commands}
-Below all orders are described and how they work depending on the current state of BATS. In addition some orders can have a slightly different behavior depending if it was BATS or the teammate who ordered it. Because of all tests and different behaviors in the command these are described with mostly pseudo-code. Common for all order functions are the two parameters: \texttt{teammateOrdered} and \texttt{reason}; teammateOrdered is set to true if the teammate ordered the command, reason is the reason to print out if the command is successful, this is only used when BATS ordered the command—e.g. attack because BATS expands. In additions all commands write out the intention (and possibly reason) of the command, this is done through IntentionWriter \texttt{intentionWriter}; how IntentionWriter works is described in section \ref{sec:communication}
+Below are all orders that both BATS can decide to use (described further down) and the teammate can
+order through his commands. The commands almost behave exactly the same independent on who ordered
+the command except that if a command fails it will only print out an output if the teammate ordered the
+command—some other exceptions exist.
+
+The orders work differently depending on the current state of BATS. Because of all tests and
+different behaviors in the commands, these are easily described in pseudo-code. Common for all
+functions are the two parameters: \texttt{teammateOrdered}
+and \texttt{reason}; teammateOrdered is set to true if the teammate ordered the command, reason is
+the reason to print out if the command is successful, the reason parameter is only used when BATS ordered the
+command—e.g. attack because BATS expands. The messages are sent with the help of
+\texttt{IntentionWriter}; how IntentionWriter works is described in section \ref{sec:communication}.
 
 \paragraph{Attack}
-Has in general three behaviors: Creates a new frontal attack, reinforces the existing frontal attack, or does nothing. Listing \ref{lst:order_attack} displays the pseudo-code for the attack command.
+Has in general three behaviors: Creates a new frontal attack, reinforces the existing frontal
+attack, or does nothing. Listing \ref{lst:order_attack} displays the pseudo-code for the attack
+command.
 \begin{lstlisting}[label={lst:order_attack},caption={Pseudo-code for the attack command}]
 // Never do a frontal attack when under attack
 if (isUnderAttack()) {
 	if (teammateOrdered) {
-		intentionWriter.write(BotAttackNot, BotIsUnderAttack);
+		IntentionWriter.write(BotAttackNot, BotIsUnderAttack);
 	}
 	return;
 }
@@ -31,21 +46,25 @@ if (canAttack) {
 	// Add free units to the old Attack squad if it exists
 	if (oldSquad != NULL) {
 		oldSquad.addUnts(freeUnits);
-		intentionWriter.write(BotAttackMerged, reason);
+		IntentionWriter.write(BotAttackMerged, reason);
 	}
 	// Create new attack and ping position
 	else {
 		attackSquad = new AttackSquad(freeUnits);
 		attackPos = attackSquad.getAttackPosition();
-		intentionWriter.write(BotAttack, reason, attackPos);
+		IntentionWriter.write(BotAttack, reason, attackPos);
 	}
 } else {
-	intentionWriter.write(BotAttackNot, BotNotEnoughUnits);
+	IntentionWriter.write(BotAttackNot, BotNotEnoughUnits);
 }
 \end{lstlisting}
 
 \paragraph{Follow}
-Follow almost behaves as the attack command, but instead of creating a regular Attack squad, it will instead follow the largest teammate player’s squad. In addition to the attack’s three behaviors—create new frontal attack (that follows teammate), reinforce the frontal attack, or does nothing—it has one additional behavior: If BATS already has a frontal attack, that is not following a teammate, it will abandon its goal and instead follow the teammate.
+Follow almost behaves as the attack command, but instead of creating a regular Attack squad, it will
+instead follow the largest teammate player’s squad. In addition to the attack’s three
+behaviors—create new frontal attack (that follows teammate), reinforce the frontal attack, or does
+nothing—it has one additional behavior: If BATS already has a frontal attack, that is not following
+a teammate, it will abandon its goal and instead follow the teammate.
 
 \paragraph{Drop}
 Drop will try to create a drop from any of the unit compositions that are available.
@@ -58,21 +77,26 @@ if (!availableCompositions.empty()) {
 	chosenComposition = availableCompositions[randomId];
 
 	drop = new DropSquad(freeUnits, chosenComposition);
-	intentionWriter.write(BotDrop, reason, drop.getDropPosition());
+	IntentionWriter.write(BotDrop, reason, drop.getDropPosition());
 }
 // No drops available
 else {
 	if (teammateOrdered) {
-		intentionWriter.write(BotDropNot, BotNotEnoughUnits);
+		IntentionWriter.write(BotDropNot, BotNotEnoughUnits);
 	}
 }
 \end{lstlisting}
 
 \paragraph{Scout}
-As with drop, scout uses available unit composition; it does however not choose a random composition but uses the composition with highest priority—i.e. the first composition, as UnitCompositionFactory’s getUnitCompositionByType() returns composition sorted by priority, where the highest priority is first.
+As with drop, scout uses available unit composition; it does however not choose a random composition
+but uses the composition with highest priority—i.e. the first composition, as
+UnitCompositionFactory’s getUnitCompositionByType() returns composition sorted by priority, where
+the highest priority is first.
 
 \paragraph{Expand}
-Expand will first check if there are any expansions available, i.e. not already taken; if there are expansions available it will append a command center (or equivalent for other races) to the Build planner, which in turn will build an expansions when it has resources for it.
+Expand will first check if there are any expansions available, i.e. not already taken; if there are
+expansions available it will append a command center (or equivalent for other races) to the Build
+planner, which in turn will build an expansions when it has resources for it.
 
 \paragraph{Transition}
 Transition transitions to the next phase in the game—there are three phases: early, mid, and late
@@ -80,7 +104,10 @@ game. How the Commander handles the transition command can be seen in listing
 \ref{lst:order_transition}.
 
 \subsection{Order creation rules}
-The Commander can create orders either from its own actions and states, or what the teammate player is doing. Examples of this is it might attack when it is expanding, and it might expand if it has high amount of minerals, for reaction to teammate actions it attack if the teammate player is expanding.
+The Commander can create orders either from its own actions and states, or what the teammate player
+is doing. Examples of this is it might attack when it is expanding, and it might expand if it has
+high amount of minerals, for reaction to teammate actions it attack if the teammate player is
+expanding.
 \clearpage
 \begin{lstlisting}[label={lst:order_transition},caption={Pseudo-code for transition command}]
 // Only transition if not in late game already
@@ -94,12 +121,13 @@ if (mBuildPlanner.canTransition()) {
 	mBuildPlanner.switchToNextPhase();
 } else {
 	if (teammateOrdered) {
-		intentionWriter.write(BotTransitionNot, BotTransitionNoMore);
+		IntentionWriter.write(BotTransitionNot, BotTransitionNoMore);
 	}
 }
 \end{lstlisting}
 
 \subsubsection{Reacting on own actions and states}
+\label{sec:react_own}
 These are the reactions (commands) to BATS's own state.
 
 \paragraph{Expand}
