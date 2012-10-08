@@ -1,20 +1,49 @@
 % !TEX root = ../main.tex
 % !TEX spellcheck = en_US
 \chapter{Introduction}
-Have you ever wanted the bot\footnote{A bot is a computer player that you either can play with or against} you played with in an RTS to communicate or control it to test that strategy that you want to play with your friend when s/he is not available? Then you can continue reading as this thesis is about that, a communicating bot that tells its intentions and why to you, the player, and allows you to control the bot using simple commands like, attack, expand, drop.
+Have you ever wanted the bot\footnote{A bot is a computer player that you either can play with or
+against} you played with in an RTS to communicate or control it to test that strategy that you want
+to play with your friend when s/he is not available? Then you can continue reading as this thesis is
+about that, a communicating bot that tells its intentions and reasons to you, the player, and allows
+you to control the bot using simple commands like, attack, expand, drop.
 
-Although there exist a new (released less than 5 years ago) few Real-Time Strategy (RTS) games, none of these lets you control your bot in a simple way and at the same time communicates its intentions and reasons to you, at least not to our knowledge. This includes research, where we have yet to find a single subject on communication between human player and bot.
+Although there exist a few new (released less than 5 years ago) Real-Time Strategy (RTS) games, none
+of these lets you control your bot in a simple way and at the same time communicates its intentions
+and reasons to you, at least not to our knowledge. This includes research, where we have yet to find
+a single subject on communication between human player and bot.
 
-Our focus lies in evaluating if it is worthwhile to do further research in this unexplored area, both for the purpose of researchers and for game developers to help them decide if they shall invest money in a collaborative teammate bot for RTS games.
+Our focus lies in evaluating if it is worthwhile to do further research in this unexplored area,
+both for the purpose of researchers and for companies to help them decide if they shall invest
+money in a collaborative teammate bot for RTS games.
 
-To familiarize you with RTS games, StarCraft, and collaborative game bots a brief description on all subjects is given below. Once you have basic knowledge of the subjects we will give a thorough background what others have done in closely related subjects. Then a detailed description of the methods we used; this includes implementation on the bot, why it was implement this way, and how it was evaluated. Next the results of our experiments and our conclusions are presented; and finally we present new subjects for future work.
+To familiarize you with RTS games, StarCraft, and collaborative game bots a brief description on all
+subjects is given below. Once you have basic knowledge of the subjects we will give a thorough
+background what others have done in closely related subjects. Then a detailed system description,
+why it was implement this way, and how it was evaluated (methods). Next the results of our
+experiments and our conclusions are presented; and finally we present new subjects for future work.
 
 \section{RTS}
-An RTS game is a computer game that heavily relies on strategy and fast execution. An analogy would be to play chess where both you and your opponent can move pieces at the same time, you will only see your own pieces and a tile beside them—meaning you do not know the location of the opponent’s pieces or when s/he makes a move—on top of that you have to think of a strategy fast before your opponent gets a lead.
+An RTS game is a computer game that heavily relies on strategy and fast execution. An analogy would
+be to play chess where both you and your opponent can move pieces at the same time, you will only
+see your own pieces and a tile beside them—meaning you do not know the location of the opponent’s
+pieces or when s/he makes a move—on top of that you have to think of a strategy fast before your
+opponent gets a lead.
 
-In reality, RTS games resembles more a battle field than a game of chess—you control the army (both units and structures) and what to spend the resources on. At the start of the game you have a single base and your goal is to build up the technology to create powerful units by collecting resources. Often you cannot go straight for the best technology as it takes time and resources to build up all necessary technology and if you only focus on technology you will not have any units for defense if the enemy comes.
+In reality, RTS games resembles more a battle field than a game of chess—you control the army (both
+units and structures) and what to spend the resources on. At the start of the game you have a single
+base and your goal is to build up the technology to create powerful units by collecting resources.
+Often you cannot go straight for the best technology as it takes time and resources to build up all
+necessary technology and if you only focus on technology you will not have any units for defense if
+the enemy comes.
 
-In most, if not all, RTS games the player can choose whether s/he wants to play a campaign—usually accompanied with a story—or a simple skirmish game. A skirmish game is in its simplest form a quick battle where both you and your enemy or enemies start with the same amount of resources and structures. Many variants of skirmish games can be played, this thesis will focus on team skirmishes, more specific teams of 2 players versus 2 players. One human collaborating with our proposed teammate bot in one team, and two default bots\footnote{A default bot is the bot that already exists in the game, usually when the player want to play against it during skirmish matches.} in the other team. How this will work is explained throughout the thesis.
+In most, if not all, RTS games the player can choose whether s/he wants to play a campaign—usually
+accompanied with a story—or a simple skirmish game. A skirmish game is in its simplest form a quick
+battle where both you and your enemy or enemies start with the same amount of resources and
+structures. Many variants of skirmish games can be played, this thesis will focus on team
+skirmishes, more specific teams of 2 players versus 2 players. One human collaborating with our
+proposed teammate bot in one team, and two default bots\footnote{A default bot is the bot that
+already exists in the game, usually when the player want to play against it during skirmish
+matches.} in the other team. How this will work is explained throughout the thesis.
 
 There is no real standard for RTS games, they all work a bit different from each other. Instead of
 covering all different types of RTS games a short description how StarCraft: Brood War works will be
@@ -24,10 +53,10 @@ of all time until maybe the introduction of StarCraft 2. More reasons why we cho
 War can be found in section \ref{sec:why_starcraft}
 
 \subsection{StarCraft}
-The AI is implemented in an RTS game: StarCraft, more specifically StarCraft: Brood War—an expansion
+The bot is implemented in an RTS game: StarCraft, more specifically StarCraft: Brood War—an expansion
 to StarCraft that introduced new units. Henceforth StarCraft: Brood War will be referenced as
 StarCraft for simplicity. The StarCraft description below was gathered both from the StarCraft
-manual\cite{scmanual}, the inofficial StarCraft wiki\cite{scwiki}, and the our observations in
+manual\cite{scmanual}, the inofficial StarCraft wiki\cite{scwiki}, and our observations in
 gameplay. E.g. to test whether Protoss shields regenerated in battle, we created a single player
 game where a probe was sent to attack another probe and we observed that shields regenerates in
 battle since the probe’s shield points regenerated (increased). Figure \ref{fig:starcraft} shows a
@@ -48,7 +77,7 @@ gas—game resources used to build structures, units and upgrades. Minerals and 
 located in clusters of several mineral fields and occasionally a Vespene geyser (gas). The player
 always starts at a base with both mineral fields and a Vespene geyser. To mine minerals and gas,
 workers go to the fields and then return to the closest main structure of the player. Because of the
-travel distance you usually want to build a new main structure near resource clusters.
+travel distance you usually want to build new main structures near resource clusters.
 
 Mineral fields have a fixed number of resources they can yield; when all have been depleted the
 mineral field disappears. A Vespene geyser on the other hand does not disappear after depletion,
@@ -58,9 +87,9 @@ simultaneously collect minerals from a mineral field, or gas from a gas depot, o
 automatically queued to start mining when the first worker brings back the resources.
 
 \label{sec:starcraft_supply} StarCraft limits the number of units one can have to 200
-supply\footnote{Called Psi for Protoss, and Control for Zerg which makes more sense on those unit.
+supply\footnote{Called Psi for Protoss, and Control for Zerg which makes more sense for these races.
 Supply is, however, the most common used jargon for all races.}. Each unit occupies some supply,
-ranging from a half supply (Zerglings) to six supplies (Carriers), armed nuclear silos take up 8
+ranging from a half supply (Zerglings) to six supplies (Carriers), armed nuclear silos take up eight
 supplies. In general, the better the unit the more supply it occupies. The player starts with 9 to
 10 max supply (depending on the race). To increase the max supply a special structure (unit for
 Zerg) can be built; main bases also generate supply, 10 for Terran Command Center, 9 for Protoss
@@ -106,7 +135,7 @@ While it seems most obvious to build “the best” units at the beginning, this
 possible—although there is no such thing as best unit as all units are good depending on the
 situation, powerful unit might be a better wording. A powerful unit require certain structures, that
 in turn require other structures, i.e. unit and structure requirements can be seen as an acyclic
-graph  where the best structures and units are at the ends. For example, to build a Carrier one
+graph where the best structures and units are at the ends. For example, to build a Carrier one
 requires a Fleet Beacon (for the Carrier tech) and a Stargate (to build the unit), the Stargate then
 requires a Cybernetics core, the Cybernetics core requires a Gateway and a Gateway requires a Nexus.
 As you might conclude, you need a lot of resources and time to be able to build a Carrier; if you go
@@ -114,7 +143,7 @@ straight for Carriers your enemy can just walk into the base with any number of 
 entire base.
 
 \paragraph{Unit Health}
-The health of units for each race works a bit different. Terran units do not generate health.
+The unit health for each race works a bit different. Terran units do not generate health.
 Mechanical units (both ground and air) and structures can be repaired by an SCV at the cost of
 minerals and gas, depending on what resources were required to build the unit or structure; an SCV
 can also repair another SCV since they are vehicles. Biological units, such as marines and medics
@@ -134,7 +163,7 @@ All Zerg units and structures automatically regenerates health at a very slow ra
 battle, but because it regenerates slowly units usually only heal 1 or 2 HP during a shorter battle.
 
 \section{Teammates} A teammate is a player, either human or bot, that helps the team towards a
-common goal. Teammate bots often prioritize the human player because it is their experience, thus
+common goal. Teammate bots often prioritize the human player because it is human's experience, thus
 the bot acts as a helper to the player and team.
 
 \subsection{Human teammate} You can divide human teams into essentially two groups: where players

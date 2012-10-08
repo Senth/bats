@@ -5,21 +5,21 @@
 The Commander creates all orders for BATS, except defenses as the \nameref{sec:defense_manager} does that. This means that it orders attacks, drops, expansions, scouts, and when to transition to the next phase.
 
 \subsection{Orders/Commands}
-Below all orders are described and how they work depending on the current state of BATS. In addition some orders can have a slightly different behavior depending if it was BATS or the teammate who ordered it. Because of all tests and different behaviors in the command these are described with mostly pseudo-code. Common for all order functions are the two parameters: \texttt{alliedOrdered} and \texttt{reason}; alliedOrdered is set to true if the teammate ordered the command, reason is the reason to print out if the command is successful, this is only used when BATS ordered the command—e.g. attack because BATS expands. In additions all commands write out the intention (and possibly reason) of the command, this is done through IntentionWriter \texttt{mIntentionWriter}; how IntentionWriter works is described in section \ref{sec:communication}
+Below all orders are described and how they work depending on the current state of BATS. In addition some orders can have a slightly different behavior depending if it was BATS or the teammate who ordered it. Because of all tests and different behaviors in the command these are described with mostly pseudo-code. Common for all order functions are the two parameters: \texttt{teammateOrdered} and \texttt{reason}; teammateOrdered is set to true if the teammate ordered the command, reason is the reason to print out if the command is successful, this is only used when BATS ordered the command—e.g. attack because BATS expands. In additions all commands write out the intention (and possibly reason) of the command, this is done through IntentionWriter \texttt{intentionWriter}; how IntentionWriter works is described in section \ref{sec:communication}
 
 \paragraph{Attack}
 Has in general three behaviors: Creates a new frontal attack, reinforces the existing frontal attack, or does nothing. Listing \ref{lst:order_attack} displays the pseudo-code for the attack command.
 \begin{lstlisting}[label={lst:order_attack},caption={Pseudo-code for the attack command}]
 // Never do a frontal attack when under attack
 if (isUnderAttack()) {
-	if (alliedOrdered) {
-		mIntentionWriter.write(BotAttackNot, BotIsUnderAttack);
+	if (teammateOrdered) {
+		intentionWriter.write(BotAttackNot, BotIsUnderAttack);
 	}
 	return;
 }
 
 // Teammates can create attacks even if few units
-if (alliedOrdered) {
+if (teammateOrdered) {
 	canAttack = !freeUnits.empty();
 } else {
 	canAttack = canFrontalAttack(); // Checks enough units
@@ -31,16 +31,16 @@ if (canAttack) {
 	// Add free units to the old Attack squad if it exists
 	if (oldSquad != NULL) {
 		oldSquad.addUnts(freeUnits);
-		mIntentionWriter.write(BotAttackMerged, reason);
+		intentionWriter.write(BotAttackMerged, reason);
 	}
 	// Create new attack and ping position
 	else {
 		attackSquad = new AttackSquad(freeUnits);
 		attackPos = attackSquad.getAttackPosition();
-		mIntentionWriter.write(BotAttack, reason, attackPos);
+		intentionWriter.write(BotAttack, reason, attackPos);
 	}
 } else {
-	mIntentionWriter.write(BotAttackNot, BotNotEnoughUnits);
+	intentionWriter.write(BotAttackNot, BotNotEnoughUnits);
 }
 \end{lstlisting}
 
@@ -57,13 +57,13 @@ if (!availableCompositions.empty()) {
 	randomId = rand() % availableCompositions.size();
 	chosenComposition = availableCompositions[randomId];
 
-	dropSquad = new DropSquad(freeUnits, chosenComposition);
-	mIntentionWriter.write(BotDrop, reason, dropSquad.getDropPosition());
+	drop = new DropSquad(freeUnits, chosenComposition);
+	intentionWriter.write(BotDrop, reason, drop.getDropPosition());
 }
 // No drops available
 else {
-	if (alliedOrdered) {
-		mIntentionWriter.write(BotDropNot, BotNotEnoughUnits);
+	if (teammateOrdered) {
+		intentionWriter.write(BotDropNot, BotNotEnoughUnits);
 	}
 }
 \end{lstlisting}
@@ -80,7 +80,8 @@ game. How the Commander handles the transition command can be seen in listing
 \ref{lst:order_transition}.
 
 \subsection{Order creation rules}
-The Commander can create orders either from its own actions and states, or what the allied player is doing. Examples of this is it might attack when it is expanding, and it might expand if it has high amount of minerals, for reaction to allied actions it attack if the allied player is expanding.
+The Commander can create orders either from its own actions and states, or what the teammate player is doing. Examples of this is it might attack when it is expanding, and it might expand if it has high amount of minerals, for reaction to teammate actions it attack if the teammate player is expanding.
+\clearpage
 \begin{lstlisting}[label={lst:order_transition},caption={Pseudo-code for transition command}]
 // Only transition if not in late game already
 if (mBuildPlanner.canTransition()) {
@@ -92,8 +93,8 @@ if (mBuildPlanner.canTransition()) {
 
 	mBuildPlanner.switchToNextPhase();
 } else {
-	if (alliedOrdered) {
-		mIntentionWriter.write(BotTransitionNot, BotTransitionNoMore);
+	if (teammateOrdered) {
+		intentionWriter.write(BotTransitionNot, BotTransitionNoMore);
 	}
 }
 \end{lstlisting}
@@ -102,7 +103,7 @@ if (mBuildPlanner.canTransition()) {
 These are the reactions (commands) to BATS's own state.
 
 \paragraph{Expand}
-In order to expand from own reactions BATS meet all conditions below.
+In order to expand from own reactions BATS needs to meet all conditions below.
 \begin{itemize}
   \item \textbf{Not be under attack.} Expanding when we are under attack will most likely kill the expansion
 	  directly
@@ -138,11 +139,11 @@ are an expansion will be added to the beginning of the build order.
 To attack from own reactions BATS shall meet all conditions below.
 \begin{itemize}
   \item \textbf{Shall not be under attack.} It is better to stay and defend and then possibly
-	attack, although a small counter attack might be effective when the enemy army is small and BATS
-	can spare some units for the attack, this functionality has not been implemented.
-  \item \textbf{Not have a current attack.} aving one big army is easier to control and generally
-	much stronger than splitting it into 2 smaller attacks for slower armies\cite{day9} as BATS will
-	use in the experiment. Although ordering a second attack when we have a frontal attack will
+	attack, although a small counter-attack might be effective when the enemy army is small and BATS
+	can spare some units for the attack, counter-attacks have not been implemented.
+  \item \textbf{Not have a current attack.} Having one big army is easier to control and generally
+	much stronger than splitting it into 2 smaller attacks for slower armies\cite{day9}, and BATS will
+	use slower armies in the experiment. Although ordering a second attack when we have a frontal attack will
 	reinforce units, but we did not have enough time to implement and test when to reinforce the
 	army.
 \end{itemize}
@@ -161,7 +162,7 @@ are an attack will be created.
 \paragraph{Scout}
 The scout order conditions are much simpler than expand and attack. BATS will always send out a
 scout if it is not scouting, not under attack, and has \CommanderScoutOnWorkerCount. The Commander
-uses \ref{sec:unit_composition}s for the scout to get the best available scout unit. From lowest
+uses \nameref{sec:unit_composition}s for the scout to get the best available scout unit. From lowest
 priority this is:
 \vspace{0.5em}
 \begin{compactenum}
@@ -181,20 +182,20 @@ The transition order conditions are just as simple as the scout. It will transit
 already in late game, no buildings in the build order, and is high on resources (higher or equal to
 \classificationHighOnMinerals~minerals and \classificationHighOnGas~gas).
 
-\subsubsection{Reacting on allied actions} All orders here are grouped by allied actions instead of
+\subsubsection{Reacting on teammate actions} All orders here are grouped by teammate actions instead of
 the commands (as opposed to reacting on own actions), this feels like a more intuitive approach and
 was implemented this way.
 
-\paragraph{Allied expands} If the allied player expands, BATS first want to create a distracting
+\paragraph{Teammate expands} If the teammate player expands, BATS first want to create a distracting
 attack (for now only drops are available) to distract the enemy from the expansion, if no drops are
 available it will create a frontal attack. But before the Commander creates any attack it checks so
 that we are not under attack or already attacking.
 
-\paragraph{Allied attacks} Depending on what type of attack the allied player has BATS behaves
+\paragraph{Teammate attacks} Depending on what type of attack the teammate player has BATS behaves
 differently, but common for all types of attack, it will not do anything if it is under attack. If
-the allied attacks with a frontal attack BATS will first try to join it, if it already does not have
-a frontal attack and has enough units (\classificationFrontalAttackUnitsMin) for a frontal attack,
-otherwise it will try to drop if it does not have a drop out and has enough units for a drop.
+the teammate attacks with a frontal attack BATS will first try to join it if BATS does not already
+have an frontal attack or not enough units (\classificationFrontalAttackUnitsMin) for a frontal attack,
+otherwise it will try to drop if it does not have a drop and has enough units for a drop.
 
-When the allied player has a distracting attack out BATS will try to create a distracting (drop)
+When the teammate player has a distracting attack out BATS will try to create a distracting (drop)
 attack as well, but will only succeed if it has enough units.

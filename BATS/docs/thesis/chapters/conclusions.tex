@@ -1,24 +1,47 @@
 % !TEX root = ../main.tex
 % !TEX spellcheck = en_US
 \chapter{Conclusions and future work}
-First we go through our conclusions on the bot, what the players thought, liked and disliked about the bot and scenarios. Then we go through some lessons we have learned during the project we thought was worth mentioning, and last future work for researchers focusing on three different areas, teammate bot behavior, communication and control.
+First we go through our conclusions on the bot, what the players thought, liked and disliked about
+the bot and scenarios. Then we go through some lessons we have learned during the project we thought
+was worth mentioning, and last future work for researchers focusing on three different areas,
+teammate bot behavior, communication and control.
 
 \section{Bot conclusions}
-We conclude that a teammate bot for RTS games that communicates its intentions and reasons is indeed more fun to play with, just as according to our hypothesis. What surprised us was that some players preferred when the bot only communicated.
-This was later identified to depend on the player's skill where more experienced players liked the ability to control the bot whereas beginners tended to get overwhelmed by all the existing game action and thus did not want to focus on yet another task: controlling the bot.
-This is an interesting question on how to balance the control so that beginners aren't overwhelmed but at the same time meets the needs of a more skillful player. We talk more about this in Future work \ref{sec:future_control}.
+We conclude that a teammate bot for RTS games that communicates its intentions and reasons is indeed
+more fun to play with, although we did not find any statistical difference between Communication +
+Control and only Communication both of these include communication.
 
-The most liked feature was the ability for the bot to communicate its intentions and reasons to the player. The most reasons were ``it was fun to know what the bot is doing'' and ``easier to plan because he told me his plans''. This aligns with what Norman states, humans want to know what the AI is doing\cite{norman07}.
+What surprised us was that some players
+preferred when the bot only communicated. This was later identified to depend on the player's skill
+where more experienced players liked the ability to control the bot whereas beginners tended to get
+overwhelmed by all the existing game action and thus did not want to focus on yet another task:
+controlling the bot. This is an interesting question on how to balance the control so that
+beginners aren't overwhelmed but at the same time meets the needs of a more skillful player. We talk
+more about this in Future work \ref{sec:future_control}.\\
 
-An important aspect BATS missed was point 5 from McGee's and Abraham's definition\cite{mcgee10} of a real-time teammate bot, ``whenever possible, prioritizing the player experience''—for the full list see section \ref{sec:teammate_bots}. When the player either ordered BATS to attack or follow him/her, BATS almost always ended up blocking the path for the player close to the attack, here BATS did not prioritize the player experience as it should have let the player through. Disrespecting this ``rule'' probably made ``The army halted in choke points and made it impossible for me to come through'' top the disliked features list.
+
+The most liked feature was the ability for the bot to communicate its intentions and reasons to the
+player. The most reasons were ``it was fun to know what the bot is doing'' and ``easier to plan
+because he told me his plans''. This aligns with what Norman states, humans want to know what the AI
+is doing\cite{norman07}.
+
+An important aspect BATS missed was point 5 from McGee's and Abraham's definition\cite{mcgee10} of a
+real-time teammate bot, ``whenever possible, prioritizing the player experience''—for the full list
+see section \ref{sec:teammate_bots}. When the player either ordered BATS to attack or follow
+him/her, BATS almost always ended up blocking the path for the player close to the attack location,
+not prioritizing the player experience as it should let the player through.
+Disrespecting this ``rule'' probably made ``The army halted in choke points and made it impossible
+for me to come through'' top the disliked features list.
 
 \section{Project conclusions}
 \paragraph{Magnusson's notes}
 Being a perfectionist is not easy, this was one of the causes why we did not meet our first
 deadline. I implemented features that were never used but what I thought were nice to have, such as
 the Wait Goals, advanced drop mechanics, while we remove Wait goals and drops entirely and it would
-not affect the test results.
-In addition to this I changed existing systems much more than needed—instead of using the existing squad manager with squads I create a new squad manager, this was because the functionality differed quite much what we wanted to have in BATS, but maybe not needed. We would have saved some weeks on this task alone.
+not affect the test results.  In addition to this I changed existing systems much more than
+needed—instead of using the existing squad manager with squads I create a new squad manager, this
+was because the functionality differed quite much what we wanted to have in BATS, but maybe not
+needed. We would have saved some weeks on this task alone.
 
 In addition I tweaked and fixed small thing that ``it will only take two hours'', but I found many
 of these small tweaks and some of them took more than two hours. After half the bot had been
@@ -34,20 +57,44 @@ but either put them in the right priority or put them in a bag of things to do i
 left.
 
 \section{Future work}
-We will split the section in three parts, first discussing future work for the behavior of a teammate bot, then improvements on the communication, and finally the control of a teammate bot. While these are RTS game specific topics many of the Communication and Control topics can be slightly changed to match another game genre.
+We will split the section in three parts, first discussing future work for the behavior of a
+teammate bot, then improvements on the communication, and finally the control of a teammate bot.
+While these are RTS game specific topics many of the Communication and Control topics can be
+slightly changed to match another game genre.
 
 \subsection{Teammate bot behavior}
-BATS behaves in ways that we thought would be good, both through own experience, research, and testing; but it still lacks a solid behavior to be used in a commercial game as its behavior does not change depending on the play style of the human player. More research needs to be done on what players want a teammate bot to do and how much initiative the bot shall have, if the bot has control the degree of initiative can depend on how much the player want to control the bot, i.e. the more control the player wants the less initiative the bot shall have, or does the players, independent of skill and play style, always want the same initiative?
+BATS behaves in ways that we thought would be good, both through own experience, research, and
+testing; but it still lacks a solid behavior to be used in a commercial game as its behavior does
+not change depending on the play style of the human player. More research needs to be done on what
+players want a teammate bot to do and how much initiative the bot shall have, if the bot has control
+the degree of initiative can depend on how much the player want to control the bot, i.e. the more
+control the player wants the less initiative the bot shall have, or does the players, independent of
+skill and play style, always want the same initiative?
 
-A possibility for teammate bots can be either a full-time or temporarily replacement for a human player in online matches—temporarily when the player disconnects. But how shall the bot behave when it is used as a replacement for the entire game? It needs to be balanced so it either matches the human players' skills in its own team or by setting a predefined skill to either increase or decrease the entire team's total skill.
-When it acts as a temporarily replacement the players might want it to continue using the same strategy as the player and not do any hasty actions that could make the player loose, the bot could use some learning algorithm that always is on when the player plays matches and then send out this information to the other clients if the player gets disconnected, one of the clients could then take temporary control of the player continue play as nothing happened.
-For both scenarios it might be good to do player modeling for the teammate bot to know how it shall play, further resources on player modeling for RTS games can be found here\cite{bakkes09, jansen07, kabanza10, schadd07, synnaeve11}.
+A possibility for teammate bots can be either a full-time or temporarily replacement for a human
+player in online matches—temporarily when the player disconnects. But how shall the bot behave when
+it is used as a replacement for the entire game? It needs to be balanced so it either matches the
+human players' skills in its own team or by setting a predefined skill to either increase or
+decrease the entire team's total skill.  When it acts as a temporarily replacement the players might
+want it to continue using the same strategy as the player and not do any hasty actions that could
+make the player loose, the bot could use some learning algorithm that always is on when the player
+plays matches and then send out this information to the other clients if the player gets
+disconnected, one of the clients could then take temporary control of the player continue play as
+nothing happened.  For both scenarios it might be good to do player modeling for the teammate bot to
+know how it shall play, further resources on player modeling for RTS games can be found
+here\cite{bakkes09, jansen07, kabanza10, schadd07, synnaeve11}.
 
 \subsection{Communication}
-The messages from BATS are very simple and aimed to feel like less auto-generated messages. In case of text messages the player might not want long ``human-like'' sentences, but instead short sentences.
+The messages from BATS are very simple and aimed to feel like less auto-generated messages. In case
+of text messages the player might not want long ``human-like'' sentences, but instead short
+sentences.
 
-There is also the possibility to either synthesize the message or record own messages to see if the player prefer messages that are read to him/her.
-Reading messages out loud might be good but cannot be processed as quickly by the player and it can be hard if the computer want to send messages very often, meaning some research needs to be done on how often and what type of messages shall be sent for the player not to be overwhelmed by messages—this type of research can also be done on text messages.
+There is also the possibility to either synthesize the message or record own messages to see if the
+player prefer messages that are read to him/her.  Reading messages out loud might be good but cannot
+be processed as quickly by the player and it can be hard if the computer want to send messages very
+often, meaning some research needs to be done on how often and what type of messages shall be sent
+for the player not to be overwhelmed by messages—this type of research can also be done on text
+messages.
 
 \subsection{Control}
 \label{sec:future_control}

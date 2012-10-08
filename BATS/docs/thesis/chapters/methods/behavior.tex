@@ -25,39 +25,14 @@ will first be given.
 
 The goal of BATS is to behave more like a human, i.e. use strategies that humans use, communicate
 more like humans, and so forth, as it has been shown that at least enemy bots are more fun when they
-behave like humans\cite{soni08}.
+behave like humans\cite{soni08}. \\
 % TODO Find Yannakakis
 
-Expansions can be created through build orders, or added autonomously to the build order when BATS's
-resources are getting high. It can also expand when it has launched an attack or vice versa, attack
-because it expands. Instead of doing random attacks, it will try to create attacks when it expands,
-so the attack covers the expansion which is a common (among professionals) and good strategy in
-StarCraft\cite{day9}. It can also launch an attack if an upgrade will finish soon, or if the
-teammate is moving out to attack. Scouting is done all the time, except the first couple of minutes
-in the game and when BATS is under attack. Section \ref{sec:Commander} \nameref{sec:Commander}
-describes the triggers to expand, attack, and scout in more detail.
 
-For defensive measures BATS places units good at defending choke points near its own choke points
-that abuts to an undefended region; the rest of the units will patrol between the choke points. BATS
-will however help the teammate player when s/he is under attack, but will never have any stationary
-units there. Section \ref{sec:defense_manager} \nameref{sec:defense_manager} describes BATS's
-defense in more detail.
 
-Attack squads finds a place to attack depending on the structure type and distance from other
-attacks. It prioritizes important structures, such as newly created Expansions. The squad will
-retreat when the enemy squad is too strong, or if it destroyed all structures near the attack
-location. Section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} further describes
-where the Attack squads finds their location and \ref{sec:attack_squad} \nameref{sec:attack_squad}
-describes Attack squads in more detail.
-
-\paragraph{System overview}
-Figure \ref{fig:system_overview} shows a high level overview of the most important classes of BATS. Although the figure is a bit cluttered 7 of the 15 associations either go to the Squad or IntentionWriter. The \emph{Commander} will order an expand when the resources are getting high, or when BATS moves out to attack—this causes the attack to cover the expansion which is a common (among professionals) strategy in StarCraft\cite{day9}. The \emph{Commander} uses the \emph{SelfClassifier} when ordering commands due to BATS's current state. The \emph{Commander} will attack when expanding, an upgrade will finish soon, or use \emph{PlayerArmyManager} to check if the teammate moves out to attack.
-
-\emph{AttackCoordinator} uses squad information from \emph{PlayerArmyManager} together with spotted structures from \emph{ExplorationManager} to find a good place for the attack. The \emph{DefenseManager} is in charge of the defense and will place units good at defending near its own choke points that abuts to an undefended region; the rest of the units will patrol between these choke points.
-
-The \emph{Build planner} creates structures from a build order, the build order is not fixed at supply counts but is instead listed in order and the first (not built) structure in the build order will be build directly when BATS has enough resources. BATS will, however, prioritize unit production over all structures.
-
-The \emph{Commander}, \emph{DefenseManager}, and \emph{AttackSquad} uses \emph{IntentionWriter} to write messages; messages are sent by intention and an optional reason, the same intention will however not be sent again if it is sent within the timeout limit.
+Figure \ref{fig:system_overview} shows a high level overview of the most important classes of BATS.
+The figure is a bit cluttered, but 7 of the 15 associations either go to the Squad or
+IntentionWriter.
 
 \begin{figure}[htb]
 	\centering
@@ -108,3 +83,43 @@ The \emph{Commander}, \emph{DefenseManager}, and \emph{AttackSquad} uses \emph{I
 	\caption{System overview of BATS}
 	\label{fig:system_overview}
 \end{figure}
+
+The Commander is in charge of expanding, attacking, and scouting and uses SelfClassifier or
+PlayerArmyManager to decide on what action it shall take—
+PlayerArmyManager handles the teammate's
+virtual squads and is used to see what the teammate does with those squads. Expansions can be created through
+build orders, or added autonomously to the build order when BATS's resources are getting high. It
+can also expand when it has launched an attack or vice versa, attack because it expands. Instead of
+doing random attacks, it will try to create attacks when it expands, so the attack covers the
+expansion which is a common (among professionals) and good strategy in StarCraft\cite{day9}. It can
+also launch an attack if an upgrade will finish soon, or if the teammate is moving out to attack.
+Scouting is done all the time, except the first couple of minutes in the game and when BATS is under
+attack. Section \ref{sec:Commander} \nameref{sec:Commander} describes the triggers to expand,
+attack, and scout in more detail.
+
+DefenseManager decide where units (good at defending) shall be placed, i.e. close to choke points
+that abuts to an undefended region. The rest of the units will patrol between the choke points. BATS
+will however help the teammate player when s/he is under attack, but will never have any stationary
+units there. Section \ref{sec:defense_manager} \nameref{sec:defense_manager} describes BATS's
+defense in more detail.
+
+Attack squads asks AttackCoordinator for a place to attack which prioritizes the location depending on the structure type and distance from other
+attacks. It prioritizes important structures, such as newly created Expansions. The squad will
+retreat when the enemy squad is too strong, or if it destroyed all structures near the attack
+location. Section \ref{sec:attack_coordinator} \nameref{sec:attack_coordinator} further describes
+where the Attack squads finds their location and \ref{sec:attack_squad} \nameref{sec:attack_squad}
+describes Attack squads in more detail.
+
+Scout squad moves to an location while trying to avoid enemies, the scout asks ExplorationManager
+for the location to scout, which is the location that was visited the longest time ago. When it
+either gets to the location or is interrupted by enemies it will ask for a new location to scout.
+
+The Build planner creates structures from a build order, the build order is not fixed at
+supply counts but is instead listed in order and the first (not built) structure in the build order
+will be build directly when BATS has enough resources. BATS will, however, prioritize unit
+production over all structures.
+
+The Commander, DefenseManager, and AttackSquad uses IntentionWriter to
+write messages; messages are sent by intention and an optional reason, the same intention will
+however not be sent again if it is sent within the timeout limit.
+

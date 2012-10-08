@@ -2,16 +2,8 @@
 % !TEX spellcheck = en_US
 \chapter{Results}
 These are the results from testing the bot on 14 people, 12 males and 2 females, ages 21–26, with
-skills varying from beginners who only played StarCraft few times to those who have played more
+skills varying from beginners who only played StarCraft a few times to those who have played more
 than 20 hours of skirmish matches in either StarCraft: Brood War or StarCraft 2.
-
-\subsection{RQ 1 Which type of bot is most fun to play with?}
-``Which is most fun to play with, communicating bot, controllable bot, both communicating and
-controllable bot, or none?'' Figure \ref{fig:results_fun} shows the questionnaire results from the
-four questions, one for each scenario. An interesting observation was that some testers preferred
-communication over both control and communication. During the interviews we found a correlation
-between control and player skill—players with higher skill tended to prefer control whereas lower
-skill players became overwhelmed by all tasks, including control.
 
 \begin{figure}[htb]
 \begin{tikzpicture}
@@ -52,6 +44,93 @@ skill players became overwhelmed by all tasks, including control.
 \label{fig:results_fun}
 \end{figure}
 
+\def\scenarionames{{"None","Comm","Control","Comm+Cont"}}
+\begin{figure}[htb]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[width=12cm,height=8cm,
+			ylabel=Average,
+			xmin=-1,xmax=4,
+			ymin=0,ymax=6,
+			enlargelimits=false,
+			legend style={at={0.5, -0.15)},
+				anchor=north, legend columns=-1,/tikz/every even column/.append style={column sep=0.5cm}},
+			ybar,
+			bar width=16pt,
+			xtick=data,
+			xticklabel={\pgfmathparse{\scenarionames[Mod(\tick,4)]}\pgfmathresult},
+		]
+			
+			\addplot+[error bars/.cd,y dir=both,y explicit]
+				coordinates {
+					(0, 2.25) +- (0, 1.019)
+					(1, 4.357) +- (0, 1.277)
+					(2, 3.643) +- (0, 0.842)
+					(3, 4.571) +- (0, 1.089)
+				};
+
+		\end{axis}
+
+	\end{tikzpicture}
+	\caption{Average vote with standard deviation}
+	\label{fig:results_average}
+\end{figure}
+
+\subsection{RQ 1 Which type of bot is most fun to play with?}
+``Which is most fun to play with, communicating bot, controllable bot, both communicating and
+controllable bot, or none?'' Figure \ref{fig:results_fun} shows the questionnaire results from the
+four questions, one for each scenario; the results are summorized in figure
+\ref{fig:results_average} for an easier comparison.
+
+To validate our hypothesis if the testers thought it was most fun to play (in this order) with a communicating and
+controllable, communicating, controllable, and a bot with none of these features we conducted paired two-sample
+T-tests, results found in table \ref{tbl:t-test-all}. These null hypotheses tests whether the
+differences between the scenarios are enough to deduct
+whether the order from figure \ref{fig:results_average} could be trusted.
+
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+ & \textbf{None} & \textbf{Comm} & \textbf{Control} & \textbf{Comm+Cont} \\ \hline
+\textbf{None} & N/A & 0.0013 & 0.0029 & 0.0015 \\ \hline
+\textbf{Comm} & 0.0013 & N/A & 0.1461 & 0.6301 \\ \hline
+\textbf{Control} & 0.0029 & 0.1461 & N/A & 0.0094 \\ \hline
+\textbf{Comm+Cont} & 0.0015 & 0.6301 & 0.0094 & N/A \\ \hline
+\end{tabular}
+\end{center}
+\vspace{-12pt}
+\caption{Paired two-sample t-test}
+\label{tbl:t-test-all}
+\end{table}
+From table \ref{tbl:t-test-all} we can see that there is not enough difference between neither
+communication + control and only communication nor only communication and only control. What we can
+deduct from this the possible order of fun in table \ref{tbl:order_fun} where 1 is most fun and 4 is
+least fun.
+
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{1} & Communication + Control & Communication & \\ \hline
+		\textbf{2} & Communication + Control & Communication & Control \\ \hline
+		\textbf{3} & Communication & Control & \\ \hline
+		\textbf{4} & None & & \\ \hline
+
+	\end{tabular}
+	\caption{Possible fun order from the t-tests}
+	\label{tbl:order_fun}
+\end{table}
+
+An interesting observation was that some testers preferred communication over both control and
+communication. During the interviews we found a correlation between control and player skill—players
+with higher skill tended to prefer control whereas lower skill players became overwhelmed by all
+tasks, including the control of the bot.
+
+
+
+
+
 \paragraph{Control \& communication}
 during the interviews 8 of 14 testers felt it was most fun to play with the bot when it had both
 communication and control on. Two of the tester could not decide whether only communication or both
@@ -74,8 +153,8 @@ the bot when it only had communication on. Below you can find the testers' reaso
 was most fun to play.
 \begin{itemize}
 	\item I already had a lot on my mind, controlling him was a bit too much for me.	
-	\item Easier to plan because he told me his plans.
-	\item I am lazy therefore it was easier to let the bot do its job.
+	\item Easier for me to plan because he told me his plans.
+	\item I am lazy therefore it was easier to let the bot do the hard work.
 \end{itemize}
 
 \paragraph{Control only}
@@ -89,8 +168,12 @@ does'' (paraphrased), i.e. same reasons as other players who thought control and
 
 \subsection{RQ 1.1 Which features are most liked?}
 Below the most liked features are shown in two lists, one containing general features and the other
-specific commands they liked.
+specific commands they liked. As mentioned these can serve as guidelines for future work what
+features shall be prioritized.
 \paragraph{General liked features}
+Most noteworthy is the communication which more than half of the testers commented on, more
+specifically ``Fun to know what the bot is doing'' and ``Easier to plan because he told me his
+plans.''
 \begin{itemize}
 	\item Communication
 	\begin{itemize}
@@ -99,7 +182,7 @@ specific commands they liked.
 		\item Easier to plan because he told me his plans.
 		\item Feels more like team play when he is communicating.
 		\item Direct response after ordering a command, then you knew if the bot would follow the command or not.
-		\item It had humor, e.g. Leeeeroooooooy Jenkins.
+		\item It had humor, e.g. Leeeeroooooooy Jenkins message when attacking.
 		\item Almost like playing with a real player.
 		\item Asked player for help when under attack.
 	\end{itemize}
@@ -148,6 +231,8 @@ specific commands they liked.
 Instead of asking what features the testers disliked, we asked what they disliked about BATS (notice
 the removal of feature). Below is a list of all things they disliked about BATS.
 \paragraph{General disliked features}
+Almost all testers mentioned they were annoyed by BATS halting its army in choke points making it
+impossible for them to pass.
 \begin{itemize}
 	\item The army halted in choke points and made it impossible for me to come through.
 	\item Got stuck when moving to a place, he ran back and forth until he finally ran more too long
@@ -170,7 +255,9 @@ the removal of feature). Below is a list of all things they disliked about BATS.
 \paragraph{Disliked commands}Two answered drop as it did not work properly, but most of the testers did not test all commands and thus could not answer if they disliked any command.
 
 \subsection{RQ 1.3 Which features are missing?}
-The testers were asked which features they missed during their scenarios, the first list presented includes general features whereas the second list are specific commands they missed.
+The testers were asked which features they missed during their scenarios, the first list presented
+includes general features whereas the second list are specific commands they missed. These can serve
+as guidelines for future developers what players want from a teammate bot.
 \paragraph{General missed features}
 \begin{itemize}
 	\item More strategies, e.g. rush attacks, and would know about timings to make use of them.

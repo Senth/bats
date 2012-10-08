@@ -12,13 +12,13 @@ implemented the drop functionality. The distracting attacks are not suicide atta
 exceptions exist; they are mostly distractions to pin the enemy at his base.
 
 \paragraph{Where to attack?} The attack coordinator uses two to three weights multiplied together to
-get the near optimal attack location—the attack location is not optimal and that the weights have
+get the near optimal attack location—the attack location is not optimal as the weights have
 not been extensively balanced, but the algorithm works good enough for these experiments. The
 attacking locations are derived from seen enemy structures and expansions that have not been scouted
 for \attackCoordinatorExpansionNotCheckedTime.
 
-The first weight, \emph{distance}, prioritizes structures (and location) far away from other
-existing attacks, not including allied attacks yet; as it is a good idea to spread out multiple
+The first weight, \emph{distance}, prioritizes structures (and locations) far away from other
+existing attacks, not including teammate attacks yet; as it is a good idea to spread out multiple
 attack to split up the enemy army—i.e. we are not implying that multiple armies are better than a
 big, only that when using multiple armies it is good for the armies to spread out. The second
 weight, \emph{type}, determines how important a structure or location is to attack, and the third
@@ -26,13 +26,13 @@ weight, \emph{defended}, is how well defended an area is—the defended weight i
 but distracting attacks will use it to get a location that can be attacked without taking the risk
 to die (such as drops dying to anti-air).
 
-In addition to these weights, if the squad is a frontal attack and follows an allied squad, it will
-get an attack position near the allied squads target instead of using the weights. The attack
+In addition to these weights, if the squad is a frontal attack and follows an teammate squad, it will
+get an attack position near the teammate squad's target instead of using the weights. The attack
 position is still the same positions used for the regular algorithm.
 
 Enemy armies are not included in the calculation, because one rarely gain anything on trading
-armies, one should find gaps in the defense instead\cite{day9}. It is still good engage a weaker
-enemy army and BATS will do that if the squad is close by, but it will not search for those small
+armies, one should find gaps in the defense instead\cite{day9}. It is still good to engage a weaker
+enemy army and BATS will do that only if the squad is close by, it will not search for those small
 armies. In addition, because armies are mobile it would be hard to track them, i.e. time consuming
 to implement such a feature.
 
@@ -71,15 +71,26 @@ decide the how and where the squad shall attack.
 \end{figure}
 
 \paragraph{Coordinated attacks}
-To achieve a sense of coordinated attacks, Attack squads have \nameref{sec:wait_goals} added by the attack coordinator—fully described in section \ref{sec:wait_goals}. The Wait goal for Attack squads is a Wait goal that succeeds whenever an attack is within position (close to its goal and waiting), or is already attacking something. The goal fails when it has timed out (\attackCoordinatorWaitGoalTimeout). The Wait goal is added to all existing squads and the new squad gets the already existing Wait goals, when all attacks are in position they will start their attack simultaneously.
+To achieve a sense of coordinated attacks, Attack squads have \nameref{sec:wait_goals} added by the
+attack coordinator—fully described in section \ref{sec:wait_goals}. The Wait goal for Attack squads
+is a Wait goal that succeeds whenever an attack is within position (close to its goal and waiting),
+or is already attacking something. The goal fails when it has timed out
+(\attackCoordinatorWaitGoalTimeout). The Wait goal is added to all existing squads and the new squad
+gets the already existing Wait goals, when all attacks are in position they will start their attack
+simultaneously.
 
 \subsection{Calculation of distance weight}
-Distance weight is a simple calculation: if no other Attack squads are present it defaults to 1.0. Otherwise the average from all other attacking squads are calculated as described in equation \ref{eq:distance_weight}.
+Distance weight is a simple calculation: if no other Attack squads are present it defaults to 1.0.
+Otherwise the average from all other attacking squads are calculated as described in equation
+\ref{eq:distance_weight}.
 \begin{equation}
 \label{eq:distance_weight}
 weight = \frac{\sum_{i=1}^{s}{distance(i)^2}}{s} \qquad \left\{s = \text{number of Attack squads}\right.
 \end{equation}
-Here \emph{weight} is the average distance from all other attacking squads. The weight is then normalized to [0.0, 1.0], shown in equation \ref{eq:distance_weight_normalized}—dividing the weight with the maximum map distance. As with most distance calculations, they use the squared version for faster calculation since no root calculations are needed.
+Here \emph{weight} is the average distance from all other attacking squads. The weight is then
+normalized to [0.0, 1.0], shown in equation \ref{eq:distance_weight_normalized}—dividing the weight
+with the maximum map distance. As with most distance calculations, they use the squared version for
+faster calculation since no root calculations are needed.
 \begin{equation}
 \label{eq:distance_weight_normalized}
 normalized\ weight = \frac{weight}{MAP\_WIDTH^2 + MAP\_HEIGHT^2}
@@ -87,15 +98,33 @@ normalized\ weight = \frac{weight}{MAP\_WIDTH^2 + MAP\_HEIGHT^2}
 
 
 \subsection{Calculation of type weight}
-This weight prioritizes different structures and locations. Most of the values here are fixed and one type calculated between fixed values (expansions). The structures and locations are presented in priority order below with the current values assign to them. These values are rough estimates what might be good, thus one shall not think these are \emph{the} values. Because the weights are multiplied this will give a logarithmic behavior, i.e. the difference between 0.1 and 0.2 is greater than 0.2 and 0.3 (0.2 is the double of 0.1, whereas 0.3 is less than double of 0.2).
+This weight prioritizes different structures and locations. Most of the values here are fixed,
+expansions are however calculated between fixed values. The structures and locations are presented in
+priority order below with the current values assign to them. These values are rough estimates what
+might be good, thus one shall not think these are \emph{the} values. Because the weights are
+multiplied this will give a logarithmic behavior, i.e. the difference between 0.1 and 0.2 is greater
+than 0.2 and 0.3 (0.2 is the double of 0.1, whereas 0.3 is less than double of 0.2).
 
 \paragraph{Not scouted expansions \attackCoordinatorWeightsExpansionNotChecked}
-These are expansion that have not been visited for the last \attackCoordinatorExpansionNotCheckedTime. The idea is to check expansions when moving out to attack, although the current version does not work as expected; because the \nameref{sec:scout_squad} cannot cover all the areas quickly the Attack squad will act more as a scout than Attack squad because of visiting expansions in various location around the map. To fix this only the closest expansions to the enemy shall be checked and possibly only one with this squad, as this is roughly what Magnusson has observed when watching professional StarCraft players. This feature was therefore disabled during the experimentations.
+These are expansion that have not been visited for the last
+\attackCoordinatorExpansionNotCheckedTime. The idea is to check expansions when moving out to
+attack, although the current version does not work as expected; because the
+\nameref{sec:scout_squad} cannot cover all the areas quickly the Attack squad will act more as a
+scout than Attack squad because of visiting expansions in various location around the map. To fix
+this only the closest expansions to the enemy shall be checked and possibly only one with this
+squad, as this is roughly what Magnusson has observed when watching professional StarCraft players.
+This feature was therefore disabled during the experimentations.
 	
 \paragraph{Expansions \attackCoordinatorWeightsExpansionMinMax}
-Expansion weight for existing enemy expansions. The weight is higher for fresh expansions; fresh expansions being defined by the expansions current mineral amount (in fractions)—the \nameref{sec:resource_counter} tracks the amount of all mineral fields.
+Expansion weight for existing enemy expansions. The weight is higher for fresh expansions; fresh
+expansions being defined by the expansions current mineral amount (in fractions)—the
+\nameref{sec:resource_counter} tracks the amount of all mineral fields.
 
-The minimum value can, in addition to its normal state, be used as a kind of ceiling function; e.g. if it is set to ceil\conf and the minimum is set to 0.5 while only 20\% of the minerals are left it will ceil the weight to 0.5, see equation \ref{eq:weight_expansion_ceil}. If it is set to normal, the fraction will be normalized in the [0.5, 1.0] range, meaning the weight will be 0.6, see equation \ref{eq:weight_expansion_normal}.
+The minimum value can, in addition to its normal state, be used as a kind of ceiling function; e.g.
+if it is set to ceil\conf and the minimum is set to 0.5 while only 20\% of the minerals are left it
+will ceil the weight to 0.5, see equation \ref{eq:weight_expansion_ceil}. If it is set to normal,
+the fraction will be normalized in the [0.5, 1.0] range, meaning the weight will be 0.6, see
+equation \ref{eq:weight_expansion_normal}.
 \begin{equation}
 \label{eq:weight_expansion_ceil}
 weight =
@@ -110,22 +139,54 @@ weight = fracMinerals(x) \times (maxValue - minValue) + minValue
 \end{equation}
 
 \paragraph{Addons \attackCoordinatorWeightsAddonStructure}
-Addons are structures built in connection to another structure and only exist for Terran. These are both upgrade structures and can make either the attached unit producing structure create advanced units (such as tanks), or all specific unit producing structures able to produce the unit—e.g. the addon Covert Ops for a Science Facility makes Ghosts available for production in all Barracks. The only exception to this is the addons to the Command Center which is either Comsat for detection or Nuclear Silo for nukes.
+Addons are structures built in connection to another structure and only exist for Terran. These are
+both upgrade structures and can make either the attached unit producing structure create advanced
+units (such as tanks), or all specific unit producing structures able to produce the unit—e.g. the
+addon Covert Ops for a Science Facility makes Ghosts available for production in all Barracks. The
+only exception to this is the addons to the Command Center which is either Comsat for detection or
+Nuclear Silo for nukes.
 
 \paragraph{Supplies \attackCoordinatorWeightsSupplyStructure}
-Supplies are structures that provide space (or food) for more units to be created, see section \ref{sec:starcraft_supply} for how supplies work. This supply priority only makes sense for Terran as they work differently for the other classes: Protoss also uses their supplies for powering buildings, i.e. a higher priority would be good here; for Zerg the supplies are increased by the Overlord unit, this would require an additional algorithm for searching for Overlords, the priority would be higher, maybe even higher for only air attacks.
+Supplies are structures that provide space (or food) for more units to be created, see section
+\ref{sec:starcraft_supply} for how supplies work. This supply priority only makes sense for Terran
+as they work differently for the other classes: Protoss also uses their supplies for powering
+buildings, i.e. a higher priority would be good here; for Zerg the supplies are increased by the
+Overlord unit, this would require an additional algorithm for searching for Overlords, the priority
+would be higher, maybe even higher for only air attacks.
 
 \paragraph{Upgrade structures \attackCoordinatorWeightsUpgradeStructure}
-Upgrade structures does not, despite its name, include all structures that can upgrade, only structures that can upgrade general attack and defense bonuses are treated as upgrade structures. Meaning Terran Academy (which upgrades Stim packs for Marines) is not treated as an upgrade structure. The reason is because of simplicity; attack and defense upgrades come in three steps meaning there are 6–12 upgrades in total (depending on what structure) for that structure and is continued to be upgraded throughout the game. This means its a lot bigger chance that the structure still is useful (for the enemy) even when attacking it later in the game, as opposed to the Academy which upgrades are long done—although in this case medics and firebats could not be created by the enemy, but the enemy can simply prioritize marines in the meanwhile and not much harm would be done.
+Upgrade structures does not, despite its name, include all structures that can upgrade, only
+structures that can upgrade general attack and defense bonuses are treated as upgrade structures.
+Meaning Terran Academy (which upgrades Stim packs for Marines) is not treated as an upgrade
+structure. The reason is because of simplicity; attack and defense upgrades come in three steps
+meaning there are 6–12 upgrades in total (depending on what structure) for that structure and is
+continued to be upgraded throughout the game. This means its a lot bigger chance that the structure
+still is useful (for the enemy) even when attacking it later in the game, as opposed to the Academy
+which upgrades are long done—although in this case medics and firebats could not be created by the
+enemy, but the enemy can simply prioritize marines in the meanwhile and not much harm would be done.
 
-As an improvement BATS could keep track of which upgrades it has seen and then exclude these buildings. Attack and defense upgrades can be directly seen on the enemy while unit abilities, but stim, and other ability upgrades needs to be activated by the enemy for BATS to know about it.
+As an improvement BATS could keep track of which upgrades it has seen and then exclude these
+buildings. Attack and defense upgrades can be directly seen on the enemy while unit abilities, but
+stim, and other ability upgrades needs to be activated by the enemy for BATS to know about it.
 
 \paragraph{Unit producing structure \attackCoordinatorWeightsUnitProducingStructure}
-All structures that can produce units. These are not ordered in any specific order, not to say that it does not matter because it does, but it will always vary depending on the situation. If the enemy has 10 barracks and 1 Starport, it is probably best to destroy the Starport, whereas if the enemy has 1 barrack and 4 Starports it might be best to destroy the barracks.
+All structures that can produce units. These are not ordered in any specific order, not to say that
+it does not matter because it does, but it will always vary depending on the situation. If the enemy
+has 10 Barracks and 1 Starport, it is probably best to destroy the Starport, whereas if the enemy
+has 1 Barrack and 4 Starports it might be best to destroy the barracks.
 
 \paragraph{Other structures \attackCoordinatorWeightsOtherStructure}
-All other structures that have not been covered, this includes research structures, but defensive
-structures, such as bunkers and turrets.
+All other structures that have not been covered, this includes research structures and defensive
+structures, such as Academy, Bunkers, and Turrets.
 
 \subsubsection{Why this order?}
-Because StarCraft is mostly about managing expansions\cite{day9}, BATS tries to deny and kill fresh expansions as its first priority (the top two priorities). Targeting addons can both stop the production of an important upgrade (siege mode for tanks) and the ability to create tanks, ghosts, etc. Delaying late game units is usually good as they are generally better than early game units. Supply depots are almost always good to destroy since it halts all unit production, unless the enemy has stacked up lots of supplies—which almost always is a bad strategy—or lost many units in a recent battle. Stopping an upgrade is probably better than killing a unit producing structure, because if the upgrade finishes all existing units will get the upgrade, while if we kill a unit producing structure only 2–4 units will get stopped, but it depends on the type of unit producing structure, what upgrade structure etc; but this priority will do for now.
+Because StarCraft is mostly about managing expansions\cite{day9}, BATS tries to deny and kill fresh
+expansions as its first priority (the top two priorities). Targeting addons can both stop the
+production of an important upgrade (siege mode for tanks) and the ability to create tanks, ghosts,
+etc. Delaying late game units is usually good as they are generally better than early game units.
+Supply depots are almost always good to destroy since it halts all unit production, unless the enemy
+has stacked up lots of supplies—which almost always is a bad strategy—or lost many units in a recent
+battle. Stopping an upgrade is probably better than killing a unit producing structure, because if
+the upgrade finishes all existing units will get the upgrade, while if we kill a unit producing
+structure only 2–4 units will get stopped, but it depends on the type of unit producing structure,
+what upgrade structure etc; but this priority will do for now.

@@ -2,15 +2,39 @@
 % !TEX spellcheck = en_US 
 \section{Communication}
 \label{sec:communication}
-For the bot to communicate with the teammate using sentences BATS uses IntentionWriter which can write an intention message together with an optional reason and an optional ping location. When BATS want to write out an intention (and maybe a reason) to the teammate it uses the writeIntention function. Each intention and reason has multiple messages and are picked at random and then put together to a final sentence with the intention first—if no reason is specified it will only use the intention as the whole message. The random function, however, is not entirely random, it will never pick the last used intention or reason message.
+BATS uses the IntentionWriter to send messages to the teammate, a message consists of an
+intention together with an optional reason and ping location.
+Each intention and reason has multiple messages and are picked at random and put together to form a 
+sentence with the intention first—if no reason is specified it will only use the intention as
+the whole message. The random function, however, is not entirely random, it will never pick the last
+used intention or reason message.
 
-For the bot not to spam the same intention all the time a default timeout is set to 30\conf~in-game seconds; if the bot tries to send another message with the same intention before it has timed out IntentionWriter will skip the message. The timeout can be overridden by each intention, for example warning that BATS is under attack has a timeout of 60\conf~in-game seconds.
+To not spam the teammate messages with the same intention share a timeout, default set to 30\conf~in-game
+seconds; if the bot tries to send another message with the same intention before it has timed out
+IntentionWriter will skip the message. The timeout can be overridden by each intention, for example
+warning that BATS is under attack has a timeout of 60\conf~in-game seconds.
 
-All messages and timeout settings are read from an ini-file to easily add, change, or remove existing messages, and to reload messages during gameplay. See appendix \ref{sec:intention_and_reason_messages} for the full ini-file with all intention and reason messages.
+All messages and timeout settings are read from an ini-file to easily add, change, or remove
+existing messages, and to reload messages during gameplay. See appendix
+\ref{sec:intention_and_reason_messages} for the full ini-file with all intention and reason
+messages.
 
-Although this is a simple communication system that will pick two parts of the sentence and put them together it works relatively well as a communication tool. A better approach would be to create specific messages for each intention and reason put together, i.e. not randomize one from intention and one from reason, but create around 5 messages for each combination. This will create more tailored messages and will have better English, as this system has some limitations (described below). This was not implemented because it required much more sentences and thus time.
+This simple communication system that picks two parts of the sentence at random and put them
+together works relatively well. A better approach would be to create
+specific messages for each intention and reason together, i.e. not randomize one from intention
+and one from reason, but create around 5 messages for each combination. This will create more
+tailored messages and will have better English, as this system has some limitations (described
+below). This was not implemented because it required much more sentences and thus time.
 
 \paragraph{Limitations}
-Because the intention message could be used with many reasons the intention needs to be generic and cannot be tailored to the situation. E.g. ``Falling back'', ``I'm retreating'', instead of ``Fleeing from the enemy'', while all work for the reason ``because the enemy is too strong'' the last intention will not work for ``because you're retreating''.
+Because the intention message could be used with many reasons the intention needs to be generic and
+cannot be tailored to the situation. E.g. ``Falling back'', ``I'm retreating'', instead of ``Fleeing
+from the enemy'', while all work for the reason ``because the enemy is too strong'' the last
+intention will not work for ``because you're retreating.''
 
-Many of the sentences may sound a bit strange and some could sound auto-generated. For example ``I will attack, you're expanding'' and ``Leeeerooooooooy Jenkins, because I'm expanding''\footnote{Leroy Jenkins is an Internet joke from World of WarCraft where Leroy was tired of waiting of his group and ran into several mobs (monsters) killing the entire group. In the beginning he yelled his name, thus this message.}, but maybe not ``I will attack, while you are expanding'' or ``Sending out an attack, because I'm going to expand''.
+Many of the sentences may sound a bit strange and some could sound auto-generated. For example ``I
+will attack, you're expanding'' and ``Leeeerooooooooy Jenkins, because I'm
+expanding''\footnote{Leroy Jenkins is an Internet joke from World of WarCraft where Leroy was tired
+of waiting of his group and ran into several mobs (monsters) killing the entire group. In the
+beginning he yelled his name, thus this message.}, but maybe not ``I will attack, while you are
+expanding'' or ``Sending out an attack, because I'm going to expand.''
